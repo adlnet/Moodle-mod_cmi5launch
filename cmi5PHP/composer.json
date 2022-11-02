@@ -1,0 +1,46 @@
+{
+    "name": "rusticisoftware/cmi5",
+    "type": "library",
+    "description": "Experience API (cmi5 API) Library",
+    "homepage": "http://rusticisoftware.github.io/cmi5PHP/",
+    "keywords": [
+        "cmi5",
+        "cmi5",
+        "xapi",
+        "experience api",
+        "e-learning",
+        "scorm"
+    ],
+    "license": "Apache-2.0",
+    "authors": [
+        {
+            "name": "Brian J. Miller",
+            "email": "brian.miller@cmi5api.com",
+            "role": "Developer"
+        }
+    ],
+    "support": {
+        "email": "support@cmi5api.com",
+        "issues": "https://github.com/RusticiSoftware/cmi5PHP/issues"
+    },
+    "require": {
+        "php": "~5.5 || ^7.0.3",
+        "ext-openssl": "*",
+        "namshi/jose": "^7.2.1",
+        "willdurand/negotiation": "^2.0"
+    },
+    "require-dev": {
+        "phpdocumentor/phpdocumentor": "2.*",
+        "phpunit/phpunit": "@stable"
+    },
+    "autoload": {
+        "psr-4": {
+            "cmi5\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "cmi5Test\\": "tests/"
+        }
+    }
+}

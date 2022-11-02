@@ -1,0 +1,9 @@
+/*	Left align English text only INPUT fields, when in RTL mode.
+ */
+#page-mod-cmi5launch-mod.dir-rtl #fitem_id_cmi5launchurl input, 
+#page-mod-cmi5launch-mod.dir-rtl #fitem_id_cmi5activityid input,
+#page-mod-cmi5launch-mod.dir-rtl #fitem_id_cmi5launchlrsendpoint input,
+#page-mod-cmi5launch-mod.dir-rtl #fitem_id_cmi5launchlrslogin input,
+#page-mod-cmi5launch-mod.dir-rtl #fitem_id_cmi5launchlrspass input,
+#page-mod-cmi5launch-mod.dir-rtl #fitem_id_cmi5launchlrsversion input
+{direction:ltr;text-align:left;}

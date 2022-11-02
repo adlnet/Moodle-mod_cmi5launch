@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<libraries>
+    <library>
+        <location>cmi5PHP/</location>
+        <name>cmi5PHP</name>
+        <version>0.40.0</version>
+        <license>Apache</license>
+        <licenseversion>2</licenseversion>
+    </library>
+</libraries>
