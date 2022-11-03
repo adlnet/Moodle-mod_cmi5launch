@@ -35,6 +35,7 @@ flowchart TB
   end
   Lesson --> Lesson
   cmi5 -.-> cmi5DB[(cmi5 DB)]
-  LessonLink -.-> LRS[(LRS)]
-  Lesson -.-> LRS[(LRS)]
+  LessonLink -. xAPI .-> LRS[(LRS)]
+  Lesson -. xAPI .-> LRS[(LRS)]
 ```
+Thoughts... add a 'WebHook' to the cmi5 player... It allows you to send real-time data from one application to another whenever a given event occurs.
