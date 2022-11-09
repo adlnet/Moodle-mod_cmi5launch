@@ -45,7 +45,7 @@ function xmldb_cmi5launch_upgrade($oldversion) {
     if ($oldversion < 2013083100) {
         // Define field cmi5activityid to be added to cmi5launch.
         $table = new xmldb_table('cmi5launch');
-        $field = new xmldb_field('cmi5activityid', XMLDB_TYPE_TEXT, '255', null, XMLDB_NOTNULL, null, null, 'cmi5launchurl');
+        $field = new xmldb_field('cmi5activityid', XMLDB_TYPE_TEXT, '1333', null, XMLDB_NOTNULL, null, null, 'cmi5launchurl');
 
         // Add field cmi5activityid.
         if (!$dbman->field_exists($table, $field)) {
@@ -58,7 +58,7 @@ function xmldb_cmi5launch_upgrade($oldversion) {
     if ($oldversion < 2013111600) {
         // Define field cmi5verbid to be added to cmi5launch.
         $table = new xmldb_table('cmi5launch');
-        $field = new xmldb_field('cmi5verbid', XMLDB_TYPE_TEXT, '255', null, XMLDB_NOTNULL, null, null, 'cmi5launchurl');
+        $field = new xmldb_field('cmi5verbid', XMLDB_TYPE_TEXT, '1333', null, XMLDB_NOTNULL, null, null, 'cmi5launchurl');
 
         // Add field cmi5activityid.
         if (!$dbman->field_exists($table, $field)) {

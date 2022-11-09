@@ -72,4 +72,32 @@ if ($ADMIN->fulltree) {
         get_string('cmi5launchuseactoremail', 'cmi5launch'),
         get_string('cmi5launchuseactoremail_help', 'cmi5launch'),
         1));
+    
+    $settings->add(new admin_setting_configtext_mod_cmi5launch('cmi5launch/cmi5launchplayerurl',
+        get_string('cmi5launchplayerurl', 'cmi5launch'),
+        get_string('cmi5launchplayerurl_help', 'cmi5launch'),
+        get_string('cmi5launchplayerurl_default', 'cmi5launch'), PARAM_URL));
+
+    $settings->add(new admin_setting_configtext('cmi5launch/cmi5launchplayerport',
+        get_string('cmi5launchplayerport', 'cmi5launch'),
+        get_string('cmi5launchplayerport_help', 'cmi5launch'),
+        get_string('cmi5launchplayerport_default', 'cmi5launch')));
+
+    $setting = new admin_setting_configtext('cmi5launch/cmi5launchtenantname',
+        get_string('cmi5launchtenantname', 'cmi5launch'),
+        get_string('cmi5launchtenantname_help', 'cmi5launch'),
+        get_string('cmi5launchtenantname_default', 'cmi5launch'));
+    $settings->add($setting);
+
+    $setting = new admin_setting_configtext('cmi5launch/cmi5launchtenantpass',
+        get_string('cmi5launchtenantpass', 'cmi5launch'),
+        get_string('cmi5launchtenantpass_help', 'cmi5launch'),
+        get_string('cmi5launchtenantpass_default', 'cmi5launch'));
+    $settings->add($setting);
+
+    $setting = new admin_setting_configtext('cmi5launch/cmi5launchtenanttoken',
+        get_string('cmi5launchtenanttoken', 'cmi5launch'),
+        get_string('cmi5launchtenanttoken_help', 'cmi5launch'),
+        get_string('cmi5launchtenanttoken_default', 'cmi5launch'));
+    $settings->add($setting);
 }

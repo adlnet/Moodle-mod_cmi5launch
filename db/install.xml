@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="mod/cmi5launch/db" VERSION="2016121200" COMMENT="XMLDB file for Moodle mod/cmi5launch"
+<XMLDB PATH="mod/cmi5launch/db" VERSION="20221103" COMMENT="XMLDB file for Moodle mod/cmi5launch"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
   <TABLES>
-    <TABLE NAME="cmi5launch" COMMENT="cmi5launch table">
+    <TABLE NAME="cmi5launch" COMMENT="Settings for an individual course">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Course cmi5launch activity belongs to"/>
         <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="name field for moodle instances"/>
         <FIELD NAME="intro" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="General introduction of the cmi5launch activity"/>
         <FIELD NAME="introformat" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Format of the intro field (MOODLE, HTML, MARKDOWN...)"/>
-        <FIELD NAME="cmi5launchurl" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Launch URL"/>
+        <FIELD NAME="cmi5launchurl" TYPE="char" LENGTH="1333" NOTNULL="true" SEQUENCE="false" COMMENT="Launch URL"/>
         <FIELD NAME="cmi5activityid" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Launch URL"/>
         <FIELD NAME="cmi5verbid" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Launch URL"/>
         <FIELD NAME="cmi5expiry" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="365" SEQUENCE="false" COMMENT="Number of days to expire completion after"/>
         <FIELD NAME="overridedefaults" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false" COMMENT="Determines if the activity is inheriting the global defaults or has overriden them at the activity level."/>
-        <FIELD NAME="cmi5multipleregs" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false" COMMENT="" DEFAULT="1" />
+        <FIELD NAME="cmi5multipleregs" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
       </FIELDS>
@@ -35,9 +35,14 @@
         <FIELD NAME="lrsauthentication" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="LRS authentication type"/>
         <FIELD NAME="lrslogin" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="LRS login (username)"/>
         <FIELD NAME="lrspass" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="LRS password"/>
-        <FIELD NAME="customacchp" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT=""/>
-        <FIELD NAME="useactoremail" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false" COMMENT="" DEFAULT="1"/>
+        <FIELD NAME="customacchp" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="useactoremail" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
         <FIELD NAME="lrsduration" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Duration activity will remain active for."/>
+        <FIELD NAME="tenantname" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="The name of the user for the cmi5 player"/>
+        <FIELD NAME="tenantpass" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="the password of the tenant user of the cmi5 Player"/>
+        <FIELD NAME="tenanttoken" TYPE="char" LENGTH="350" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="playerport" TYPE="int" LENGTH="5" NOTNULL="false" DEFAULT="66398" SEQUENCE="false" COMMENT="The port to use to access the cmi5 player"/>
+        <FIELD NAME="playerurl" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="The URL or IP address of the cmi5 player"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
