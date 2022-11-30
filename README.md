@@ -27,8 +27,11 @@ This flowchart shows the path a user takes to get to a cmi5 Lesson Link. Once th
 flowchart TB
   subgraph MOODLE[Moodle Application]
     direction TB
-    Course(Course) --> Assignment(Assignment) --> Activity(Activity) --> Link(Lesson Link)
+    Course(Course) --> Assignment(Assignment) --> Activity --> Link
     Webhook[Progress\nEndpoint]
+    subgraph Activity
+      Link(Lesson Link)
+    end
   end
   MOODLE -.-> MoodleDB[(Moodle DB)]
 
@@ -36,12 +39,12 @@ flowchart TB
     direction TB
     Lesson --> Lesson
   end
+
   cmi5 -.-> Webhook
-  Link --> cmi5
+  Link <---> cmi5
   Link -.-> LRS[(LRS)]
   cmi5 -.-> cmi5DB[(cmi5 DB)]
   cmi5 -.-> LRS
-  
 ```
 
 ## User progress
