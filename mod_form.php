@@ -58,6 +58,13 @@ class mod_cmi5launch_mod_form extends moodleform_mod {
         $mform->addRule('name', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
         $mform->addHelpButton('name', 'cmi5launchname', 'cmi5launch');
 
+    //Imma gonna just see if this is right place to edit, lets add something to form for funnsies
+    //This works IF the get_string pulls 'trialname' from Moodle/lang/en/moodle.php, which is odd because the other variables pull from Moodle/lang/cmi5launch.php
+  //  $mform->addElement('text', 'name', get_string('trialname'),  array('size' => '64'));
+    /////////////////////////////////////
+    //so now the question is, since this is a form builder, should it post/get, I think another file should do htat and fee to here, yes?
+
+
         // Adding the standard "intro" and "introformat" fields.
         $this->standard_intro_elements();
 
@@ -93,6 +100,7 @@ class mod_cmi5launch_mod_form extends moodleform_mod {
         $filemanageroptions['maxfiles'] = 1;
         $filemanageroptions['subdirs'] = 0;
 
+        //Is this where the upload is handled
         $mform->addElement(
             'filemanager',
             'packagefile',
