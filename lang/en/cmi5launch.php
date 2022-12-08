@@ -28,6 +28,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+//$string['trialname'] = "Is this working? If so I rock!";
+
 $string['modulename'] = 'cmi5 Launch Link';
 $string['modulenameplural'] = 'cmi5 Launch Links';
 $string['modulename_help'] = 'A plug in for Moodle that allows the launch of cmi5 (xAPI) content which is then tracked to a separate LRS.';
