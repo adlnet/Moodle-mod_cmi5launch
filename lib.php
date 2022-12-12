@@ -533,16 +533,23 @@ It looks like the standard Quiz module does that same thing, so I don't feel so 
  * @return array empty if no issue is found. Array of error message otherwise
  */
 
+ //This cmi5launch param is a string passed to the get element on the form? Is THIS where 
+ //the zip file is uploaded? -MB 
+ //U=On reading above, it seems to get what it wants FROM the XML file rather than a 
+ //response? 
+ ///THIS seems to be where info is c=getting parsed, but WHERE in THIS -MB
 function cmi5launch_process_new_package($cmi5launch) {
     global $DB, $CFG;
 
     $cmid = $cmi5launch->coursemodule;
     $context = context_module::instance($cmid);
 
+    //the id its pulling from here is the id field in cmi5launch table
     // Reload cmi5 instance.
     $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
 
     $fs = get_file_storage();
+
     $fs->delete_area_files($context->id, 'mod_cmi5launch', 'package');
     file_save_draft_area_files(
         $cmi5launch->packagefile,
@@ -565,12 +572,21 @@ function cmi5launch_process_new_package($cmi5launch) {
     $packagefile = false;
 
     $packagefile = $fs->get_file($context->id, 'mod_cmi5launch', 'package', 0, '/', $zipfilename);
+    //Can I see packagefile pleaase???
+    var_dump($packagefile);
 
+ 
     $fs->delete_area_files($context->id, 'mod_cmi5launch', 'content');
 
     $packer = get_file_packer('application/zip');
     $packagefile->extract_to_storage($packer, $context->id, 'mod_cmi5launch', 'content', 0, '/');
-
+///THIS seems to be the extractor, hmmmm
+       //Maybe I could intercept herE? -MB
+    //Maybe a big intercept window first, just to know it's working, like a new window that say INTERCEPTED!!- MB
+    echo '<script type="text/javascript">';
+    echo ' alert("Intercepted!!!!!")';  //not showing an alert box.
+    echo '</script>';
+    
     // If the cmi5.xml file isn't there, don't do try to use it.
     // This is unlikely as it should have been checked when the file was validated.
     if ($manifestfile = $fs->get_file($context->id, 'mod_cmi5launch', 'content', 0, '/', 'cmi5.xml')) {
@@ -585,6 +601,9 @@ function cmi5launch_process_new_package($cmi5launch) {
 
         $objxml = new xml2Array();
         $manifest = $objxml->parse($xmltext);
+
+        //Maybe the MANIFEST??
+
 
         // Update activity id from the first activity in cmi5.xml, if it is found.
         // Skip without error if not. (The Moodle admin will need to enter the id manually).
@@ -601,6 +620,14 @@ function cmi5launch_process_new_package($cmi5launch) {
             }
         }
     }
+    //What is the 'record' below? -MB
+    //echo "<br>";
+    //echo "What is the record item? - ";
+    //var_dump($record);
+    //echo "<br>";
+//Or maybe what we need to do is get it from DB, I remember florian telling us how to make, 
+
+//Ok, it's saving the reference to the cmi5Launch table, so we should just be able to grab there right? How will we know right id - MB? 
     // Save reference.
     return $DB->update_record('cmi5launch', $record);
 }
@@ -754,11 +781,23 @@ function cmi5launch_getactor($instance) {
  */
 function cmi5launch_settings($instance) {
     global $DB, $CFG, $cmi5launchsettings;
+    global $cmi5launch;
+    //Ok, so instance above, seems to always be cmi5launch->id? So WHERE is tHIS set? -MB
+    echo "Spitting into the wind here";
+    echo "<br>";
+    echo "what is cmi5launchsettings here??";
+    var_dump($cmi5launchsettings);
+    echo "<br>";
+    $trial = $cmi5launch->id;
+    echo "welp, what is cmi5launch->id here?   " . $trial; 
+    
+
 
     if (!is_null($cmi5launchsettings)) {
         return $cmi5launchsettings;
     }
 
+    //ok here is where it is accessing the table, below it seems to calls certain fields of the tablebut why is cmi5launch tacked onto front??-MB
     $expresult = array();
     $activitysettings = $DB->get_record(
         'cmi5launch_lrs',
@@ -766,7 +805,8 @@ function cmi5launch_settings($instance) {
         $fields = '*',
         $strictness = IGNORE_MISSING
     );
-
+//
+//Its getting the id here using instace, where is instace from ? -MB
     // If global settings are not used, retrieve activity settings.
     if (!use_global_cmi5_lrs_settings($instance)) {
         $expresult['cmi5launchlrsendpoint'] = $activitysettings->lrsendpoint;

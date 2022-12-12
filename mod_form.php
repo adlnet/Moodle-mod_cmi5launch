@@ -82,23 +82,35 @@ class mod_cmi5launch_mod_form extends moodleform_mod {
         $mform->addRule('cmi5launchurl', null, 'required', null, 'client');
         $mform->addRule('cmi5launchurl', get_string('maximumchars', '', 1333), 'maxlength', 1333, 'client');
         $mform->addHelpButton('cmi5launchurl', 'cmi5launchurl', 'cmi5launch');
+        //Here is where they can put in launch url -MB
         $mform->setDefault('cmi5launchurl', 'https://example.com/example-activity/index.html');
-
+            //here is the activity id box -MB
         $mform->addElement('text', 'cmi5activityid', get_string('cmi5activityid', 'cmi5launch'), array('size' => '64'));
         $mform->setType('cmi5activityid', PARAM_TEXT);
         $mform->addRule('cmi5activityid', null, 'required', null, 'client');
         $mform->addRule('cmi5activityid', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
         $mform->addHelpButton('cmi5activityid', 'cmi5activityid', 'cmi5launch');
         $mform->setDefault('cmi5activityid', 'https://example.com/example-activity');
+            //end activity id text box
+            
         // End required Fields for Activity.
 
         // New local package upload.
 
+        //Ok, this is making an array of filemanager
         $filemanageroptions = array();
         $filemanageroptions['accepted_types'] = array('.zip');
         $filemanageroptions['maxbytes'] = 0;
         $filemanageroptions['maxfiles'] = 1;
         $filemanageroptions['subdirs'] = 0;
+
+        //MB
+        //Lets see something
+        $mform->addElement('text', 'trial');
+        //Ok, this added a text box where I thought it would. hrmmmmmm
+            //so below is where the form gets uploaded, how can we intercept and sendd
+            //to cmi5 as well as moodle??
+
 
         //Is this where the upload is handled
         $mform->addElement(

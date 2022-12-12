@@ -51,5 +51,29 @@
         <INDEX NAME="cmi5launchid" UNIQUE="false" FIELDS="cmi5launchid" COMMENT="ID used to join cmi5launch activity with the LRS settings."/>
       </INDEXES>
     </TABLE>
+    <TABLE NAME="cmi5_player" COMMENT="Store variables for API communication with CMI5 player">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" COMMENT=""/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" COMMENT="The id of returned course"/>
+        <FIELD NAME="cmi5launchid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Index to join cmi5launch activity id"/>
+        <FIELD NAME="cmi5endpoint" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="CMI5 Endpoint (URL)"/>
+        <FIELD NAME="cmi5authentication" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="CMI5 authentication type"/>
+        <FIELD NAME="cmi5login" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="CMI5 player login (username)"/>
+        <FIELD NAME="cmi5pass" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="CMI5 player password"/>
+        <FIELD NAME="useactoremail" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
+        <FIELD NAME="lrsduration" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Duration activity will remain active for."/>
+        <FIELD NAME="tenantname" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="The name of the user for the cmi5 player"/>
+        <FIELD NAME="tenantpass" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="the password of the tenant user of the cmi5 Player"/>
+        <FIELD NAME="tenanttoken" TYPE="char" LENGTH="350" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="launchmethod" TYPE="char" LENGTH="10" NOTNULL="false" DEFAULT="AnyWindow" SEQUENCE="false" COMMENT="Whether the URL opens in it's own window or new one"/>
+        <FIELD NAME="courseurl" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="The URL or IP address of the course"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="courseid" UNIQUE="false" FIELDS="courseid" COMMENT="ID used to track uploaded course."/>
+      </INDEXES>
+    </TABLE>
   </TABLES>
 </XMLDB>
