@@ -1,5 +1,5 @@
 <?php
-namespace myWork;
+//namespace cmi5;
 
 ///Class to hold methods for working with cmi5
 // @method - createTenant: used to create a new tenant
@@ -24,6 +24,9 @@ class cmi5Connectors{
     }
     public function getRetrieveUrl(){
         return [$this, 'retrieveUrl'];
+    }
+    public function getRetrieveUrl2(){
+        return [$this, 'retrieveUrl2'];
     }
     //////
     //Function to create a tenant
@@ -163,7 +166,65 @@ class cmi5Connectors{
         //return response
         return $launchResponse;
     }
+     
+    ///Function to retrieve a luanch URL for course
+    //Same as function above except I'm going to attempt to use this in moodle
+    //and pass moodles variables to it instead 
+    //@param $actorName - the tenant name to be passed as name property actor->account 
+    //@param $homepage - The URL that will be passed as the homepage property in actor->account
+    //@param $returnUrl - The URL that will be passed as the returnUrl property in actor
+    //@param $url - The URL to send request for launch URL to
+    ////////
+    public function retrieveUrl2($actorName, $homepage, $returnUrl, $url, $bearerToken){
+
+        echo "Retreive url function entered ";
+
+        //retrieve and assign params
+        $actor = $actorName;
+        $homeUrl = $homepage;
+        $retUrl = $returnUrl;
+        $token = $bearerToken;
+        $reqUrl = $url;
+        echo "<br>";
+        echo "actorname is {$actor} and the home URL is {$homeUrl}, now returnURL is {$retUrl}, the token is {$token}, and its going to {$reqUrl}";
+        echo "<br>";
+
+        //the body of the request must be made as array first
+        $data = array(
+            'actor' => array (
+                'account' => array(
+                    "homePage" => $homeUrl,
+                    "name" => $actor,
+                )
+            ),
+            'returnUrl' => $retUrl
+        );
+    
+        // use key 'http' even if you send the request to https://...
+        //There can be multiple headers but as an array under the ONE header
+        //content(body) must be JSON encoded here, as that is what CMI5 player accepts
+        //JSON_UNESCAPED_SLASHES used so http addresses are displayed correctly
+        $options = array(
+            'http' => array(
+                'method'  => 'POST',
+                'ignore_errors' => true,
+                'header' => array("Authorization: Bearer ". $token,  
+                    "Content-Type: application/json\r\n" .
+                    "Accept: application/json\r\n"),
+                'content' => json_encode($data, JSON_UNESCAPED_SLASHES)
+
+            )
+        );
+
+        //the options are here placed into a stream to be sent
+        $context  = stream_context_create(($options));
+
+        //sends the stream to the specified URL and stores results (the false is use_include_path, which we dont want in this case, we want to go to the url)
+        $launchResponse = file_get_contents( $reqUrl, false, $context );
         
+        //return response
+        return $launchResponse;
+    }
      
         ///Function to construct, send an URL, and save result
         //@param $dataBody - the data that will be used to construct the body of request as JSON 
@@ -200,8 +261,9 @@ class cmi5Connectors{
     
         //return response
         return $result;
-        }
-     
-    } 
-     
+    }
+ 
+ 
+}
+
     ?>

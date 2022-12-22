@@ -1,4 +1,6 @@
 <?php
+//namespace cmi5;
+
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -35,6 +37,11 @@ require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/autoload.php");
 
 // SCORM library from the SCORM module. Required for its xml2Array class by cmi5launch_process_new_package.
 require_once("$CFG->dirroot/mod/scorm/datamodels/scormlib.php");
+
+//////////////////////////////////////
+//require the class i made to connect to cmi5 player - MB
+require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/cmi5Connector.php");
+//////////////////////////////////////
 
 global $cmi5launchsettings;
 $cmi5launchsettings = null;
@@ -101,6 +108,8 @@ function cmi5launch_add_instance(stdClass $cmi5launch, mod_cmi5launch_mod_form $
     }
 
     return $cmi5launch->id;
+
+    //Ok, this returns the id of the the newly added course, useful for tracking the course tiself, but need the file name of because it has now been approved as valid upload - MB
 }
 
 /**
@@ -540,11 +549,29 @@ It looks like the standard Quiz module does that same thing, so I don't feel so 
  ///THIS seems to be where info is c=getting parsed, but WHERE in THIS -MB
 function cmi5launch_process_new_package($cmi5launch) {
     global $DB, $CFG;
-
     $cmid = $cmi5launch->coursemodule;
     $context = context_module::instance($cmid);
+    ////////////////////////////////////////////////////////////////////////////////
+    /*OK, can we get filepath HERE???
+    copied this code from another function above, perhaps if it works we can backtrack it to its params and see where
+    we can make our own function
+    global $CFG;
+    $contents = array();
+    $context = context_module::instance($cm->id);
 
-    //the id its pulling from here is the id field in cmi5launch table
+    $fs = get_file_storage();
+    $files = $fs->get_area_files($context->id, 'mod_cmi5launch', 'package', 0, 'sortorder DESC, id ASC', false);
+*/
+
+//ok, it is not recording the full filepath, even once retreived it shows '/' as filepath and then tacks on filename. Maybe for now hardcode directory where
+//course uploads are? But that means future users would have to always put them in a certain directory, SOMEWHERE it is there....hmmmmmmmmm
+//it MUST be here somehwere!!!! Maybe i can find and 'send' a filerequest even without knowing the back end, like can we just send one of their arrays?
+//you know without break ing the array down??//like can i just pass zipfilename into jsonencode of 'content' in 
+//sendrequest2
+/////////////////////////////////////////////////////////////////////////////////
+
+
+    //the id its pulling from here is the id field in cmi5launch table-MB
     // Reload cmi5 instance.
     $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
 
@@ -566,27 +593,156 @@ function cmi5launch_process_new_package($cmi5launch) {
         return false;
     }
 
+    ///////////////////////////////////////////////////////////////////////////////////
+    foreach ($files as $fileinfo) {
+        $file = array();
+        $file['type'] = 'file';
+        $file['filename']     = $fileinfo->get_filename();
+        $file['filepath']     = $fileinfo->get_filepath();
+        $file['filesize']     = $fileinfo->get_filesize();
+        $file['fileurl'] = file_encode_url("$CFG->wwwroot/" . '$http://localhost', '/' . $context->id . '/mod_cmi5launch/package');
+        $fileinfo->get_filepath().$fileinfo->get_filename();
+        $file['timecreated']  = $fileinfo->get_timecreated();
+        $file['timemodified'] = $fileinfo->get_timemodified();
+        $file['sortorder']    = $fileinfo->get_sortorder();
+        $file['userid']       = $fileinfo->get_userid();
+        $file['author']       = $fileinfo->get_author();
+        $file['license']      = $fileinfo->get_license();
+        $filecontents[] = $file;
+    }
+////////////////////////////////////////////////////////////////////////////
+    
+    //Hey!!!! If this is getting the filenmae, can I just have that sent to MY table, maybe with id to track it?? hrmmm -MB
+    // ok, lets make a filenamre part of my table and try to send fgile to that-MB
+    // Check to see if there is a record of this instance in the table.
+    //Table is the new one I made, go off id cause why not? 
+    $cmi5launchID = $DB->get_record(
+        'cmi5launch_player',
+        ['id' => $record->id,
+        ],
+        '*',    
+        IGNORE_MISSING
+    );
+    echo 'Is the problem "record?" +++++++++++++++++';
+    var_dump($record);
+    echo"<br>";
+    echo "ok, doesn't seem to be record, nmaybe its my id? Cmi5launchID equals ";
+    echo"<br>";
+    var_dump($cmi5launchID);
+    
+
+    // If not, will need to insert_record.
+    ///I think the problem here is thAT both tables have autoimplement on id, I want the ids to match
+    ////maybe if I take autoimplement off? 
+    //ok now that auto implement is off, how do i get it to map id to id.....
+    //What if I make a new object, BASED on the id I want, and pass that in??
+
+    if (!$cmi5launchID) {
+        //Lets make the info we want to pass in here based on id?
+        //can we just look at record and manipulate or need
+        //aa brand new thing? How about an array
+        $returnedID = $DB->import_record('cmi5launch_player', $record, true);
+        if ($returnedID != null || false) {
+            echo "<br>";
+            echo "Ok, soooo, it looks like ti IS false so are we making it into the if loop??";
+            echo "<br>";
+            echo "Here we are in the if branch, so what is our new record??";
+            echo "<br>";
+            var_dump($returnedID);
+            echo "<br>";
+            echo "WHAT is going on? Why did the returnedID hold an int??? What if we make a get-record or field calls";
+            echo "<br>";
+            echo "<br>";
+            $trialRecord = $DB->get_record('cmi5launch_player', ['id' => $returnedID], '*', IGNORE_MISSING);
+            var_dump($trialRecord);
+
+
+        } else { // If it does exist, update it.
+           // $cmi5launchID->coursefilename = $files;
+            echo "<br>";
+            echo "what is goingnon? Are we making it to else loop ?";
+
+
+            if (!$DB->update_record('cmi5launch_player', $cmi5launchID)) {
+                // return false;
+                echo 'returned false';
+            }
+        }
+    }
+    //Urm check?? - MB
+
+
     $zipfile = reset($files);
     $zipfilename = $zipfile->get_filename();
+    echo'<br>';
+    echo '~~~~~~~~lets see what zipfilename is ~~~~~~~~~';
+    echo'<br>';
+
+    var_dump($zipfilename);
 
     $packagefile = false;
 
     $packagefile = $fs->get_file($context->id, 'mod_cmi5launch', 'package', 0, '/', $zipfilename);
     //Can I see packagefile pleaase???
+    echo'<br>';
+    echo 'OMGoodneess! I am finally dumping packagfile???';
+    echo'<br>';
+
     var_dump($packagefile);
 
- 
+    echo'<br>';
+    echo '!!!!!!!!!!!!!!!!!!!IS THIS THE FILE I NEEED!!!!!!!!!!!!!!!!';
+    echo'<br>';
+   // $testing = valid_uploaded_file($zipfile);
+    //var_dump($testing);
+
+    //////////////////////////////
+    ///Here is where we are testing getting a launch url with my little functions
+    ///////////////////////////////
+    //to bring in functions
+    $connectors = new cmi5Connectors;
+    //create retreiveURLfunction
+    $retrieveUrl = $connectors->getRetrieveUrl2();
+    //Now, what we need to do is GET these params from our tables instead of 
+    //just having them/feeding them
+    $cmi5launchInfo = $DB->get_record(
+        'cmi5launch_player',
+        ['id' => $record->id,
+        ],
+        '*',    
+        IGNORE_MISSING
+    );
+    //$actorName = $cmi5launchInfo->name;
+    $actorName = "Victory";
+    $homepage ="http://myLMSexample.com";
+    $returnUrl="http://127.0.0.1:63398.com";
+    $url= "http://localhost:63398/api/v1/course/12/launch-url/0" ;
+    $token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJ1cm46Y2F0YXB1bHQ6cGxheWVyIiwiYXVkIjoidXJuOmNhdGFwdWx0Ok1vb2RsZS1WaWN0b3J5Iiwic3ViIjo0LCJqdGkiOiIxMTVkYTEzOS0wNTYxLTQ0MmItYTQwYy01Mzc5NTg3NGZjOTQiLCJpYXQiOjE2NzE3MzY5MzR9.1SXtBlkBFoodsJ-RVEr1C4btU1RE6c9rj30udWwurVI";
+
+//pause and see if this works
+    echo '<br>';
+    echo '<br>';
+    echo 'The actor name is ---------- ' . $actorName . ' -----------------';
+    echo '<br>';  
+    echo '<br>';
+    
+    //utilize function
+    $result = $retrieveUrl($actorName, $homepage, $returnUrl, $url, $token);
+    echo '<br>';  
+    echo '<br>';
+    echo "Does result actually get anything?" . $result;
+    echo '<br>';  
+    echo '<br>';
+    
+    
+    
+    ///////////////////////////////////////////////
+    ///////////////////////////////////////////////
     $fs->delete_area_files($context->id, 'mod_cmi5launch', 'content');
 
     $packer = get_file_packer('application/zip');
     $packagefile->extract_to_storage($packer, $context->id, 'mod_cmi5launch', 'content', 0, '/');
-///THIS seems to be the extractor, hmmmm
-       //Maybe I could intercept herE? -MB
-    //Maybe a big intercept window first, just to know it's working, like a new window that say INTERCEPTED!!- MB
-    echo '<script type="text/javascript">';
-    echo ' alert("Intercepted!!!!!")';  //not showing an alert box.
-    echo '</script>';
-    
+
     // If the cmi5.xml file isn't there, don't do try to use it.
     // This is unlikely as it should have been checked when the file was validated.
     if ($manifestfile = $fs->get_file($context->id, 'mod_cmi5launch', 'content', 0, '/', 'cmi5.xml')) {
@@ -787,9 +943,6 @@ function cmi5launch_settings($instance) {
     echo "<br>";
     echo "what is cmi5launchsettings here??";
     var_dump($cmi5launchsettings);
-    echo "<br>";
-    $trial = $cmi5launch->id;
-    echo "welp, what is cmi5launch->id here?   " . $trial; 
     
 
 

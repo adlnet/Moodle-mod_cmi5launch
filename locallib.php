@@ -187,6 +187,9 @@ function cmi5launch_get_launch_url($registrationuuid) {
     return $rtnstring;
 }
 
+///This might be useful to take info back from sending a course and parsing data
+//-MB
+
 /**
  * Used with Learning Locker integration to fetch credentials from the LRS.
  * This process is not part of the xAPI specification or the cmi5 launch spec.

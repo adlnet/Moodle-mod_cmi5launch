@@ -106,10 +106,15 @@ class mod_cmi5launch_mod_form extends moodleform_mod {
 
         //MB
         //Lets see something
-        $mform->addElement('text', 'trial');
+       // $mform->addElement('text', 'trial');
         //Ok, this added a text box where I thought it would. hrmmmmmm
             //so below is where the form gets uploaded, how can we intercept and sendd
             //to cmi5 as well as moodle??
+            //This works to add button! SO, lets gets our code working, see if we can submit
+            //a zip by hijacking it, and once it's all working,
+            //delete this step and just have it work in background? -MB
+
+           // $mform->addElement('button', '', get_string("buttonlabel"));
 
 
         //Is this where the upload is handled
