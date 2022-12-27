@@ -92,7 +92,20 @@ class mod_cmi5launch_mod_form extends moodleform_mod {
         $mform->addHelpButton('cmi5activityid', 'cmi5activityid', 'cmi5launch');
         $mform->setDefault('cmi5activityid', 'https://example.com/example-activity');
             //end activity id text box
-            
+        
+        //Ok, lets try to add a tenantname box and see if we can capturethe info
+        $mform->addElement('text', 'cmi5tenantname', get_string('cmi5tenantname', 'cmi5launch'), array('size' => '64'));
+        $mform->setType('cmi5tenantname', PARAM_TEXT);
+        $mform->addRule('cmi5tenantname', null, 'required', null, 'client');
+        $mform->addRule('cmi5tenantname', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
+        $mform->addHelpButton('cmi5tenantname', 'cmi5tenantname', 'cmi5launch');
+        $mform->setDefault('cmi5tenantname', 'Moodle');
+        
+        
+
+
+
+
         // End required Fields for Activity.
 
         // New local package upload.

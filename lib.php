@@ -39,8 +39,9 @@ require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/autoload.php");
 require_once("$CFG->dirroot/mod/scorm/datamodels/scormlib.php");
 
 //////////////////////////////////////
-//require the class i made to connect to cmi5 player - MB
+//require the classes i made to connect to cmi5 player - MB
 require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/cmi5Connector.php");
+require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/cmi5_table_connectors.php");
 //////////////////////////////////////
 
 global $cmi5launchsettings;
@@ -82,6 +83,9 @@ function cmi5launch_supports($feature) {
  * @param mod_cmi5launch_mod_form $mform
  * @return int The id of the newly inserted cmi5launch record
  */
+
+ ////////////So if this is where  new instance is made, can this also be where we recover data from my new text fields? 
+ //Or if it pulls from mod_form, so were it pulls from to copy and make a function that pulls from MY textboxes. - MB
 function cmi5launch_add_instance(stdClass $cmi5launch, mod_cmi5launch_mod_form $mform = null) {
     global $DB, $CFG;
 
@@ -551,6 +555,26 @@ function cmi5launch_process_new_package($cmi5launch) {
     global $DB, $CFG;
     $cmid = $cmi5launch->coursemodule;
     $context = context_module::instance($cmid);
+    
+    //to bring in functions from class cmi5Connector
+    $connectors = new cmi5Connectors;
+       //to bring in functions from class cmi5Connector
+    $tableConnectors = new cmi5Tables;
+    //create retreiveURLfunction
+    $retrieveUrl = $connectors->getRetrieveUrl2();
+    $populateTable = $tableConnectors->getPopulateTable();
+
+///////////////////////////////////
+//Here is a random piece of code that SEEMS to get tenant password, it is from settings.php
+$setting = get_string('cmi5launchtenantpass', 'cmi5launch');
+global $cmi5launchsettings;
+get_string('cmi5launchtenantpass_help', 'cmi5launch');
+get_string('cmi5launchtenantpass_default', 'cmi5launch');
+    echo "<br>";
+    echo"?????????????????????{{{{{{{{{{{{{ Ok, not what we need, but what is global cmi5launchsettings?? Maybe what Im looking for??  ";
+    var_dump($cmi5launchsettings);
+    echo"    ?????????????????????{{{{{{{{{{{{{ ";
+    echo "<br>";
     ////////////////////////////////////////////////////////////////////////////////
     /*OK, can we get filepath HERE???
     copied this code from another function above, perhaps if it works we can backtrack it to its params and see where
@@ -616,60 +640,30 @@ function cmi5launch_process_new_package($cmi5launch) {
     // ok, lets make a filenamre part of my table and try to send fgile to that-MB
     // Check to see if there is a record of this instance in the table.
     //Table is the new one I made, go off id cause why not? 
-    $cmi5launchID = $DB->get_record(
+
+    //Retrieve ID to use for searching/creating record
+    $tableId = $record->id;
+    echo '<br>';
+    echo 'What is gthis table id here? ? ? ? ? ? ? ?' . $tableId;
+    echo "<br>";
+    $cmi5launchID = $populateTable($record, 'cmi5launch_player');
+    // I am so stupid! I am not trying to populate this table this way!! I need to add
+    //the info from settings! So can I add themt ot record
+    $cmi5launchID = $populateTable($record, 'cmi5launch_lrs');
+    //
+    $DB->get_record(
         'cmi5launch_player',
         ['id' => $record->id,
         ],
         '*',    
         IGNORE_MISSING
     );
-    echo 'Is the problem "record?" +++++++++++++++++';
-    var_dump($record);
+
     echo"<br>";
     echo "ok, doesn't seem to be record, nmaybe its my id? Cmi5launchID equals ";
     echo"<br>";
     var_dump($cmi5launchID);
-    
 
-    // If not, will need to insert_record.
-    ///I think the problem here is thAT both tables have autoimplement on id, I want the ids to match
-    ////maybe if I take autoimplement off? 
-    //ok now that auto implement is off, how do i get it to map id to id.....
-    //What if I make a new object, BASED on the id I want, and pass that in??
-
-    if (!$cmi5launchID) {
-        //Lets make the info we want to pass in here based on id?
-        //can we just look at record and manipulate or need
-        //aa brand new thing? How about an array
-        $returnedID = $DB->import_record('cmi5launch_player', $record, true);
-        if ($returnedID != null || false) {
-            echo "<br>";
-            echo "Ok, soooo, it looks like ti IS false so are we making it into the if loop??";
-            echo "<br>";
-            echo "Here we are in the if branch, so what is our new record??";
-            echo "<br>";
-            var_dump($returnedID);
-            echo "<br>";
-            echo "WHAT is going on? Why did the returnedID hold an int??? What if we make a get-record or field calls";
-            echo "<br>";
-            echo "<br>";
-            $trialRecord = $DB->get_record('cmi5launch_player', ['id' => $returnedID], '*', IGNORE_MISSING);
-            var_dump($trialRecord);
-
-
-        } else { // If it does exist, update it.
-           // $cmi5launchID->coursefilename = $files;
-            echo "<br>";
-            echo "what is goingnon? Are we making it to else loop ?";
-
-
-            if (!$DB->update_record('cmi5launch_player', $cmi5launchID)) {
-                // return false;
-                echo 'returned false';
-            }
-        }
-    }
-    //Urm check?? - MB
 
 
     $zipfile = reset($files);
@@ -699,10 +693,7 @@ function cmi5launch_process_new_package($cmi5launch) {
     //////////////////////////////
     ///Here is where we are testing getting a launch url with my little functions
     ///////////////////////////////
-    //to bring in functions
-    $connectors = new cmi5Connectors;
-    //create retreiveURLfunction
-    $retrieveUrl = $connectors->getRetrieveUrl2();
+    
     //Now, what we need to do is GET these params from our tables instead of 
     //just having them/feeding them
     $cmi5launchInfo = $DB->get_record(
@@ -717,7 +708,26 @@ function cmi5launch_process_new_package($cmi5launch) {
     $homepage ="http://myLMSexample.com";
     $returnUrl="http://127.0.0.1:63398.com";
     $url= "http://localhost:63398/api/v1/course/12/launch-url/0" ;
-    $token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJ1cm46Y2F0YXB1bHQ6cGxheWVyIiwiYXVkIjoidXJuOmNhdGFwdWx0Ok1vb2RsZS1WaWN0b3J5Iiwic3ViIjo0LCJqdGkiOiIxMTVkYTEzOS0wNTYxLTQ0MmItYTQwYy01Mzc5NTg3NGZjOTQiLCJpYXQiOjE2NzE3MzY5MzR9.1SXtBlkBFoodsJ-RVEr1C4btU1RE6c9rj30udWwurVI";
+    //$token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJ1cm46Y2F0YXB1bHQ6cGxheWVyIiwiYXVkIjoidXJuOmNhdGFwdWx0Ok1vb2RsZS1WaWN0b3J5Iiwic3ViIjo0LCJqdGkiOiIxMTVkYTEzOS0wNTYxLTQ0MmItYTQwYy01Mzc5NTg3NGZjOTQiLCJpYXQiOjE2NzE3MzY5MzR9.1SXtBlkBFoodsJ-RVEr1C4btU1RE6c9rj30udWwurVI";
+
+    //Create an instance of lrs record??
+    $cmi5launchInfoLrs = $DB->get_record(
+        'cmi5launch_lrs',
+        ['id' => $record->id,
+        ],
+        '*',    
+        IGNORE_MISSING
+    );
+    $settings = cmi5launch_settings($record->id);
+    echo '<br>';
+    echo '<br>';
+    echo  'Is it as easy as this? settingS is globals?? ---------- ' . var_dump($settings) . ' -----------------';
+    echo '<br>';
+    echo '<br>';
+    //Is token even populated here?
+
+    $token = $cmi5launchInfoLrs->tenanttoken;
+
 
 //pause and see if this works
     echo '<br>';

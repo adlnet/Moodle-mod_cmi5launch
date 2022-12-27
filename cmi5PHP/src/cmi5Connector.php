@@ -13,6 +13,7 @@ class cmi5Connectors{
     public static $bearerToken = "";
     public static $launchUrl = "";
 
+    
     //To make a new instance and hold variables??
   //  global $returnedToken = $connectors->$GLOBALS.$bearerToken;
     
@@ -28,6 +29,7 @@ class cmi5Connectors{
     public function getRetrieveUrl2(){
         return [$this, 'retrieveUrl2'];
     }
+
     //////
     //Function to create a tenant
     // @param $urlToSend - URL retrieved from user in URL textbox
@@ -177,8 +179,13 @@ class cmi5Connectors{
     ////////
     public function retrieveUrl2($actorName, $homepage, $returnUrl, $url, $bearerToken){
 
+        //Will this let me update DB tables from here? -MB
+        global $DB, $CFG;
+        /////////
+
         echo "Retreive url function entered ";
 
+        
         //retrieve and assign params
         $actor = $actorName;
         $homeUrl = $homepage;
@@ -225,7 +232,8 @@ class cmi5Connectors{
         //return response
         return $launchResponse;
     }
-     
+
+
         ///Function to construct, send an URL, and save result
         //@param $dataBody - the data that will be used to construct the body of request as JSON 
         //@param $url - The URL the request will be sent to
