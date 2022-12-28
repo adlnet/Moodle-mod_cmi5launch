@@ -540,17 +540,14 @@ It looks like the standard Quiz module does that same thing, so I don't feel so 
  * Note: This takes the *first* activity from the cmi5.xml file to be the activity intended
  * to be launched. It will not go hunting for launch URLs any activities listed below.
  * Based closely on code from the SCORM and (to a lesser extent) Resource modules.
+ **** Also, as this is where a course is first uploaded/created, this is where
+ **** tenant info is attached to record and URL can be retrieved -MB 12/28/22
  * @package  mod_cmi5launch
  * @category cmi5
  * @param object $cmi5launch An object from the form in mod_form.php
  * @return array empty if no issue is found. Array of error message otherwise
  */
 
- //This cmi5launch param is a string passed to the get element on the form? Is THIS where 
- //the zip file is uploaded? -MB 
- //U=On reading above, it seems to get what it wants FROM the XML file rather than a 
- //response? 
- ///THIS seems to be where info is c=getting parsed, but WHERE in THIS -MB
 function cmi5launch_process_new_package($cmi5launch) {
     global $DB, $CFG;
     $cmid = $cmi5launch->coursemodule;
@@ -616,26 +613,7 @@ get_string('cmi5launchtenantpass_default', 'cmi5launch');
     if (count($files) < 1) {
         return false;
     }
-
-    ///////////////////////////////////////////////////////////////////////////////////
-    foreach ($files as $fileinfo) {
-        $file = array();
-        $file['type'] = 'file';
-        $file['filename']     = $fileinfo->get_filename();
-        $file['filepath']     = $fileinfo->get_filepath();
-        $file['filesize']     = $fileinfo->get_filesize();
-        $file['fileurl'] = file_encode_url("$CFG->wwwroot/" . '$http://localhost', '/' . $context->id . '/mod_cmi5launch/package');
-        $fileinfo->get_filepath().$fileinfo->get_filename();
-        $file['timecreated']  = $fileinfo->get_timecreated();
-        $file['timemodified'] = $fileinfo->get_timemodified();
-        $file['sortorder']    = $fileinfo->get_sortorder();
-        $file['userid']       = $fileinfo->get_userid();
-        $file['author']       = $fileinfo->get_author();
-        $file['license']      = $fileinfo->get_license();
-        $filecontents[] = $file;
-    }
-////////////////////////////////////////////////////////////////////////////
-    
+   
     //Hey!!!! If this is getting the filenmae, can I just have that sent to MY table, maybe with id to track it?? hrmmm -MB
     // ok, lets make a filenamre part of my table and try to send fgile to that-MB
     // Check to see if there is a record of this instance in the table.
@@ -646,18 +624,28 @@ get_string('cmi5launchtenantpass_default', 'cmi5launch');
     echo '<br>';
     echo 'What is gthis table id here? ? ? ? ? ? ? ?' . $tableId;
     echo "<br>";
-    $cmi5launchID = $populateTable($record, 'cmi5launch_player');
+    //This is coming back from populate table with null values, why ?
+   
+   //lets see if populate table works in other func, the launch settings func, may make more
+   //sense to go there
+    //$cmi5launchID = $populateTable($record, 'cmi5launch_player');
+    
+    
     // I am so stupid! I am not trying to populate this table this way!! I need to add
     //the info from settings! So can I add themt ot record
-    $cmi5launchID = $populateTable($record, 'cmi5launch_lrs');
+    //$cmi5launchID = $populateTable($record, 'cmi5launch_lrs');
     //
-    $DB->get_record(
+    $testing = $DB->get_record(
         'cmi5launch_player',
         ['id' => $record->id,
         ],
         '*',    
         IGNORE_MISSING
     );
+    echo"<br>";
+    echo "What is record here ??>><><<>>><>><>><  " ;
+    var_dump($testing);
+    echo"<br>";
 
     echo"<br>";
     echo "ok, doesn't seem to be record, nmaybe its my id? Cmi5launchID equals ";
@@ -712,7 +700,7 @@ get_string('cmi5launchtenantpass_default', 'cmi5launch');
 
     //Create an instance of lrs record??
     $cmi5launchInfoLrs = $DB->get_record(
-        'cmi5launch_lrs',
+        'cmi5launch_player',
         ['id' => $record->id,
         ],
         '*',    
@@ -721,13 +709,20 @@ get_string('cmi5launchtenantpass_default', 'cmi5launch');
     $settings = cmi5launch_settings($record->id);
     echo '<br>';
     echo '<br>';
-    echo  'Is it as easy as this? settingS is globals?? ---------- ' . var_dump($settings) . ' -----------------';
+    echo  'Is it as easy as this? cmi5launchInfolrs equals ---------- ';
+    var_dump($cmi5launchInfoLrs) . ' -----------------';
     echo '<br>';
     echo '<br>';
     //Is token even populated here?
 
     $token = $cmi5launchInfoLrs->tenanttoken;
 
+    echo '<br>';
+    echo '<br>';
+    echo  'And what about token?? token equals ---------- ';
+    var_dump($token) . ' -----------------';
+    echo '<br>';
+    echo '<br>';
 
 //pause and see if this works
     echo '<br>';
@@ -951,8 +946,23 @@ function cmi5launch_settings($instance) {
     //Ok, so instance above, seems to always be cmi5launch->id? So WHERE is tHIS set? -MB
     echo "Spitting into the wind here";
     echo "<br>";
-    echo "what is cmi5launchsettings here??";
-    var_dump($cmi5launchsettings);
+       //to bring in functions from class cmi5Connector
+       $connectors = new cmi5Connectors;
+       //to bring in functions from class cmi5Connector
+    $tableConnectors = new cmi5Tables;
+    //create retreiveURLfunction
+    $retrieveUrl = $connectors->getRetrieveUrl2();
+    $populateTable = $tableConnectors->getPopulateTable();
+    echo "<br>";
+    echo "<br>";
+    echo "<br>";
+    echo"What is cmi5launch? is it a record object?";
+    echo "<br>";echo "<br>";
+    var_dump($cmi5launch);
+    echo "<br>";echo "<br>";echo "<br>";echo "<br>";
+    echo "Does populate table work here? here??";
+    $cmi5launchID = $populateTable($cmi5launch, 'cmi5launch_player');
+   
     
 
 

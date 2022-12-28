@@ -1,7 +1,6 @@
 <?php
 
-///Class to hold methods for working with the table for cmi5 connections.
-//The table is cmi5launch_player
+///Class to hold methods for working with table cmi5launch_playe for cmi5 connections.
 // @property -
 // - MB 
 class cmi5Tables
@@ -21,96 +20,69 @@ class cmi5Tables
 
 
     //////
-    //Function populate a DB tables
+    //Function to populate a DB table
     /* @param mixed $id - the id to update/create record on
-    * @param mixed $record - info to create record in DB - object
+    * @param object $record - info to create record in DB 
     *@param $table - the table to be populated
-    * @return $newRecord - record that has been created/updated
+    * @return $newRecord/updatedRecord - record that has been created/updated
     */
     public function populateTable($record, $table)
     {
-
-        echo "Table about to be populated! is " . $table;
-        echo "Table will be populated with id " . $record->id;
         global $DB;
+        //Id to create/update record
+        $id = $record->id;
 
         //Make sure record doesn't exist before attempting to create
-        $check = $this->checkRecord($record->id, $table);
-        echo "<br>";
-        echo "<br>";
-        echo "<br>";
-        echo "<br>";
-        echo "HEEEEYYYYYY!!!!! WHAT IS CHECK HERE???" . $check;
-        echo "<br>";
-        echo "<br>";
-        echo "<br>";
-        echo "<br>";
-        //ok why is it true??? This record SHOULD be new right?
-
+        $check = $this->checkRecord($id, $table);
 
         //If false, record doesn't exist, so import it
         if (!$check) {
-            echo '<br>';
-            echo '*******************************************';
-            echo "<br>";
-            $returnedID = $DB->import_record($table, $record, true);
-            
+
+            //import_record returns a true/false value based on if record created successfully  
+            $recordImported = $DB->import_record($table, $record, true);
+
             //Ensure it was imported successfully
-            if ($returnedID != null || false) {
+            if ($recordImported != null || false) {
 
-
-                $newRecord = $DB->get_record($table, ['id' => $returnedID], '*', IGNORE_MISSING);
+                //Retrieve newly created record
+                $newRecord = $DB->get_record($table, ['id' => $id], '*', IGNORE_MISSING);
                 
-                //Update newly created record to hold tenant info for sending to cmi5
-                $settings = cmi5launch_settings($returnedID);
-
-                echo '<br>';
-            echo '**********What is settings here??? '. var_dump($settings) .'*********************************';
-            echo "<br>";
-
-                   //Ahh of course! I am trying to assign to wrong thing! This is the bool
-                   //that shows if record was imported successfully or not
-                   //NOW we need to get the record and assign! -MB
+                //Retrieve user settings to apply to newly created record
+                $settings = cmi5launch_settings($id);
                 $newRecord->tenantname = $settings['cmi5launchtenantname'];
                 $newRecord->tenanttoken = $settings['cmi5launchtenanttoken'];
-                echo '<br>';
-                echo '###########################################';
-                echo "<br>";
 
-                //Return created record
-                //??MB Is it enought to just return newrecord? I dont know if retreiving it again is necessary
-                return $newRecord = $DB->get_record($table, ['id' => $returnedID], '*', IGNORE_MISSING);
+                //Update record in table with newly retrieved tenant data
+                $DB->update_record($table, $newRecord, true);
+
+                //Return record from updated table
+                return $newRecord = $DB->get_record($table, ['id' => $id], '*', IGNORE_MISSING);
             }
-        } else {
-
-                echo '<br>';
-                echo '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%';
-                echo "<br>";
-
+        }   else {
                 // If it does exist, update it
-                $returnedID = $DB->update_record($table, $record, true);
-                $updatedRecord = $DB->get_record($table, ['id' => $returnedID], '*', IGNORE_MISSING);
-                
-                //Ensure it was imported successfully
-                if ($returnedID != null || false) {
+                //update_record returns true/false depending on success
+                $recordUpdate = $DB->update_record($table, $record, true);
 
-                    //Update newly created record to hold tenant info for sending to cmi5
-                    $settings = cmi5launch_settings($returnedID);
+                //Ensure it was updated successfully
+                if ($recordUpdate != null || false) {
+
+                    //Retrieve the updated record
+                    $updatedRecord = $DB->get_record($table, ['id' => $id], '*', IGNORE_MISSING);
+
+                    //Retrieve user settings to apply to newly created record
+                    $settings = cmi5launch_settings($id);
                     $updatedRecord->tenantname = $settings['cmi5launchtenantname'];
                     $updatedRecord->tenanttoken = $settings['cmi5launchtenanttoken'];
-                
-                    echo '<br>';
-                    echo '###########################################';
-                    echo "<br>";
-    
-                    //Return created record
-                    return $updatedRecord = $DB->get_record($table, ['id' => $returnedID], '*', IGNORE_MISSING);
+                    
+                    //Update record in table with newly retrieved tenant data
+                    $DB->update_record($table, $updatedRecord, true);
+
+                    //Return record from updated table
+                    return $updatedRecord = $DB->get_record($table, ['id' => $id], '*', IGNORE_MISSING);
                 }
-        }
+            }
         
     }
-
-
 
     /**
      * Summary of checkRecord
@@ -124,65 +96,13 @@ class cmi5Tables
         global $DB;
 
         //Attempt to get record
-        //OG COUSE! I need to make this TABLE ionstead of explicitly say table name
-        $cmi5launchID = $DB->get_record(
-            $table,
-            [
-                'id' => $id,
-            ],
-            '*',
-        IGNORE_MISSING
-        );
+        $cmi5launchID = $DB->get_record($table, ['id' => $id,], '*', IGNORE_MISSING);
 
         if (!$cmi5launchID) {
             return false;
         } else {
             return true;
         }
-    }
-
-    /**
-     * Creates or updates database table with passed in record on passed in id
-     * @param mixed $id - the id to update/create record on
-     * @param mixed $record - info to create record in DB - object
-     * @return $newRecord - record that has been created/updated
-     */
-    public function createRecord($id, $record)
-    {
-
-        global $DB;
-
-        //Make sure record doesn't exist before attempting to create
-        $check = $this->checkRecord($id);
-
-        //If false, record doesn't exist, so import it
-        if (!$check) {
-            echo '<br>';
-            echo '*******************************************';
-            echo "<br>";
-            $returnedID = $DB->import_record('cmi5launch_player', $record, true);
-            if ($returnedID != null || false) {
-
-                echo '<br>';
-                echo '###########################################';
-                echo "<br>";
-
-                //Return created record
-                return $newRecord = $DB->get_record('cmi5launch_player', ['id' => $returnedID], '*', IGNORE_MISSING);
-
-            } else {
-
-                echo '<br>';
-                echo '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%';
-                echo "<br>";
-
-                // If it does exist, update it
-                $DB->update_record('cmi5launch_player', $record, true);
-                //Return created record
-                return $newRecord = $DB->get_record('cmi5launch_player', ['id' => $returnedID], '*', IGNORE_MISSING);
-            }
-        }
-
     }
 }
     ?>
