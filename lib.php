@@ -542,6 +542,7 @@ It looks like the standard Quiz module does that same thing, so I don't feel so 
  * Based closely on code from the SCORM and (to a lesser extent) Resource modules.
  **** Also, as this is where a course is first uploaded/created, this is where
  **** tenant info is attached to record and URL can be retrieved -MB 12/28/22
+ ****TODO, there may be a better place to call URL in future, but here is where the record is first accessable
  * @package  mod_cmi5launch
  * @category cmi5
  * @param object $cmi5launch An object from the form in mod_form.php
@@ -555,44 +556,12 @@ function cmi5launch_process_new_package($cmi5launch) {
     
     //to bring in functions from class cmi5Connector
     $connectors = new cmi5Connectors;
-       //to bring in functions from class cmi5Connector
+    //to bring in functions from class cmi5_table_connectors
     $tableConnectors = new cmi5Tables;
-    //create retreiveURLfunction
+    //create instance of class functions
     $retrieveUrl = $connectors->getRetrieveUrl2();
     $populateTable = $tableConnectors->getPopulateTable();
 
-///////////////////////////////////
-//Here is a random piece of code that SEEMS to get tenant password, it is from settings.php
-$setting = get_string('cmi5launchtenantpass', 'cmi5launch');
-global $cmi5launchsettings;
-get_string('cmi5launchtenantpass_help', 'cmi5launch');
-get_string('cmi5launchtenantpass_default', 'cmi5launch');
-    echo "<br>";
-    echo"?????????????????????{{{{{{{{{{{{{ Ok, not what we need, but what is global cmi5launchsettings?? Maybe what Im looking for??  ";
-    var_dump($cmi5launchsettings);
-    echo"    ?????????????????????{{{{{{{{{{{{{ ";
-    echo "<br>";
-    ////////////////////////////////////////////////////////////////////////////////
-    /*OK, can we get filepath HERE???
-    copied this code from another function above, perhaps if it works we can backtrack it to its params and see where
-    we can make our own function
-    global $CFG;
-    $contents = array();
-    $context = context_module::instance($cm->id);
-
-    $fs = get_file_storage();
-    $files = $fs->get_area_files($context->id, 'mod_cmi5launch', 'package', 0, 'sortorder DESC, id ASC', false);
-*/
-
-//ok, it is not recording the full filepath, even once retreived it shows '/' as filepath and then tacks on filename. Maybe for now hardcode directory where
-//course uploads are? But that means future users would have to always put them in a certain directory, SOMEWHERE it is there....hmmmmmmmmm
-//it MUST be here somehwere!!!! Maybe i can find and 'send' a filerequest even without knowing the back end, like can we just send one of their arrays?
-//you know without break ing the array down??//like can i just pass zipfilename into jsonencode of 'content' in 
-//sendrequest2
-/////////////////////////////////////////////////////////////////////////////////
-
-
-    //the id its pulling from here is the id field in cmi5launch table-MB
     // Reload cmi5 instance.
     $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
 
@@ -613,90 +582,32 @@ get_string('cmi5launchtenantpass_default', 'cmi5launch');
     if (count($files) < 1) {
         return false;
     }
-   
-    //Hey!!!! If this is getting the filenmae, can I just have that sent to MY table, maybe with id to track it?? hrmmm -MB
-    // ok, lets make a filenamre part of my table and try to send fgile to that-MB
-    // Check to see if there is a record of this instance in the table.
-    //Table is the new one I made, go off id cause why not? 
-
-    //Retrieve ID to use for searching/creating record
-    $tableId = $record->id;
-    echo '<br>';
-    echo 'What is gthis table id here? ? ? ? ? ? ? ?' . $tableId;
-    echo "<br>";
-    //This is coming back from populate table with null values, why ?
-   
-   //lets see if populate table works in other func, the launch settings func, may make more
-   //sense to go there
-    //$cmi5launchID = $populateTable($record, 'cmi5launch_player');
     
-    
-    // I am so stupid! I am not trying to populate this table this way!! I need to add
-    //the info from settings! So can I add themt ot record
-    //$cmi5launchID = $populateTable($record, 'cmi5launch_lrs');
-    //
-    $testing = $DB->get_record(
-        'cmi5launch_player',
-        ['id' => $record->id,
-        ],
-        '*',    
-        IGNORE_MISSING
-    );
-    echo"<br>";
-    echo "What is record here ??>><><<>>><>><>><  " ;
-    var_dump($testing);
-    echo"<br>";
-
-    echo"<br>";
-    echo "ok, doesn't seem to be record, nmaybe its my id? Cmi5launchID equals ";
-    echo"<br>";
-    var_dump($cmi5launchID);
-
-
-
     $zipfile = reset($files);
     $zipfilename = $zipfile->get_filename();
-    echo'<br>';
-    echo '~~~~~~~~lets see what zipfilename is ~~~~~~~~~';
-    echo'<br>';
-
-    var_dump($zipfilename);
 
     $packagefile = false;
 
     $packagefile = $fs->get_file($context->id, 'mod_cmi5launch', 'package', 0, '/', $zipfilename);
-    //Can I see packagefile pleaase???
-    echo'<br>';
-    echo 'OMGoodneess! I am finally dumping packagfile???';
-    echo'<br>';
-
-    var_dump($packagefile);
-
-    echo'<br>';
-    echo '!!!!!!!!!!!!!!!!!!!IS THIS THE FILE I NEEED!!!!!!!!!!!!!!!!';
-    echo'<br>';
-   // $testing = valid_uploaded_file($zipfile);
-    //var_dump($testing);
-
-    //////////////////////////////
-    ///Here is where we are testing getting a launch url with my little functions
-    ///////////////////////////////
+    
+    //Populate player table with record and tenant info for URL retrieval
+    $tenantRecord = $populateTable($record, 'cmi5launch_player');
     
     //Now, what we need to do is GET these params from our tables instead of 
     //just having them/feeding them
-    $cmi5launchInfo = $DB->get_record(
+    $tenantRecord = $DB->get_record(
         'cmi5launch_player',
         ['id' => $record->id,
         ],
         '*',    
         IGNORE_MISSING
     );
-    //$actorName = $cmi5launchInfo->name;
-    $actorName = "Victory";
-    $homepage ="http://myLMSexample.com";
-    $returnUrl="http://127.0.0.1:63398.com";
-    $url= "http://localhost:63398/api/v1/course/12/launch-url/0" ;
-    //$token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJ1cm46Y2F0YXB1bHQ6cGxheWVyIiwiYXVkIjoidXJuOmNhdGFwdWx0Ok1vb2RsZS1WaWN0b3J5Iiwic3ViIjo0LCJqdGkiOiIxMTVkYTEzOS0wNTYxLTQ0MmItYTQwYy01Mzc5NTg3NGZjOTQiLCJpYXQiOjE2NzE3MzY5MzR9.1SXtBlkBFoodsJ-RVEr1C4btU1RE6c9rj30udWwurVI";
+
+    $actorName = $tenantRecord->name; 
+    $homepage =$tenantRecord->homepage;
+    $returnUrl=$tenantRecord->returnurl;
+    $url= $tenantRecord-> requesturl;
+    $token = $tenantRecord->tenanttoken;
 
     //Create an instance of lrs record??
     $cmi5launchInfoLrs = $DB->get_record(
@@ -706,31 +617,7 @@ get_string('cmi5launchtenantpass_default', 'cmi5launch');
         '*',    
         IGNORE_MISSING
     );
-    $settings = cmi5launch_settings($record->id);
-    echo '<br>';
-    echo '<br>';
-    echo  'Is it as easy as this? cmi5launchInfolrs equals ---------- ';
-    var_dump($cmi5launchInfoLrs) . ' -----------------';
-    echo '<br>';
-    echo '<br>';
-    //Is token even populated here?
 
-    $token = $cmi5launchInfoLrs->tenanttoken;
-
-    echo '<br>';
-    echo '<br>';
-    echo  'And what about token?? token equals ---------- ';
-    var_dump($token) . ' -----------------';
-    echo '<br>';
-    echo '<br>';
-
-//pause and see if this works
-    echo '<br>';
-    echo '<br>';
-    echo 'The actor name is ---------- ' . $actorName . ' -----------------';
-    echo '<br>';  
-    echo '<br>';
-    
     //utilize function
     $result = $retrieveUrl($actorName, $homepage, $returnUrl, $url, $token);
     echo '<br>';  
@@ -739,10 +626,6 @@ get_string('cmi5launchtenantpass_default', 'cmi5launch');
     echo '<br>';  
     echo '<br>';
     
-    
-    
-    ///////////////////////////////////////////////
-    ///////////////////////////////////////////////
     $fs->delete_area_files($context->id, 'mod_cmi5launch', 'content');
 
     $packer = get_file_packer('application/zip');
@@ -763,9 +646,6 @@ get_string('cmi5launchtenantpass_default', 'cmi5launch');
         $objxml = new xml2Array();
         $manifest = $objxml->parse($xmltext);
 
-        //Maybe the MANIFEST??
-
-
         // Update activity id from the first activity in cmi5.xml, if it is found.
         // Skip without error if not. (The Moodle admin will need to enter the id manually).
         if (isset($manifest[0]["children"][0]["children"][0]["attrs"]["ID"])) {
@@ -781,14 +661,6 @@ get_string('cmi5launchtenantpass_default', 'cmi5launch');
             }
         }
     }
-    //What is the 'record' below? -MB
-    //echo "<br>";
-    //echo "What is the record item? - ";
-    //var_dump($record);
-    //echo "<br>";
-//Or maybe what we need to do is get it from DB, I remember florian telling us how to make, 
-
-//Ok, it's saving the reference to the cmi5Launch table, so we should just be able to grab there right? How will we know right id - MB? 
     // Save reference.
     return $DB->update_record('cmi5launch', $record);
 }
@@ -950,21 +822,6 @@ function cmi5launch_settings($instance) {
        $connectors = new cmi5Connectors;
        //to bring in functions from class cmi5Connector
     $tableConnectors = new cmi5Tables;
-    //create retreiveURLfunction
-    $retrieveUrl = $connectors->getRetrieveUrl2();
-    $populateTable = $tableConnectors->getPopulateTable();
-    echo "<br>";
-    echo "<br>";
-    echo "<br>";
-    echo"What is cmi5launch? is it a record object?";
-    echo "<br>";echo "<br>";
-    var_dump($cmi5launch);
-    echo "<br>";echo "<br>";echo "<br>";echo "<br>";
-    echo "Does populate table work here? here??";
-    $cmi5launchID = $populateTable($cmi5launch, 'cmi5launch_player');
-   
-    
-
 
     if (!is_null($cmi5launchsettings)) {
         return $cmi5launchsettings;
@@ -978,8 +835,6 @@ function cmi5launch_settings($instance) {
         $fields = '*',
         $strictness = IGNORE_MISSING
     );
-//
-//Its getting the id here using instace, where is instace from ? -MB
     // If global settings are not used, retrieve activity settings.
     if (!use_global_cmi5_lrs_settings($instance)) {
         $expresult['cmi5launchlrsendpoint'] = $activitysettings->lrsendpoint;

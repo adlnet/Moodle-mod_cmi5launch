@@ -32,6 +32,12 @@ class cmi5Tables
         //Id to create/update record
         $id = $record->id;
 
+        //TODO - I am hardcoding these for now, want to check with others as to best way to collect this info
+        //such as from cmi5 mod install page, or cmi5 course uploadpage??? -MB
+        $homepage ="http://myLMSexample.com";
+        $returnUrl="http://127.0.0.1:63398.com";
+        $url= "http://localhost:63398/api/v1/course/12/launch-url/0" ;
+
         //Make sure record doesn't exist before attempting to create
         $check = $this->checkRecord($id, $table);
 
@@ -51,6 +57,9 @@ class cmi5Tables
                 $settings = cmi5launch_settings($id);
                 $newRecord->tenantname = $settings['cmi5launchtenantname'];
                 $newRecord->tenanttoken = $settings['cmi5launchtenanttoken'];
+                $newRecord->homepage = $homepage;
+                $newRecord->returnurl = $returnUrl;
+                $newRecord->requesturl = $url;
 
                 //Update record in table with newly retrieved tenant data
                 $DB->update_record($table, $newRecord, true);
@@ -73,7 +82,10 @@ class cmi5Tables
                     $settings = cmi5launch_settings($id);
                     $updatedRecord->tenantname = $settings['cmi5launchtenantname'];
                     $updatedRecord->tenanttoken = $settings['cmi5launchtenanttoken'];
-                    
+                    $updatedRecord->homepage = $homepage;
+                    $updatedRecord->returnurl = $returnUrl;
+                    $updatedRecord->requesturl = $url;
+
                     //Update record in table with newly retrieved tenant data
                     $DB->update_record($table, $updatedRecord, true);
 

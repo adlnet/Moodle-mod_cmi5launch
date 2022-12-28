@@ -67,6 +67,9 @@
         <FIELD NAME="homepage" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Tenants homepage(URL)"/>
         <FIELD NAME="registrationid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Course registration ID returned by CMI5 player"/>
         <FIELD NAME="sessionid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Id created when an AU launch URL is requested"/>
+        <FIELD NAME="launchurl" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Returned launch url from cmi5 player"/>
+        <FIELD NAME="requesturl" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Url to send launch url request to"/>
+
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
