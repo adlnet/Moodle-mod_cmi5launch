@@ -52,7 +52,8 @@ class cmi5Tables
 
                 //Retrieve newly created record
                 $newRecord = $DB->get_record($table, ['id' => $id], '*', IGNORE_MISSING);
-                
+ 
+                //////////////////////////////////////////////////////////////////////////
                 //Retrieve user settings to apply to newly created record
                 $settings = cmi5launch_settings($id);
                 $newRecord->tenantname = $settings['cmi5launchtenantname'];
@@ -63,6 +64,7 @@ class cmi5Tables
 
                 //Update record in table with newly retrieved tenant data
                 $DB->update_record($table, $newRecord, true);
+
 
                 //Return record from updated table
                 return $newRecord = $DB->get_record($table, ['id' => $id], '*', IGNORE_MISSING);

@@ -590,42 +590,31 @@ function cmi5launch_process_new_package($cmi5launch) {
 
     $packagefile = $fs->get_file($context->id, 'mod_cmi5launch', 'package', 0, '/', $zipfilename);
     
-    //Populate player table with record and tenant info for URL retrieval
+    //Populate player table with record and tenant info for URL retrieval, and retrieve newly created record
     $tenantRecord = $populateTable($record, 'cmi5launch_player');
     
-    //Now, what we need to do is GET these params from our tables instead of 
-    //just having them/feeding them
-    $tenantRecord = $DB->get_record(
-        'cmi5launch_player',
-        ['id' => $record->id,
-        ],
-        '*',    
-        IGNORE_MISSING
-    );
-
+    //TODO-Better to just use tenantRecord->property in retrieveUrl func??
     $actorName = $tenantRecord->name; 
     $homepage =$tenantRecord->homepage;
     $returnUrl=$tenantRecord->returnurl;
     $url= $tenantRecord-> requesturl;
     $token = $tenantRecord->tenanttoken;
 
-    //Create an instance of lrs record??
-    $cmi5launchInfoLrs = $DB->get_record(
-        'cmi5launch_player',
-        ['id' => $record->id,
-        ],
-        '*',    
-        IGNORE_MISSING
-    );
 
     //utilize function
     $result = $retrieveUrl($actorName, $homepage, $returnUrl, $url, $token);
-    echo '<br>';  
-    echo '<br>';
-    echo "Does result actually get anything?" . $result;
-    echo '<br>';  
-    echo '<br>';
     
+    //decode returned response into array
+    $returnedInfo = json_decode($result, true);
+
+    //Assign the returnedInfo to tenantRecord
+    $tenantRecord->sessionid = $returnedInfo['id'];
+    $tenantRecord->launchmethod = $returnedInfo['launchMethod'];
+    $tenantRecord->launchurl = $returnedInfo['url'];
+
+    //Update record in table with newly retrieved url data
+    $DB->update_record("cmi5launch_player", $tenantRecord, true);
+
     $fs->delete_area_files($context->id, 'mod_cmi5launch', 'content');
 
     $packer = get_file_packer('application/zip');
