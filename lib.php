@@ -559,9 +559,9 @@ function cmi5launch_process_new_package($cmi5launch) {
     //to bring in functions from class cmi5_table_connectors
     $tableConnectors = new cmi5Tables;
     //create instance of class functions
-    $retrieveUrl = $connectors->getRetrieveUrl2();
+    $retrieveUrl = $connectors->getRetrieveUrl();
     $populateTable = $tableConnectors->getPopulateTable();
-
+    $createCourse = $connectors->getCreateCourse();
     // Reload cmi5 instance.
     $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
 
@@ -600,12 +600,32 @@ function cmi5launch_process_new_package($cmi5launch) {
     $url= $tenantRecord-> requesturl;
     $token = $tenantRecord->tenanttoken;
 
+    //TODO - When uploading a new course - this is where we want it to send to CMI5 and
+    //then here we can get the laucnh URL, although in the future may go elsewhere
+///////////////Can zipfilename work for sending to cmi5 player if I pass into my func?
+    echo "<br>";
+    echo "<br>";
+    echo "About to try createCourse";
+    echo "<br>";
+$createCourse($context->id, $token, $zipfilename );
+//////////////////////////////////////////
+echo "<br>";echo "<br>";
+    echo "Tried to fire createCourse, hope it worked";
+    echo "<br>";echo "<br>";
 
     //utilize function
     $result = $retrieveUrl($actorName, $homepage, $returnUrl, $url, $token);
     
     //decode returned response into array
     $returnedInfo = json_decode($result, true);
+
+    //Hrmmm something worng here, this was working earlier, lets dump and find out
+    echo "<br>";
+    echo "<br>";
+    echo "returnedinfo is no longer working, why????";
+    var_dump($returnedInfo);
+    echo "<br>";
+    echo "<br>";
 
     //Assign the returnedInfo to tenantRecord
     $tenantRecord->sessionid = $returnedInfo['id'];
@@ -804,13 +824,10 @@ function cmi5launch_getactor($instance) {
 function cmi5launch_settings($instance) {
     global $DB, $CFG, $cmi5launchsettings;
     global $cmi5launch;
-    //Ok, so instance above, seems to always be cmi5launch->id? So WHERE is tHIS set? -MB
-    echo "Spitting into the wind here";
+    //This may be a good place to pull up launchurl from cmi5launch_player -MB
     echo "<br>";
-       //to bring in functions from class cmi5Connector
-       $connectors = new cmi5Connectors;
-       //to bring in functions from class cmi5Connector
-    $tableConnectors = new cmi5Tables;
+    echo "This may be  a good place to launchurl";
+    echo "<br>";
 
     if (!is_null($cmi5launchsettings)) {
         return $cmi5launchsettings;

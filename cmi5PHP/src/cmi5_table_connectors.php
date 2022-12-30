@@ -37,7 +37,7 @@ class cmi5Tables
         $homepage ="http://myLMSexample.com";
         $returnUrl="http://127.0.0.1:63398.com";
         $url= "http://localhost:63398/api/v1/course/12/launch-url/0" ;
-
+        
         //Make sure record doesn't exist before attempting to create
         $check = $this->checkRecord($id, $table);
 
@@ -58,6 +58,8 @@ class cmi5Tables
                 $settings = cmi5launch_settings($id);
                 $newRecord->tenantname = $settings['cmi5launchtenantname'];
                 $newRecord->tenanttoken = $settings['cmi5launchtenanttoken'];
+                $newRecord->cmi5playerurl = $settings['cmi5launchplayerurl'];
+                $newRecord->cmi5playerport = $settings['cmi5launchplayerport'];
                 $newRecord->homepage = $homepage;
                 $newRecord->returnurl = $returnUrl;
                 $newRecord->requesturl = $url;
@@ -65,6 +67,9 @@ class cmi5Tables
                 //Update record in table with newly retrieved tenant data
                 $DB->update_record($table, $newRecord, true);
 
+
+                //new way to make url
+                $url = "http://" . $newRecord->cmi5playerurl . $newRecord->cmi5playerport . "/api/v1/course/12/launch-url/0";
 
                 //Return record from updated table
                 return $newRecord = $DB->get_record($table, ['id' => $id], '*', IGNORE_MISSING);

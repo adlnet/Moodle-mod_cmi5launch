@@ -69,6 +69,10 @@
         <FIELD NAME="sessionid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Id created when an AU launch URL is requested"/>
         <FIELD NAME="launchurl" TYPE="char" LENGTH="500" NOTNULL="false" SEQUENCE="false" COMMENT="Returned launch url from cmi5 player"/>
         <FIELD NAME="requesturl" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Url to send launch url request to"/>
+        <FIELD NAME="cmi5playerurl" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Cmi5 player url"/>
+        <FIELD NAME="cmi5playerport" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Cmi5 player port"/>
+
+
 
       </FIELDS>
       <KEYS>
