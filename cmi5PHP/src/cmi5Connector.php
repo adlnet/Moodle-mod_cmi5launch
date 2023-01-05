@@ -42,7 +42,7 @@ class cmi5Connectors{
         global $DB;
         $settings = cmi5launch_settings($id);
 
-        echo"Importing a course! The course filename is " . $fileName;
+        //echo"Importing a course! The course filename is " . $fileName;
         //retrieve and assign params
         $token = $tenantToken;
         $file = $fileName;
@@ -51,12 +51,30 @@ class cmi5Connectors{
         //Can this file access the settings? 
         $url= "http://" . $settings['cmi5launchplayerurl'] . ":" . $settings['cmi5launchplayerport'] . "/api/v1/course" ;
         
+        echo"<br>";
+        echo"<br>";
+        echo "AHHH, lets see if it's building url correctly! " . $url;
+        echo"<br>";
+        echo"<br>";
+        //ItIS building correcly!
+
+
         //the body of the request must be made as array first
         //This is where the filepath is right? How do we send?
        //Ok, the bopdy of the request is the file itself...so hmmm
         $data = $file;
       
+        echo"<br>";
+        echo"<br>";
+        echo "AHHH, lets see if it's gathering token correctly  " . $token;
+        echo"<br>";
+        echo"<br>";
 
+        echo"<br>";
+        echo"<br>";
+        //echo "AHHH, lets see if it's building data correctly  " . $data;
+        echo"<br>";
+        echo"<br>";
              //which result is best? above or beyond?
 
         //sends the stream to the specified URL 
@@ -80,8 +98,8 @@ class cmi5Connectors{
         else{
             echo"<br>";
             echo"<br>";
-            echo "Tenant created. Response: is $result";
-            var_dump(json_decode($result, true));
+            echo "Course created. Response: is $result";
+            var_dump($result);
             echo"<br>";
 
         }
@@ -278,21 +296,31 @@ class cmi5Connectors{
 
                 echo "<br>";
                 echo "One arg entered!";
+                
                 echo "<br>";
-
                 //First arg will be token
                 $token = $tenantInformation[0];
-
-                //////////Hrm, how can we retreive values if not by simple []??
-                //They need to be strings, so maybe implode()??
+            echo "What is path and filename? Will this work?";
             echo "<br>";
+            $filePath = $data->get_filepath();
+            //$filePath = $data["filepath"];
+            echo "Dern filepath:    " . $filePath;
+            echo "<br>";
+            $fileName = $data->get_filename();
+           // $fileName = $data["filename"]; 
+           echo "Dern filename:    " . $fileName;
             echo "<br>";
 
-                var_dump($tenantInformation);
-echo "<br>";echo "<br>";echo "<br>";echo "<br>";
-            echo "How about just token here? " . $token;
-            echo "<br>";echo "<br>";echo "<br>";echo "<br>";echo "<br>";
-
+                //Can we change data here and make it contents???
+            $file_contents = $data->get_content();
+//dernnnnnnn
+//NONE OF THIS IS WORKING? IS FILES an option??
+            echo "IS FILES HERE?????";            
+var_dump($_FILES);
+//maybe this ay like in little proga,?
+//can't find the path, can we retreive form temp
+          //  $file_contents = file_get_contents("/var/www/moodledata/filedir" . $filePath . $fileName);
+                //Ok, the problem does not seem to be the the token, it looks good
 
                 // use key 'http' even if you send the request to https://...
                 //There can be multiple headers but as an array under the ONE header
@@ -303,18 +331,51 @@ echo "<br>";echo "<br>";echo "<br>";echo "<br>";
                         'method'  => 'POST',
                         'ignore_errors' => true,
                         'header' => array("Authorization: Bearer ". $token,  
-                            "Content-Type: application/zip\r\n" .
-                            "Accept: application/zip\r\n"),
-                        'content' => $data
+                            "Content-Type: application/zip\r\n"), 
+                        'content' => $file_contents
                     )
                 );
-    
+                //lets try adding a coma instead of dot after content-type, but it shoudl be ok with dot right?
+                //Forget that! We forgot to JSON encode data!
+                //Still not working, how about we remove the accept? IT's not
+                //in basic call
+                //Nooo, ok, well before we move to another test project
+                //Maybe it can't find file?, if sooo then maybe lets manually put file path in 
+                //JUST to see what happens
+                echo "<br>";echo "<br>";echo "<br>";echo "<br>";
+            echo "How about options? here?     >> ";
+          //  var_dump($options);
+            echo "<br>";echo "<br>";echo "<br>";echo "<br>";echo "<br>";
+       
+
                  //the options are here placed into a stream to be sent
                  $context  = stream_context_create(($options));
     
+                 //MB .. So if the token seems ok, could it be cotext?? 
+                 //which means it may also be OPTINO!!
+
+    
+                 echo "<br>";echo "<br>";echo "<br>";echo "<br>";
+                 echo "How about context? here?>>    ";
+                var_dump($context);
+                 echo "<br>";echo "<br>";echo "<br>";echo "<br>";echo "<br>";
+      
+                 ///Ok, lets make sure the args are all right!
+                 echo "<br>";echo "<br>";echo "<br>";echo "<br>";
+                 echo "ARGS about to be sent. Ffirst is URL:  >> ";
+                 var_dump($url);
+                 echo "<br>";echo "<br>";
+                 echo "ARGS about to be sent. Second is context:  >> ";
+                 var_dump($context);
+                 echo "<br>";echo "<br>";
+                echo "I a not sure what to do here....is it a file still? Can we dump it??";
+            //var_dump($data);
+                 echo "<br>";echo "<br>";echo "<br>";
+                 
                  //sends the stream to the specified URL and stores results (the false is use_include_path, which we dont want in this case, we want to go to the url)
                  $result = file_get_contents( $url, false, $context );
-         
+
+            return $result;
                 }
     }
 }

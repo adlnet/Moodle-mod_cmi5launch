@@ -607,7 +607,8 @@ function cmi5launch_process_new_package($cmi5launch) {
     echo "<br>";
     echo "About to try createCourse";
     echo "<br>";
-$createCourse($context->id, $token, $zipfilename );
+    //Moving this down JUST to try
+//$createCourse($context->id, $token, $packagefile );//files instead of packagefile??
 //////////////////////////////////////////
 echo "<br>";echo "<br>";
     echo "Tried to fire createCourse, hope it worked";
@@ -639,6 +640,12 @@ echo "<br>";echo "<br>";
 
     $packer = get_file_packer('application/zip');
     $packagefile->extract_to_storage($packer, $context->id, 'mod_cmi5launch', 'content', 0, '/');
+/////^^^^^^^^
+//Wait, if the c i5 5 file isnt, is it opening further HERE?
+    echo "<br>";
+    echo "MOVIED COURSE CREATE DOWN";
+$createCourse($context->id, $token, $packagefile );//files instead of packagefile??
+
 
     // If the cmi5.xml file isn't there, don't do try to use it.
     // This is unlikely as it should have been checked when the file was validated.
