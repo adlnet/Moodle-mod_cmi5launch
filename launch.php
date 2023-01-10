@@ -24,7 +24,9 @@
 
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once('header.php');
-
+//I added this global, It was in a wrongfile, or it was in cmi5_launchsettings even though it wasn't
+//in githib?-MB
+global $cmi5launch;
 // Trigger Activity launched event.
 $event = \mod_cmi5launch\event\activity_launched::create(array(
     'objectid' => $cmi5launch->id,
@@ -79,11 +81,15 @@ $registrationdataforthisattempt = array(
     )
 );
 
+//MB
+//Getting error on  - Exception - Attempt to modify property "httpResponse" on null
+//It's because if this isnull it can't have a property, but it is trying to 
+//access property anyway/
 if (is_null($registrationdata)) {
     // If the error is 404 create a new registration data array.
-    if ($registrationdata->httpResponse['status'] = 404) {
+   // if ($registrationdata->httpResponse['status'] = 404) {
         $registrationdata = $registrationdataforthisattempt;
-    }
+   // }
 } else if (array_key_exists($registrationid, $registrationdata)) {
     // Else if the regsitration exists update the lastlaunched date.
     $registrationdata[$registrationid]["lastlaunched"] = $datenow;
@@ -153,6 +159,8 @@ if ($lrsrespond != 204) {
 $completion = new completion_info($course);
 $completion->set_module_viewed($cm);
 
+//If this si where it calls for the launch URL, then perhaps the URL should
+//be generatedin function. Or at least retreived if exists already-MB
 // Launch the experience.
 header("Location: ". cmi5launch_get_launch_url($registrationid));
 

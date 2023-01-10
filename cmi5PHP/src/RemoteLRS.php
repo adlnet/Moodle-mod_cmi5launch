@@ -117,6 +117,8 @@ class RemoteLRS implements LRSInterface
                 array_push($http['header'], "$k: $v");
             }
         }
+        //MB - Passing null to as param two 'numeric_prefix' in http_build_query
+        //is deprecetad
         if (isset($options['params']) && count($options['params']) > 0) {
             $url .= '?' . http_build_query($options['params'], null, '&', PHP_QUERY_RFC3986);
         }

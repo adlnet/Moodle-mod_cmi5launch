@@ -71,12 +71,13 @@
         <FIELD NAME="requesturl" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Url to send launch url request to"/>
         <FIELD NAME="cmi5playerurl" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Cmi5 player url"/>
         <FIELD NAME="cmi5playerport" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Cmi5 player port"/>
+        <FIELD NAME="returnurl" TYPE="varchar" LENGTH="<maximum_limit>" NOTNULL="false" SEQUENCE="false" COMMENT="The full course as a string"/>
 
 
 
       </FIELDS>
       <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="primary" TYPE="primary" FIELDS="courseid"/>
       </KEYS>
       <INDEXES>
         <INDEX NAME="name" UNIQUE="false" FIELDS="name"/>

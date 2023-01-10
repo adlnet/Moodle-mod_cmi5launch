@@ -559,7 +559,7 @@ function cmi5launch_process_new_package($cmi5launch) {
     //to bring in functions from class cmi5_table_connectors
     $tableConnectors = new cmi5Tables;
     //create instance of class functions
-    $retrieveUrl = $connectors->getRetrieveUrl();
+   // $retrieveUrl = $connectors->getRetrieveUrl();
     $populateTable = $tableConnectors->getPopulateTable();
     $createCourse = $connectors->getCreateCourse();
     // Reload cmi5 instance.
@@ -599,6 +599,7 @@ function cmi5launch_process_new_package($cmi5launch) {
     $returnUrl=$tenantRecord->returnurl;
     $url= $tenantRecord-> requesturl;
     $token = $tenantRecord->tenanttoken;
+    
 
     //TODO - When uploading a new course - this is where we want it to send to CMI5 and
     //then here we can get the laucnh URL, although in the future may go elsewhere
@@ -607,13 +608,25 @@ function cmi5launch_process_new_package($cmi5launch) {
     echo "<br>";
     echo "About to try createCourse";
     echo "<br>";
-$createCourse($context->id, $token, $zipfilename );
+    //Moving this down JUST to try
+   $courseInfo = $createCourse($context->id, $token, $packagefile );//files instead of packagefile??
 //////////////////////////////////////////
-echo "<br>";echo "<br>";
-    echo "Tried to fire createCourse, hope it worked";
+    //So can we save the returned info here? 
+    $tenantRecord->courseid = $courseInfo['id'];
+    
     echo "<br>";echo "<br>";
+    echo "Tried to fire createCourse, hope it worked";
+    
+    echo "<br>";
+    echo "Ok, lets see if I grabbed the right info" . $courseInfo['id'];
+    echo "<br>";
 
-    //utilize function
+    //Save info
+    $DB->update_record("cmi5launch_player", $tenantRecord, true);
+
+    //This is probably best done in local lib cmi5launch_get_luanch_url
+/*
+//utilize function
     $result = $retrieveUrl($actorName, $homepage, $returnUrl, $url, $token);
     
     //decode returned response into array
@@ -634,7 +647,7 @@ echo "<br>";echo "<br>";
 
     //Update record in table with newly retrieved url data
     $DB->update_record("cmi5launch_player", $tenantRecord, true);
-
+*/    
     $fs->delete_area_files($context->id, 'mod_cmi5launch', 'content');
 
     $packer = get_file_packer('application/zip');
@@ -823,7 +836,7 @@ function cmi5launch_getactor($instance) {
  */
 function cmi5launch_settings($instance) {
     global $DB, $CFG, $cmi5launchsettings;
-    global $cmi5launch;
+    //global $cmi5launch;
     //This may be a good place to pull up launchurl from cmi5launch_player -MB
     echo "<br>";
     echo "This may be  a good place to launchurl";

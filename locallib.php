@@ -125,14 +125,14 @@ function cmi5_launched_statement($registrationid) {
  * @return string launch link including querystring.
  */
 function cmi5launch_get_launch_url($registrationuuid) {
-    global $cmi5launch, $CFG;
+    global $cmi5launch, $CFG, $DB;
     $cmi5launchsettings = cmi5launch_settings($cmi5launch->id);
     $expiry = new DateTime('NOW');
     $xapiduration = $cmi5launchsettings['cmi5launchlrsduration'];
     $expiry->add(new DateInterval('PT'.$xapiduration.'M'));
 
     $url = trim($cmi5launchsettings['cmi5launchlrsendpoint']);
-
+    
     // Call the function to get the credentials from the LRS.
     $basiclogin = trim($cmi5launchsettings['cmi5launchlrslogin']);
     $basicpass = trim($cmi5launchsettings['cmi5launchlrspass']);
@@ -166,7 +166,58 @@ function cmi5launch_get_launch_url($registrationuuid) {
             break;
     }
 
-    // Build the URL to be returned.
+    //to bring in functions from class cmi5Connector
+    $connectors = new cmi5Connectors;
+    //to bring in functions from class cmi5_table_connectors
+    $tableConnectors = new cmi5Tables;
+    //create instance of class functions
+    $retrieveUrl = $connectors->getRetrieveUrl();
+  
+    // Reload cmi5 instance. //This is populated in lib.php and 
+    //in func cmi5launch_process_new_package, so here I am tking 
+    //it from the table
+    $record = $DB->get_record('cmi5launch_player', array('id' => $cmi5launch->id));
+
+
+//Populate player table with record and tenant info for URL retrieval, and retrieve newly created record
+//$tenantRecord = $populateTable($record, 'cmi5launch_player');
+    
+//TODO-Better to just use tenantRecord->property in retrieveUrl func??
+$actorName = $record->name; 
+$homepage =$record->homepage;
+$returnUrl=$record->returnurl;
+$url= $record-> requesturl;
+$token = $record->tenanttoken;
+
+    //utilize function
+    $result = $retrieveUrl($actorName, $homepage, $returnUrl, $url, $token);
+    
+    //decode returned response into array
+    $returnedInfo = json_decode($result, true);
+
+    //Hrmmm something worng here, this was working earlier, lets dump and find out
+    echo "<br>";
+    echo "<br>";
+    echo "Make sure the returnedinfo is correct????";
+    var_dump($returnedInfo);
+    echo "<br>";
+    echo "<br>";
+
+    //Save the returnedInfo to table
+    $record->sessionid = $returnedInfo['id'];
+    $record->launchmethod = $returnedInfo['launchMethod'];
+    $record->launchurl = $returnedInfo['url'];
+    $DB->update_record("cmi5launch_player", $record, true);
+
+
+    //Is this URL to be returned the right one? -MB
+//SO since this is the right one, do we need to just grab it from
+//a table or build like below? 
+//The one in the table does grab by actor right? Or might the actor change here?
+
+//This is the orig func, I don't know if we need ANY aspects of it
+// Build the URL to be returned.
+/*
     $rtnstring = $cmi5launch->cmi5launchurl."?".http_build_query(
         array(
             "endpoint" => $url,
@@ -183,8 +234,12 @@ function cmi5launch_get_launch_url($registrationuuid) {
         '&',
         PHP_QUERY_RFC3986
     );
-
-    return $rtnstring;
+*/
+    //To find out, lets return it
+    ///YES! This does control the url, so above needs to retrieve based on id.
+  //  $rtnstring = "http://localhost:63398/content/4/22/index.html?endpoint=http%3A%2F%2Flocalhost%3A63398%2Flrs&fetch=http%3A%2F%2Flocalhost%3A63398%2Ffetch-url%2F72&actor=%7B%22account%22%3A%7B%22homePage%22%3A%22http%3A%2F%2FmyLMSexample.com%22%2C%22name%22%3A%22Victory%22%7D%7D&activityId=https%3A%2F%2Fw3id.org%2Fxapi%2Fcmi5%2Fcatapult%2Fplayer%2Fcourse%2F4e2becf0-f7eb-4ecd-8d91-607d92a375b0%2Fau%2F0&registration=66e72149-ab6a-49e3-82d5-7b2fde0c5121";
+    $rtnstring = $record->launchurl; 
+  return $rtnstring;
 }
 
 ///This might be useful to take info back from sending a course and parsing data
