@@ -609,7 +609,7 @@ function cmi5launch_process_new_package($cmi5launch) {
     echo "About to try createCourse";
     echo "<br>";
     //Moving this down JUST to try
-   $courseInfo = $createCourse($context->id, $token, $packagefile );//files instead of packagefile??
+//$createCourse($context->id, $token, $packagefile );//files instead of packagefile??
 //////////////////////////////////////////
     //So can we save the returned info here? 
     $tenantRecord->courseid = $courseInfo['id'];
@@ -652,6 +652,12 @@ function cmi5launch_process_new_package($cmi5launch) {
 
     $packer = get_file_packer('application/zip');
     $packagefile->extract_to_storage($packer, $context->id, 'mod_cmi5launch', 'content', 0, '/');
+/////^^^^^^^^
+//Wait, if the c i5 5 file isnt, is it opening further HERE?
+    echo "<br>";
+    echo "MOVIED COURSE CREATE DOWN";
+$createCourse($context->id, $token, $packagefile );//files instead of packagefile??
+
 
     // If the cmi5.xml file isn't there, don't do try to use it.
     // This is unlikely as it should have been checked when the file was validated.
