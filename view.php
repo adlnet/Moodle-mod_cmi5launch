@@ -98,10 +98,57 @@ if ($cmi5launch->intro) { // Conditions to show the intro can change to look for
         });
     </script>
 <?php
+//MB
+//THIS! We don't want this!@!!
+//Maybe we can call URL HERE? 
+//Below it is generating a regid with getUUID. Looking into this func, it is randomly creating
+//a id
+ //So I am going to cut two lines and try and insert our link here. 
+ //However it will createa URL, that should be ok? and saved to table?
 
 // Generate a registration id for any new attempt.
 $cmi5phputil = new \cmi5\Util();
-$registrationid = $cmi5phputil->getUUID();
+//$registrationid = $cmi5phputil->getUUID();
+
+echo "<br>";
+//echo "What is the registrationID here (theirs) : " . $registrationid;
+//var_dump($registrationid);
+echo "<br>";
+
+//to bring in functions from class cmi5Connector
+$connectors = new cmi5Connectors;
+//create instance of class functions
+$retrieveUrl = $connectors->getRetrieveUrl();
+//$result = $retrieveUrl($actorName, $homepage, $returnUrl, $url, $token);
+
+
+echo "Trying to launch url with this id " . $cmi5launch->id;
+//Lets try making our own regid here 
+$urlResults = $retrieveUrl($cmi5launch->id);
+echo "<br>";
+echo "Did it wokr? Here are results: ";
+var_dump($urlResults);
+echo "<br>";
+//test array
+parse_str($urlResults, $urlParsed);
+echo "<br>";
+echo "Did the parsing work? Here are results: ";
+var_dump($urlParsed);
+echo "<br>";
+//Perhaps we could have a func that creates/retreives a reguuid, and IT will call
+//the retreive url func? Just want it to be succint. And where should the info be saved to table?
+//Perhaps in func?
+//But whatever that returns, the reg id is IN THE URL right? So should that be parsed here or in
+//another
+
+//Ok, here is our new regid
+$registrationid = substr($urlParsed['registration'],0, -2);
+
+echo "<br>";
+echo "What is the registrationID here (ours) : ";
+var_dump($registrationid);
+echo "<br>";
+
 $getregistrationdatafromlrsstate = cmi5launch_get_global_parameters_and_get_state(
     "http://cmi5api.co.uk/stateapikeys/registrations"
 );
@@ -175,6 +222,7 @@ if ($lrsrespond == 200) {
 }
 
 // Add a form to be posted based on the attempt selected.
+//AHA! view.php launches launch.phpo as a FORM - MB
 ?>
     <form id="launchform" action="launch.php" method="get" target="_blank">
         <input id="launchform_registration" name="launchform_registration" type="hidden" value="default">

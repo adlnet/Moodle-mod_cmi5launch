@@ -173,42 +173,49 @@ function cmi5launch_get_launch_url($registrationuuid) {
     //create instance of class functions
     $retrieveUrl = $connectors->getRetrieveUrl();
   
+    //what is this?
+    echo "<br>";
+    echo "WHAT IS THIS????";
+    $wht = $cmi5launch->id;
+    echo"What is    >>>> " .$wht . " <<<<< ";
+    echo "<br>";
     // Reload cmi5 instance. //This is populated in lib.php and 
     //in func cmi5launch_process_new_package, so here I am tking 
     //it from the table
-    $record = $DB->get_record('cmi5launch_player', array('id' => $cmi5launch->id));
+//    $record = $DB->get_record('cmi5launch_player', array('id' => $cmi5launch->id));
 
 
 //Populate player table with record and tenant info for URL retrieval, and retrieve newly created record
 //$tenantRecord = $populateTable($record, 'cmi5launch_player');
-    
+
+/*
 //TODO-Better to just use tenantRecord->property in retrieveUrl func??
 $actorName = $record->name; 
 $homepage =$record->homepage;
 $returnUrl=$record->returnurl;
 $url= $record-> requesturl;
 $token = $record->tenanttoken;
-
+*/
     //utilize function
-    $result = $retrieveUrl($actorName, $homepage, $returnUrl, $url, $token);
+    //$result = $retrieveUrl($actorName, $homepage, $returnUrl, $url, $token);
     
     //decode returned response into array
-    $returnedInfo = json_decode($result, true);
+  //  $returnedInfo = json_decode($result, true);
 
     //Hrmmm something worng here, this was working earlier, lets dump and find out
     echo "<br>";
     echo "<br>";
     echo "Make sure the returnedinfo is correct????";
-    var_dump($returnedInfo);
+    //var_dump($returnedInfo);
     echo "<br>";
     echo "<br>";
-
+/*
     //Save the returnedInfo to table
     $record->sessionid = $returnedInfo['id'];
     $record->launchmethod = $returnedInfo['launchMethod'];
     $record->launchurl = $returnedInfo['url'];
     $DB->update_record("cmi5launch_player", $record, true);
-
+*/
 
     //Is this URL to be returned the right one? -MB
 //SO since this is the right one, do we need to just grab it from
@@ -237,8 +244,16 @@ $token = $record->tenanttoken;
 */
     //To find out, lets return it
     ///YES! This does control the url, so above needs to retrieve based on id.
-  //  $rtnstring = "http://localhost:63398/content/4/22/index.html?endpoint=http%3A%2F%2Flocalhost%3A63398%2Flrs&fetch=http%3A%2F%2Flocalhost%3A63398%2Ffetch-url%2F72&actor=%7B%22account%22%3A%7B%22homePage%22%3A%22http%3A%2F%2FmyLMSexample.com%22%2C%22name%22%3A%22Victory%22%7D%7D&activityId=https%3A%2F%2Fw3id.org%2Fxapi%2Fcmi5%2Fcatapult%2Fplayer%2Fcourse%2F4e2becf0-f7eb-4ecd-8d91-607d92a375b0%2Fau%2F0&registration=66e72149-ab6a-49e3-82d5-7b2fde0c5121";
-    $rtnstring = $record->launchurl; 
+//    $rtnstring ="http://localhost:63398/content/4/37/index.html?endpoint=http%3A%2F%2Flocalhost%3A63398%2Flrs&fetch=http%3A%2F%2Flocalhost%3A63398%2Ffetch-url%2F78&actor=%7B%22account%22%3A%7B%22homePage%22%3A%22http%3A%2F%2FmyLMSexample.com%22%2C%22name%22%3A%22Victory%22%7D%7D&activityId=https%3A%2F%2Fw3id.org%2Fxapi%2Fcmi5%2Fcatapult%2Fplayer%2Fcourse%2F730665fb-383c-4047-aa19-1ff044d567c6%2Fau%2F0&registration=775f1018-224d-4d27-a842-993751a177f1";
+
+//This is where I have it pulling from a table to et info, above they o by uuid
+//What table are THEY pulling from?
+//$rtnstring = $record->launchurl; 
+
+//Retrieve actor record, this enables correct actor info for URL storage
+$record = $DB->get_record("cmi5launch_player", array('id' => $cmi5launch->id));
+$rtnstring = $record->
+
   return $rtnstring;
 }
 

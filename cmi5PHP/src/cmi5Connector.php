@@ -58,14 +58,12 @@ class cmi5Connectors{
         $data = $file;
   
         //sends the stream to the specified URL 
-        $result = $this->sendRequest($data, $url, $token);
+        $result = $this->sendRequestM($data, $url, $token);
 
-        echo "<br>";echo "<br>";
+  
         echo "<br>";
         echo "Okey pokey result is hopefully gonna work lets dump it here";
         var_dump($result);
-        echo "<br>";
-        echo "<br>";
         echo "<br>";
 
         if ($result === FALSE) 
@@ -79,6 +77,20 @@ class cmi5Connectors{
             echo"<br>";
             echo"<br>";
             echo "Course created. Response: is $result";
+		  //to bring in functions from class cmi5Connector
+		  //$connectors = new cmi5Connectors;
+		  //to bring in functions from class cmi5_table_connectors
+		  //$tableConnectors = new cmi5Tables;
+		  //create instance of class functions
+		  //$populateTable = $tableConnectors->getPopulateTable();
+		  //Now we can popuate table and the id wont be null
+		  //We can populate with theerturned course id
+		  //If we chnage ow ppulate tbale works tl be good, it doesn't
+		  //need a record really cause al ttakes is the record id? S ust pass an id? 
+		  
+		 
+		  //Populate player table with record and tenant info for URL retrieval, and retrieve newly created record
+   			//$tenantRecord = $populateTable($record, 'cmi5launch_player');
             var_dump($result);
             echo"<br>";
 
@@ -111,7 +123,7 @@ class cmi5Connectors{
             'code' => $tenant);
     
         //sends the stream to the specified URL 
-        $result = $this->sendRequest($data, $url, $username, $password);
+        $result = $this->sendRequestM($data, $url, $username, $password);
 
         echo "<br>";
         echo "What about here?";
@@ -158,7 +170,7 @@ class cmi5Connectors{
     
     
         //sends the stream to the specified URL 
-        $token = $this->sendRequest($data, $url, $username, $password);
+        $token = $this->sendRequestM($data, $url, $username, $password);
 
         if ($token === FALSE) 
             { echo"Something went wrong!";
@@ -178,29 +190,52 @@ class cmi5Connectors{
     //@param $returnUrl - The URL that will be passed as the returnUrl property in actor
     //@param $url - The URL to send request for launch URL to
     ////////
-    public function retrieveUrl($actorName, $homepage, $returnUrl, $url, $bearerToken){
-
+    //Trying somehting new, maybe just pass in id instead of above params?
+    public function retrieveUrl($id){
+		global $DB;
         echo "Retreive url function entered ";
 
-        //retrieve and assign params
-        $actor = $actorName;
-        $homeUrl = $homepage;
-        $retUrl = $returnUrl;
-        $token = $bearerToken;
-        $reqUrl = $url;
+	   //Maybe better to retreive them here as noted instead of in process_new_packae
+	   //in lib.php??
+
+	   // Retrieve record, this enables correect actor info for URL retrieval
+	  // $record = $DB->get_record('cmi5launch', array('id' => $id));
+	//I dont think this is the right time to pull get->record
+
+
+		//to bring in functions from class cmi5_table_connectors
+		//$tableConnectors = new cmi5Tables;
+		//create instance of class functions
+		//$populateTable = $tableConnectors->getPopulateTable();
+		//Populate player table with record and tenant info for URL retrieval, and retrieve newly created record
+  		//$tenantRecord = $populateTable($record, 'cmi5launch_player');
+		 
+		$settings = cmi5launch_settings($id);
+		//TODO - I am hardcoding these for now, want to check with others as to best way to collect this info
+        //such as from cmi5 mod install page, or cmi5 course uploadpage??? -MB
+        $homepage ="http://myLMSexample.com";
+        $returnUrl="http://127.0.0.1:63398.com";
+	   $actor= $settings['cmi5launchtenantname'];
+		$token = $settings['cmi5launchtenanttoken'];
+		$playerUrl = $settings['cmi5launchplayerurl'];
+		$playerPort = $settings['cmi5launchplayerport'];
+		$courseId = $id;
+    	//new way to make url
+		$url = "http://" . $playerUrl . ":" . $playerPort . "/api/v1/course/" . $courseId  ."/launch-url/0";
+
         echo "<br>";
-        echo "actorname is {$actor} and the home URL is {$homeUrl}, now returnURL is {$retUrl}, the token is {$token}, and its going to {$reqUrl}";
+        echo "actorname is {$actor} and the home URL is {$homepage}, now returnURL is {$returnUrl}, the token is {$token}, and its going to {$url}";
         echo "<br>";
 
         //the body of the request must be made as array first
         $data = array(
             'actor' => array (
                 'account' => array(
-                    "homePage" => $homeUrl,
+                    "homePage" => $homepage,
                     "name" => $actor,
                 )
             ),
-            'returnUrl' => $retUrl
+            'returnUrl' => $returnUrl
         );
     
         // use key 'http' even if you send the request to https://...
@@ -223,18 +258,27 @@ class cmi5Connectors{
         $context  = stream_context_create(($options));
 
         //sends the stream to the specified URL and stores results (the false is use_include_path, which we dont want in this case, we want to go to the url)
-        $launchResponse = file_get_contents( $reqUrl, false, $context );
-        
+        $launchResponse = file_get_contents( $url, false, $context );
+
+	   	//to bring in functions from class cmi5Connector
+		$connectors = new cmi5Tables;
+		//create instance of class functions
+		$saveUrl = $connectors->getSaveURL();
+		//Save the returned info to the correct table
+		$saveUrl($id, $launchResponse);
+		
         //return response
         return $launchResponse;
     }
+
+
         ///Function to construct, send an URL, and save result
         //@param $dataBody - the data that will be used to construct the body of request as JSON 
         //@param $url - The URL the request will be sent to
         //@param ...$tenantInfo is a variable length param. If one is passed, it is $token, if two it is $username and $password
         ///
         /////
-        public function sendRequest($dataBody, $urlDest, ...$tenantInfo) {
+        public function sendRequestM($dataBody, $urlDest, ...$tenantInfo) {
             $data = $dataBody;
             $url = $urlDest;
             $tenantInformation = $tenantInfo;

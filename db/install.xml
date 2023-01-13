@@ -12,7 +12,8 @@
         <FIELD NAME="intro" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="General introduction of the cmi5launch activity"/>
         <FIELD NAME="introformat" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Format of the intro field (MOODLE, HTML, MARKDOWN...)"/>
         <FIELD NAME="cmi5launchurl" TYPE="char" LENGTH="1333" NOTNULL="true" SEQUENCE="false" COMMENT="Launch URL"/>
-        <FIELD NAME="cmi5activityid" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Launch URL"/>
+        <FIELD NAME="cmi5activityid" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="??? "/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="This is the course id returned by cmi5"/>
         <FIELD NAME="cmi5verbid" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Launch URL"/>
         <FIELD NAME="cmi5expiry" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="365" SEQUENCE="false" COMMENT="Number of days to expire completion after"/>
         <FIELD NAME="overridedefaults" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false" COMMENT="Determines if the activity is inheriting the global defaults or has overriden them at the activity level."/>
@@ -65,19 +66,18 @@
         <FIELD NAME="launchmethod" TYPE="char" LENGTH="10" NOTNULL="false" DEFAULT="AnyWindow" SEQUENCE="false" COMMENT="Whether the course's retrieved URL opens in it's own window or new one"/>
         <FIELD NAME="returnurl" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Tenants return url, where it will go after closing course from launch url"/>
         <FIELD NAME="homepage" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Tenants homepage(URL)"/>
-        <FIELD NAME="registrationid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Course registration ID returned by CMI5 player"/>
+        <FIELD NAME="registrationid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Course registration ID returned by CMI5 player. We want to use this for LRS instead"/>
         <FIELD NAME="sessionid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Id created when an AU launch URL is requested"/>
         <FIELD NAME="launchurl" TYPE="char" LENGTH="500" NOTNULL="false" SEQUENCE="false" COMMENT="Returned launch url from cmi5 player"/>
         <FIELD NAME="requesturl" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Url to send launch url request to"/>
         <FIELD NAME="cmi5playerurl" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Cmi5 player url"/>
         <FIELD NAME="cmi5playerport" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Cmi5 player port"/>
-        <FIELD NAME="returnurl" TYPE="varchar" LENGTH="<maximum_limit>" NOTNULL="false" SEQUENCE="false" COMMENT="The full course as a string"/>
-
-
-
+        <FIELD NAME="courseinfo" TYPE="text" LENGTH="4000" NOTNULL="false" SEQUENCE="false" COMMENT="The full string of course info"/>              
+        <FIELD NAME="firstlaunch" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Time activity was first launched, for LRS."/>
+        <FIELD NAME="lastlaunch" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Time activity was last launched, for LRS."/>
       </FIELDS>
       <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="courseid"/>
+        <KEY NAME="primary" TYPE="primary" FIELDS="registrationid"/>
       </KEYS>
       <INDEXES>
         <INDEX NAME="name" UNIQUE="false" FIELDS="name"/>

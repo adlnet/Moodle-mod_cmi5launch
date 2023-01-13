@@ -559,9 +559,10 @@ function cmi5launch_process_new_package($cmi5launch) {
     //to bring in functions from class cmi5_table_connectors
     $tableConnectors = new cmi5Tables;
     //create instance of class functions
-   // $retrieveUrl = $connectors->getRetrieveUrl();
+    $retrieveUrl = $connectors->getRetrieveUrl();
     $populateTable = $tableConnectors->getPopulateTable();
     $createCourse = $connectors->getCreateCourse();
+    
     // Reload cmi5 instance.
     $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
 
@@ -591,15 +592,21 @@ function cmi5launch_process_new_package($cmi5launch) {
     $packagefile = $fs->get_file($context->id, 'mod_cmi5launch', 'package', 0, '/', $zipfilename);
     
     //Populate player table with record and tenant info for URL retrieval, and retrieve newly created record
-    $tenantRecord = $populateTable($record, 'cmi5launch_player');
+  // $tenantRecord = $populateTable($record, 'cmi5launch_player');
     
     //TODO-Better to just use tenantRecord->property in retrieveUrl func??
-    $actorName = $tenantRecord->name; 
-    $homepage =$tenantRecord->homepage;
-    $returnUrl=$tenantRecord->returnurl;
-    $url= $tenantRecord-> requesturl;
-    $token = $tenantRecord->tenanttoken;
-    
+    //$actorName = $tenantRecord->name; 
+    //$homepage =$tenantRecord->homepage;
+    //$returnUrl=$tenantRecord->returnurl;
+    //$url= $tenantRecord-> requesturl;
+//   $token = $tenantRecord->tenanttoken;
+
+    //Well, if the course needs to be made at same time as new record, 
+    //What if we just retreive token here? Instead of in populate table?
+    //Retrieve user settings to apply to newly created record
+    $settings = cmi5launch_settings($cmi5launch->id);
+    $token = $settings['cmi5launchtenanttoken'];
+
 
     //TODO - When uploading a new course - this is where we want it to send to CMI5 and
     //then here we can get the laucnh URL, although in the future may go elsewhere
@@ -608,38 +615,29 @@ function cmi5launch_process_new_package($cmi5launch) {
     echo "<br>";
     echo "About to try createCourse";
     echo "<br>";
-    //Moving this down JUST to try
-//$createCourse($context->id, $token, $packagefile );//files instead of packagefile??
+    //Maybe createcourse should cal populate able? Then the id won't ever be null
+//No create course canRETURN naid and then THAT id na be sent..	
+   $courseResults =  $createCourse($context->id, $token, $packagefile );//files instead of packagefile??
 //////////////////////////////////////////
-    //So can we save the returned info here? 
-    $tenantRecord->courseid = $courseInfo['id'];
-    
-    echo "<br>";echo "<br>";
+echo "<br>";echo "<br>";
     echo "Tried to fire createCourse, hope it worked";
+    echo "<br>";echo "<br>";
+//Take the results of creaetd course and save new course id to table
+	$record->courseid = $courseResults["id"];
+	echo "<br>";
+            echo "WHAT IS Re records cmi5activyt HERE?" . $record->courseid;
+            echo"<br>";
+    //Populate player table with record and tenant info for URL retrieval, and retrieve newly created record
+	//$tenantRecord = $populateTable($record, 'cmi5launch_player');
     
-    echo "<br>";
-    echo "Ok, lets see if I grabbed the right info" . $courseInfo['id'];
-    echo "<br>";
 
-    //Save info
-    $DB->update_record("cmi5launch_player", $tenantRecord, true);
-
-    //This is probably best done in local lib cmi5launch_get_luanch_url
-/*
-//utilize function
-    $result = $retrieveUrl($actorName, $homepage, $returnUrl, $url, $token);
+    //utilize function
+    //$result = $retrieveUrl($actorName, $homepage, $returnUrl, $url, $token);
     
     //decode returned response into array
-    $returnedInfo = json_decode($result, true);
+    //$returnedInfo = json_decode($result, true);
 
-    //Hrmmm something worng here, this was working earlier, lets dump and find out
-    echo "<br>";
-    echo "<br>";
-    echo "returnedinfo is no longer working, why????";
-    var_dump($returnedInfo);
-    echo "<br>";
-    echo "<br>";
-
+/*
     //Assign the returnedInfo to tenantRecord
     $tenantRecord->sessionid = $returnedInfo['id'];
     $tenantRecord->launchmethod = $returnedInfo['launchMethod'];
@@ -647,17 +645,11 @@ function cmi5launch_process_new_package($cmi5launch) {
 
     //Update record in table with newly retrieved url data
     $DB->update_record("cmi5launch_player", $tenantRecord, true);
-*/    
+*/
     $fs->delete_area_files($context->id, 'mod_cmi5launch', 'content');
 
     $packer = get_file_packer('application/zip');
     $packagefile->extract_to_storage($packer, $context->id, 'mod_cmi5launch', 'content', 0, '/');
-/////^^^^^^^^
-//Wait, if the c i5 5 file isnt, is it opening further HERE?
-    echo "<br>";
-    echo "MOVIED COURSE CREATE DOWN";
-$createCourse($context->id, $token, $packagefile );//files instead of packagefile??
-
 
     // If the cmi5.xml file isn't there, don't do try to use it.
     // This is unlikely as it should have been checked when the file was validated.
@@ -842,7 +834,7 @@ function cmi5launch_getactor($instance) {
  */
 function cmi5launch_settings($instance) {
     global $DB, $CFG, $cmi5launchsettings;
-    //global $cmi5launch;
+    global $cmi5launch;
     //This may be a good place to pull up launchurl from cmi5launch_player -MB
     echo "<br>";
     echo "This may be  a good place to launchurl";
@@ -851,6 +843,9 @@ function cmi5launch_settings($instance) {
     if (!is_null($cmi5launchsettings)) {
         return $cmi5launchsettings;
     }
+    echo "<br>";
+    echo "11111111";
+    echo "<br>";
 
     //ok here is where it is accessing the table, below it seems to calls certain fields of the tablebut why is cmi5launch tacked onto front??-MB
     $expresult = array();
@@ -860,6 +855,11 @@ function cmi5launch_settings($instance) {
         $fields = '*',
         $strictness = IGNORE_MISSING
     );
+    echo "<br>";
+    echo "Is activity settings being pop?";
+	var_dump($activitysettings);
+    echo "<br>";
+
     // If global settings are not used, retrieve activity settings.
     if (!use_global_cmi5_lrs_settings($instance)) {
         $expresult['cmi5launchlrsendpoint'] = $activitysettings->lrsendpoint;

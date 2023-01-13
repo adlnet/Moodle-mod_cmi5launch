@@ -22,6 +22,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+
+ //So WHO calls THIS? We need to go into this WITH a UUID already
+
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once('header.php');
 //I added this global, It was in a wrongfile, or it was in cmi5_launchsettings even though it wasn't
@@ -36,6 +39,11 @@ $event->add_record_snapshot('course_modules', $cm);
 $event->add_record_snapshot('cmi5launch', $cmi5launch);
 $event->trigger();
 
+//MB//
+//BUT, launchform_reg IS this file.... So it will probably be empty,
+//Where is it getting the id from?
+//A-from  script running behind the scenes in view.php. View.php calls this form, but
+//in the meantime the regid is being generated. We need to get there. 
 // Get the registration id.
 $registrationid = required_param('launchform_registration', PARAM_TEXT);
 if (empty($registrationid)) {
@@ -47,6 +55,8 @@ if (empty($registrationid)) {
     die();
 }
 
+//MB//
+//Here we want to send OUR REGG
 // Save a record of this registration to the LRS state API.
 
 $getregistrationdatafromlrsstate = cmi5launch_get_global_parameters_and_get_state(
@@ -80,6 +90,12 @@ $registrationdataforthisattempt = array(
         "lastlaunched" => $datenow
     )
 );
+
+echo "<br>";
+echo "What is the registrationID here in launch.php after weird array thingy : ";
+var_dump($registrationid);
+echo "<br>";
+//Nothing! This is where the error is, so why can their id change and not mine???
 
 //MB
 //Getting error on  - Exception - Attempt to modify property "httpResponse" on null
@@ -141,6 +157,7 @@ if ($lrsrespond != 204) {
     die();
 }
 
+//I think this is throwing the error. it must not like my regid, why? Lets ivestigate
 $savelaunchedstatement = cmi5_launched_statement($registrationid);
 
 $lrsrespond = $savelaunchedstatement->httpResponse['status'];
@@ -162,6 +179,12 @@ $completion->set_module_viewed($cm);
 //If this si where it calls for the launch URL, then perhaps the URL should
 //be generatedin function. Or at least retreived if exists already-MB
 // Launch the experience.
+//////
+//Because this is where the regid is generated, maybe we can call our func here?
+//I don't want it having wrong uuid...
+
+////Ok, so now we need itt saved to a table so below func can retreive
+
 header("Location: ". cmi5launch_get_launch_url($registrationid));
 
 exit;
