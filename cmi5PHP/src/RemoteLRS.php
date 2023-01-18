@@ -36,6 +36,7 @@ class RemoteLRS implements LRSInterface
     protected $headers;
     protected $extended;
 
+    //THI IS THE PRIBLEM, THE ARGS HERE WHHYYY -MBMBMBMBMBM
     public function __construct() {
         $_num_args = func_num_args();
         if ($_num_args == 1) {

@@ -33,65 +33,106 @@ class cmi5Tables
         global $DB;
 
 		$table = "cmi5launch_player";
-   
-          //Make sure record doesn't exist before attempting to create
-          $check = $this->checkRecord($id, $table);
+
+		//We can get the reg id here and be sure to save it as it's necessary
+		//cant be null
+		$urlDecoded = json_decode($urlInfo, true);
+		$url = $urlDecoded['url'];
+		//urlInfo is one big string so
+		parse_str($url, $urlInfo);
+		echo "<br>";
+		echo "url decoded is  : ";
+		var_dump($urlInfo);
+		echo "<br>";
+
+		$regid = $urlInfo['registration'];
+		
+		//parse_str($urlInfo, $urlParsed);
+		//Ok, here is our new regid	
+		echo "<br>";
+		echo "Registration id  : ";
+		var_dump($regid);
+		echo "<br>";
+		
+         
 
 		//Retrieve actor record, this enables correct actor info for URL storage
 		$record = $DB->get_record("cmi5launch", array('id' => $id));
+		//Assign new regid
+		//$record->registrationid = $regid;
+
+		//This always uses id...no wonder I am having trouble
+        //Attempt to get record
+        $check = $DB->get_record($table, ['registrationid' => $regid,], '*', IGNORE_MISSING);
+
+
+		 //Make sure record doesn't exist before attempting to create
+         //This should go by reggid right? Not id as previous?
+	  //  $check = $this->checkRecord($regid, $table);
+
+		//This needs to be changed megan, it can't be called cmi5activity id and regid elsewhere unless,
+		//we write a query. Line 69 doesn't know its the id it needs. 
 	
 
-          //If false, record doesn't exist, so import it
-          if (!$check) {
-  
+          //If false, record doesn't exist, so create  it
+		if (!$check) {
+
 			echo "<br>";
 			echo "Record doesn't exist";
 			echo "<br>";
-  
-              //import_record returns a true/false value based on if record created successfully  
-              $recordImported = $DB->import_record($table, $record, true);
-  
-              //Ensure it was imported successfully
-              if ($recordImported != null || false) {
-  
-                  echo"<br>";
-                  echo "S if record is 1 that means it should com here bein neither false or ull";
-                  echo"<br>";
-  
-                  //Retrieve newly created record
-                  $newRecord = $DB->get_record($table, ['courseid' => $id], '*', IGNORE_MISSING);
-   
-                  //////////////////////////////////////////////////////////////////////////
-                  //Retrieve user settings to apply to newly created record
-                  $settings = cmi5launch_settings($record->id);
-                  $newRecord->tenantname = $settings['cmi5launchtenantname'];
-                  $newRecord->tenanttoken = $settings['cmi5launchtenanttoken'];
-                  $newRecord->cmi5playerurl = $settings['cmi5launchplayerurl'];
-                  $newRecord->cmi5playerport = $settings['cmi5launchplayerport'];
-     			$newRecord->sessionid = $urlInfo['id'];
-     			$newRecord->launchmethod = $urlInfo['launchMethod'];
-     			$newRecord->launchurl = $urlInfo['url'];
-   
 
-                  //Update record in table with newly retrieved tenant data
-                  //Ok, here is were the trouble isits not updatin table caus et says the 
-                  //courseid is dup, quesion is, do we want that? Maybe we have MakeCOurse ni wron spo, althouh if thye pdte
-                  //the course we would want itto have new id...hrmm
-                  $DB->update_record($table, $newRecord, true);
-                  echo"<br>";
-                  echo "Are we ettin here Is this where it's haning up?? ";
-                  echo"<br>";
-  
-                  //new way to make url
-                  $url = "http://" . $newRecord->cmi5playerurl . $newRecord->cmi5playerport . "/api/v1/course/12/launch-url/0";
-  
-                  //Return record from updated table
-                  return $newRecord = $DB->get_record($table, ['courseid' => $id], '*', IGNORE_MISSING);
-              }
-          }   else {
+				//Assign new regid
+			//$record->registrationid = $regid;
+
+			//Lets skip the if here
+
+				echo "<br>";
+				echo "S if record is 1 that means it should com here bein neither false or ull";
+				echo "<br>";
+
+				//////////////////////////////////////////////////////////////////////////
+				//Retrieve user settings to apply to newly created record
+				
+				$settings = cmi5launch_settings($record->id);
+				$record->tenantname = $settings['cmi5launchtenantname'];
+				$record->tenanttoken = $settings['cmi5launchtenanttoken'];
+				$record->cmi5playerurl = $settings['cmi5launchplayerurl'];
+				$record->cmi5playerport = $settings['cmi5launchplayerport'];
+				$record->sessionid = $urlDecoded['id'];
+				$record->launchmethod = $urlDecoded['launchMethod'];
+				$record->launchurl = $urlDecoded['url'];
+				//Assign new regid
+				$record->registrationid = $regid;
+
+				//new way to make url
+				$url = "http://" . $record->cmi5playerurl . $record->cmi5playerport . "/api/v1/course/12/launch-url/0";
+				//Assign new url
+				$record->requrl = $url;
+				
+				//import_record returns a true/false value based on if record created successfully  
+				$recordImported = $DB->import_record($table, $record, true);
+
+				//Update record in table with newly retrieved tenant data
+				//Ok, here is were the trouble isits not updatin table caus et says the 
+				//courseid is dup, quesion is, do we want that? Maybe we have MakeCOurse ni wron spo, althouh if thye pdte
+				//the course we would want itto have new id...hrmm
+				//$DB->update_record($table, $newRecord, true);
+				echo "<br>";
+				echo "Are we ettin here Is this where it's haning up?? ";
+				echo "<br>";
+
+				
+				//Return record from updated table
+				//return $newRecord = $DB->get_record($table, ['courseid' => $id], '*', IGNORE_MISSING);
+				echo "<br>";
+				echo "Record created, URL saved. regid is  " . $regid;
+				echo "<br>";
+			
+			
+		} else {
   
               echo "<br>";
-              echo "Record DOES existand needs to be updated";
+              echo "Record DOES exist and needs to be updated";
               echo "<br>";
                   // If it does exist, update it
                   //update_record returns true/false depending on success
@@ -101,22 +142,26 @@ class cmi5Tables
                   if ($recordUpdate != null || false) {
   
                       //Retrieve the updated record
-                      $updatedRecord = $DB->get_record($table, ['courseid' => $id], '*', IGNORE_MISSING);
+                      $updatedRecord = $DB->get_record($table, ['registrationid' => $regid], '*', IGNORE_MISSING);
   
                       	//Retrieve user settings to apply to newly created record
                       	$settings = cmi5launch_settings($id);
                       	$updatedRecord->tenantname = $settings['cmi5launchtenantname'];
                       	$updatedRecord->tenanttoken = $settings['cmi5launchtenanttoken'];
-                      	$updatedRecord->sessionid = $urlInfo['id'];
-     				$updatedRecord->launchmethod = $urlInfo['launchMethod'];
-     				$updatedRecord->launchurl = $urlInfo['url'];
+                      	$updatedRecord->sessionid = $urlDecoded['id'];
+     				$updatedRecord->launchmethod = $urlDecoded['launchMethod'];
+     				$updatedRecord->launchurl = $urlDecoded['url'];
 
                       //Update record in table with newly retrieved tenant data
                       $DB->update_record($table, $updatedRecord, true);
   
                       //Return record from updated table
-                      return $updatedRecord = $DB->get_record($table, ['courseid' => $id], '*', IGNORE_MISSING);
-                  }
+                      //return $updatedRecord = $DB->get_record($table, ['courseid' => $id], '*', IGNORE_MISSING);
+				  echo "<br>";
+				  echo "Record updated, URL is saved, regid is  " . $regid;
+				  echo "<br>";
+				
+				}
               }
    
    
@@ -251,6 +296,7 @@ class cmi5Tables
     {
         global $DB;
 
+	   //This always uses id...no wonder I am having trouble
         //Attempt to get record
         $cmi5launchID = $DB->get_record($table, ['id' => $id,], '*', IGNORE_MISSING);
 

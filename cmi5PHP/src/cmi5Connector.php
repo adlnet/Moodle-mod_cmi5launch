@@ -209,7 +209,12 @@ class cmi5Connectors{
 		//$populateTable = $tableConnectors->getPopulateTable();
 		//Populate player table with record and tenant info for URL retrieval, and retrieve newly created record
   		//$tenantRecord = $populateTable($record, 'cmi5launch_player');
-		 
+		
+		
+		//Retrieve actor record, this enables correct actor info for URL storage
+		$record = $DB->get_record("cmi5launch", array('id' => $id));
+
+
 		$settings = cmi5launch_settings($id);
 		//TODO - I am hardcoding these for now, want to check with others as to best way to collect this info
         //such as from cmi5 mod install page, or cmi5 course uploadpage??? -MB
@@ -219,9 +224,9 @@ class cmi5Connectors{
 		$token = $settings['cmi5launchtenanttoken'];
 		$playerUrl = $settings['cmi5launchplayerurl'];
 		$playerPort = $settings['cmi5launchplayerport'];
-		$courseId = $id;
-    	//new way to make url
-		$url = "http://" . $playerUrl . ":" . $playerPort . "/api/v1/course/" . $courseId  ."/launch-url/0";
+		$courseId = $record->courseid;
+
+	$url = "http://" . $playerUrl . ":" . $playerPort . "/api/v1/course/" . $courseId  ."/launch-url/0";
 
         echo "<br>";
         echo "actorname is {$actor} and the home URL is {$homepage}, now returnURL is {$returnUrl}, the token is {$token}, and its going to {$url}";

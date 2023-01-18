@@ -834,20 +834,11 @@ function cmi5launch_getactor($instance) {
  */
 function cmi5launch_settings($instance) {
     global $DB, $CFG, $cmi5launchsettings;
-    global $cmi5launch;
-    //This may be a good place to pull up launchurl from cmi5launch_player -MB
-    echo "<br>";
-    echo "This may be  a good place to launchurl";
-    echo "<br>";
-
+    
     if (!is_null($cmi5launchsettings)) {
         return $cmi5launchsettings;
     }
-    echo "<br>";
-    echo "11111111";
-    echo "<br>";
 
-    //ok here is where it is accessing the table, below it seems to calls certain fields of the tablebut why is cmi5launch tacked onto front??-MB
     $expresult = array();
     $activitysettings = $DB->get_record(
         'cmi5launch_lrs',
@@ -855,11 +846,7 @@ function cmi5launch_settings($instance) {
         $fields = '*',
         $strictness = IGNORE_MISSING
     );
-    echo "<br>";
-    echo "Is activity settings being pop?";
-	var_dump($activitysettings);
-    echo "<br>";
-
+  
     // If global settings are not used, retrieve activity settings.
     if (!use_global_cmi5_lrs_settings($instance)) {
         $expresult['cmi5launchlrsendpoint'] = $activitysettings->lrsendpoint;

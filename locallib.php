@@ -252,9 +252,12 @@ $token = $record->tenanttoken;
 
 //Retrieve actor record, this enables correct actor info for URL storage
 $record = $DB->get_record("cmi5launch_player", array('id' => $cmi5launch->id));
-$rtnstring = $record->
+    $rtnstring = $record->launchurl;
+    echo "<br>";
+    echo "I think this may be problem, what is rtnstring here" . $rtnstring; //or not
+    echo "<br>";
 
-  return $rtnstring;
+    return $rtnstring;
 }
 
 ///This might be useful to take info back from sending a course and parsing data
@@ -441,12 +444,34 @@ function cmi5launch_get_global_parameters_and_get_state($key) {
     global $cmi5launch;
     $cmi5launchsettings = cmi5launch_settings($cmi5launch->id);
 
+    echo "<br>";
+echo "Ok, Are we entering this func? is cmi5launchsetting pop here";
+    var_dump($cmi5launchsettings);
+echo "<br>";
+
     $lrs = new \cmi5\RemoteLRS(
         $cmi5launchsettings['cmi5launchlrsendpoint'],
         $cmi5launchsettings['cmi5launchlrsversion'],
         $cmi5launchsettings['cmi5launchlrslogin'],
         $cmi5launchsettings['cmi5launchlrspass']
     );
+
+    echo "<br>";
+    echo "Ok, we are entering this func!!! What is LRS here??";
+        var_dump($lrs);
+    echo "<br>";
+    echo "<br>";echo "<br>";
+    echo "<br>";
+    echo "What is this here> cmi5launch->cmi5activityid" . trim($cmi5launch->cmi5activityid);
+    echo "<br>";echo "<br>";
+    echo "<br>";
+    $test = cmi5launch_getactor($cmi5launch->id);
+    echo "What is this here> cmi5launch->id" . 
+    var_dump($test);
+    echo "<br>";echo "<br>";
+    echo "<br>";
+    echo "What is this key here?" . ($key);
+
 
     return $lrs->retrieveState(
         new \cmi5\Activity(array("id" => trim($cmi5launch->cmi5activityid))),

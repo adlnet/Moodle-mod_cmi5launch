@@ -125,10 +125,24 @@ $retrieveUrl = $connectors->getRetrieveUrl();
 echo "Trying to launch url with this id " . $cmi5launch->id;
 //Lets try making our own regid here 
 $urlResults = $retrieveUrl($cmi5launch->id);
+
+
 echo "<br>";
 echo "Did it wokr? Here are results: ";
 var_dump($urlResults);
 echo "<br>";
+$urlDecoded = json_decode($urlResults, true);
+
+$url = $urlDecoded['url'];
+		//urlInfo is one big string so
+		parse_str($url, $urlInfo);
+		echo "<br>";
+		echo "url decoded is  : ";
+		var_dump($urlInfo);
+		echo "<br>";
+
+		$registrationid = $urlInfo['registration'];
+/*
 //test array
 parse_str($urlResults, $urlParsed);
 echo "<br>";
@@ -141,9 +155,14 @@ echo "<br>";
 //But whatever that returns, the reg id is IN THE URL right? So should that be parsed here or in
 //another
 
+
 //Ok, here is our new regid
 $registrationid = substr($urlParsed['registration'],0, -2);
+*/
 
+//$record = $DB->get_record('cmi5launch_player', ['id' => $cmi5launch->id,], '*', IGNORE_MISSING);
+
+//$registrationid = $record->registrationid;
 echo "<br>";
 echo "What is the registrationID here (ours) : ";
 var_dump($registrationid);
@@ -152,13 +171,24 @@ echo "<br>";
 $getregistrationdatafromlrsstate = cmi5launch_get_global_parameters_and_get_state(
     "http://cmi5api.co.uk/stateapikeys/registrations"
 );
+
+echo "<br>";
+echo "AHA!!!!!! Not gettin here or next??&&&&&&&&&&&&&&&&";
+echo "<br>";
 $lrsrespond = $getregistrationdatafromlrsstate->httpResponse['status'];
 
+echo "<br>";
+echo "Ok, We are going to do this the harrrd way 11111111111111111111";
+echo "<br>";
 
 if ($lrsrespond != 200 && $lrsrespond != 404) {
     // On clicking new attempt, save the registration details to the LRS State and launch a new attempt.
     echo "<div class='alert alert-error'>" . get_string('cmi5launch_notavailable', 'cmi5launch') . "</div>";
 
+    echo "<br>";
+    echo "Ok, We are going to do this the harrrd way 222222222222222222";
+    echo "<br>";
+    
     if ($CFG->debug == 32767) {
         echo "<p>Error attempting to get registration data from State API.</p>";
         echo "<pre>";
@@ -168,9 +198,16 @@ if ($lrsrespond != 200 && $lrsrespond != 404) {
     die();
 }
 
+echo "<br>";
+    echo "Ok, We are going to do this the harrrd way 3333333333333333333";
+    echo "<br>";
+
 if ($lrsrespond == 200) {
     $registrationdatafromlrs = json_decode($getregistrationdatafromlrsstate->content->getContent(), true);
 
+    echo "<br>";
+    echo "Ok, We are going to do this the harrrd way 4444444444444444444";
+    echo "<br>";
     foreach ($registrationdatafromlrs as $key => $item) {
 
         if (!is_array($registrationdatafromlrs[$key])) {

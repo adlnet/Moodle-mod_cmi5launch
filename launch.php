@@ -39,21 +39,34 @@ $event->add_record_snapshot('course_modules', $cm);
 $event->add_record_snapshot('cmi5launch', $cmi5launch);
 $event->trigger();
 
+echo'<br>';
+echo "THIS IS IN LAUNCH FORM. HERE cmi5launch IS : "  ;
+var_dump($cmi5launch); 
+echo'<br>';
+
 //MB//
 //BUT, launchform_reg IS this file.... So it will probably be empty,
 //Where is it getting the id from?
 //A-from  script running behind the scenes in view.php. View.php calls this form, but
 //in the meantime the regid is being generated. We need to get there. 
 // Get the registration id.
+//I think this is the error!!!! Lets get regid from table here? YES
+//THIS MAY be a problem, but not the one I'm working on
+
 $registrationid = required_param('launchform_registration', PARAM_TEXT);
 if (empty($registrationid)) {
     echo "<div class='alert alert-error'>".get_string('cmi5launch_regidempty', 'cmi5launch')."</div>";
     // Failed to connect to LRS.
     if ($CFG->debug == 32767) {
-        echo "<p>Error attempting to get registration id querystring parameter.</p>";
+        echo "<p>E'rror attempting to get registration id querystring parameter.</p>";
     }
     die();
 }
+
+echo'<br>';
+echo "THIS IS IN LAUNCH FORM. HERE regid IS : " . $registrationid; 
+echo'<br>';
+//$registrationid = $DB->get_record('cmi5launch_player', ['registrationid' => $regid,], '*', IGNORE_MISSING);
 
 //MB//
 //Here we want to send OUR REGG
