@@ -110,78 +110,17 @@ if ($cmi5launch->intro) { // Conditions to show the intro can change to look for
 $cmi5phputil = new \cmi5\Util();
 $registrationid = $cmi5phputil->getUUID();
 
-echo "<br>";
-//echo "What is the registrationID here (theirs) : " . $registrationid;
-//var_dump($registrationid);
-echo "<br>";
-
-//to bring in functions from class cmi5Connector
-$connectors = new cmi5Connectors;
-//create instance of class functions
-
-//////$retrieveUrl = $connectors->getRetrieveUrl();
-
-//$result = $retrieveUrl($actorName, $homepage, $returnUrl, $url, $token);
-
-
-//echo "Trying to launch url with this id " . $cmi5launch->id;
-//Lets try making our own regid here 
-//////$urlResults = $retrieveUrl($cmi5launch->id);
-
-
-echo "<br>";
-echo "Did it wokr? Here are results: ";
-//////////var_dump($urlResults);
-echo "<br>";
-///////////$urlDecoded = json_decode($urlResults, true);
-/*
-$url = $urlDecoded['url'];
-		//urlInfo is one big string so
-		parse_str($url, $urlInfo);
-		echo "<br>";
-		echo "url decoded is  : ";
-		var_dump($urlInfo);
-		echo "<br>";
-
-		$registrationid = $urlInfo['registration'];
-
-//test array
-parse_str($urlResults, $urlParsed);
-echo "<br>";
-echo "Did the parsing work? Here are results: ";
-var_dump($urlParsed);
-echo "<br>";
-//Perhaps we could have a func that creates/retreives a reguuid, and IT will call
-//the retreive url func? Just want it to be succint. And where should the info be saved to table?
-//Perhaps in func?
-//But whatever that returns, the reg id is IN THE URL right? So should that be parsed here or in
-//another
-
-
-//Ok, here is our new regid
-$registrationid = substr($urlParsed['registration'],0, -2);
-*/
-
-//$record = $DB->get_record('cmi5launch_player', ['id' => $cmi5launch->id,], '*', IGNORE_MISSING);
-
-//$registrationid = $record->registrationid;
-echo "<br>";
-echo "What is the registrationID here (ours) : ";
-var_dump($registrationid);
-echo "<br>";
-
 $getregistrationdatafromlrsstate = cmi5launch_get_global_parameters_and_get_state(
     "http://cmi5api.co.uk/stateapikeys/registrations"
 );
 
-echo "<br>";
-echo "AHA!!!!!! Not gettin here or next??&&&&&&&&&&&&&&&&";
-echo "<br>";
-$lrsrespond = $getregistrationdatafromlrsstate->httpResponse['status'];
 
+$lrsrespond = $getregistrationdatafromlrsstate->httpResponse['status'];
 echo "<br>";
-echo "Ok, We are going to do this the harrrd way 11111111111111111111";
-echo "<br>";
+    echo "Ok, We are going to do this the harrrd way 1111111111";
+echo "Whayt is http status here? " ;
+var_dump($lrsrespond);
+    echo "<br>";
 
 if ($lrsrespond != 200 && $lrsrespond != 404) {
     // On clicking new attempt, save the registration details to the LRS State and launch a new attempt.

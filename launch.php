@@ -39,9 +39,11 @@ $event->add_record_snapshot('course_modules', $cm);
 $event->add_record_snapshot('cmi5launch', $cmi5launch);
 $event->trigger();
 
+
+$newRecord = $DB->get_record('cmi5launch', ['id' => $cmi5launch->id], '*', IGNORE_MISSING);
 echo'<br>';
-echo "THIS IS IN LAUNCH FORM. HERE cmi5launch IS : "  ;
-var_dump($cmi5launch); 
+echo "THIS IS IN LAUNCH FORM. HERE record pulled by id is IS : "  ;
+var_dump($newRecord); 
 echo'<br>';
 
 //MB//
@@ -53,6 +55,7 @@ echo'<br>';
 //I think this is the error!!!! Lets get regid from table here? YES
 //THIS MAY be a problem, but not the one I'm working on
 
+/*
 $registrationid = required_param('launchform_registration', PARAM_TEXT);
 if (empty($registrationid)) {
     echo "<div class='alert alert-error'>".get_string('cmi5launch_regidempty', 'cmi5launch')."</div>";
@@ -61,21 +64,86 @@ if (empty($registrationid)) {
         echo "<p>E'rror attempting to get registration id querystring parameter.</p>";
     }
     die();
-}
+}*/
 //Can it acces the table here??
 //It can but doesn't know the sessionid to go byyy...
 //Florian thinks we can get it from lrs. /This may be better approach, how ele to keep
 //track of sessionid??
+////////////////////////////////////////////////////////////////////////////////////
+//to bring in functions from class cmi5Connector
+$connectors = new cmi5Connectors;
+//create instance of class functions
+
+$retrieveUrl = $connectors->getRetrieveUrl();
+
+//$result = $retrieveUrl($actorName, $homepage, $returnUrl, $url, $token);
+
+
+//echo "Trying to launch url with this id " . $cmi5launch->id;
+//Lets try making our own regid here 
+$urlResults = $retrieveUrl($cmi5launch->id);
+
+
+echo "<br>";
+echo "Did it wokr? Here are results: ";
+var_dump($urlResults);
+echo "<br>";
+$urlDecoded = json_decode($urlResults, true);
+
+$url = $urlDecoded['url'];
+		//urlInfo is one big string so
+		parse_str($url, $urlInfo);
+		echo "<br>";
+		echo "url decoded is  : ";
+		var_dump($urlInfo);
+		echo "<br>";
+
+		$registrationid = $urlInfo['registration'];
+
+//test array
+parse_str($urlResults, $urlParsed);
+echo "<br>";
+echo "Did the parsing work? Here are results: ";
+var_dump($urlParsed);
+echo "<br>";
+//Perhaps we could have a func that creates/retreives a reguuid, and IT will call
+//the retreive url func? Just want it to be succint. And where should the info be saved to table?
+//Perhaps in func?
+//But whatever that returns, the reg id is IN THE URL right? So should that be parsed here or in
+//another
+
+
+//Ok, here is our new regid
+//$registrationid = substr($urlParsed['registration'],0, -2);
+
+
+//$record = $DB->get_record('cmi5launch_player', ['id' => $cmi5launch->id,], '*', IGNORE_MISSING);
+
+//$registrationid = $record->registrationid;
+echo "<br>";
+echo "What is the registrationID here (ours) : ";
+var_dump($registrationid);
+echo "<br>";
+
+////////////////////////////////////////////////////////////////////////////////////
+echo'<br>';
+echo "THIS IS IN LAUNCH FORM. HERE regid IS : " . $registrationid; 
+echo'<br>';
+//$registrationid = $DB->get_record('cmi5launch_player', ['registrationid' => $registrationid,], '*', IGNORE_MISSING);
 
 echo'<br>';
 echo "THIS IS IN LAUNCH FORM. HERE regid IS : " . $registrationid; 
 echo'<br>';
-$registrationid = $DB->get_record('cmi5launch_player', ['registrationid' => $regid,], '*', IGNORE_MISSING);
 
-echo'<br>';
-echo "THIS IS IN LAUNCH FORM. HERE regid IS : " . $registrationid; 
-echo'<br>';
-
+//This is from above
+if (empty($registrationid)) {
+    echo "<div class='alert alert-error'>".get_string('cmi5launch_regidempty', 'cmi5launch')."</div>";
+    // Failed to connect to LRS.
+    if ($CFG->debug == 32767) {
+        echo "<p>E'rror attempting to get registration id querystring parameter.</p>";
+    }
+    die();
+}
 //MB//
 //Here we want to send OUR REGG
 // Save a record of this registration to the LRS state API.
@@ -114,8 +182,8 @@ $registrationdataforthisattempt = array(
 );
 
 echo "<br>";
-echo "What is the registrationID here in launch.php after weird array thingy : ";
-var_dump($registrationid);
+echo "What is the registrationdata here? IT's causing trouble : ";
+var_dump($registrationdata); //Its null so whyy
 echo "<br>";
 //Nothing! This is where the error is, so why can their id change and not mine???
 
@@ -125,9 +193,9 @@ echo "<br>";
 //access property anyway/
 if (is_null($registrationdata)) {
     // If the error is 404 create a new registration data array.
-    if ($registrationdata->httpResponse['status'] = 404) {
+   /* if ($registrationdata->httpResponse['status'] = 404) {*/
         $registrationdata = $registrationdataforthisattempt;
-    }
+   /* }*/
 } else if (array_key_exists($registrationid, $registrationdata)) {
     // Else if the regsitration exists update the lastlaunched date.
     $registrationdata[$registrationid]["lastlaunched"] = $datenow;

@@ -92,6 +92,7 @@ function cmi5launch_add_instance(stdClass $cmi5launch, mod_cmi5launch_mod_form $
     // Need the id of the newly created instance to return (and use if override defaults checkbox is checked).
     $cmi5launch->id = $DB->insert_record('cmi5launch', $cmi5launch);
 
+    //Check this out MB
     $cmi5launchlrs = cmi5launch_build_lrs_settings($cmi5launch);
 
     // Determine if override defaults checkbox is checked or we need to save watershed creds.

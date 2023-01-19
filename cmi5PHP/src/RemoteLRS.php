@@ -36,7 +36,6 @@ class RemoteLRS implements LRSInterface
     protected $headers;
     protected $extended;
 
-    //THI IS THE PRIBLEM, THE ARGS
     public function __construct() {
         $_num_args = func_num_args();
         if ($_num_args == 1) {
@@ -74,20 +73,10 @@ class RemoteLRS implements LRSInterface
         // moreStatements method which is based on server root rather
         // than the stored endpoint
         //
-
-        echo "<br>";
-        echo "What is resource here? " . $resource;
-        echo "<br>";
-        
         $url = $resource;
         if (! preg_match('/^http/', $resource)) {
             $url = $this->endpoint . $resource;
         }
-
-        echo "<br>";
-        echo "What is url here? " . $url;
-        echo "<br>";
-
         $http = array(
             //
             // redirects are not part of the spec so LRSs shouldn't be returning them
@@ -110,7 +99,6 @@ class RemoteLRS implements LRSInterface
                 'X-Experience-API-Version: ' . $this->version
             ),
         );
-
         if (isset($this->auth)) {
             array_push($http['header'], 'Authorization: ' . $this->auth);
         }
@@ -129,27 +117,18 @@ class RemoteLRS implements LRSInterface
                 array_push($http['header'], "$k: $v");
             }
         }
-
-        echo "<br>";
-        echo "Here is where it is building the query, what is the options array " ;
-        var_dump($options['params']);
-        echo "<br>";
-        //MB - Passing null to as param two 'numeric_prefix' in http_build_query
-        //is deprecetad
+        //Passing null as a second param is deprecated. Trying to remove to see if it clears error-MB
         if (isset($options['params']) && count($options['params']) > 0) {
             $url .= '?' . http_build_query($options['params'], null, '&', PHP_QUERY_RFC3986);
         }
-        
+
         if (($method === 'PUT' || $method === 'POST') && isset($options['content'])) {
             $http['content'] = $options['content'];
             if (is_string($options['content'])) {
                 array_push($http['header'], 'Content-length: ' . strlen($options['content']));
             }
         }
-        echo "<br>";
-        echo "Here is where it is building the query, what is the options[cont] array " ;
-        var_dump($options['content']);
-        echo "<br>";
+
         $success = false;
 
         //
@@ -160,61 +139,28 @@ class RemoteLRS implements LRSInterface
         //
         set_error_handler(
             function ($errno, $errstr, $errfile, $errline, array $errcontext) {
-                echo"<br>";
-                echo "IS this error handler being entered??";
-                echo"<br>";
-                //MB
                 throw new \ErrorException($errstr, 0, $errno, $errfile, $errline);
             }
         );
-
 
         $fp = null;
         $response = null;
 
         try {
-          
-        echo"<br>";
-        echo "WE ARE IN in try??? and url here is : ";
-            var_dump($url);
-            echo "WE ARE IN in try??? and url here decoded is : ";
-            var_dump(urldecode($url));
-        echo"<br>";
-     
-            //The username:pass is correct
             $context = stream_context_create(array( 'http' => $http ));
-            //This call to fp is what is failing
             $fp = fopen($url, 'rb', false, $context);
-            ////MB
-            echo"<br>";
-            echo "WE ARE IN sendREQUEST; what is fp here???" . $fp;
-            echo"<br>";
-            $php_errormsg = "";
-            //MB added pspmessage above
+
             if (! $fp) {
                 $content = "Request failed: $php_errormsg";
             }
         }
         catch (\ErrorException $ex) {
-            echo"<br>";
-            echo "So the catch should be triggered, what is ex here? : " .$ex;
-            echo"<br>";
             $content = "Request failed: $ex";
         }
 
         restore_error_handler();
 
-        echo"<br>";
-        echo "WE ARE IN sendREQUEST; Are we going past the RESTORATION of the setERRORHANDLER???";
-        echo"<br>";
-
-        //We are not going in it looks like, which means fp is false
-        //Why is FP falsE???
         if ($fp) {
-
-            echo"<br>";
-        echo "WE ARE IN sendREQUEST; Are we in this IF what is fp here : ??? : " .$fp;
-        echo"<br>";
             $metadata = stream_get_meta_data($fp);
             $content  = stream_get_contents($fp);
 
@@ -696,11 +642,6 @@ class RemoteLRS implements LRSInterface
     }
 
     public function retrieveState($activity, $agent, $id) {
-
-        echo "<br>";
-        echo "Ok, so are we entering the retrieveState func?";
-        echo "<br>";
-        
         if (! $activity instanceof Activity) {
             $activity = new Activity($activity);
         }
@@ -717,9 +658,6 @@ class RemoteLRS implements LRSInterface
             ),
             'ignore404' => true,
         );
-
-        //MB
-        //They are not entering this
         if (func_num_args() > 3) {
             $options = func_get_arg(3);
             if (isset($options)) {
@@ -729,12 +667,8 @@ class RemoteLRS implements LRSInterface
             }
         }
 
-
-        //THIS IS PROBLEM!! IT's not going past this!!!-MB
         $response = $this->sendRequest('GET', 'activities/state', $requestCfg);
-        echo "<br>";
-        echo "Ok, so we ARE entering the retrieveState! Is response working? response is" . $response;
-        echo "<br>";
+
         if ($response->success) {
             $doc = new State(
                 array(

@@ -166,62 +166,6 @@ function cmi5launch_get_launch_url($registrationuuid) {
             break;
     }
 
-    //to bring in functions from class cmi5Connector
-    $connectors = new cmi5Connectors;
-    //to bring in functions from class cmi5_table_connectors
-    $tableConnectors = new cmi5Tables;
-    //create instance of class functions
-    $retrieveUrl = $connectors->getRetrieveUrl();
-  
-    //what is this?
-    echo "<br>";
-    echo "WHAT IS THIS????";
-    $wht = $cmi5launch->id;
-    echo"What is    >>>> " .$wht . " <<<<< ";
-    echo "<br>";
-    // Reload cmi5 instance. //This is populated in lib.php and 
-    //in func cmi5launch_process_new_package, so here I am tking 
-    //it from the table
-//    $record = $DB->get_record('cmi5launch_player', array('id' => $cmi5launch->id));
-
-
-//Populate player table with record and tenant info for URL retrieval, and retrieve newly created record
-//$tenantRecord = $populateTable($record, 'cmi5launch_player');
-
-/*
-//TODO-Better to just use tenantRecord->property in retrieveUrl func??
-$actorName = $record->name; 
-$homepage =$record->homepage;
-$returnUrl=$record->returnurl;
-$url= $record-> requesturl;
-$token = $record->tenanttoken;
-*/
-    //utilize function
-    //$result = $retrieveUrl($actorName, $homepage, $returnUrl, $url, $token);
-    
-    //decode returned response into array
-  //  $returnedInfo = json_decode($result, true);
-
-    //Hrmmm something worng here, this was working earlier, lets dump and find out
-    echo "<br>";
-    echo "<br>";
-    echo "Make sure the returnedinfo is correct????";
-    //var_dump($returnedInfo);
-    echo "<br>";
-    echo "<br>";
-/*
-    //Save the returnedInfo to table
-    $record->sessionid = $returnedInfo['id'];
-    $record->launchmethod = $returnedInfo['launchMethod'];
-    $record->launchurl = $returnedInfo['url'];
-    $DB->update_record("cmi5launch_player", $record, true);
-*/
-
-    //Is this URL to be returned the right one? -MB
-//SO since this is the right one, do we need to just grab it from
-//a table or build like below? 
-//The one in the table does grab by actor right? Or might the actor change here?
-
 //This is the orig func, I don't know if we need ANY aspects of it
 // Build the URL to be returned.
 /*
@@ -251,7 +195,7 @@ $token = $record->tenanttoken;
 //$rtnstring = $record->launchurl; 
 
 //Retrieve actor record, this enables correct actor info for URL storage
-$record = $DB->get_record("cmi5launch_player", array('id' => $cmi5launch->id));
+$record = $DB->get_record("cmi5launch_player", array('id' => $registrationuuid));
     $rtnstring = $record->launchurl;
     echo "<br>";
     echo "I think this may be problem, what is rtnstring here" . $rtnstring; //or not
@@ -444,33 +388,12 @@ function cmi5launch_get_global_parameters_and_get_state($key) {
     global $cmi5launch;
     $cmi5launchsettings = cmi5launch_settings($cmi5launch->id);
 
-    echo "<br>";
-echo "Ok, Are we entering this func? is cmi5launchsetting pop here";
-    var_dump($cmi5launchsettings);
-echo "<br>";
-
     $lrs = new \cmi5\RemoteLRS(
         $cmi5launchsettings['cmi5launchlrsendpoint'],
         $cmi5launchsettings['cmi5launchlrsversion'],
         $cmi5launchsettings['cmi5launchlrslogin'],
         $cmi5launchsettings['cmi5launchlrspass']
     );
-
-    echo "<br>";
-    echo "Ok, we are entering this func!!! What is LRS here??";
-        var_dump($lrs);
-    echo "<br>";
-    echo "<br>";echo "<br>";
-    echo "<br>";
-    echo "What is this here> cmi5launch->cmi5activityid :" . trim($cmi5launch->cmi5activityid);
-    echo "<br>";echo "<br>";
-    echo "<br>";
-    $test = cmi5launch_getactor($cmi5launch->id);
-    echo "What is this here> cmi5launch->id";
-    var_dump($test);
-    echo "<br>";echo "<br>";
-    echo "<br>";
-    echo "What is this key here?" . ($key);
 
 
     return $lrs->retrieveState(
@@ -594,7 +517,7 @@ function cmi5launch_send_api_request($auth, $method, $url) {
     echo "<br>";
     echo "URL is : " . $url;
     echo "<br>";
-    echo "Context is : " . $context;
+    //echo "Context is : " . $context;
     echo "<br>";
 
     $fp = fopen($url, 'rb', false, $context);
