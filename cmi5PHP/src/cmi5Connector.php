@@ -99,7 +99,8 @@ class cmi5Connectors{
             $returnedInfo = json_decode($result, true);
             
             //Return an array with tenant name and info
-            return $returnedInfo;
+            return $result;
+		  //what if result is returned and json decode happens later?
     }
 
     //////

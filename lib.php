@@ -84,8 +84,6 @@ function cmi5launch_supports($feature) {
  * @return int The id of the newly inserted cmi5launch record
  */
 
- ////////////So if this is where  new instance is made, can this also be where we recover data from my new text fields? 
- //Or if it pulls from mod_form, so were it pulls from to copy and make a function that pulls from MY textboxes. - MB
 function cmi5launch_add_instance(stdClass $cmi5launch, mod_cmi5launch_mod_form $mform = null) {
     global $DB, $CFG;
 
@@ -112,8 +110,6 @@ function cmi5launch_add_instance(stdClass $cmi5launch, mod_cmi5launch_mod_form $
     }
 
     return $cmi5launch->id;
-
-    //Ok, this returns the id of the the newly added course, useful for tracking the course tiself, but need the file name of because it has now been approved as valid upload - MB
 }
 
 /**
@@ -554,14 +550,13 @@ function cmi5launch_process_new_package($cmi5launch) {
     $cmid = $cmi5launch->coursemodule;
     $context = context_module::instance($cmid);
     
+    //MB
     //to bring in functions from class cmi5Connector
     $connectors = new cmi5Connectors;
+    $table = new cmi5Tables;
     //to bring in functions from class cmi5_table_connectors
-    $tableConnectors = new cmi5Tables;
-    //create instance of class functions
-    $retrieveUrl = $connectors->getRetrieveUrl();
-    $populateTable = $tableConnectors->getPopulateTable();
     $createCourse = $connectors->getCreateCourse();
+	$populateTable = $table->getPopulateTable();
     
     // Reload cmi5 instance.
     $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
@@ -590,19 +585,7 @@ function cmi5launch_process_new_package($cmi5launch) {
     $packagefile = false;
 
     $packagefile = $fs->get_file($context->id, 'mod_cmi5launch', 'package', 0, '/', $zipfilename);
-    
-    //Populate player table with record and tenant info for URL retrieval, and retrieve newly created record
-  // $tenantRecord = $populateTable($record, 'cmi5launch_player');
-    
-    //TODO-Better to just use tenantRecord->property in retrieveUrl func??
-    //$actorName = $tenantRecord->name; 
-    //$homepage =$tenantRecord->homepage;
-    //$returnUrl=$tenantRecord->returnurl;
-    //$url= $tenantRecord-> requesturl;
-//   $token = $tenantRecord->tenanttoken;
-
-    //Well, if the course needs to be made at same time as new record, 
-    //What if we just retreive token here? Instead of in populate table?
+ 
     //Retrieve user settings to apply to newly created record
     $settings = cmi5launch_settings($cmi5launch->id);
     $token = $settings['cmi5launchtenanttoken'];
@@ -610,42 +593,23 @@ function cmi5launch_process_new_package($cmi5launch) {
 
     //TODO - When uploading a new course - this is where we want it to send to CMI5 and
     //then here we can get the laucnh URL, although in the future may go elsewhere
-///////////////Can zipfilename work for sending to cmi5 player if I pass into my func?
-    echo "<br>";
-    echo "<br>";
-    echo "About to try createCourse";
-    echo "<br>";
-    //Maybe createcourse should cal populate able? Then the id won't ever be null
-//No create course canRETURN naid and then THAT id na be sent..	
-   $courseResults =  $createCourse($context->id, $token, $packagefile );//files instead of packagefile??
-//////////////////////////////////////////
-echo "<br>";echo "<br>";
-    echo "Tried to fire createCourse, hope it worked";
-    echo "<br>";echo "<br>";
+
+   $courseResults =  $createCourse($context->id, $token, $packagefile );
 //Take the results of creaetd course and save new course id to table
-	$record->courseid = $courseResults["id"];
-	echo "<br>";
-            echo "WHAT IS Re records cmi5activyt HERE?" . $record->courseid;
-            echo"<br>";
+echo "<br>";
+echo "Why is it showing as array here?? isnt it string? : ";
+        var_dump($courseResults);
+        echo "<br>";
+
+	
+	$record->courseinfo = $courseResults;
+	$returnedInfo = json_decode($courseResults, true);
+	$test = $returnedInfo["lmsId"] . "/au/0";
+	$record->courseid = $returnedInfo["id"];
+	$record->cmi5activityid = $test;
     //Populate player table with record and tenant info for URL retrieval, and retrieve newly created record
-	//$tenantRecord = $populateTable($record, 'cmi5launch_player');
-    
-
-    //utilize function
-    //$result = $retrieveUrl($actorName, $homepage, $returnUrl, $url, $token);
-    
-    //decode returned response into array
-    //$returnedInfo = json_decode($result, true);
-
-/*
-    //Assign the returnedInfo to tenantRecord
-    $tenantRecord->sessionid = $returnedInfo['id'];
-    $tenantRecord->launchmethod = $returnedInfo['launchMethod'];
-    $tenantRecord->launchurl = $returnedInfo['url'];
-
-    //Update record in table with newly retrieved url data
-    $DB->update_record("cmi5launch_player", $tenantRecord, true);
-*/
+	$populateTable($record, 'cmi5launch');
+ 
     $fs->delete_area_files($context->id, 'mod_cmi5launch', 'content');
 
     $packer = get_file_packer('application/zip');
@@ -666,7 +630,11 @@ echo "<br>";echo "<br>";
         $objxml = new xml2Array();
         $manifest = $objxml->parse($xmltext);
 
-        // Update activity id from the first activity in cmi5.xml, if it is found.
+	   //Skip without error? The moodle admin needs to set? 
+	   //Is this what is causing the activityid to be a url in locallib cmi5launchand get global params?
+      //MB
+	   
+	   // Update activity id from the first activity in cmi5.xml, if it is found.
         // Skip without error if not. (The Moodle admin will need to enter the id manually).
         if (isset($manifest[0]["children"][0]["children"][0]["attrs"]["ID"])) {
             $record->cmi5activityid = $manifest[0]["children"][0]["children"][0]["attrs"]["ID"];

@@ -183,13 +183,13 @@ class cmi5Tables
     {
         global $DB;
         //Id to create/update record
-        $id = $record->courseid;
+        $id = $record->id;
 
         //TODO - I am hardcoding these for now, want to check with others as to best way to collect this info
         //such as from cmi5 mod install page, or cmi5 course uploadpage??? -MB
-        $homepage ="http://myLMSexample.com";
-        $returnUrl="http://127.0.0.1:63398.com";
-        $url= "http://localhost:63398/api/v1/course/12/launch-url/0" ;
+       // $homepage ="http://myLMSexample.com";
+        //$returnUrl="http://127.0.0.1:63398.com";
+        
         
         //Make sure record doesn't exist before attempting to create
         $check = $this->checkRecord($id, $table);
@@ -223,19 +223,14 @@ class cmi5Tables
 
                 //Retrieve newly created record
                 //rees the rolem, it's lookin for the new id
-                $newRecord = $DB->get_record($table, ['courseid' => $id], '*', IGNORE_MISSING);
- 
+                $newRecord = $DB->get_record($table, ['id' => $id], '*', IGNORE_MISSING);
+ //new way to make url
+ $url = "http://" . $record->cmi5playerurl . $record->cmi5playerport . "/api/v1/". $record->courseid. "/launch-url/0";
+
                 //////////////////////////////////////////////////////////////////////////
                 //Retrieve user settings to apply to newly created record
                 //Maybe its here? ITs lokin for reg id? 
-                $settings = cmi5launch_settings($record->id);
-                $newRecord->tenantname = $settings['cmi5launchtenantname'];
-                $newRecord->tenanttoken = $settings['cmi5launchtenanttoken'];
-                $newRecord->cmi5playerurl = $settings['cmi5launchplayerurl'];
-                $newRecord->cmi5playerport = $settings['cmi5launchplayerport'];
-                $newRecord->homepage = $homepage;
-                $newRecord->returnurl = $returnUrl;
-                $newRecord->requesturl = $url;
+                $newRecord->launchurl = $url;
 
                 //Update record in table with newly retrieved tenant data
                 //Ok, here is were the trouble isits not updatin table caus et says the 
@@ -246,18 +241,20 @@ class cmi5Tables
                 echo "Are we ettin here Is this where it's haning up?? ";
                 echo"<br>";
 
-                //new way to make url
-                $url = "http://" . $newRecord->cmi5playerurl . $newRecord->cmi5playerport . "/api/v1/course/12/launch-url/0";
-
+                
                 //Return record from updated table
-                return $newRecord = $DB->get_record($table, ['courseid' => $id], '*', IGNORE_MISSING);
+                return $newRecord = $DB->get_record($table, ['id' => $id], '*', IGNORE_MISSING);
             }
         }   else {
 
             echo "<br>";
             echo "Record DOES existand needs to be updated";
             echo "<br>";
-                // If it does exist, update it
+//new way to make url
+$url = "http://" . $record->cmi5playerurl . $record->cmi5playerport . "/api/v1/". $record->courseid. "/launch-url/0";
+
+
+            // If it does exist, update it
                 //update_record returns true/false depending on success
                 $recordUpdate = $DB->update_record($table, $record, true);
 
@@ -265,21 +262,16 @@ class cmi5Tables
                 if ($recordUpdate != null || false) {
 
                     //Retrieve the updated record
-                    $updatedRecord = $DB->get_record($table, ['courseid' => $id], '*', IGNORE_MISSING);
+                    $updatedRecord = $DB->get_record($table, ['id' => $id], '*', IGNORE_MISSING);
 
                     //Retrieve user settings to apply to newly created record
                     $settings = cmi5launch_settings($id);
-                    $updatedRecord->tenantname = $settings['cmi5launchtenantname'];
-                    $updatedRecord->tenanttoken = $settings['cmi5launchtenanttoken'];
-                    $updatedRecord->homepage = $homepage;
-                    $updatedRecord->returnurl = $returnUrl;
-                    $updatedRecord->requesturl = $url;
-
+                    $connectors = new cmi5Connectors;
                     //Update record in table with newly retrieved tenant data
                     $DB->update_record($table, $updatedRecord, true);
 
                     //Return record from updated table
-                    return $updatedRecord = $DB->get_record($table, ['courseid' => $id], '*', IGNORE_MISSING);
+                    return $updatedRecord = $DB->get_record($table, ['id' => $id], '*', IGNORE_MISSING);
                 }
             }
         

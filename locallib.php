@@ -462,11 +462,11 @@ echo "<br>";
     echo "<br>";
     echo "<br>";echo "<br>";
     echo "<br>";
-    echo "What is this here> cmi5launch->cmi5activityid" . trim($cmi5launch->cmi5activityid);
+    echo "What is this here> cmi5launch->cmi5activityid :" . trim($cmi5launch->cmi5activityid);
     echo "<br>";echo "<br>";
     echo "<br>";
     $test = cmi5launch_getactor($cmi5launch->id);
-    echo "What is this here> cmi5launch->id" . 
+    echo "What is this here> cmi5launch->id";
     var_dump($test);
     echo "<br>";echo "<br>";
     echo "<br>";
@@ -587,7 +587,25 @@ function cmi5launch_send_api_request($auth, $method, $url) {
     }
 
     $context = stream_context_create(array( 'http' => $http ));
+//MB
+//IS the problem that THIS fopen isnt working?
+    echo "<br>";
+    echo "I think this is the problem, one of the args may be wrong. Checking: ";
+    echo "<br>";
+    echo "URL is : " . $url;
+    echo "<br>";
+    echo "Context is : " . $context;
+    echo "<br>";
+
     $fp = fopen($url, 'rb', false, $context);
+    
+    echo "<br>";
+    echo "Is FP true or false here? : " . $fp;
+    echo "<br>";
+    //MB
+    //What iif we gave content a null value?
+    $content = "";
+    
     if (! $fp) {
         return array (
             "metadata" => null,

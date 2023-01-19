@@ -57,14 +57,6 @@ class mod_cmi5launch_mod_form extends moodleform_mod {
         $mform->addRule('name', null, 'required', null, 'client');
         $mform->addRule('name', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
         $mform->addHelpButton('name', 'cmi5launchname', 'cmi5launch');
-
-    //Imma gonna just see if this is right place to edit, lets add something to form for funnsies
-    //This works IF the get_string pulls 'trialname' from Moodle/lang/en/moodle.php, which is odd because the other variables pull from Moodle/lang/cmi5launch.php
-  //  $mform->addElement('text', 'name', get_string('trialname'),  array('size' => '64'));
-    /////////////////////////////////////
-    //so now the question is, since this is a form builder, should it post/get, I think another file should do htat and fee to here, yes?
-
-
         // Adding the standard "intro" and "introformat" fields.
         $this->standard_intro_elements();
 
@@ -92,19 +84,6 @@ class mod_cmi5launch_mod_form extends moodleform_mod {
         $mform->addHelpButton('cmi5activityid', 'cmi5activityid', 'cmi5launch');
         $mform->setDefault('cmi5activityid', 'https://example.com/example-activity');
             //end activity id text box
-        
-        //Ok, lets try to add a tenantname box and see if we can capturethe info
-        $mform->addElement('text', 'cmi5tenantname', get_string('cmi5tenantname', 'cmi5launch'), array('size' => '64'));
-        $mform->setType('cmi5tenantname', PARAM_TEXT);
-        $mform->addRule('cmi5tenantname', null, 'required', null, 'client');
-        $mform->addRule('cmi5tenantname', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
-        $mform->addHelpButton('cmi5tenantname', 'cmi5tenantname', 'cmi5launch');
-        $mform->setDefault('cmi5tenantname', 'Moodle');
-        
-        
-
-
-
 
         // End required Fields for Activity.
 
@@ -116,21 +95,6 @@ class mod_cmi5launch_mod_form extends moodleform_mod {
         $filemanageroptions['maxbytes'] = 0;
         $filemanageroptions['maxfiles'] = 1;
         $filemanageroptions['subdirs'] = 0;
-
-        //MB
-        //Lets see something
-       // $mform->addElement('text', 'trial');
-        //Ok, this added a text box where I thought it would. hrmmmmmm
-            //so below is where the form gets uploaded, how can we intercept and sendd
-            //to cmi5 as well as moodle??
-            //This works to add button! SO, lets gets our code working, see if we can submit
-            //a zip by hijacking it, and once it's all working,
-            //delete this step and just have it work in background? -MB
-
-           // $mform->addElement('button', '', get_string("buttonlabel"));
-
-
-        //Is this where the upload is handled
         $mform->addElement(
             'filemanager',
             'packagefile',

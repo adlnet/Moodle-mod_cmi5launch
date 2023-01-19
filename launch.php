@@ -62,16 +62,25 @@ if (empty($registrationid)) {
     }
     die();
 }
+//Can it acces the table here??
+//It can but doesn't know the sessionid to go byyy...
+//Florian thinks we can get it from lrs. /This may be better approach, how ele to keep
+//track of sessionid??
 
 echo'<br>';
 echo "THIS IS IN LAUNCH FORM. HERE regid IS : " . $registrationid; 
 echo'<br>';
-//$registrationid = $DB->get_record('cmi5launch_player', ['registrationid' => $regid,], '*', IGNORE_MISSING);
+$registrationid = $DB->get_record('cmi5launch_player', ['registrationid' => $regid,], '*', IGNORE_MISSING);
+
+echo'<br>';
+echo "THIS IS IN LAUNCH FORM. HERE regid IS : " . $registrationid; 
+echo'<br>';
 
 //MB//
 //Here we want to send OUR REGG
 // Save a record of this registration to the LRS state API.
 
+//Below they are commi=unicating with sate...hmmmm!
 $getregistrationdatafromlrsstate = cmi5launch_get_global_parameters_and_get_state(
     "http://cmi5api.co.uk/stateapikeys/registrations"
 );
@@ -116,9 +125,9 @@ echo "<br>";
 //access property anyway/
 if (is_null($registrationdata)) {
     // If the error is 404 create a new registration data array.
-   // if ($registrationdata->httpResponse['status'] = 404) {
+    if ($registrationdata->httpResponse['status'] = 404) {
         $registrationdata = $registrationdataforthisattempt;
-   // }
+    }
 } else if (array_key_exists($registrationid, $registrationdata)) {
     // Else if the regsitration exists update the lastlaunched date.
     $registrationdata[$registrationid]["lastlaunched"] = $datenow;

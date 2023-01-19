@@ -108,7 +108,7 @@ if ($cmi5launch->intro) { // Conditions to show the intro can change to look for
 
 // Generate a registration id for any new attempt.
 $cmi5phputil = new \cmi5\Util();
-//$registrationid = $cmi5phputil->getUUID();
+$registrationid = $cmi5phputil->getUUID();
 
 echo "<br>";
 //echo "What is the registrationID here (theirs) : " . $registrationid;
@@ -118,21 +118,23 @@ echo "<br>";
 //to bring in functions from class cmi5Connector
 $connectors = new cmi5Connectors;
 //create instance of class functions
-$retrieveUrl = $connectors->getRetrieveUrl();
+
+//////$retrieveUrl = $connectors->getRetrieveUrl();
+
 //$result = $retrieveUrl($actorName, $homepage, $returnUrl, $url, $token);
 
 
-echo "Trying to launch url with this id " . $cmi5launch->id;
+//echo "Trying to launch url with this id " . $cmi5launch->id;
 //Lets try making our own regid here 
-$urlResults = $retrieveUrl($cmi5launch->id);
+//////$urlResults = $retrieveUrl($cmi5launch->id);
 
 
 echo "<br>";
 echo "Did it wokr? Here are results: ";
-var_dump($urlResults);
+//////////var_dump($urlResults);
 echo "<br>";
-$urlDecoded = json_decode($urlResults, true);
-
+///////////$urlDecoded = json_decode($urlResults, true);
+/*
 $url = $urlDecoded['url'];
 		//urlInfo is one big string so
 		parse_str($url, $urlInfo);
@@ -142,7 +144,7 @@ $url = $urlDecoded['url'];
 		echo "<br>";
 
 		$registrationid = $urlInfo['registration'];
-/*
+
 //test array
 parse_str($urlResults, $urlParsed);
 echo "<br>";
