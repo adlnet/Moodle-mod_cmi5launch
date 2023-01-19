@@ -108,7 +108,8 @@ if ($cmi5launch->intro) { // Conditions to show the intro can change to look for
 
 // Generate a registration id for any new attempt.
 $cmi5phputil = new \cmi5\Util();
-$registrationid = $cmi5phputil->getUUID();
+//MB//
+//$registrationid = $cmi5phputil->getUUID();
 
 $getregistrationdatafromlrsstate = cmi5launch_get_global_parameters_and_get_state(
     "http://cmi5api.co.uk/stateapikeys/registrations"

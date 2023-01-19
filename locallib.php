@@ -195,7 +195,7 @@ function cmi5launch_get_launch_url($registrationuuid) {
 //$rtnstring = $record->launchurl; 
 
 //Retrieve actor record, this enables correct actor info for URL storage
-$record = $DB->get_record("cmi5launch_player", array('id' => $registrationuuid));
+$record = $DB->get_record("cmi5launch_player", array('registrationid' => $registrationuuid));
     $rtnstring = $record->launchurl;
     echo "<br>";
     echo "I think this may be problem, what is rtnstring here" . $rtnstring; //or not

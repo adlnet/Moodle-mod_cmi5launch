@@ -40,11 +40,7 @@ class cmi5Tables
 		$url = $urlDecoded['url'];
 		//urlInfo is one big string so
 		parse_str($url, $urlInfo);
-		echo "<br>";
-		echo "url decoded is  : ";
-		var_dump($urlInfo);
-		echo "<br>";
-
+	
 		$regid = $urlInfo['registration'];
 		
 		//parse_str($urlInfo, $urlParsed);

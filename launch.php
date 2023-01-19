@@ -41,10 +41,7 @@ $event->trigger();
 
 
 $newRecord = $DB->get_record('cmi5launch', ['id' => $cmi5launch->id], '*', IGNORE_MISSING);
-echo'<br>';
-echo "THIS IS IN LAUNCH FORM. HERE record pulled by id is IS : "  ;
-var_dump($newRecord); 
-echo'<br>';
+
 
 //MB//
 //BUT, launchform_reg IS this file.... So it will probably be empty,
@@ -84,28 +81,17 @@ $retrieveUrl = $connectors->getRetrieveUrl();
 $urlResults = $retrieveUrl($cmi5launch->id);
 
 
-echo "<br>";
-echo "Did it wokr? Here are results: ";
-var_dump($urlResults);
-echo "<br>";
 $urlDecoded = json_decode($urlResults, true);
 
 $url = $urlDecoded['url'];
 		//urlInfo is one big string so
 		parse_str($url, $urlInfo);
-		echo "<br>";
-		echo "url decoded is  : ";
-		var_dump($urlInfo);
-		echo "<br>";
-
+	
 		$registrationid = $urlInfo['registration'];
 
 //test array
 parse_str($urlResults, $urlParsed);
-echo "<br>";
-echo "Did the parsing work? Here are results: ";
-var_dump($urlParsed);
-echo "<br>";
+
 //Perhaps we could have a func that creates/retreives a reguuid, and IT will call
 //the retreive url func? Just want it to be succint. And where should the info be saved to table?
 //Perhaps in func?
@@ -120,10 +106,6 @@ echo "<br>";
 //$record = $DB->get_record('cmi5launch_player', ['id' => $cmi5launch->id,], '*', IGNORE_MISSING);
 
 //$registrationid = $record->registrationid;
-echo "<br>";
-echo "What is the registrationID here (ours) : ";
-var_dump($registrationid);
-echo "<br>";
 
 ////////////////////////////////////////////////////////////////////////////////////
 echo'<br>';
@@ -181,10 +163,7 @@ $registrationdataforthisattempt = array(
     )
 );
 
-echo "<br>";
-echo "What is the registrationdata here? IT's causing trouble : ";
-var_dump($registrationdata); //Its null so whyy
-echo "<br>";
+
 //Nothing! This is where the error is, so why can their id change and not mine???
 
 //MB
