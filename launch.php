@@ -40,7 +40,7 @@ $event->add_record_snapshot('cmi5launch', $cmi5launch);
 $event->trigger();
 
 
-$newRecord = $DB->get_record('cmi5launch', ['id' => $cmi5launch->id], '*', IGNORE_MISSING);
+//$newRecord = $DB->get_record('cmi5launch', ['id' => $cmi5launch->id], '*', IGNORE_MISSING);
 
 
 //MB//
@@ -52,31 +52,98 @@ $newRecord = $DB->get_record('cmi5launch', ['id' => $cmi5launch->id], '*', IGNOR
 //I think this is the error!!!! Lets get regid from table here? YES
 //THIS MAY be a problem, but not the one I'm working on
 
-/*
+//None of this is working! How can I tell what brings this form up?
+/*/Okay, I'm going to try to see which button was pressed
+if(isset($_GET['cmi5launch_newattempt'])){
+    echo "<br>";
+    echo "START NEW REGISTRATION BUTTON CLICKED!!!!!!!";
+    echo "<br>";
+
+}elseif(($_GET['cmi5relaunch_attempt'])){
+
+    echo "<br>";
+    echo "LUANCH BUTTON CLICKED!!!!!!!";
+    echo "<br>";
+    }
+    else{
+        echo "<br>";
+    echo "NOTHINGG!!!!!!!";
+    echo "<br>";
+    }
+ 
+echo "<br>";
+echo " WTF is the get here???!!!!!!!";
+var_dump($_GET);
+echo "<br>";
+echo "<br>";
+echo " WTF is the post here???!!!!!!!";
+var_dump($_POST);
+echo "<br>";
+echo "<br>";
+echo " WTF is the env here???!!!!!!!";
+var_dump($_ENV);
+echo "<br>";
+
+*/
+//$buttonSelected = required_param('launchform_button', PARAM_TEXT);
+
+//Can we find out what button was pushed with required_param?
 $registrationid = required_param('launchform_registration', PARAM_TEXT);
 if (empty($registrationid)) {
-    echo "<div class='alert alert-error'>".get_string('cmi5launch_regidempty', 'cmi5launch')."</div>";
+   echo "<div class='alert alert-error'>".get_string('cmi5launch_regidempty', 'cmi5launch')."</div>";
+
+   
+
     // Failed to connect to LRS.
     if ($CFG->debug == 32767) {
-        echo "<p>E'rror attempting to get registration id querystring parameter.</p>";
+        echo "<p>Error attempting to get registration id querystring parameter.</p>";
     }
     die();
-}*/
+}
+elseif($registrationid == 1){
+       //to bring in functions from class cmi5Connector
+       $connectors = new cmi5Connectors;
+       //create instance of class functions
+       $retrieveUrl = $connectors->getRetrieveUrl();
+   
+       //Lets try making our own regid here 
+       $urlResults = $retrieveUrl($cmi5launch->id);
+   
+       $urlDecoded = json_decode($urlResults, true);
+   
+       $url = $urlDecoded['url'];
+       //urlInfo is one big string so
+       parse_str($url, $urlInfo);
+   
+       $registrationid = $urlInfo['registration'];
+   
+       //Would it work to temp save the regid and url to the cmi5launch table and only save them to other
+       //DB when successfully at launch?
+       //test array
+       parse_str($urlResults, $urlParsed);
+}
+//What if we passed it as a 0 from view, and created/saved it here based on results?
+
+
 //Can it acces the table here??
 //It can but doesn't know the sessionid to go byyy...
 //Florian thinks we can get it from lrs. /This may be better approach, how ele to keep
 //track of sessionid??
 ////////////////////////////////////////////////////////////////////////////////////
+//Im oing to try to put this in the other form and have this launch.php pull the id
+//Instead of making it here. This might solve the dup problme.
+//Because we ponly want it to pop on NEW reg
+/*
 //to bring in functions from class cmi5Connector
 $connectors = new cmi5Connectors;
 //create instance of class functions
 
+//Wait, can we simply direct FROM here? Like if they click new, call the new, otherwise it pulls up old.
+//Like can this form change based on whats clicked? 
+//PICK UP HERE MONDAY AND REMEM THAT THE EVENT CLICK ARE ON view.php MB
+
 $retrieveUrl = $connectors->getRetrieveUrl();
 
-//$result = $retrieveUrl($actorName, $homepage, $returnUrl, $url, $token);
-
-
-//echo "Trying to launch url with this id " . $cmi5launch->id;
 //Lets try making our own regid here 
 $urlResults = $retrieveUrl($cmi5launch->id);
 
@@ -97,35 +164,8 @@ parse_str($urlResults, $urlParsed);
 //Perhaps in func?
 //But whatever that returns, the reg id is IN THE URL right? So should that be parsed here or in
 //another
+*/
 
-
-//Ok, here is our new regid
-//$registrationid = substr($urlParsed['registration'],0, -2);
-
-
-//$record = $DB->get_record('cmi5launch_player', ['id' => $cmi5launch->id,], '*', IGNORE_MISSING);
-
-//$registrationid = $record->registrationid;
-
-////////////////////////////////////////////////////////////////////////////////////
-echo'<br>';
-echo "THIS IS IN LAUNCH FORM. HERE regid IS : " . $registrationid; 
-echo'<br>';
-//$registrationid = $DB->get_record('cmi5launch_player', ['registrationid' => $registrationid,], '*', IGNORE_MISSING);
-
-echo'<br>';
-echo "THIS IS IN LAUNCH FORM. HERE regid IS : " . $registrationid; 
-echo'<br>';
-
-//This is from above
-if (empty($registrationid)) {
-    echo "<div class='alert alert-error'>".get_string('cmi5launch_regidempty', 'cmi5launch')."</div>";
-    // Failed to connect to LRS.
-    if ($CFG->debug == 32767) {
-        echo "<p>E'rror attempting to get registration id querystring parameter.</p>";
-    }
-    die();
-}
 //MB//
 //Here we want to send OUR REGG
 // Save a record of this registration to the LRS state API.
@@ -147,8 +187,28 @@ if ($lrsrespond != 200 && $lrsrespond != 404) {
     }
     die();
 }
+
+//////MB
+//Ok, HERE is where it successfully talked to LRS
+//SO HERE WE should save to DB? 
 if ($lrsrespond == 200) {
     $registrationdata = json_decode($getregistrationdatafromlrsstate->content->getContent(), true);
+    //LEts double check what data is here
+    //echo "<br>";
+    //echo "Doublechecking this is where it should save ionfo to DB : ";
+    //var_dump($registrationdata);
+   // echo "<br>";
+
+   	//Only if successfully sent to LRS
+   	
+	   //to bring in functions from class cmi5Connector
+	//	$connectors = new cmi5Tables;
+		//create instance of class functions
+	//	$saveUrl = $connectors->getSaveURL();
+		//Save the returned info to the correct table
+	//	$saveUrl($id, $launchResponse);
+		
+
 } else {
     $registrationdata = null;
 }
@@ -254,6 +314,7 @@ $completion->set_module_viewed($cm);
 
 ////Ok, so now we need itt saved to a table so below func can retreive
 
+//This needs regid saved to table....
 header("Location: ". cmi5launch_get_launch_url($registrationid));
 
 exit;

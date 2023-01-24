@@ -196,22 +196,12 @@ class cmi5Connectors{
 		global $DB;
         echo "Retreive url function entered ";
 
-	   //Maybe better to retreive them here as noted instead of in process_new_packae
-	   //in lib.php??
+	   //Ok, so here retreive url is our old version. So dont we 
+	   //want to split it? We want this to in the end check if a regid exists
+	   //Then if ti doesnt call create?/
+	   //Riht remember now! Want to see if we can find regid with time
+	   //Cause that table keeops them separate somehow  
 
-	   // Retrieve record, this enables correect actor info for URL retrieval
-	  // $record = $DB->get_record('cmi5launch', array('id' => $id));
-	//I dont think this is the right time to pull get->record
-
-
-		//to bring in functions from class cmi5_table_connectors
-		//$tableConnectors = new cmi5Tables;
-		//create instance of class functions
-		//$populateTable = $tableConnectors->getPopulateTable();
-		//Populate player table with record and tenant info for URL retrieval, and retrieve newly created record
-  		//$tenantRecord = $populateTable($record, 'cmi5launch_player');
-		
-		
 		//Retrieve actor record, this enables correct actor info for URL storage
 		$record = $DB->get_record("cmi5launch", array('id' => $id));
 
@@ -266,7 +256,10 @@ class cmi5Connectors{
         //sends the stream to the specified URL and stores results (the false is use_include_path, which we dont want in this case, we want to go to the url)
         $launchResponse = file_get_contents( $url, false, $context );
 
-	   	//to bring in functions from class cmi5Connector
+	   ///HERE! We dont want to save just cause it was returned,
+	   //Only if successfully sent to LRS
+	   
+	   //to bring in functions from class cmi5Connector
 		$connectors = new cmi5Tables;
 		//create instance of class functions
 		$saveUrl = $connectors->getSaveURL();

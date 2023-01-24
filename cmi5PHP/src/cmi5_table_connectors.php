@@ -17,6 +17,7 @@ class cmi5Tables
     {
         return [$this, 'populateTable'];
     }
+   
     public function getSaveURL()
     {
         return [$this, 'saveURL'];
@@ -77,15 +78,7 @@ class cmi5Tables
 			echo "Record doesn't exist";
 			echo "<br>";
 
-				//Assign new regid
-			//$record->registrationid = $regid;
-
-			//Lets skip the if here
-
-				echo "<br>";
-				echo "S if record is 1 that means it should com here bein neither false or ull";
-				echo "<br>";
-
+			
 				//////////////////////////////////////////////////////////////////////////
 				//Retrieve user settings to apply to newly created record
 				
