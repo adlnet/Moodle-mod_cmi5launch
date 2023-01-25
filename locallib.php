@@ -166,44 +166,12 @@ function cmi5launch_get_launch_url($registrationuuid) {
             break;
     }
 
-//This is the orig func, I don't know if we need ANY aspects of it
-// Build the URL to be returned.
-/*
-    $rtnstring = $cmi5launch->cmi5launchurl."?".http_build_query(
-        array(
-            "endpoint" => $url,
-            "auth" => "Basic ".$basicauth,
-            "actor" => cmi5launch_myjson_encode(
-                cmi5launch_getactor($cmi5launch->id)->asVersion(
-                    $cmi5launchsettings['cmi5launchlrsversion']
-                )
-            ),
-            "registration" => $registrationuuid,
-            "activity_id" => $cmi5launch->cmi5activityid
-        ),
-        '',
-        '&',
-        PHP_QUERY_RFC3986
-    );
-*/
-    //To find out, lets return it
-    ///YES! This does control the url, so above needs to retrieve based on id.
-//    $rtnstring ="http://localhost:63398/content/4/37/index.html?endpoint=http%3A%2F%2Flocalhost%3A63398%2Flrs&fetch=http%3A%2F%2Flocalhost%3A63398%2Ffetch-url%2F78&actor=%7B%22account%22%3A%7B%22homePage%22%3A%22http%3A%2F%2FmyLMSexample.com%22%2C%22name%22%3A%22Victory%22%7D%7D&activityId=https%3A%2F%2Fw3id.org%2Fxapi%2Fcmi5%2Fcatapult%2Fplayer%2Fcourse%2F730665fb-383c-4047-aa19-1ff044d567c6%2Fau%2F0&registration=775f1018-224d-4d27-a842-993751a177f1";
+	//Retrieve launch url
+	$record = $DB->get_record("cmi5launch_player", array('registrationid' => $registrationuuid));
+	$rtnstring = $record->launchurl;
 
-//This is where I have it pulling from a table to et info, above they o by uuid
-//What table are THEY pulling from?
-//$rtnstring = $record->launchurl; 
-
-//Retrieve actor record, this enables correct actor info for URL storage
-$record = $DB->get_record("cmi5launch_player", array('registrationid' => $registrationuuid));
-    $rtnstring = $record->launchurl;
-   
-
-    return $rtnstring;
+	return $rtnstring;
 }
-
-///This might be useful to take info back from sending a course and parsing data
-//-MB
 
 /**
  * Used with Learning Locker integration to fetch credentials from the LRS.
@@ -508,23 +476,9 @@ function cmi5launch_send_api_request($auth, $method, $url) {
     }
 
     $context = stream_context_create(array( 'http' => $http ));
-//MB
-//IS the problem that THIS fopen isnt working?
-    echo "<br>";
-    echo "I think this is the problem, one of the args may be wrong. Checking: ";
-    echo "<br>";
-    echo "URL is : " . $url;
-    echo "<br>";
-    //echo "Context is : " . $context;
-    echo "<br>";
 
     $fp = fopen($url, 'rb', false, $context);
     
-    echo "<br>";
-    echo "Is FP true or false here? : " . $fp;
-    echo "<br>";
-    //MB
-    //What iif we gave content a null value?
     $content = "";
     
     if (! $fp) {

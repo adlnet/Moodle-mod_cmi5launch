@@ -92,7 +92,6 @@ function cmi5launch_add_instance(stdClass $cmi5launch, mod_cmi5launch_mod_form $
     // Need the id of the newly created instance to return (and use if override defaults checkbox is checked).
     $cmi5launch->id = $DB->insert_record('cmi5launch', $cmi5launch);
 
-    //Check this out MB
     $cmi5launchlrs = cmi5launch_build_lrs_settings($cmi5launch);
 
     // Determine if override defaults checkbox is checked or we need to save watershed creds.
@@ -552,12 +551,12 @@ function cmi5launch_process_new_package($cmi5launch) {
     $context = context_module::instance($cmid);
     
     //MB
-    //to bring in functions from class cmi5Connector
-    $connectors = new cmi5Connectors;
-    $table = new cmi5Tables;
-    //to bring in functions from class cmi5_table_connectors
-    $createCourse = $connectors->getCreateCourse();
-	$populateTable = $table->getPopulateTable();
+	//bring in functions from classes cmi5Connector/Cmi5Tables
+	$connectors = new cmi5Connectors;
+	$tables = new cmi5Tables;
+	//bring in functions from class cmi5_table_connectors
+	$createCourse = $connectors->getCreateCourse();
+	$populateTable = $tables->getPopulateTable();
     
     // Reload cmi5 instance.
     $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
@@ -591,24 +590,19 @@ function cmi5launch_process_new_package($cmi5launch) {
     $settings = cmi5launch_settings($cmi5launch->id);
     $token = $settings['cmi5launchtenanttoken'];
 
-
-    //TODO - When uploading a new course - this is where we want it to send to CMI5 and
-    //then here we can get the laucnh URL, although in the future may go elsewhere
-
-   $courseResults =  $createCourse($context->id, $token, $packagefile );
-//Take the results of creaetd course and save new course id to table
-echo "<br>";
-echo "Why is it showing as array here?? isnt it string? : ";
-        var_dump($courseResults);
-        echo "<br>";
-
+	$courseResults =  $createCourse($context->id, $token, $packagefile );
 	
+	//Take the results of created course and save new course id to table
 	$record->courseinfo = $courseResults;
 	$returnedInfo = json_decode($courseResults, true);
-	$test = $returnedInfo["lmsId"] . "/au/0";
-	$record->courseid = $returnedInfo["id"];
-	$record->cmi5activityid = $test;
-    //Populate player table with record and tenant info for URL retrieval, and retrieve newly created record
+    $lmsId = $returnedInfo["lmsId"] . "/au/0";
+    $record->courseid = $returnedInfo["id"];
+    $record->cmi5activityid = $lmsId;
+	//create url for sending to when requesting launch url for course 
+	$url = "http://" . $record->cmi5playerurl . $record->cmi5playerport . "/api/v1/". $record->courseid. "/launch-url/0";
+	$record->launchurl = $url;
+    	
+	//Populate player table with new course info
 	$populateTable($record, 'cmi5launch');
  
     $fs->delete_area_files($context->id, 'mod_cmi5launch', 'content');
@@ -631,10 +625,6 @@ echo "Why is it showing as array here?? isnt it string? : ";
         $objxml = new xml2Array();
         $manifest = $objxml->parse($xmltext);
 
-	   //Skip without error? The moodle admin needs to set? 
-	   //Is this what is causing the activityid to be a url in locallib cmi5launchand get global params?
-      //MB
-	   
 	   // Update activity id from the first activity in cmi5.xml, if it is found.
         // Skip without error if not. (The Moodle admin will need to enter the id manually).
         if (isset($manifest[0]["children"][0]["children"][0]["attrs"]["ID"])) {
