@@ -35,6 +35,7 @@ $event->add_record_snapshot('course_modules', $cm);
 $event->add_record_snapshot('cmi5launch', $cmi5launch);
 $event->trigger();
 
+
 //Retrieve registration id (from view.php)
 $registrationid = required_param('launchform_registration', PARAM_TEXT);
 if (empty($registrationid)) {
@@ -51,10 +52,22 @@ elseif($registrationid == 1)
 {
 	//to bring in functions from class cmi5Connector
 	$connectors = new cmi5Connectors;
-	$retrieveUrl = $connectors->getRetrieveUrl();
+
+    //We need to parse and cutoff from the ///
+    //Build url to pass as returnUrl
+	$returnUrl = ('http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] .'/mod/cmi5launch/view.php'. '?id=' .$cm->id);
+    //Build url to pass as homeurl
+    $homeUrl = ('http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF']);
+
+    echo "<br>";
+    echo "Why does it work on one and not the other? what is $_SERVER here? ";
+    var_dump($_SERVER);
+    echo "<br>";
+
+    $retrieveUrl = $connectors->getRetrieveUrl();
 
 	//Retrieve launch URL from CMI5 player
-	$url = $retrieveUrl($cmi5launch->id);
+	$url = $retrieveUrl($cmi5launch->id, $returnUrl, $homeUrl);
 	//urlInfo is one big string so
 	parse_str($url, $urlInfo);
 	//Retrieve registration id from end of parsed URL

@@ -137,6 +137,7 @@ class RemoteLRS implements LRSInterface
         // the immediate call to turn it into an exception, and then restore
         // normal handling
         //
+        
         set_error_handler(
             function ($errno, $errstr, $errfile, $errline, array $errcontext) {
                 throw new \ErrorException($errstr, 0, $errno, $errfile, $errline);

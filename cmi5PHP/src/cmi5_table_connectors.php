@@ -11,16 +11,18 @@ class cmi5Tables
 
     public function getSaveURL()
     {
-        return [$this, 'saveURL'];
+        return [$this, 'saveURLs'];
     }
 
     /**
      * //Function to save URL info to it's table
      * @param mixed $id - base id to make sure record is saved to correct actor
      * @param mixed $urlInfo - urlInfo that was returned from cmi5 such as sessionId, launchWindow, URL
+     * @param mixed $retUrl - Tenants return url for when course window closes.
+    * @param mixed $homeUrl - Tenants url for homepage.
      * @return mixed
      */
-    public function saveURL($id, $urlInfo)
+    public function saveURLs($id, $urlInfo, $retUrl, $homeUrl)
     {
         global $DB;
 
@@ -31,7 +33,8 @@ class cmi5Tables
         $url = $urlDecoded['url'];
         parse_str($url, $urlInfo);
         $regid = $urlInfo['registration'];
-
+        $returnUrl = $retUrl;
+        $homepage = $homeUrl;
         //Retrieve actor record, this enables correct actor info for URL storage
         $record = $DB->get_record("cmi5launch", array('id' => $id));
 
@@ -52,10 +55,11 @@ class cmi5Tables
             $record->launchurl = $urlDecoded['url'];
             //Assign new regid
             $record->registrationid = $regid;
-            
+            $record->returnurl = $returnUrl;
+            $record->homepage = $homepage;
+
             $DB->import_record($table, $record, true);
-
-
+         
         } else {
             // If it does exist, update it
 
@@ -66,7 +70,8 @@ class cmi5Tables
                 $record->sessionid = $urlDecoded['id'];
                 $record->launchmethod = $urlDecoded['launchMethod'];
                 $record->launchurl = $urlDecoded['url'];
-
+                $record->returnUrl = $returnUrl;
+                $record->homepage = $homepage;
                 //Update record in table with newly retrieved tenant data
                 $DB->update_record($table, $record, true);
 

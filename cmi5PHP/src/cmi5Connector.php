@@ -124,22 +124,25 @@ class cmi5Connectors{
 
     ///Function to retrieve a launch URL for course
     //@param $id -Actor id to find correct info for url request
+    //@param $retUrl - returnUrl to pass to cmi5 in request
+    //@param $retUrl - homepage Url to pass to cmi5 in request
+    //@param $id -Actor id to find correct info for url request
     //@return $url - The launch URL returned from cmi5 player
     ////////
     //Trying somehting new, maybe just pass in id instead of above params?
-    public function retrieveUrl($id){
+    public function retrieveUrl($id, $retUrl, $homeUrl){
 		global $DB;
-        
+
 		//Retrieve actor record, this enables correct actor info for URL storage
 		$record = $DB->get_record("cmi5launch", array('id' => $id));
 
 
 		$settings = cmi5launch_settings($id);
 		//TODO - I am hardcoding these for now, want to check with others as to best way to collect this info
-        //such as from cmi5 mod install page, or cmi5 course uploadpage??? -MB
-        $homepage ="http://myLMSexample.com";
-        $returnUrl="http://127.0.0.1:63398.com";
-	    $actor= $settings['cmi5launchtenantname'];
+        	//such as from cmi5 mod install page, or cmi5 course uploadpage??? -MB
+        	$homepage = $homeUrl;
+        	$returnUrl= $retUrl;
+		$actor= $settings['cmi5launchtenantname'];
 		$token = $settings['cmi5launchtenanttoken'];
 		$playerUrl = $settings['cmi5launchplayerurl'];
 		$playerPort = $settings['cmi5launchplayerport'];
@@ -183,15 +186,16 @@ class cmi5Connectors{
 	   //to bring in functions from class cmi5Connector
 		$connectors = new cmi5Tables;
 		$saveUrl = $connectors->getSaveURL();
-		//Save the returned info to the correct table
-		$saveUrl($id, $launchResponse);
+
+        //Save the returned info to the correct table
+		$saveUrl($id, $launchResponse, $returnUrl, $homepage);
 		
 		//Only return the URL
 		$urlDecoded = json_decode($launchResponse, true);
 		$url = $urlDecoded['url'];
 
         //return response
-        return $url;
+       // return $url;
     }
 
 

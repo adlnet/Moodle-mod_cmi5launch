@@ -46,6 +46,7 @@ $PAGE->requires->jquery();
 // Output starts here.
 echo $OUTPUT->header();
 
+
 if ($cmi5launch->intro) { // Conditions to show the intro can change to look for own settings or whatever.
     echo $OUTPUT->box(
         format_module_intro('cmi5launch', $cmi5launch, $cm->id),
@@ -53,6 +54,10 @@ if ($cmi5launch->intro) { // Conditions to show the intro can change to look for
         'cmi5launchintro'
     );
 }
+
+
+    
+
 
 // TODO: Put all the php inserted data as parameters on the functions and put the functions in a separate JS file.
 ?>
