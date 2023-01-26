@@ -52,12 +52,7 @@ class cmi5Tables
             $record->launchurl = $urlDecoded['url'];
             //Assign new regid
             $record->registrationid = $regid;
-
-            //new way to make url
-            $url = "http://" . $record->cmi5playerurl . $record->cmi5playerport . "/api/v1/course/".$record->cmi5playerport."/launch-url/0";
-            //Assign new url
-            $record->requrl = $url;
-
+            
             $DB->import_record($table, $record, true);
 
 
@@ -74,12 +69,6 @@ class cmi5Tables
 
                 //Update record in table with newly retrieved tenant data
                 $DB->update_record($table, $record, true);
-
-                //Return record from updated table
-                //return $updatedRecord = $DB->get_record($table, ['courseid' => $id], '*', IGNORE_MISSING);
-                echo "<br>";
-                echo "Record updated, URL is saved, regid is  " . $regid;
-                echo "<br>";
 
             }
         }
@@ -102,36 +91,13 @@ class cmi5Tables
         //If false, record doesn't exist, so import it
         if (!$check) {
 
-            //import_record returns a true/false value based on if record created successfully  
-            $recordImported = $DB->import_record($table, $record, true);
+            $DB->import_record($table, $record, true);
 
-            //Ensure it was imported successfully
-            if ($recordImported != null || false) {
-
-                //Retrieve newly created record
-                $newRecord = $DB->get_record($table, ['id' => $id], '*', IGNORE_MISSING);
-
-                //Update record in table with newly retrieved tenant data
-                $DB->update_record($table, $newRecord, true);
-
-                //Return record from updated table
-//                return $newRecord = $DB->get_record($table, ['id' => $id], '*', IGNORE_MISSING);
-            }
         } else {
 
             // If it does exist, update it
-            //update_record returns true/false depending on success
-            $recordUpdate = $DB->update_record($table, $record, true);
+            $DB->update_record($table, $record, true);
 
-            //Ensure it was updated successfully
-            if ($recordUpdate != null || false) {
-
-                //Retrieve the updated record
-                $updatedRecord = $DB->get_record($table, ['id' => $id], '*', IGNORE_MISSING);
-
-                //Update record in table with newly retrieved tenant data
-                $DB->update_record($table, $updatedRecord, true);
-            }
         }
 
     }

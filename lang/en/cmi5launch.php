@@ -102,11 +102,6 @@ $string['cmi5launchurl_help'] = 'The base URL of the cmi5 activity you want to l
 
 $string['cmi5activityid'] = 'Activity ID';
 $string['cmi5activityid_help'] = 'The identifying IRI for the primary activity being launched.';
-/////////////////////////////
-//I'm gonna try and add boxes for my stuff - MB
-$string['cmi5tenantname'] = 'Tenant Name';
-$string['cmi5tenantname_help'] = 'The name of tenant who will use link.';
-////////////////////////////////////////////////
 
 $string['cmi5package'] = 'Zip package';
 $string['cmi5package_help'] = 'If you have a packaged cmi5 course, you can upload it here. If you upload a package, the Launch URL and Activity ID fields above will be automatically populated when you save using data from the cmi5.xml file contained in the zip. You can edit these settings at any time, but should not change the Activity ID (either directly or by file upload) unless you understand the consequences.';

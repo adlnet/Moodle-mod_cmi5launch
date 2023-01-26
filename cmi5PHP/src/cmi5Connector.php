@@ -57,7 +57,7 @@ class cmi5Connectors{
     // @param $user - username 
     // @param $pass - password 
     // @param $newTenantName - the name the new tenant will be, retreived from Tenant Name textbox
-    /////MB
+    /////
     public function createTenant($urlToSend, $user, $pass, $newTenantName){ 
     
         //retrieve and assign params

@@ -37,12 +37,9 @@ require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/autoload.php");
 
 // SCORM library from the SCORM module. Required for its xml2Array class by cmi5launch_process_new_package.
 require_once("$CFG->dirroot/mod/scorm/datamodels/scormlib.php");
-
-//////////////////////////////////////
-//require the classes i made to connect to cmi5 player - MB
+//Classes for connecting to CMI5 player
 require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/cmi5Connector.php");
 require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/cmi5_table_connectors.php");
-//////////////////////////////////////
 
 global $cmi5launchsettings;
 $cmi5launchsettings = null;
@@ -536,9 +533,6 @@ It looks like the standard Quiz module does that same thing, so I don't feel so 
  * Note: This takes the *first* activity from the cmi5.xml file to be the activity intended
  * to be launched. It will not go hunting for launch URLs any activities listed below.
  * Based closely on code from the SCORM and (to a lesser extent) Resource modules.
- **** Also, as this is where a course is first uploaded/created, this is where
- **** tenant info is attached to record and URL can be retrieved -MB 12/28/22
- ****TODO, there may be a better place to call URL in future, but here is where the record is first accessable
  * @package  mod_cmi5launch
  * @category cmi5
  * @param object $cmi5launch An object from the form in mod_form.php
@@ -550,7 +544,6 @@ function cmi5launch_process_new_package($cmi5launch) {
     $cmid = $cmi5launch->coursemodule;
     $context = context_module::instance($cmid);
     
-    //MB
 	//bring in functions from classes cmi5Connector/Cmi5Tables
 	$connectors = new cmi5Connectors;
 	$tables = new cmi5Tables;

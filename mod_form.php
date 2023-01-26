@@ -74,17 +74,13 @@ class mod_cmi5launch_mod_form extends moodleform_mod {
         $mform->addRule('cmi5launchurl', null, 'required', null, 'client');
         $mform->addRule('cmi5launchurl', get_string('maximumchars', '', 1333), 'maxlength', 1333, 'client');
         $mform->addHelpButton('cmi5launchurl', 'cmi5launchurl', 'cmi5launch');
-        //Here is where they can put in launch url -MB
         $mform->setDefault('cmi5launchurl', 'https://example.com/example-activity/index.html');
-            //here is the activity id box -MB
         $mform->addElement('text', 'cmi5activityid', get_string('cmi5activityid', 'cmi5launch'), array('size' => '64'));
         $mform->setType('cmi5activityid', PARAM_TEXT);
         $mform->addRule('cmi5activityid', null, 'required', null, 'client');
         $mform->addRule('cmi5activityid', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
         $mform->addHelpButton('cmi5activityid', 'cmi5activityid', 'cmi5launch');
         $mform->setDefault('cmi5activityid', 'https://example.com/example-activity');
-            //end activity id text box
-
         // End required Fields for Activity.
 
         // New local package upload.

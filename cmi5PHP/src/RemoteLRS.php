@@ -117,7 +117,7 @@ class RemoteLRS implements LRSInterface
                 array_push($http['header'], "$k: $v");
             }
         }
-        //Passing null as a second param is deprecated. Trying to remove to see if it clears error-MB
+        //TODO-Passing null as a second param is deprecated. 
         if (isset($options['params']) && count($options['params']) > 0) {
             $url .= '?' . http_build_query($options['params'], null, '&', PHP_QUERY_RFC3986);
         }
