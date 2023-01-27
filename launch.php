@@ -57,17 +57,12 @@ elseif($registrationid == 1)
     //Build url to pass as returnUrl
 	$returnUrl = ('http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] .'/mod/cmi5launch/view.php'. '?id=' .$cm->id);
     //Build url to pass as homeurl
-    $homeUrl = ('http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF']);
-
-    echo "<br>";
-    echo "Why does it work on one and not the other? what is $_SERVER here? ";
-    var_dump($_SERVER);
-    echo "<br>";
+   // $homeUrl = ('http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF']);
 
     $retrieveUrl = $connectors->getRetrieveUrl();
 
 	//Retrieve launch URL from CMI5 player
-	$url = $retrieveUrl($cmi5launch->id, $returnUrl, $homeUrl);
+	$url = $retrieveUrl($cmi5launch->id, $returnUrl);
 	//urlInfo is one big string so
 	parse_str($url, $urlInfo);
 	//Retrieve registration id from end of parsed URL

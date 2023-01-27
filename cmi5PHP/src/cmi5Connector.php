@@ -125,12 +125,11 @@ class cmi5Connectors{
     ///Function to retrieve a launch URL for course
     //@param $id -Actor id to find correct info for url request
     //@param $retUrl - returnUrl to pass to cmi5 in request
-    //@param $retUrl - homepage Url to pass to cmi5 in request
     //@param $id -Actor id to find correct info for url request
     //@return $url - The launch URL returned from cmi5 player
     ////////
     //Trying somehting new, maybe just pass in id instead of above params?
-    public function retrieveUrl($id, $retUrl, $homeUrl){
+    public function retrieveUrl($id, $retUrl){
 		global $DB;
 
 		//Retrieve actor record, this enables correct actor info for URL storage
@@ -140,7 +139,7 @@ class cmi5Connectors{
 		$settings = cmi5launch_settings($id);
 		//TODO - I am hardcoding these for now, want to check with others as to best way to collect this info
         	//such as from cmi5 mod install page, or cmi5 course uploadpage??? -MB
-        	$homepage = $homeUrl;
+        	$homepage = $settings['cmi5launchcustomacchp'];
         	$returnUrl= $retUrl;
 		$actor= $settings['cmi5launchtenantname'];
 		$token = $settings['cmi5launchtenanttoken'];
@@ -195,7 +194,7 @@ class cmi5Connectors{
 		$url = $urlDecoded['url'];
 
         //return response
-       // return $url;
+        return $url;
     }
 
 

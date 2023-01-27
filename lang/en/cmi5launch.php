@@ -69,7 +69,7 @@ $string['cmi5launchcustomacchp'] = 'Custom account homePage';
 $string['cmi5launchcustomacchp_help'] = 'If entered, Moodle will use this homePage in conjunction with the ID number user profile field to identify the learner.
 If the ID number is not entered for a learner, they will instead be identified by email or Moodle ID number.
 Note: If a learner\'s id changes, they will lose access to registrations associated with former ids and completion data may be reset. Reports in your LRS may also be affected.';
-$string['cmi5launchcustomacchp_default'] = '';
+$string['cmi5launchcustomacchp_default'] = 'https://moodle.com';
 
 //cmi5 player root location
 $string['cmi5launchplayerurl'] = 'cmi5 Player URL';
