@@ -137,10 +137,9 @@ class cmi5Connectors{
 
 
 		$settings = cmi5launch_settings($id);
-		//TODO - I am hardcoding these for now, want to check with others as to best way to collect this info
-        	//such as from cmi5 mod install page, or cmi5 course uploadpage??? -MB
-        	$homepage = $settings['cmi5launchcustomacchp'];
-        	$returnUrl= $retUrl;
+
+        $homepage = $settings['cmi5launchcustomacchp'];
+        $returnUrl= $retUrl;
 		$actor= $settings['cmi5launchtenantname'];
 		$token = $settings['cmi5launchtenanttoken'];
 		$playerUrl = $settings['cmi5launchplayerurl'];

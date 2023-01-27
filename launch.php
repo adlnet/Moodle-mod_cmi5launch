@@ -56,8 +56,6 @@ elseif($registrationid == 1)
     //We need to parse and cutoff from the ///
     //Build url to pass as returnUrl
 	$returnUrl = ('http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] .'/mod/cmi5launch/view.php'. '?id=' .$cm->id);
-    //Build url to pass as homeurl
-   // $homeUrl = ('http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF']);
 
     $retrieveUrl = $connectors->getRetrieveUrl();
 
@@ -162,6 +160,9 @@ if ($lrsrespond != 204) {
     }
     die();
 }
+/*
+Moodle used to send a launched statement to LRS. This is no longer needed as CMI%
+player handles the tracking. - MB 1/27/23
 
 $savelaunchedstatement = cmi5_launched_statement($registrationid);
 
@@ -177,7 +178,7 @@ if ($lrsrespond != 204) {
     }
     die();
 }
-
+*/
 $completion = new completion_info($course);
 $completion->set_module_viewed($cm);
 

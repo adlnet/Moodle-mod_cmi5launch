@@ -583,17 +583,12 @@ function cmi5launch_process_new_package($cmi5launch) {
     $settings = cmi5launch_settings($cmi5launch->id);
     $token = $settings['cmi5launchtenanttoken'];
 
-    
-
 	$courseResults =  $createCourse($context->id, $token, $packagefile );
 
 
 	//Take the results of created course and save new course id to table
 	$record->courseinfo = $courseResults;
 	$returnedInfo = json_decode($courseResults, true);
-
-   
-
     $lmsId = $returnedInfo["lmsId"] . "/au/0";
     $record->courseid = $returnedInfo["id"];
     $record->cmi5activityid = $lmsId;
