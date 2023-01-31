@@ -593,7 +593,7 @@ function cmi5launch_process_new_package($cmi5launch) {
     $record->courseid = $returnedInfo["id"];
     $record->cmi5activityid = $lmsId;
 	//create url for sending to when requesting launch url for course 
-	$url = "http://" . $record->cmi5playerurl . $record->cmi5playerport . "/api/v1/". $record->courseid. "/launch-url/0";
+	$url = $record->cmi5playerurl . "/api/v1/". $record->courseid. "/launch-url/0";
 	$record->launchurl = $url;
     	
 	//Populate player table with new course info
