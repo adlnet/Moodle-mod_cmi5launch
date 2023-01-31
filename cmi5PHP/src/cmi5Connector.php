@@ -136,6 +136,7 @@ class cmi5Connectors{
 		$record = $DB->get_record("cmi5launch", array('id' => $id));
 
 		$settings = cmi5launch_settings($id);
+
         $homepage = $settings['cmi5launchcustomacchp'];
         $returnUrl= $retUrl;
 		$actor= $settings['cmi5launchtenantname'];

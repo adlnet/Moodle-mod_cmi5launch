@@ -159,6 +159,9 @@ if ($lrsrespond != 204) {
     }
     die();
 }
+/*
+Moodle used to send a launched statement to LRS. This is no longer needed as CMI%
+player handles the tracking. - MB 1/27/23
 
 $savelaunchedstatement = cmi5_launched_statement($registrationid);
 
@@ -174,7 +177,7 @@ if ($lrsrespond != 204) {
     }
     die();
 }
-
+*/
 $completion = new completion_info($course);
 $completion->set_module_viewed($cm);
 
