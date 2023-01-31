@@ -28,6 +28,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+//$string['trialname'] = "Is this working? If so I rock!";
+
 $string['modulename'] = 'cmi5 Launch Link';
 $string['modulenameplural'] = 'cmi5 Launch Links';
 $string['modulename_help'] = 'A plug in for Moodle that allows the launch of cmi5 (xAPI) content which is then tracked to a separate LRS.';
@@ -67,16 +69,12 @@ $string['cmi5launchcustomacchp'] = 'Custom account homePage';
 $string['cmi5launchcustomacchp_help'] = 'If entered, Moodle will use this homePage in conjunction with the ID number user profile field to identify the learner.
 If the ID number is not entered for a learner, they will instead be identified by email or Moodle ID number.
 Note: If a learner\'s id changes, they will lose access to registrations associated with former ids and completion data may be reset. Reports in your LRS may also be affected.';
-$string['cmi5launchcustomacchp_default'] = '';
+$string['cmi5launchcustomacchp_default'] = 'https://moodle.com';
 
 //cmi5 player root location
 $string['cmi5launchplayerurl'] = 'cmi5 Player URL';
-$string['cmi5launchplayerurl_help'] = 'The url (e.g. http://player.example.com). Must NOT include a trailing forward slash.';
+$string['cmi5launchplayerurl_help'] = 'The url to communicate with CMI5 player, can include port number(e.g. http://player.example.com or http://localhost:63398). Must NOT include a trailing forward slash.';
 $string['cmi5launchplayerurl_default'] = '';
-
-$string['cmi5launchplayerport'] = 'cmi5 Player Port';
-$string['cmi5launchplayerport_help'] = 'Used with \'cmi5 Player URL\'. The port used to interact with the cmi5 Player API.';
-$string['cmi5launchplayerport_default'] = '66398';
 
 //cmi5 player credentials
 $string['cmi5launchtenantname'] = 'cmi5 Player: Basic Username';

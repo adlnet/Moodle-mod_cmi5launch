@@ -117,6 +117,7 @@ class RemoteLRS implements LRSInterface
                 array_push($http['header'], "$k: $v");
             }
         }
+        //TODO-Passing null as a second param is deprecated. 
         if (isset($options['params']) && count($options['params']) > 0) {
             $url .= '?' . http_build_query($options['params'], null, '&', PHP_QUERY_RFC3986);
         }
@@ -136,6 +137,7 @@ class RemoteLRS implements LRSInterface
         // the immediate call to turn it into an exception, and then restore
         // normal handling
         //
+        
         set_error_handler(
             function ($errno, $errstr, $errfile, $errline, array $errcontext) {
                 throw new \ErrorException($errstr, 0, $errno, $errfile, $errline);

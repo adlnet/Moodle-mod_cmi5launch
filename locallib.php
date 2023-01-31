@@ -125,14 +125,14 @@ function cmi5_launched_statement($registrationid) {
  * @return string launch link including querystring.
  */
 function cmi5launch_get_launch_url($registrationuuid) {
-    global $cmi5launch, $CFG;
+    global $cmi5launch, $CFG, $DB;
     $cmi5launchsettings = cmi5launch_settings($cmi5launch->id);
     $expiry = new DateTime('NOW');
     $xapiduration = $cmi5launchsettings['cmi5launchlrsduration'];
     $expiry->add(new DateInterval('PT'.$xapiduration.'M'));
 
     $url = trim($cmi5launchsettings['cmi5launchlrsendpoint']);
-
+    
     // Call the function to get the credentials from the LRS.
     $basiclogin = trim($cmi5launchsettings['cmi5launchlrslogin']);
     $basicpass = trim($cmi5launchsettings['cmi5launchlrspass']);
@@ -166,25 +166,11 @@ function cmi5launch_get_launch_url($registrationuuid) {
             break;
     }
 
-    // Build the URL to be returned.
-    $rtnstring = $cmi5launch->cmi5launchurl."?".http_build_query(
-        array(
-            "endpoint" => $url,
-            "auth" => "Basic ".$basicauth,
-            "actor" => cmi5launch_myjson_encode(
-                cmi5launch_getactor($cmi5launch->id)->asVersion(
-                    $cmi5launchsettings['cmi5launchlrsversion']
-                )
-            ),
-            "registration" => $registrationuuid,
-            "activity_id" => $cmi5launch->cmi5activityid
-        ),
-        '',
-        '&',
-        PHP_QUERY_RFC3986
-    );
+	//Retrieve launch url
+	$record = $DB->get_record("cmi5launch_player", array('registrationid' => $registrationuuid));
+	$rtnstring = $record->launchurl;
 
-    return $rtnstring;
+	return $rtnstring;
 }
 
 /**
@@ -375,6 +361,7 @@ function cmi5launch_get_global_parameters_and_get_state($key) {
         $cmi5launchsettings['cmi5launchlrspass']
     );
 
+
     return $lrs->retrieveState(
         new \cmi5\Activity(array("id" => trim($cmi5launch->cmi5activityid))),
         cmi5launch_getactor($cmi5launch->id),
@@ -489,7 +476,11 @@ function cmi5launch_send_api_request($auth, $method, $url) {
     }
 
     $context = stream_context_create(array( 'http' => $http ));
+
     $fp = fopen($url, 'rb', false, $context);
+    
+    $content = "";
+    
     if (! $fp) {
         return array (
             "metadata" => null,

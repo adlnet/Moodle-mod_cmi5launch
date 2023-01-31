@@ -1,4 +1,6 @@
 <?php
+//namespace cmi5;
+
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -35,6 +37,9 @@ require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/autoload.php");
 
 // SCORM library from the SCORM module. Required for its xml2Array class by cmi5launch_process_new_package.
 require_once("$CFG->dirroot/mod/scorm/datamodels/scormlib.php");
+//Classes for connecting to CMI5 player
+require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/cmi5Connector.php");
+require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/cmi5_table_connectors.php");
 
 global $cmi5launchsettings;
 $cmi5launchsettings = null;
@@ -75,6 +80,7 @@ function cmi5launch_supports($feature) {
  * @param mod_cmi5launch_mod_form $mform
  * @return int The id of the newly inserted cmi5launch record
  */
+
 function cmi5launch_add_instance(stdClass $cmi5launch, mod_cmi5launch_mod_form $mform = null) {
     global $DB, $CFG;
 
@@ -535,14 +541,21 @@ It looks like the standard Quiz module does that same thing, so I don't feel so 
 
 function cmi5launch_process_new_package($cmi5launch) {
     global $DB, $CFG;
-
     $cmid = $cmi5launch->coursemodule;
     $context = context_module::instance($cmid);
-
+    
+	//bring in functions from classes cmi5Connector/Cmi5Tables
+	$connectors = new cmi5Connectors;
+	$tables = new cmi5Tables;
+	//bring in functions from class cmi5_table_connectors
+	$createCourse = $connectors->getCreateCourse();
+	$populateTable = $tables->getPopulateTable();
+    
     // Reload cmi5 instance.
     $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
 
     $fs = get_file_storage();
+
     $fs->delete_area_files($context->id, 'mod_cmi5launch', 'package');
     file_save_draft_area_files(
         $cmi5launch->packagefile,
@@ -558,14 +571,34 @@ function cmi5launch_process_new_package($cmi5launch) {
     if (count($files) < 1) {
         return false;
     }
-
+    
     $zipfile = reset($files);
     $zipfilename = $zipfile->get_filename();
 
     $packagefile = false;
 
     $packagefile = $fs->get_file($context->id, 'mod_cmi5launch', 'package', 0, '/', $zipfilename);
+ 
+    //Retrieve user settings to apply to newly created record
+    $settings = cmi5launch_settings($cmi5launch->id);
+    $token = $settings['cmi5launchtenanttoken'];
 
+	$courseResults =  $createCourse($context->id, $token, $packagefile );
+
+
+	//Take the results of created course and save new course id to table
+	$record->courseinfo = $courseResults;
+	$returnedInfo = json_decode($courseResults, true);
+    $lmsId = $returnedInfo["lmsId"] . "/au/0";
+    $record->courseid = $returnedInfo["id"];
+    $record->cmi5activityid = $lmsId;
+	//create url for sending to when requesting launch url for course 
+	$url = $record->cmi5playerurl . "/api/v1/". $record->courseid. "/launch-url/0";
+	$record->launchurl = $url;
+    	
+	//Populate player table with new course info
+	$populateTable($record, 'cmi5launch');
+ 
     $fs->delete_area_files($context->id, 'mod_cmi5launch', 'content');
 
     $packer = get_file_packer('application/zip');
@@ -586,7 +619,7 @@ function cmi5launch_process_new_package($cmi5launch) {
         $objxml = new xml2Array();
         $manifest = $objxml->parse($xmltext);
 
-        // Update activity id from the first activity in cmi5.xml, if it is found.
+	   // Update activity id from the first activity in cmi5.xml, if it is found.
         // Skip without error if not. (The Moodle admin will need to enter the id manually).
         if (isset($manifest[0]["children"][0]["children"][0]["attrs"]["ID"])) {
             $record->cmi5activityid = $manifest[0]["children"][0]["children"][0]["attrs"]["ID"];
@@ -754,7 +787,7 @@ function cmi5launch_getactor($instance) {
  */
 function cmi5launch_settings($instance) {
     global $DB, $CFG, $cmi5launchsettings;
-
+    
     if (!is_null($cmi5launchsettings)) {
         return $cmi5launchsettings;
     }
@@ -766,7 +799,7 @@ function cmi5launch_settings($instance) {
         $fields = '*',
         $strictness = IGNORE_MISSING
     );
-
+  
     // If global settings are not used, retrieve activity settings.
     if (!use_global_cmi5_lrs_settings($instance)) {
         $expresult['cmi5launchlrsendpoint'] = $activitysettings->lrsendpoint;

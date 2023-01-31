@@ -46,6 +46,7 @@ $PAGE->requires->jquery();
 // Output starts here.
 echo $OUTPUT->header();
 
+
 if ($cmi5launch->intro) { // Conditions to show the intro can change to look for own settings or whatever.
     echo $OUTPUT->box(
         format_module_intro('cmi5launch', $cmi5launch, $cm->id),
@@ -54,15 +55,23 @@ if ($cmi5launch->intro) { // Conditions to show the intro can change to look for
     );
 }
 
+
+    
+
+
 // TODO: Put all the php inserted data as parameters on the functions and put the functions in a separate JS file.
 ?>
+
     <script>
-        // Function to test for key press and call launch function if space or enter is hit.
+      
         function key_test(registration) {
+        
             if (event.keyCode === 13 || event.keyCode === 32) {
                 mod_cmi5launch_launchexperience(registration);
+          
             }
         }
+        
         // Function to run when the experience is launched.
         function mod_cmi5launch_launchexperience(registration) {
             // Set the form paramters.
@@ -99,14 +108,15 @@ if ($cmi5launch->intro) { // Conditions to show the intro can change to look for
     </script>
 <?php
 
-// Generate a registration id for any new attempt.
-$cmi5phputil = new \cmi5\Util();
-$registrationid = $cmi5phputil->getUUID();
+
+//Start at 1, if continuing old attempt it will draw previous regid from LRS
+$registrationid = 1;
+
 $getregistrationdatafromlrsstate = cmi5launch_get_global_parameters_and_get_state(
     "http://cmi5api.co.uk/stateapikeys/registrations"
 );
-$lrsrespond = $getregistrationdatafromlrsstate->httpResponse['status'];
 
+$lrsrespond = $getregistrationdatafromlrsstate->httpResponse['status'];
 
 if ($lrsrespond != 200 && $lrsrespond != 404) {
     // On clicking new attempt, save the registration details to the LRS State and launch a new attempt.
@@ -115,17 +125,17 @@ if ($lrsrespond != 200 && $lrsrespond != 404) {
     if ($CFG->debug == 32767) {
         echo "<p>Error attempting to get registration data from State API.</p>";
         echo "<pre>";
-        var_dump($getregistrationdatafromlrsstate);
+       var_dump($getregistrationdatafromlrsstate);
         echo "</pre>";
     }
     die();
 }
 
+
 if ($lrsrespond == 200) {
     $registrationdatafromlrs = json_decode($getregistrationdatafromlrsstate->content->getContent(), true);
-
+//Populate table with previous experiences
     foreach ($registrationdatafromlrs as $key => $item) {
-
         if (!is_array($registrationdatafromlrs[$key])) {
             $reason = "Excepted array, found " . $registrationdatafromlrs[$key];
             throw new moodle_exception($reason, 'cmi5launch', '', $warnings[$reason]);
@@ -133,7 +143,7 @@ if ($lrsrespond == 200) {
         array_push(
             $registrationdatafromlrs[$key],
             "<a tabindex=\"0\" id='cmi5relaunch_attempt'
-            onkeyup=\"key_test('".$key."')\" onclick=\"mod_cmi5launch_launchexperience('".$key."')\" style='cursor: pointer;'>"
+            onkeyup=\"key_test('".$key."')\" onclick=\"mod_cmi5launch_launchexperience('".$key. "')\" style='cursor: pointer;'>"
             . get_string('cmi5launchviewlaunchlink', 'cmi5launch') . "</a>"
         );
         $registrationdatafromlrs[$key]['created'] = date_format(
@@ -158,8 +168,8 @@ if ($lrsrespond == 200) {
     // Needs to come after previous attempts so a non-sighted user can hear launch options.
     if ($cmi5launch->cmi5multipleregs) {
         echo "<p id='cmi5launch_newattempt'><a tabindex=\"0\"
-        onkeyup=\"key_test('".$registrationid."')\" onclick=\"mod_cmi5launch_launchexperience('"
-            . $registrationid
+        onkeyup=\"key_test('".$registrationid ."')\" onclick=\"mod_cmi5launch_launchexperience('"
+            . $registrationid 
             . "')\" style=\"cursor: pointer;\">"
             . get_string('cmi5launch_attempt', 'cmi5launch')
             . "</a></p>";

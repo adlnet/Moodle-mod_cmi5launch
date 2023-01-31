@@ -22,6 +22,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once('header.php');
 
@@ -34,24 +35,44 @@ $event->add_record_snapshot('course_modules', $cm);
 $event->add_record_snapshot('cmi5launch', $cmi5launch);
 $event->trigger();
 
-// Get the registration id.
+
+//Retrieve registration id (from view.php)
 $registrationid = required_param('launchform_registration', PARAM_TEXT);
 if (empty($registrationid)) {
     echo "<div class='alert alert-error'>".get_string('cmi5launch_regidempty', 'cmi5launch')."</div>";
+
     // Failed to connect to LRS.
     if ($CFG->debug == 32767) {
         echo "<p>Error attempting to get registration id querystring parameter.</p>";
     }
     die();
 }
+//If it's 1 than the "Start New Registration" was pushed
+elseif($registrationid == 1)
+{
+	//to bring in functions from class cmi5Connector
+	$connectors = new cmi5Connectors;
+
+    //Build url to pass as returnUrl
+    $returnUrl = $CFG->wwwroot .'/mod/cmi5launch/view.php'. '?id=' .$cm->id;
+
+    $retrieveUrl = $connectors->getRetrieveUrl();
+
+	//Retrieve launch URL from CMI5 player
+	$url = $retrieveUrl($cmi5launch->id, $returnUrl);
+	//urlInfo is one big string so
+	parse_str($url, $urlInfo);
+	//Retrieve registration id from end of parsed URL
+	$registrationid = $urlInfo['registration'];
+}
 
 // Save a record of this registration to the LRS state API.
-
 $getregistrationdatafromlrsstate = cmi5launch_get_global_parameters_and_get_state(
     "http://cmi5api.co.uk/stateapikeys/registrations"
 );
 $errorhtml = "<div class='alert alert-error'>".get_string('cmi5launch_notavailable', 'cmi5launch')."</div>";
 $lrsrespond = $getregistrationdatafromlrsstate->httpResponse['status'];
+//Unable to connect to LRS
 if ($lrsrespond != 200 && $lrsrespond != 404) {
     // Failed to connect to LRS.
     echo $errorhtml;
@@ -63,6 +84,7 @@ if ($lrsrespond != 200 && $lrsrespond != 404) {
     }
     die();
 }
+//Successfully connected to LRS
 if ($lrsrespond == 200) {
     $registrationdata = json_decode($getregistrationdatafromlrsstate->content->getContent(), true);
 } else {
@@ -79,11 +101,14 @@ $registrationdataforthisattempt = array(
     )
 );
 
+//Getting error on  - Exception - Attempt to modify property "httpResponse" on null
+//It's because if this isnull it can't have a property, but it is trying to 
+//access property anyway
 if (is_null($registrationdata)) {
     // If the error is 404 create a new registration data array.
-    if ($registrationdata->httpResponse['status'] = 404) {
+   /* if ($registrationdata->httpResponse['status'] = 404) {*/
         $registrationdata = $registrationdataforthisattempt;
-    }
+   /* }*/
 } else if (array_key_exists($registrationid, $registrationdata)) {
     // Else if the regsitration exists update the lastlaunched date.
     $registrationdata[$registrationid]["lastlaunched"] = $datenow;
@@ -134,6 +159,9 @@ if ($lrsrespond != 204) {
     }
     die();
 }
+/*
+Moodle used to send a launched statement to LRS. This is no longer needed as CMI%
+player handles the tracking. - MB 1/27/23
 
 $savelaunchedstatement = cmi5_launched_statement($registrationid);
 
@@ -149,11 +177,10 @@ if ($lrsrespond != 204) {
     }
     die();
 }
-
+*/
 $completion = new completion_info($course);
 $completion->set_module_viewed($cm);
 
-// Launch the experience.
 header("Location: ". cmi5launch_get_launch_url($registrationid));
 
 exit;

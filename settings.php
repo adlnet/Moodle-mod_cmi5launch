@@ -78,11 +78,6 @@ if ($ADMIN->fulltree) {
         get_string('cmi5launchplayerurl_help', 'cmi5launch'),
         get_string('cmi5launchplayerurl_default', 'cmi5launch'), PARAM_URL));
 
-    $settings->add(new admin_setting_configtext('cmi5launch/cmi5launchplayerport',
-        get_string('cmi5launchplayerport', 'cmi5launch'),
-        get_string('cmi5launchplayerport_help', 'cmi5launch'),
-        get_string('cmi5launchplayerport_default', 'cmi5launch')));
-
     $setting = new admin_setting_configtext('cmi5launch/cmi5launchtenantname',
         get_string('cmi5launchtenantname', 'cmi5launch'),
         get_string('cmi5launchtenantname_help', 'cmi5launch'),
