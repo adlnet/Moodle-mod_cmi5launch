@@ -22,7 +22,7 @@ class cmi5Connectors{
     // @return  $result - Response from cmi5 player
     public function createCourse($id, $tenantToken, $fileName){
 
-        global $DB;
+        global $DB, $CFG;
         $settings = cmi5launch_settings($id);
 
         //retrieve and assign params
@@ -38,12 +38,15 @@ class cmi5Connectors{
         //sends the stream to the specified URL 
         $result = $this->sendRequest($data, $url, $token);
 
-        if ($result === FALSE) {	
-			echo"Something went wrong sending the request";
-               echo"<br>";
-          	echo "Dumping session to troubleshoot.";
-               var_dump($_SESSION);
-               echo "<br>";
+        if ($result === FALSE) {
+
+            if ($CFG->debugdeveloper) {
+                echo "Something went wrong sending the request";
+                echo "<br>";
+                echo "Dumping session to troubleshoot.";
+                var_dump($_SESSION);
+                echo "<br>";
+            }
 	     } else {
 
 			//Return an array with tenant name and info
@@ -58,8 +61,9 @@ class cmi5Connectors{
     // @param $pass - password 
     // @param $newTenantName - the name the new tenant will be, retreived from Tenant Name textbox
     /////
-    public function createTenant($urlToSend, $user, $pass, $newTenantName){ 
-    
+    public function createTenant($urlToSend, $user, $pass, $newTenantName){
+
+        global $CFG;
         //retrieve and assign params
         $url = $urlToSend;
         $username = $user;
@@ -73,10 +77,12 @@ class cmi5Connectors{
         //sends the stream to the specified URL 
         $result = $this->sendRequest($data, $url, $username, $password);
 
-        if ($result === FALSE) 
-            { echo"Something went wrong!";
-                echo"<br>";
-                var_dump($_SESSION);
+        if ($result === FALSE){
+            if ($CFG->debugdeveloper)  {
+                    echo "Something went wrong!";
+                    echo "<br>";
+                    var_dump($_SESSION);
+                }
         }
         
         //decode returned response into array
@@ -93,7 +99,8 @@ class cmi5Connectors{
     // @param $audience - the name the of the audience using the token,
     // @param #tenantId - the id of the tenant
      function retrieveToken($urlToSend, $user, $pass, $audience, $tenantId){
-    
+
+        global $CFG;
         //retrieve and assign params
         $url = $urlToSend;
         $username = $user;
@@ -110,13 +117,15 @@ class cmi5Connectors{
         //sends the stream to the specified URL 
         $token = $this->sendRequest($data, $url, $username, $password);
 
-        if ($token === FALSE) 
-            { echo"Something went wrong!";
-            echo"<br>";
-            var_dump($_SESSION);
+        if ($token === FALSE){
+
+            if ($CFG->debugdeveloper)  {
+                echo "Something went wrong!";
+                echo "<br>";
+                var_dump($_SESSION);
+                }
         }
         else{
-            echo"The token is  + $token";
             return $token;
         }
 
