@@ -54,8 +54,8 @@ elseif($registrationid == 1)
 	$connectors = new cmi5Connectors;
 
     //Build url to pass as returnUrl
-	$returnUrl = ('http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] .'/mod/cmi5launch/view.php'. '?id=' .$cm->id);
-  
+    $returnUrl = $CFG->wwwroot .'/mod/cmi5launch/view.php'. '?id=' .$cm->id;
+
     $retrieveUrl = $connectors->getRetrieveUrl();
 
 	//Retrieve launch URL from CMI5 player
