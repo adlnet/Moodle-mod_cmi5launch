@@ -49,7 +49,6 @@ class cmi5Tables
             $record->tenantname = $settings['cmi5launchtenantname'];
             $record->tenanttoken = $settings['cmi5launchtenanttoken'];
             $record->cmi5playerurl = $settings['cmi5launchplayerurl'];
-            $record->cmi5playerport = $settings['cmi5launchplayerport'];
             $record->sessionid = $urlDecoded['id'];
             $record->launchmethod = $urlDecoded['launchMethod'];
             $record->launchurl = $urlDecoded['url'];

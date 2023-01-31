@@ -53,12 +53,9 @@ elseif($registrationid == 1)
 	//to bring in functions from class cmi5Connector
 	$connectors = new cmi5Connectors;
 
-    //We need to parse and cutoff from the ///
     //Build url to pass as returnUrl
 	$returnUrl = ('http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] .'/mod/cmi5launch/view.php'. '?id=' .$cm->id);
-    //Build url to pass as homeurl
-   // $homeUrl = ('http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF']);
-
+  
     $retrieveUrl = $connectors->getRetrieveUrl();
 
 	//Retrieve launch URL from CMI5 player

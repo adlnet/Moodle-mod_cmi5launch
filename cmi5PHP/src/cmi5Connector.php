@@ -30,7 +30,7 @@ class cmi5Connectors{
         $file = $fileName;
 
         //Build URL to import course to
-        $url= "http://" . $settings['cmi5launchplayerurl'] . ":" . $settings['cmi5launchplayerport'] . "/api/v1/course" ;
+        $url= $settings['cmi5launchplayerurl'] . "/api/v1/course" ;
        
         //the body of the request must be made as array first
         $data = $file;
@@ -135,19 +135,15 @@ class cmi5Connectors{
 		//Retrieve actor record, this enables correct actor info for URL storage
 		$record = $DB->get_record("cmi5launch", array('id' => $id));
 
-
 		$settings = cmi5launch_settings($id);
-		//TODO - I am hardcoding these for now, want to check with others as to best way to collect this info
-        	//such as from cmi5 mod install page, or cmi5 course uploadpage??? -MB
-        	$homepage = $settings['cmi5launchcustomacchp'];
-        	$returnUrl= $retUrl;
+        $homepage = $settings['cmi5launchcustomacchp'];
+        $returnUrl= $retUrl;
 		$actor= $settings['cmi5launchtenantname'];
 		$token = $settings['cmi5launchtenanttoken'];
 		$playerUrl = $settings['cmi5launchplayerurl'];
-		$playerPort = $settings['cmi5launchplayerport'];
 		$courseId = $record->courseid;
 
-	    $url = "http://" . $playerUrl . ":" . $playerPort . "/api/v1/course/" . $courseId  ."/launch-url/0";
+	    $url = $playerUrl . "/api/v1/course/" . $courseId  ."/launch-url/0";
 
         //the body of the request must be made as array first
         $data = array(

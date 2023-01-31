@@ -73,12 +73,8 @@ $string['cmi5launchcustomacchp_default'] = 'https://moodle.com';
 
 //cmi5 player root location
 $string['cmi5launchplayerurl'] = 'cmi5 Player URL';
-$string['cmi5launchplayerurl_help'] = 'The url (e.g. http://player.example.com). Must NOT include a trailing forward slash.';
+$string['cmi5launchplayerurl_help'] = 'The url to communicate with CMI5 player, can include port number(e.g. http://player.example.com or http://localhost:63398). Must NOT include a trailing forward slash.';
 $string['cmi5launchplayerurl_default'] = '';
-
-$string['cmi5launchplayerport'] = 'cmi5 Player Port';
-$string['cmi5launchplayerport_help'] = 'Used with \'cmi5 Player URL\'. The port used to interact with the cmi5 Player API.';
-$string['cmi5launchplayerport_default'] = '66398';
 
 //cmi5 player credentials
 $string['cmi5launchtenantname'] = 'cmi5 Player: Basic Username';

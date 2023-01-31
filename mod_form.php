@@ -75,6 +75,8 @@ class mod_cmi5launch_mod_form extends moodleform_mod {
         $mform->addRule('cmi5launchurl', get_string('maximumchars', '', 1333), 'maxlength', 1333, 'client');
         $mform->addHelpButton('cmi5launchurl', 'cmi5launchurl', 'cmi5launch');
         $mform->setDefault('cmi5launchurl', 'https://example.com/example-activity/index.html');
+        
+        
         $mform->addElement('text', 'cmi5activityid', get_string('cmi5activityid', 'cmi5launch'), array('size' => '64'));
         $mform->setType('cmi5activityid', PARAM_TEXT);
         $mform->addRule('cmi5activityid', null, 'required', null, 'client');
