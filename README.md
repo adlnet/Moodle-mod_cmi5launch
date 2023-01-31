@@ -46,6 +46,53 @@ flowchart TB
   cmi5 -.-> cmi5DB[(cmi5 DB)]
   cmi5 -.-> LRS
 ```
+## Sequence diagrams for connecting to CMI5 player
+
+Following are the two functions Moodle uses to create a course and retrieve a course URL from the CMI5 player.
+
+### Create course
+
+```mermaid
+sequenceDiagram
+    title: Create Course
+    
+    participant Moodle
+    participant CMI5
+    participant C-DB as CMI5's MySQL Database
+    participant M-DB as Moodle's MySQL Database
+   
+    
+    Moodle->>+CMI5: Send POST to /api/v1/course
+    break error
+    CMI5-->>+Moodle: response other than 200
+    Note over Moodle, CMI5: Check content-type, package, or token
+    end
+    CMI5->>+C-DB: Create course in DB
+    CMI5->>+Moodle: 200, returns JSON body
+    Moodle->>+M-DB: Save lmsId, Id, course metadata
+
+```
+### Retrieve launch URL
+
+```mermaid
+sequenceDiagram
+    title: Retrieve URL
+    
+    participant Moodle
+    participant CMI5
+    participant M-DB as Moodle's MySQL Database
+   
+    
+    Moodle->>+CMI5: Send POST to /api/v1/course/{courseId}/launchurl/{AU index}
+    break error
+    CMI5-->>+Moodle: response other than 200
+    Note over Moodle, CMI5: Check actor account info, returnurl, token
+    end
+    
+    CMI5->>+Moodle: 200, returns JSON body with session id, launch method, and launch url
+    Moodle->>+M-DB: Save returned course info to DB
+
+```
 
 ## User progress
 
