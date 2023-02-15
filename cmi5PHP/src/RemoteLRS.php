@@ -360,6 +360,14 @@ class RemoteLRS implements LRSInterface
             $statement = new Statement($statement);
         }
 
+        //Ok, trial- MB
+        global $DB;
+
+        $DB->set_field("trial", "statement", $statement, null);
+
+        ///////
+
+
         $requestCfg = array(
             'headers' => array(
                 'Content-Type' => 'application/json'
@@ -399,7 +407,9 @@ class RemoteLRS implements LRSInterface
         return $response;
     }
 
+    //MB Lets see if we can save statements here
     public function saveStatements($statements) {
+
         $versioned_statements = array();
         $attachments_map = array();
         foreach ($statements as $i => $st) {
@@ -438,6 +448,7 @@ class RemoteLRS implements LRSInterface
 
             $response->content = $statements;
         }
+
 
         return $response;
     }
@@ -1201,3 +1212,5 @@ class RemoteLRS implements LRSInterface
     }
     public function getHeaders() { return $this->headers; }
 }
+
+

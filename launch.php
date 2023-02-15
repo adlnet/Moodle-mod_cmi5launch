@@ -26,6 +26,7 @@
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once('header.php');
 
+
 // Trigger Activity launched event.
 $event = \mod_cmi5launch\event\activity_launched::create(array(
     'objectid' => $cmi5launch->id,
@@ -128,6 +129,8 @@ $saveresgistrationdata = cmi5launch_get_global_parameters_and_save_state(
     "http://cmi5api.co.uk/stateapikeys/registrations",
     $registrationdataetag
 );
+
+
 $lrsrespond = $saveresgistrationdata->httpResponse['status'];
 if ($lrsrespond != 204) {
     // Failed to connect to LRS.
