@@ -24,6 +24,10 @@
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require('header.php');
 
+//Classes for connecting to Progress class - MB
+require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/Progress.php");
+
+
 // Trigger module viewed event.
 $event = \mod_cmi5launch\event\course_module_viewed::create(array(
     'objectid' => $cmi5launch->id,
@@ -54,10 +58,6 @@ if ($cmi5launch->intro) { // Conditions to show the intro can change to look for
         'cmi5launchintro'
     );
 }
-
-
-    
-
 
 // TODO: Put all the php inserted data as parameters on the functions and put the functions in a separate JS file.
 ?>
@@ -130,11 +130,36 @@ if ($lrsrespond != 200 && $lrsrespond != 404) {
     }
     die();
 }
+//MB
+	//bring in functions from classes cmi5Connector/Cmi5Tables
+	$progress = new progress;
 
+    //bring in functions from class cmi5_table_connectors
+	$getProgress = $progress->getRetrieveStatement();
 
+//MB
+//Ok, here is where I want to put progress in the tables here.
+//so here is a good place to see what params are available to pass in,
+//Hey! IS regid a tatmentid???
 if ($lrsrespond == 200) {
+    echo"<br>";
+    echo"<br>";
+    echo"What is plain registrationdatafromlrsstate here?";
+    //var_dump($getregistrationdatafromlrsstate);
+    echo"<br>";
+    echo"<br>";
+
     $registrationdatafromlrs = json_decode($getregistrationdatafromlrsstate->content->getContent(), true);
-//Populate table with previous experiences
+
+    //Array to hold verbs and be returned
+	$progress = array();
+
+
+    ///////WAIT MB
+    //What if we make a 'progress key' HERE. Then we can just pop later?
+    //Or hell, pop here!!!!
+    //Populate table with previous experiences
+    global $cmi5launch;
     foreach ($registrationdatafromlrs as $key => $item) {
         if (!is_array($registrationdatafromlrs[$key])) {
             $reason = "Excepted array, found " . $registrationdatafromlrs[$key];
@@ -154,17 +179,64 @@ if ($lrsrespond == 200) {
             date_create($registrationdatafromlrs[$key]['lastlaunched']),
             'D, d M Y H:i:s'
         );
+        //YES!! Maybe I can have an array.push here and call my progress clas! So simple!!!
+        $registrationdatafromlrs[$key]['progress'] = 
+           ("<pre>". implode( "\n ", $getProgress($key, $cmi5launch->id)) ."</pre>" );
+         //   echo "<ul><li>" . implode("</li><li>", $getProgress) . "</li></ul>";
+            //Dangit! But if we pass back array then it can't convert
+            //HERE!!! dangit!
+            //Do we need a foreach here to or in the getprogress? Only seems
+            //to have most recent verb
+        
     }
+
+    //Here is where it is making the table....so what we want is this
+    //When you click on one of the rows (they are separate when you hover)
+    //We want it to dropdown and reveal all that session history with our 
+    //brand new progress getter. So we need to
+    //MAke each row clickable and 
+    //make each row able to drop down,
+    //make the rows call the progress getter,
+    //populate the dropped down row with the proggress 
+   
+    //MB - below builds the table, so we need to add the header for progress here
+
     $table = new html_table();
     $table->id = 'cmi5launch_attempttable';
     $table->caption = get_string('modulenameplural', 'cmi5launch');
     $table->head = array(
         get_string('cmi5launchviewfirstlaunched', 'cmi5launch'),
         get_string('cmi5launchviewlastlaunched', 'cmi5launch'),
-        get_string('cmi5launchviewlaunchlinkheader', 'cmi5launch')
+        get_string('cmi5launchviewlaunchlinkheader', 'cmi5launch'),
+        get_string('cmi5launchviewprogress', 'cmi5launch'),
+
     );
+
+    //mb table data takes arrays, can I adjus theirs?
+   // $candy = array("truffle" => "candycorn");
+    //$registrationdatafromlrs = array_merge($registrationdatafromlrs, $candy);
+    //The results come back as nested array under more then statments. We only want statements, and we want them separated into unique statments
+/////OOOOHHHHH registrationdatafromlrs is an OBJECT!!!!
+//so a foreach here instead of a for???
+    //$resultChunked = array_chunk($registrationdatafromlrs[0]["data"], 1);
+        
+
+
+    
+    //Now we need 
+
     $table->data = $registrationdatafromlrs;
+ 
+    //MB
+    //This builds the table, it uses a moodle made fucntion to do so,
+    //I'm going to see if its..wait, look above, it may use moodle method to build
+    //the table BUT it builds it with the data above. 
+    //So I can either try to adjust data above or try to write a script to activate
+    //on clicking a row AFTER table built
+
     echo html_writer::table($table);
+
+    //This builds the start new reg button - MB
     // Needs to come after previous attempts so a non-sighted user can hear launch options.
     if ($cmi5launch->cmi5multipleregs) {
         echo "<p id='cmi5launch_newattempt'><a tabindex=\"0\"
@@ -174,6 +246,7 @@ if ($lrsrespond == 200) {
             . get_string('cmi5launch_attempt', 'cmi5launch')
             . "</a></p>";
     }
+
 } else {
     echo "<p tabindex=\"0\"
         onkeyup=\"key_test('".$registrationid."')\"

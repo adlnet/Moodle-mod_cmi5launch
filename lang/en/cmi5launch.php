@@ -143,6 +143,10 @@ $string['cmi5launchviewfirstlaunched'] = 'First launched';
 $string['cmi5launchviewlastlaunched'] = 'Last launched';
 $string['cmi5launchviewlaunchlinkheader'] = 'Launch link';
 $string['cmi5launchviewlaunchlink'] = 'launch';
+//MB Progress???
+$string['cmi5launchviewprogress'] = 'Progress';
+
+
 
 $string['cmi5launch_completed'] = 'Experience complete!';
 $string['cmi5launch_progress'] = 'Attempt in progress.';

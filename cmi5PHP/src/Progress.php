@@ -13,6 +13,15 @@ class progress{
 		//Now were do we get ID, will view.php have it?
 		$settings = cmi5launch_settings($id);
 
+		//Array to hold verbs and be returned
+		$progressUpdate = array();
+
+		echo("<br>");
+		echo"What ius ID turning out to be??~~~~~~ " . $id;
+		echo("<br>");
+		echo("<br>");
+		echo"What ius REGG ID turning out to be??~~~~~~ " . $regId;
+		echo("<br>");
 		//When searching by reg id, which is the option available to Moodle, many results are returned, so iterating through them is necessary
 		$data = array(
 		'registration' => $regId
@@ -21,7 +30,9 @@ class progress{
 		//Url to request statements from 
 		//MB - I think we should do LRS endpoint and add 'statements'
 		//BECAUSE it could not be LL.
-		$url = $settings['cmi5launchlrslogin'] . "statements";
+		//Here it is LOL, the login!? No! We want the ADDY!!!The ENDPOINT!!
+
+		$url = $settings['cmi5launchlrsendpoint'] . "statements";
 		//Build query with data above
 		$url = $url . '?' . http_build_query($data,"", '&',  PHP_QUERY_RFC1738);
 		//$url = $url . '?' . urlencode($data);
@@ -55,6 +66,7 @@ class progress{
 
 		$length = count($resultChunked);
 		
+		//Why is iteration unreachable? It's reachable in the other test file
 		for($i = 0; $i < $length; $i++){
 
 			var_dump($resultChunked[$i]);
@@ -69,7 +81,7 @@ class progress{
 				//If it is null then there is no display, so go by verb id
 				if(!$display ){
 					//retrieve id
-					$verbId = $resultDecoded["statements"][0]["verb"]["id"];
+					$verbId = $resultChunked[$i][0]["verb"]["id"];
 
 					//SPLITS id in two on 'verbs/', we want the end which is the actual verb
 					$split = explode('verbs/', $verbId);
@@ -77,7 +89,7 @@ class progress{
 					echo"Verb is : " . $verb;
 				}else{
 					//IF it is not null then there is a language easy to read version of verb display, such as 'en' or 'en-us'
-					$verbLang =  $resultDecoded["statements"][0]["verb"]["display"];
+					$verbLang =  $resultChunked[$i][0]["verb"]["display"];
 					//Retreive the language
 					$lang = array_key_first($verbLang);
 					//use it to retreive verb
@@ -85,7 +97,7 @@ class progress{
 					echo"<br>";
 					echo"Verb is : " . $verb;
 				}
-		}	
+			
 		//Ok, so now it has actor and verb, but we want EACH ONE to display right?
 		//Barnacles! How best to do that? Maybe return actor/verb. OH wait! forgot
 		//the dang activity *facepalm*
@@ -94,19 +106,21 @@ class progress{
 			//Objects seem to always have 'id' and 'objecttype', but do not always have 'definition'. Def is what has the easy to read version because within it
 			// is 'type' and 'name' and within 'name; is the en opr lang and easy to read vers. 
 			//See if definition AND it's sub name are there, otherwise might as qwell go with id.///EXCEPT we CANT cause it doesn't do NESTED ids....
+			
+			//THIS is the SECOND chunk, this is the problem
 			$objectInfo = $resultChunked[$i][0]["object"];
 			$definition = array_key_exists("definition", $objectInfo);
 			//If it is null then there is no "definition", so go by object id
 			if(!$definition ){
 				//retrieve id
-				$objectId = $resultDecoded["statements"][0]["object"]["id"];
+				$object = $resultChunked[$i][0]["object"]["id"];
 				//I have noticed that in the LRS when it can't find a name it references the WHOLE id as in "actor did WHOLEID", so I will do the same here
 				echo"<br>";
-				echo"Object is : " . $objectId;
+				echo"Object is : " . $object;
 				echo"<br>";
 			}else{
 				//IF it is not null then there is a language easy to read version of object definition, such as 'en' or 'en-us'
-				$objectLang =  $resultDecoded["statements"][0]["object"]["definition"]["name"];
+				$objectLang =  $resultChunked[$i][0]["object"]["definition"]["name"];
 				//Retreive the language
 				$lang = array_key_first($objectLang);
 				//use it to retreive verb
@@ -121,16 +135,38 @@ class progress{
 			echo"at/on ";
 
 			// Specified date/time in your computer's time zone.
-			$date = new DateTimeImmutable($resultDecoded['statements'][0]["timestamp"]);
+			$date = new DateTimeImmutable($resultChunked[$i][0]["timestamp"]);
 			$date = $date->format('d-m-Y' . " ".  'h:i a');
 			echo"".$date;
 			echo"<br>";
 			
 
+			///WAIT!!!
+			// I can return a STRING SMH
 			//Okay, now lets put them all in an array, pass the array out as return,
 			//Then moodle can unpack the array into a nice sentence on the screen
-			$progressUpdate =[$actor, $verb, $object, $date];
+			//$progressUpdate = array ($actor, $verb, $object, $date);
+			$progressUpdate[] = "$actor $verb $object on $date";
 			
+			/*
+			echo"<br>";
+			echo"" . var_dump($progressUpdate);
+			echo"<br>";
+			*/
+
+			
+		}
+		//We originally had progressUpdate as array because
+		//we want it ti return ALL the verbs, so lets try arraying
+		//it again
+
+		//Ok, lets see what our fancy new array setup does
+		echo"<br>";
+		echo"Fancy array is :";
+		var_dump($progressUpdate);
+		echo"<br>";
+		
+		return $progressUpdate;
 	}		
 
 
