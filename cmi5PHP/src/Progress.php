@@ -135,11 +135,27 @@ class progress{
 			echo"at/on ";
 
 			// Specified date/time in your computer's time zone.
-			$date = new DateTimeImmutable($resultChunked[$i][0]["timestamp"]);
-			$date = $date->format('d-m-Y' . " ".  'h:i a');
-			echo"".$date;
-			echo"<br>";
+			//$date = new DateTimeImmutable($resultChunked[$i][0]["timestamp"]);
 			
+			$date = new DateTime($resultChunked[$i][0]["timestamp"], new DateTimeZone('US/Eastern'));
+			//$date = $date->format('d-m-Y' . " ".  'h:i a');
+			
+			//$date = date_format(
+			//	date_create($resultChunked[$i][0]["timestamp"]),
+			//	'D, d M Y H:i:s');
+				$date->setTimezone(new DateTimeZone('America/New_York'));
+
+			var_dump($date);
+
+			$date = $date->format('d-m-Y' . " ".  'h:i a');
+
+			//echo"<br>";
+			
+			//I need a better way to do date and time
+			//We need to make it a date object!!! ...hmmm w
+			//$timestamp=$resultChunked[$i][0]["timestamp"];
+			//$date = $timestamp->format('d-m-Y' . " ".  'h:i a');
+			//echo gmdate("Y-m-d\TH:i:s\Z", $timestamp);
 
 			///WAIT!!!
 			// I can return a STRING SMH
@@ -165,7 +181,7 @@ class progress{
 		echo"Fancy array is :";
 		var_dump($progressUpdate);
 		echo"<br>";
-		
+
 		return $progressUpdate;
 	}		
 

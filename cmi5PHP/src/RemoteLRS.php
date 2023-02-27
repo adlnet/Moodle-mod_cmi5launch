@@ -137,7 +137,7 @@ class RemoteLRS implements LRSInterface
         // the immediate call to turn it into an exception, and then restore
         // normal handling
         //
-        
+        /*
         set_error_handler(
             function ($errno, $errstr, $errfile, $errline, array $errcontext) {
                 throw new \ErrorException($errstr, 0, $errno, $errfile, $errline);
@@ -159,7 +159,7 @@ class RemoteLRS implements LRSInterface
             $content = "Request failed: $ex";
         }
 
-        restore_error_handler();
+        restore_error_handler();\]
 
         if ($fp) {
             $metadata = stream_get_meta_data($fp);
@@ -182,6 +182,8 @@ class RemoteLRS implements LRSInterface
             //
             // Content-Type won't be set in the case of a 204 (and potentially others)
             //
+  
+  */
             if (isset($response['headers']['contentType']) && $response['headers']['contentType'] === "multipart/mixed") {
                 $content = $this->_parseMultipart($response['headers']['contentTypeBoundary'], $content);
             }
@@ -194,6 +196,7 @@ class RemoteLRS implements LRSInterface
             }
         }
 
+        
         return new LRSResponse($success, $content, $response);
     }
 
