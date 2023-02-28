@@ -93,8 +93,8 @@
         <FIELD NAME="registrationid" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" COMMENT="Course registration ID returned by CMI5 player. We want to use this for LRS instead"/>
         <FIELD NAME="sessionid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Id created when an AU launch URL is requested"/>
         <FIELD NAME="auid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="AU id from course package, used to retreive separate AU URLs"/>
-        <FIELD NAME="auluanchurl" TYPE="char" LENGTH="500" NOTNULL="false" SEQUENCE="false" COMMENT="Returned launch url from cmi5 player for the AU"/>
-        <FIELD NAME="launchurl" TYPE="char" LENGTH="500" NOTNULL="false" SEQUENCE="false" COMMENT="Returned launch url from cmi5 player"/>
+        <FIELD NAME="auluanchurl" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Returned launch url from cmi5 player for the AU"/>
+        <FIELD NAME="launchurl" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Returned launch url from cmi5 player"/>
         <FIELD NAME="firstlaunch" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Time activity was first launched, for LRS."/>
         <FIELD NAME="lastlaunch" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Time activity was last launched, for LRS."/>
         <FIELD NAME="completed_passed" TYPE="char" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Whether the AU has been completed or passed"/>

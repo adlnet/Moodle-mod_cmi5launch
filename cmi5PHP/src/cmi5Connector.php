@@ -15,6 +15,72 @@ class cmi5Connectors{
         return [$this, 'createCourse'];
     }
 
+    public function retrieveAUs($courseResults, $record){
+        //Who should call this func? create course in this class?
+        //or maybe moodle itself in lib.php....hmmmm...
+        //It's nott added to a table until lib right, righto,...
+        //so maybe instead of parsing ANUYTHING in LIB.php it would be better
+        //to make this a "parseCourse" thiny and do it ALL, then it's aded to the 
+        //tab le .......HEYYYY There is mprethan one LMSID as wekk!
+
+        $returnedInfo = json_decode($courseResults, true);
+    
+	   echo"<br>";
+	   echo"<br>";
+	   echo"<br>";
+	   echo"<br>";
+	   echo"Well thats not null, whats this  ";
+	   var_dump($returnedInfo);
+	   echo"<br>";
+
+        //The results come back as nested array under more then statments. We only want statements, and we want them separated into unique statments
+        $resultChunked = array_chunk($returnedInfo["metadata"]["aus"], 1);
+
+	   echo"<br>";
+	   echo"Well welll welll, whats this  ";
+	   var_dump($resultChunked);
+	   echo"<br>";
+	  
+        $length = count($resultChunked);
+
+         $tables = new cmi5Tables;
+	        //bring in functions from class cmi5_table_connectors
+    	    $populateTable = $tables->getPopulateTable();
+
+	    //These values wqonts changge based on au so do here
+		//In FACT, if we are goin to make this where tables stored
+		//Maybe store it then aus, but look at that later TODO
+	    $record->courseid = $returnedInfo["id"];
+
+
+        //Why is iteration unreachable? It's reachable in the other test file
+        for($i = 0; $i < $length; $i++){
+            //Ok, now what do we want this to DO, we want it to save all the
+            //LMS AU and stuff to table cmi5_urls right? An entry for each AU?
+            //I wonder if it would be better to save them as array key>value
+            //such as AU>au url, but we still need passed and stuff, so I think this is good
+            //
+			echo"<br>";
+			echo"Um, returned info??? is?" . $resultChunked[0][$i]["id"];
+			echo"<br>";
+
+        }
+
+
+        //Whaty is returned info here
+        //var_dump($returnedInfo);
+        //Or wait!! The entire course info is saved right? So maybe
+        //just  retreive them when needed/ getting the url
+        //Maybe here stores aUs and or in create course? 
+        //Then alter they can be pulled out for launch url
+       // $lmsId = $returnedInfo["lmsId"] . "/au/0";
+       // $record->courseid = $returnedInfo["id"];
+       // $record->cmi5activityid = $lmsId;
+        //create url for sending to when requesting launch url for course 
+        //$url = $record->cmi5playerurl . "/api/v1/". $record->courseid. "/launch-url/0";
+        //$record->launchurl = $url;
+    }
+
     //Function to create a course
     // @param $id - tenant id in Moodle
     // @param $token - tenant bearer token
@@ -153,6 +219,32 @@ class cmi5Connectors{
 		$playerUrl = $settings['cmi5launchplayerurl'];
 		$courseId = $record->courseid;
 
+        //MB
+        //see here right here! IT is sending 0 as in thats the plain thing?
+        //We could parse the aus and use them ehre? then iterate throught them
+        //so like func that parses is called,
+        //it returnes array?
+        //arrray iterates through them, saving to table,
+        //below here retreives ALL the urls
+        //But then like, which one does it know to return?
+        //That's where the tree comes in right?
+        //Or maybe it's not done here at all, it's done elsewhere and here 
+        //is where it picks what au it wants and sends off for launch url?
+	   	//MB
+		//needs course REsults/records 
+		//Should the retrieve aus go here?
+		//This is the retreive URL, so it can get the urls
+		//as well...
+		$courseResults = $record->courseinfo;
+		echo"<br>";
+		echo"<br>";
+		echo"<br>";
+		echo"<br>";
+		echo"I seee Null huh?" . $courseResults;
+		echo"<br>";
+
+		$this->retrieveAUs($courseResults, $record);
+
 	    $url = $playerUrl . "/api/v1/course/" . $courseId  ."/launch-url/0";
 
         //the body of the request must be made as array first
@@ -191,6 +283,8 @@ class cmi5Connectors{
 	   //to bring in functions from class cmi5Connector
 		$connectors = new cmi5Tables;
 		$saveUrl = $connectors->getSaveURL();
+
+	
 
         //Save the returned info to the correct table
 		$saveUrl($id, $launchResponse, $returnUrl, $homepage);

@@ -142,12 +142,6 @@ if ($lrsrespond != 200 && $lrsrespond != 404) {
 //so here is a good place to see what params are available to pass in,
 //Hey! IS regid a tatmentid???
 if ($lrsrespond == 200) {
-    echo"<br>";
-    echo"<br>";
-    echo"What is plain registrationdatafromlrsstate here?";
-    //var_dump($getregistrationdatafromlrsstate);
-    echo"<br>";
-    echo"<br>";
 
     $registrationdatafromlrs = json_decode($getregistrationdatafromlrsstate->content->getContent(), true);
 

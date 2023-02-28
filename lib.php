@@ -587,8 +587,19 @@ function cmi5launch_process_new_package($cmi5launch) {
 
 
 	//Take the results of created course and save new course id to table
-	$record->courseinfo = $courseResults;
+    //MB
+    //Ok I think here is where we want to e tthe AUs?
+
+
+    $record->courseinfo = $courseResults;
 	$returnedInfo = json_decode($courseResults, true);
+    
+    //Whaty is returned info here
+    //var_dump($returnedInfo);
+    //Or wait!! The entire course info is saved right? So maybe
+    //just  retreive them when needed/ getting the url
+    //Maybe here stores aUs and or in create course? 
+    //Then alter they can be pulled out for launch url
     $lmsId = $returnedInfo["lmsId"] . "/au/0";
     $record->courseid = $returnedInfo["id"];
     $record->cmi5activityid = $lmsId;
