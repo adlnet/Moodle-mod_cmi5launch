@@ -15,7 +15,10 @@ class cmi5Connectors{
         return [$this, 'createCourse'];
     }
 
-    public function retrieveAUs($courseResults, $record){
+    public function getRetrieveAus(){
+	return [$this, 'retrieveAus'];
+ }
+    public function retrieveAUs($returnedInfo, $record){
         //Who should call this func? create course in this class?
         //or maybe moodle itself in lib.php....hmmmm...
         //It's nott added to a table until lib right, righto,...
@@ -23,15 +26,6 @@ class cmi5Connectors{
         //to make this a "parseCourse" thiny and do it ALL, then it's aded to the 
         //tab le .......HEYYYY There is mprethan one LMSID as wekk!
 
-        $returnedInfo = json_decode($courseResults, true);
-    
-	   echo"<br>";
-	   echo"<br>";
-	   echo"<br>";
-	   echo"<br>";
-	   echo"Well thats not null, whats this  ";
-	   var_dump($returnedInfo);
-	   echo"<br>";
 
         //The results come back as nested array under more then statments. We only want statements, and we want them separated into unique statments
         $resultChunked = array_chunk($returnedInfo["metadata"]["aus"], 1);
@@ -42,7 +36,10 @@ class cmi5Connectors{
 	   echo"<br>";
 	  
         $length = count($resultChunked);
-
+	   echo"<br>";
+	   echo"I dont think it uis taking all AU what is lenth here!!!!  ";
+	   var_dump($length);
+	   echo"<br>";
          $tables = new cmi5Tables;
 	        //bring in functions from class cmi5_table_connectors
     	    $populateTable = $tables->getPopulateTable();
@@ -51,8 +48,13 @@ class cmi5Connectors{
 		//In FACT, if we are goin to make this where tables stored
 		//Maybe store it then aus, but look at that later TODO
 	    $record->courseid = $returnedInfo["id"];
-
-
+		$maybe = $record->courseid;
+	    echo"<br>";
+        echo"<br>";
+        echo"WHAT IS ID HERE???? &&&&&&&&& ". $maybe . " &&&&&&&&";
+        echo"<br>";
+		$courseAus = array( );
+		$testObjectAu = array();
         //Why is iteration unreachable? It's reachable in the other test file
         for($i = 0; $i < $length; $i++){
             //Ok, now what do we want this to DO, we want it to save all the
@@ -61,12 +63,50 @@ class cmi5Connectors{
             //such as AU>au url, but we still need passed and stuff, so I think this is good
             //
 			echo"<br>";
-			echo"Um, returned info??? is?" . $resultChunked[0][$i]["id"];
+			echo"ok, now all broken up we should have 8 separate aus ";
+			var_dump($resultChunked[$i]);
+			echo"<br>";
+			echo"so the au is sssssss --->>" ;
+			var_dump($resultChunked[$i][0]['auIndex']);
+			echo"<br>";
+			$au = $resultChunked[$i][0]['auIndex'];
+
+			//ok, it is now separating the au's so now we want the au for asking for url
+			//which i beleiove is best taken from end of lmsID
+			//right?
+			//THEY HAVEAN AU INDEX!!!! LETS TRY THAT!!!!
+			$record->auid = $au;
+			echo"<br>";
+			echo"TESTING TESTIN TESTING ";
+			$test = $record->auid;
+			var_dump($test);
 			echo"<br>";
 
+			//MB//
+			//LEts have a little fun
+			//Can this new 'object' be passed and STORED as array?
+			  //If I make it here can everyone use it?
+		        //MB
+	   		$auObject = new stdClass();
+			$auObject->au = ($resultChunked[$i][0]['auIndex']);
+			$auObject->lms_id = ($resultChunked[$i][0]['lmsId']); 
+			$auObject->au_id = ($resultChunked[$i][0]['id']);
+			$auObject->url;
+			$auObject->launchMethod = ($resultChunked[$i][0]['launchMethod']);
+			$auObject->completedOrPassed;
+
+ 
+			//$populateTable($record, "cmi5_urls");
+			$courseAus[] = $au;
+			$testObjectAu[] = $auObject;
+			echo"<br>";
+			echo"Hows the array cominG?";
+			
+			var_dump($testObjectAu);
+			echo"<br>";
         }
 
-
+	   	return $testObjectAu;
         //Whaty is returned info here
         //var_dump($returnedInfo);
         //Or wait!! The entire course info is saved right? So maybe
@@ -243,9 +283,20 @@ class cmi5Connectors{
 		echo"I seee Null huh?" . $courseResults;
 		echo"<br>";
 
-		$this->retrieveAUs($courseResults, $record);
+		//This currently retreives ana rray of the AU numbers,
+		//TODO - do we want each number to also have the entire 'au info'? Or just numbers?
+		$courseAus = $this->retrieveAUs($courseResults, $record);
+		//Now that we have the array get length and start getting separate URL!!!
+		$length = count($courseAus);
+		//Ok, now its an ARRAY of objects, to get au 'number' we want object->au
+		
+		for($i = 0; $i < $length; $i++){
 
-	    $url = $playerUrl . "/api/v1/course/" . $courseId  ."/launch-url/0";
+			$au = $courseAus[$i]->au;
+		
+
+
+	    $url = $playerUrl . "/api/v1/course/" . $courseId  ."/launch-url/" . $au;
 
         //the body of the request must be made as array first
         $data = array(
@@ -262,7 +313,7 @@ class cmi5Connectors{
         //There can be multiple headers but as an array under the ONE header
         //content(body) must be JSON encoded here, as that is what CMI5 player accepts
         //JSON_UNESCAPED_SLASHES used so http addresses are displayed correctly
-        $options = array(
+     	   $options = array(
             'http' => array(
                 'method'  => 'POST',
                 'ignore_errors' => true,
@@ -271,7 +322,7 @@ class cmi5Connectors{
                     "Accept: application/json\r\n"),
                 'content' => json_encode($data, JSON_UNESCAPED_SLASHES)
 
-            )
+            )	
         );
 
         //the options are here placed into a stream to be sent
@@ -282,7 +333,7 @@ class cmi5Connectors{
 
 	   //to bring in functions from class cmi5Connector
 		$connectors = new cmi5Tables;
-		$saveUrl = $connectors->getSaveURL();
+		$saveUrl = $connectors->getSaveAuURLs();
 
 	
 
@@ -292,7 +343,7 @@ class cmi5Connectors{
 		//Only return the URL
 		$urlDecoded = json_decode($launchResponse, true);
 		$url = $urlDecoded['url'];
-
+	};//end of my trial for length new url thingy
         //return response
         return $url;
     }

@@ -549,6 +549,7 @@ function cmi5launch_process_new_package($cmi5launch) {
 	$tables = new cmi5Tables;
 	//bring in functions from class cmi5_table_connectors
 	$createCourse = $connectors->getCreateCourse();
+    $retrieveAus = $connectors-> getRetrieveAus();
 	$populateTable = $tables->getPopulateTable();
     
     // Reload cmi5 instance.
@@ -594,17 +595,26 @@ function cmi5launch_process_new_package($cmi5launch) {
     $record->courseinfo = $courseResults;
 	$returnedInfo = json_decode($courseResults, true);
     
-    //Whaty is returned info here
-    //var_dump($returnedInfo);
-    //Or wait!! The entire course info is saved right? So maybe
-    //just  retreive them when needed/ getting the url
-    //Maybe here stores aUs and or in create course? 
-    //Then alter they can be pulled out for launch url
-    $lmsId = $returnedInfo["lmsId"] . "/au/0";
+    
+    //$aus  = array();
+    
+    //should receive an array of the aus objects
+    $aus = $retrieveAus($returnedInfo, $record);
+    //Now, knwoing what we do about stclass, is this record?
+    //and can we just smack it on here? noooo, record builds from tabke, it needs
+    //to be tables name, which is AUS!
+    $record->aus = $aus;
+
+
+    //Retrieve lmsId of course
+    $lmsId = $returnedInfo["lmsId"];
     $record->courseid = $returnedInfo["id"];
     $record->cmi5activityid = $lmsId;
 	//create url for sending to when requesting launch url for course 
-	$url = $record->cmi5playerurl . "/api/v1/". $record->courseid. "/launch-url/0";
+	//See if we save the AUs here and dynamically crfeate url
+    //I could make this a BASE url and only the end change? so like leave
+    //The trailing forward slash and later chuck your au num unto end?
+    $url = $record->cmi5playerurl . "/api/v1/". $record->courseid. "/launch-url/";
 	$record->launchurl = $url;
     	
 	//Populate player table with new course info
