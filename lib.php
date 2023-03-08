@@ -40,6 +40,9 @@ require_once("$CFG->dirroot/mod/scorm/datamodels/scormlib.php");
 //Classes for connecting to CMI5 player
 require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/cmi5Connector.php");
 require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/cmi5_table_connectors.php");
+require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/ausHelpers.php");
+require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/aus.php");
+
 
 global $cmi5launchsettings;
 $cmi5launchsettings = null;
@@ -547,9 +550,10 @@ function cmi5launch_process_new_package($cmi5launch) {
 	//bring in functions from classes cmi5Connector/Cmi5Tables
 	$connectors = new cmi5Connectors;
 	$tables = new cmi5Tables;
+    $aus_helpers = new Au_Helpers;
 	//bring in functions from class cmi5_table_connectors
 	$createCourse = $connectors->getCreateCourse();
-    $retrieveAus = $connectors-> getRetrieveAus();
+    $retrieveAus = $aus_helpers-> getRetrieveAus();
 	$populateTable = $tables->getPopulateTable();
     
     // Reload cmi5 instance.
@@ -595,16 +599,11 @@ function cmi5launch_process_new_package($cmi5launch) {
     $record->courseinfo = $courseResults;
 	$returnedInfo = json_decode($courseResults, true);
     
-    
-    //$aus  = array();
-    
-    //should receive an array of the aus objects
-    $aus = $retrieveAus($returnedInfo, $record);
-    //Now, knwoing what we do about stclass, is this record?
-    //and can we just smack it on here? noooo, record builds from tabke, it needs
-    //to be tables name, which is AUS!
+    //TODO - IS there a better way to do this? I hate it is decoded then encoded
+    //Seems repetitive but the bottom needs decoded but to store needs encoded
+    //Maybe AUs need to be encoded here 
+    $aus = json_encode($retrieveAus($returnedInfo));
     $record->aus = $aus;
-
 
     //Retrieve lmsId of course
     $lmsId = $returnedInfo["lmsId"];

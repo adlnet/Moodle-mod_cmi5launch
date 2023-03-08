@@ -24,6 +24,17 @@ class cmi5Tables
         return [$this, 'saveAuURLs'];
     }
 
+    public function getRetrieveAus()
+    {
+        return [$this, 'retrieveAus'];
+    }
+
+    public function retrieveAus($id, $retUrl){
+		global $DB;
+
+		//Retrieve actor record, this enables correct actor info for URL storage
+		$record = $DB->get_record("cmi5launch", array('id' => $id));
+    }
     /**
      * //Function to save URL info to it's table
      * @param mixed $id - base id to make sure record is saved to correct actor
@@ -167,7 +178,16 @@ class cmi5Tables
     *////////    
     public function populateTable($record, $table)
     {
-        global $DB;
+/*
+	echo"<br>";
+	echo"<br>";
+	echo"Pop table entered";
+	echo"Record AUS are : -------- . " . $record->aus;
+	echo"<br>";
+	echo"<br>";
+  
+	*/
+	global $DB;
         //Id to create/update record
         $id = $record->id;
         

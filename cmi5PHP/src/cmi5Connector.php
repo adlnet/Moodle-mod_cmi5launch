@@ -26,21 +26,25 @@ class cmi5Connectors{
         //to make this a "parseCourse" thiny and do it ALL, then it's aded to the 
         //tab le .......HEYYYY There is mprethan one LMSID as wekk!
 
-
+	   //I see its null! Lets see what it is here
+	/*   echo"<br>";
+		echo"Entered retrieveAus, What is it here?";
+		echo" " . json_encode($returnedInfo);
+		echo"<br>";
+	*/
         //The results come back as nested array under more then statments. We only want statements, and we want them separated into unique statments
         $resultChunked = array_chunk($returnedInfo["metadata"]["aus"], 1);
-
+/*
 	   echo"<br>";
 	   echo"Well welll welll, whats this  ";
-	   var_dump($resultChunked);
+	   echo"    " . json_encode($resultChunked);
 	   echo"<br>";
 	  
-        $length = count($resultChunked);
 	   echo"<br>";
-	   echo"I dont think it uis taking all AU what is lenth here!!!!  ";
-	   var_dump($length);
+		echo"Okkayyyyy" . json_encode($resultChunked[0]);
 	   echo"<br>";
-         $tables = new cmi5Tables;
+	   */
+	   $tables = new cmi5Tables;
 	        //bring in functions from class cmi5_table_connectors
     	    $populateTable = $tables->getPopulateTable();
 
@@ -49,10 +53,12 @@ class cmi5Connectors{
 		//Maybe store it then aus, but look at that later TODO
 	    $record->courseid = $returnedInfo["id"];
 		$maybe = $record->courseid;
-	    echo"<br>";
+/*	    echo"<br>";
         echo"<br>";
         echo"WHAT IS ID HERE???? &&&&&&&&& ". $maybe . " &&&&&&&&";
         echo"<br>";
+*/	
+		$length = count($resultChunked);
 		$courseAus = array( );
 		$testObjectAu = array();
         //Why is iteration unreachable? It's reachable in the other test file
@@ -62,13 +68,14 @@ class cmi5Connectors{
             //I wonder if it would be better to save them as array key>value
             //such as AU>au url, but we still need passed and stuff, so I think this is good
             //
-			echo"<br>";
+/*			echo"<br>";
 			echo"ok, now all broken up we should have 8 separate aus ";
 			var_dump($resultChunked[$i]);
 			echo"<br>";
 			echo"so the au is sssssss --->>" ;
 			var_dump($resultChunked[$i][0]['auIndex']);
 			echo"<br>";
+*/
 			$au = $resultChunked[$i][0]['auIndex'];
 
 			//ok, it is now separating the au's so now we want the au for asking for url
@@ -76,34 +83,15 @@ class cmi5Connectors{
 			//right?
 			//THEY HAVEAN AU INDEX!!!! LETS TRY THAT!!!!
 			$record->auid = $au;
-			echo"<br>";
-			echo"TESTING TESTIN TESTING ";
-			$test = $record->auid;
-			var_dump($test);
-			echo"<br>";
 
-			//MB//
-			//LEts have a little fun
-			//Can this new 'object' be passed and STORED as array?
-			  //If I make it here can everyone use it?
-		        //MB
-	   		$auObject = new stdClass();
-			$auObject->au = ($resultChunked[$i][0]['auIndex']);
-			$auObject->lms_id = ($resultChunked[$i][0]['lmsId']); 
-			$auObject->au_id = ($resultChunked[$i][0]['id']);
-			$auObject->url;
-			$auObject->launchMethod = ($resultChunked[$i][0]['launchMethod']);
-			$auObject->completedOrPassed;
-
- 
 			//$populateTable($record, "cmi5_urls");
 			$courseAus[] = $au;
 			$testObjectAu[] = $auObject;
-			echo"<br>";
-			echo"Hows the array cominG?";
+			//echo"<br>";
+			//echo"Hows the array cominG?";
 			
-			var_dump($testObjectAu);
-			echo"<br>";
+		//	var_dump($testObjectAu);
+		//	echo"<br>";
         }
 
 	   	return $testObjectAu;
@@ -276,16 +264,15 @@ class cmi5Connectors{
 		//This is the retreive URL, so it can get the urls
 		//as well...
 		$courseResults = $record->courseinfo;
-		echo"<br>";
-		echo"<br>";
-		echo"<br>";
-		echo"<br>";
-		echo"I seee Null huh?" . $courseResults;
-		echo"<br>";
-
+	
 		//This currently retreives ana rray of the AU numbers,
 		//TODO - do we want each number to also have the entire 'au info'? Or just numbers?
-		$courseAus = $this->retrieveAUs($courseResults, $record);
+		//This needs to be a different jkind of retrieval. The retrieve URL NOW is actually creating them, this needs to ull
+        //them from tables
+        //Wait, it can have the same name riht? Cause its a local func
+        //Although should this go in tables or aus??
+
+        $courseAus = $this->retrieveAUs($courseResults, $record);
 		//Now that we have the array get length and start getting separate URL!!!
 		$length = count($courseAus);
 		//Ok, now its an ARRAY of objects, to get au 'number' we want object->au

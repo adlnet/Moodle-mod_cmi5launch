@@ -99,7 +99,11 @@ class progress{
 			//Objects seem to always have 'id' and 'objecttype', but do not always have 'definition'. Def is what has the easy to read version because within it
 			// is 'type' and 'name' and within 'name; is the en opr lang and easy to read vers. 
 			//See if definition AND it's sub name are there, otherwise might as qwell go with id.///EXCEPT we CANT cause it doesn't do NESTED ids....
-			
+			echo"<br>";
+			echo"I forot, what this is resultChunked: ";
+			var_dump($resultChunked);
+			echo"<br>";
+
 			//THIS is the SECOND chunk, this is the problem
 			$objectInfo = $resultChunked[$i][0]["object"];
 			$definition = array_key_exists("definition", $objectInfo);

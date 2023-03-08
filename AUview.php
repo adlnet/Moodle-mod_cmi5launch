@@ -27,32 +27,7 @@ require('header.php');
 //Classes for connecting to Progress class - MB
 require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/Progress.php");
 
-//Classes for connecting to CMI5 player
-require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/cmi5Connector.php");
-require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/cmi5_table_connectors.php");
-require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/ausHelpers.php");
 
-
-//MB
-	//bring in functions from classes cmi5Connector/Cmi5Tables
-	$progress = new progress;
-    $auHelper = new Au_Helpers;
-    //bring in functions from class cmi5_table_connectors
-	$getProgress = $progress->getRetrieveStatement();
-    $createAUs = $auHelper->getCreateAUs();
-    //Bring in functions
-    //bring in functions from classes cmi5Connector/Cmi5Tables
-    $connectors = new cmi5Connectors;
-    $tables = new cmi5Tables;
-    //bring in functions from class cmi5_table_connectors
-    //$createCourse = $connectors->getCreateCourse();
-//    $retrieveAus = $connectors-> getRetrieveAus();
-//Why are we creating a record here? They are already made...
-//
-  //  $populateTable = $tables->getPopulateTable();
-
-//MB
-//Do we still need this?
 // Trigger module viewed event.
 $event = \mod_cmi5launch\event\course_module_viewed::create(array(
     'objectid' => $cmi5launch->id,
@@ -64,9 +39,7 @@ $event->add_record_snapshot('course_modules', $cm);
 $event->trigger();
 
 // Print the page header.
-//MB
-//This seems ok, we still want the course name, we are going to have aus
-//on the next page
+
 $PAGE->set_url('/mod/cmi5launch/view.php', array('id' => $cm->id));
 $PAGE->set_title(format_string($cmi5launch->name));
 $PAGE->set_heading(format_string($course->fullname));
@@ -78,28 +51,7 @@ $PAGE->requires->jquery();
 echo $OUTPUT->header();
 
 
-//Take the results of created course and save new course id to table
-//Load a record and parse for aus
-//MB
-//Hmmmmm should this be it's own
-// Reload cmi5 instance.
-$record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
-//Retrieve the saved course results
-//Omg, here is the prob I am not actually accessing db!
-//I am doing it backlwards! lol
-//Retrieve saved AU
-$auList = json_decode($record->aus, true);
-/*
-echo"<br>";
-echo"What is auList being returned as?" ;
-var_dump($auList);
-echo"<br>";
-*/
-$aus = $createAUs($auList);
-
-
-if ($cmi5launch->intro) { 
-    // Conditions to show the intro can change to look for own settings or whatever.
+if ($cmi5launch->intro) { // Conditions to show the intro can change to look for own settings or whatever.
     echo $OUTPUT->box(
         format_module_intro('cmi5launch', $cmi5launch, $cm->id),
         'generalbox mod_introbox',
@@ -115,9 +67,6 @@ if ($cmi5launch->intro) {
         function key_test(registration) {
         
             if (event.keyCode === 13 || event.keyCode === 32) {
-                //MBMBMBMBMB
-                //Ok, so we DON't want this right? This might be where
-                //its good to put in our redirect!!
                 mod_cmi5launch_launchexperience(registration);
           
             }
@@ -134,7 +83,7 @@ if ($cmi5launch->intro) {
             $('#cmi5launch_attempttable').remove();
             //Add some new content.
             if (!$('#cmi5launch_status').length) {
-                var message = "<tookout php starter -MB> echo get_string('cmi5launch_progress', 'cmi5launch'); ?>";
+                var message = "<?php echo get_string('cmi5launch_progress', 'cmi5launch'); ?>";
                 $('#region-main .card-body').append('\
                 <div id="cmi5launch_status"> \
                     <span id="cmi5launch_completioncheck"></span> \
@@ -149,12 +98,8 @@ if ($cmi5launch->intro) {
             }
             $('#cmi5launch_completioncheck').load('completion_check.php?id=<?php echo $id ?>&n=<?php echo $n ?>');
         }
-        //*/
 
         // TODO: there may be a better way to check completion. Out of scope for current project.
-        //MB
-        //Someone elses TODO! But this IS in scope of THSI PromiseRejectionEvent//
-        //Maybe a good place to put the red/green/yellow update stuff
         $(document).ready(function() {
             setInterval(function() {
                 $('#cmi5launch_completioncheck').load('completion_check.php?id=<?php echo $id ?>&n=<?php echo $n ?>');
@@ -163,10 +108,6 @@ if ($cmi5launch->intro) {
     </script>
 <?php
 
-//Mb
-//We shouldn't need any of this on this side. registrations being next page?
-//TRIHT! BECAUSE you see, even though each section WILL have reg
-//Thsoe are created on start new which is on new page
 
 //Start at 1, if continuing old attempt it will draw previous regid from LRS
 $registrationid = 1;
@@ -188,31 +129,13 @@ if ($lrsrespond != 200 && $lrsrespond != 404) {
         echo "</pre>";
     }
     die();
-
+}
 //MB
- 
-//////Ummmmmmmmmmmm, this is for AU right? oh, except the dang done or 
-//not.....ugh
-//	bring in functions from classes cmi5Connector/Cmi5Tables
+	//bring in functions from classes cmi5Connector/Cmi5Tables
 	$progress = new progress;
 
     //bring in functions from class cmi5_table_connectors
 	$getProgress = $progress->getRetrieveStatement();
-
-    //IT helps to CALL the function sheik lol
-   ////////////// $currentProgress = $getProgress($regId, $id);
-    /*
-    echo "<br>";  echo "<br>";
-       var_dump($getProgress);
-        echo "<br>";
-*/
-
-echo "<br>"; 
- echo "Ok, well is lrs respond workin?" . ($lrsrespond);//AHA, 404
- var_dump($getregistrationdatafromlrsstate);
-        
- 
- echo "<br>";
 
 //MB
 //Ok, here is where I want to put progress in the tables here.
@@ -226,11 +149,9 @@ if ($lrsrespond == 200) {
 	$progress = array();
 
 
-
-
-    //MB
-    //now we wan ta table, just not the way they have it, this table will show the aus
-    //name, progress, then a view link ot it's breakdown
+    ///////WAIT MB
+    //What if we make a 'progress key' HERE. Then we can just pop later?
+    //Or hell, pop here!!!!
     //Populate table with previous experiences
     global $cmi5launch;
     foreach ($registrationdatafromlrs as $key => $item) {
@@ -239,10 +160,6 @@ if ($lrsrespond == 200) {
             throw new moodle_exception($reason, 'cmi5launch', '', $warnings[$reason]);
         }
         array_push(
-            //We need to feed this an array? Maybe a one level array wioth the script to
-            //send it to new page? But that's what 'onlick' here does....
-            //MB //weel it still need the link to the au page riht?
-            //section one, section two, etc
             $registrationdatafromlrs[$key],
             "<a tabindex=\"0\" id='cmi5relaunch_attempt'
             onkeyup=\"key_test('".$key."')\" onclick=\"mod_cmi5launch_launchexperience('".$key. "')\" style='cursor: pointer;'>"
@@ -275,18 +192,17 @@ if ($lrsrespond == 200) {
     //make each row able to drop down,
     //make the rows call the progress getter,
     //populate the dropped down row with the proggress 
-}   
-//MB
-//Here is where I can change the headers
+   
+    //MB - below builds the table, so we need to add the header for progress here
+
     $table = new html_table();
-    //MB
-    //I think I will change the table id, doesn't seem to be defined elsewhere
-    $table->id = 'cmi5launch_autable';
-    $table->caption = get_string('AUtableheader', 'cmi5launch');
+    $table->id = 'cmi5launch_attempttable';
+    $table->caption = get_string('modulenameplural', 'cmi5launch');
     $table->head = array(
-        get_string('cmi5launchviewAUname', 'cmi5launch'),
-        get_string('cmi5launchviewstatus', 'cmi5launch'),
-        get_string('cmi5launchviewregistrationheader', 'cmi5launch'),
+        get_string('cmi5launchviewfirstlaunched', 'cmi5launch'),
+        get_string('cmi5launchviewlastlaunched', 'cmi5launch'),
+        get_string('cmi5launchviewlaunchlinkheader', 'cmi5launch'),
+        get_string('cmi5launchviewprogress', 'cmi5launch'),
 
     );
 
@@ -314,9 +230,6 @@ if ($lrsrespond == 200) {
 
     echo html_writer::table($table);
 
-    //MB
-    //So I KNOW we don't need this! We start new atempts on the next page
-    
     //This builds the start new reg button - MB
     // Needs to come after previous attempts so a non-sighted user can hear launch options.
     if ($cmi5launch->cmi5multipleregs) {
@@ -327,7 +240,7 @@ if ($lrsrespond == 200) {
             . get_string('cmi5launch_attempt', 'cmi5launch')
             . "</a></p>";
     }
-    
+
 } else {
     echo "<p tabindex=\"0\"
         onkeyup=\"key_test('".$registrationid."')\"
@@ -337,21 +250,14 @@ if ($lrsrespond == 200) {
         . get_string('cmi5launch_attempt', 'cmi5launch')
         . "</a></p>";
 }
-//*/
 
 // Add a form to be posted based on the attempt selected.
-//I don't think we need this, posting a form would be to activate launch.php and
-//we are really just linking yeah? 
 ?>
-
- 
-    <form id="launchform" action="AUview.php" method="get">
-        <input id="AU_view" name="AU_view" type="hidden" value="default">
+    <form id="launchform" action="launch.php" method="get" target="_blank">
+        <input id="launchform_registration" name="launchform_registration" type="hidden" value="default">
         <input id="id" name="id" type="hidden" value="<?php echo $id ?>">
         <input id="n" name="n" type="hidden" value="<?php echo $n ?>">
     </form>
-
-
 <?php
 
 echo $OUTPUT->footer();

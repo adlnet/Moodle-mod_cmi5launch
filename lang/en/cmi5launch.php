@@ -138,14 +138,19 @@ $string['completionexpiry'] = 'Expiry';
 $string['completionexpirygroup'] = 'Completion Expires After (days)';
 $string['completionexpirygroup_help'] = 'If checked, when looking for completion Moodle will only look at data stored in the LRS in the previous X days. It will unset completion for learners who had previously completed but whose completion has now expired.';
 
-// View settings.
+// AU View settings.
 $string['cmi5launchviewfirstlaunched'] = 'First launched';
 $string['cmi5launchviewlastlaunched'] = 'Last launched';
 $string['cmi5launchviewlaunchlinkheader'] = 'Launch link';
-$string['cmi5launchviewlaunchlink'] = 'launch';
-//MB Progress???
+$string['cmi5launchviewlaunchlink'] = 'view';
 $string['cmi5launchviewprogress'] = 'Progress';
 
+// View settings.
+$string['cmi5launchviewAUname'] = 'Name';
+$string['cmi5launchviewstatus'] = 'Status';
+$string['cmi5launchviewregistrationheader'] = 'Registrations';
+$string['cmi5launchviewlaunchlink'] = 'launch';
+$string['AUtableheader'] = 'Assignable Units';
 
 
 $string['cmi5launch_completed'] = 'Experience complete!';
