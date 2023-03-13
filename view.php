@@ -249,93 +249,39 @@ $table->head = array(
 
 );
 
-echo"<br>";
-    echo" ok but sighhhhh what is aus  here?    ";
-    var_dump($aus);
-    echo"<br>";
 
-//What if we use a diff type array?
-$length = count($aus);
-//Should be an array of our table objects
 $tableData = array();
-$tableData2 = array();
-//The problem is the table object is making these strings instead of arrays
-//but its an OBJECt, so lets use its properties?
-$tableObject = new stdClass();
-$tableObject->au = array('title'=>'', 'progress'=>'');
-$tableObject->link = '';
 
- //'au' = array ("title" , "progress"), 'link') );
-//Ok, so we are now dumping a huge amount into table, lets refine:
-//Do what THEY ARE doing!!! SORT BY KEY VALUE
-/*
 foreach ($aus as $key => $item) {
 
-    echo"<br>";
-    echo"I DONT UNDERSTNAD!~ IT SHOULD BE ARRAY???";
-    var_dum((array)($aus[$key]) );
-    echo"<br>";
+    //Retrieve individual AU as array
     $au = (array)($aus[$key]);
-    //OF COURSE!!! U=ITS MY OBJECT!!! lets try decodeing it
 
+    //Verify object
     if (!is_array($au)) {
-        $reason = "Excepted array, found " . "";
+        $reason = "Excepted array, found " . $au;
         throw new moodle_exception($reason, 'cmi5launch', '', $warnings[$reason]);
     }
-    array_push(
-        //We need to feed this an array? Maybe a one level array wioth the script to
-        //send it to new page? But that's what 'onlick' here does....
-        //MB //weel it still need the link to the au page riht?
-        //section one, section two, etc
-        $tableData[$au['id'] ],
-        "<a tabindex=\"0\" id='cmi5relaunch_attempt'
-            onkeyup=\"key_test('". "view" ."')\" onclick=\"mod_cmi5launch_launchexperience('". "view ". "')\" style='cursor: pointer;'>"
-            . get_string('cmi5launchviewlaunchlink', 'cmi5launch') . "</a>"
-        );
-    $au['created'] = date_format(
-        date_create($registrationdatafromlrs[$key]['created']),
-        'D, d M Y H:i:s'
-    );
-    $registrationdatafromlrs[$key]['lastlaunched'] = date_format(
-        date_create($registrationdatafromlrs[$key]['lastlaunched']),
-        'D, d M Y H:i:s'
-    );
 
-}*/
-foreach ($aus as $key => $item) {
-
-    $au = (array)($aus[$key]);
-    //OF COURSE!!! U=ITS MY OBJECT!!! lets try decodeing it
-
-    if (!is_array($au)) {
-        $reason = "Excepted array, found " . "";
-        throw new moodle_exception($reason, 'cmi5launch', '', $warnings[$reason]);
-    }
-    
-           
-    //$au['id']
-    $registrationFromAu = array();
+    //Create array of wanted info
     $auInfo = array();
-    $auInfo[] = "Trying hard!";
-    $auInfo = $au['title'][0]['text'];    
-    $registrationFromAu[] = $auInfo;
-    
-    $tableData2[] = $registrationFromAu;
-    $tableData2[]= "<a tabindex=\"0\" id='cmi5relaunch_attempt'
+    $auInfo [] = $au['title'][0]['text'];
+    $auInfo[] = "Put progress here!";
+    $auInfo [] = "<a tabindex=\"0\" id='cmi5relaunch_attempt'
     onkeyup=\"key_test('". "view" ."')\" onclick=\"mod_cmi5launch_launchexperience('". "view ". "')\" style='cursor: pointer;'>"
     . get_string('cmi5launchviewlaunchlink', 'cmi5launch') . "</a>"
-; 
+    ;   
+    
+    //add to be fed to table
+    $tableData[] = $auInfo;
+   
 }
 
 //}
 
-echo"<br>";
-    echo" ok but what is table au here?    ";
-    var_dump($tableData2);
-    echo"<br>";
 
 //This feeds the table, note registrationdatafromlrs is anOBJECT, so maybe I can foreach loop through au objects
-$table->data = $tableData2;
+$table->data = $tableData;
 //Ok, this makes the table:
 echo html_writer::table($table);
 

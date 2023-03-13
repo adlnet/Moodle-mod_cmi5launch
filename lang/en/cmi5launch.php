@@ -142,14 +142,14 @@ $string['completionexpirygroup_help'] = 'If checked, when looking for completion
 $string['cmi5launchviewfirstlaunched'] = 'First launched';
 $string['cmi5launchviewlastlaunched'] = 'Last launched';
 $string['cmi5launchviewlaunchlinkheader'] = 'Launch link';
-$string['cmi5launchviewlaunchlink'] = 'view';
+$string['cmi5launchviewlaunchlink'] = 'launch';
 $string['cmi5launchviewprogress'] = 'Progress';
 
 // View settings.
 $string['cmi5launchviewAUname'] = 'Name';
 $string['cmi5launchviewstatus'] = 'Status';
 $string['cmi5launchviewregistrationheader'] = 'Registrations';
-$string['cmi5launchviewlaunchlink'] = 'launch';
+$string['cmi5launchviewlaunchlink'] = 'view';
 $string['AUtableheader'] = 'Assignable Units';
 
 
