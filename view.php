@@ -32,13 +32,12 @@ require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/cmi5Connector.php");
 require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/cmi5_table_connectors.php");
 require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/ausHelpers.php");
 
-
 //MB
-	//bring in functions from classes cmi5Connector/Cmi5Tables
-	$progress = new progress;
+    //bring in functions from classes cmi5Connector/Cmi5Tables
+    $progress = new progress;
     $auHelper = new Au_Helpers;
     //bring in functions from class cmi5_table_connectors
-	$getProgress = $progress->getRetrieveStatement();
+    $getProgress = $progress->getRetrieveStatement();
     $createAUs = $auHelper->getCreateAUs();
     //Bring in functions
     //bring in functions from classes cmi5Connector/Cmi5Tables
@@ -77,7 +76,7 @@ $PAGE->requires->jquery();
 // Output starts here.
 echo $OUTPUT->header();
 
-
+global $cmi5launch;
 //Take the results of created course and save new course id to table
 //Load a record and parse for aus
 //MB
@@ -97,7 +96,6 @@ echo"<br>";
 */
 $aus = $createAUs($auList);
 
-
 if ($cmi5launch->intro) { 
     // Conditions to show the intro can change to look for own settings or whatever.
     echo $OUTPUT->box(
@@ -114,6 +112,7 @@ if ($cmi5launch->intro) {
       
         function key_test(registration) {
         
+            //Onclick calls this
             if (event.keyCode === 13 || event.keyCode === 32) {
                 //MBMBMBMBMB
                 //Ok, so we DON't want this right? This might be where
@@ -123,6 +122,8 @@ if ($cmi5launch->intro) {
             }
         }
         
+        //function to be run on onclick
+
         // Function to run when the experience is launched.
         function mod_cmi5launch_launchexperience(registration) {
             // Set the form paramters.
@@ -134,7 +135,7 @@ if ($cmi5launch->intro) {
             $('#cmi5launch_attempttable').remove();
             //Add some new content.
             if (!$('#cmi5launch_status').length) {
-                var message = "<tookout php starter -MB> echo get_string('cmi5launch_progress', 'cmi5launch'); ?>";
+                var message = "<? echo get_string('cmi5launch_progress', 'cmi5launch'); ?>";
                 $('#region-main .card-body').append('\
                 <div id="cmi5launch_status"> \
                     <span id="cmi5launch_completioncheck"></span> \
@@ -188,31 +189,19 @@ if ($lrsrespond != 200 && $lrsrespond != 404) {
         echo "</pre>";
     }
     die();
-
+}
 //MB
  
 //////Ummmmmmmmmmmm, this is for AU right? oh, except the dang done or 
 //not.....ugh
-//	bring in functions from classes cmi5Connector/Cmi5Tables
-	$progress = new progress;
+//  bring in functions from classes cmi5Connector/Cmi5Tables
+    $progress = new progress;
 
     //bring in functions from class cmi5_table_connectors
-	$getProgress = $progress->getRetrieveStatement();
+    $getProgress = $progress->getRetrieveStatement();
 
     //IT helps to CALL the function sheik lol
    ////////////// $currentProgress = $getProgress($regId, $id);
-    /*
-    echo "<br>";  echo "<br>";
-       var_dump($getProgress);
-        echo "<br>";
-*/
-
-echo "<br>"; 
- echo "Ok, well is lrs respond workin?" . ($lrsrespond);//AHA, 404
- var_dump($getregistrationdatafromlrsstate);
-        
- 
- echo "<br>";
 
 //MB
 //Ok, here is where I want to put progress in the tables here.
@@ -223,101 +212,8 @@ if ($lrsrespond == 200) {
     $registrationdatafromlrs = json_decode($getregistrationdatafromlrsstate->content->getContent(), true);
 
     //Array to hold verbs and be returned
-	$progress = array();
+    $progress = array();
 
-
-
-
-    //MB
-    //now we wan ta table, just not the way they have it, this table will show the aus
-    //name, progress, then a view link ot it's breakdown
-    //Populate table with previous experiences
-    global $cmi5launch;
-    foreach ($registrationdatafromlrs as $key => $item) {
-        if (!is_array($registrationdatafromlrs[$key])) {
-            $reason = "Excepted array, found " . $registrationdatafromlrs[$key];
-            throw new moodle_exception($reason, 'cmi5launch', '', $warnings[$reason]);
-        }
-        array_push(
-            //We need to feed this an array? Maybe a one level array wioth the script to
-            //send it to new page? But that's what 'onlick' here does....
-            //MB //weel it still need the link to the au page riht?
-            //section one, section two, etc
-            $registrationdatafromlrs[$key],
-            "<a tabindex=\"0\" id='cmi5relaunch_attempt'
-            onkeyup=\"key_test('".$key."')\" onclick=\"mod_cmi5launch_launchexperience('".$key. "')\" style='cursor: pointer;'>"
-            . get_string('cmi5launchviewlaunchlink', 'cmi5launch') . "</a>"
-        );
-        $registrationdatafromlrs[$key]['created'] = date_format(
-            date_create($registrationdatafromlrs[$key]['created']),
-            'D, d M Y H:i:s'
-        );
-        $registrationdatafromlrs[$key]['lastlaunched'] = date_format(
-            date_create($registrationdatafromlrs[$key]['lastlaunched']),
-            'D, d M Y H:i:s'
-        );
-        //YES!! Maybe I can have an array.push here and call my progress clas! So simple!!!
-        $registrationdatafromlrs[$key]['progress'] = 
-           ("<pre>". implode( "\n ", $getProgress($key, $cmi5launch->id)) ."</pre>" );
-         //   echo "<ul><li>" . implode("</li><li>", $getProgress) . "</li></ul>";
-            //Dangit! But if we pass back array then it can't convert
-            //HERE!!! dangit!
-            //Do we need a foreach here to or in the getprogress? Only seems
-            //to have most recent verb
-        
-    }
-
-    //Here is where it is making the table....so what we want is this
-    //When you click on one of the rows (they are separate when you hover)
-    //We want it to dropdown and reveal all that session history with our 
-    //brand new progress getter. So we need to
-    //MAke each row clickable and 
-    //make each row able to drop down,
-    //make the rows call the progress getter,
-    //populate the dropped down row with the proggress 
-}   
-//MB
-//Here is where I can change the headers
-    $table = new html_table();
-    //MB
-    //I think I will change the table id, doesn't seem to be defined elsewhere
-    $table->id = 'cmi5launch_autable';
-    $table->caption = get_string('AUtableheader', 'cmi5launch');
-    $table->head = array(
-        get_string('cmi5launchviewAUname', 'cmi5launch'),
-        get_string('cmi5launchviewstatus', 'cmi5launch'),
-        get_string('cmi5launchviewregistrationheader', 'cmi5launch'),
-
-    );
-
-    //mb table data takes arrays, can I adjus theirs?
-   // $candy = array("truffle" => "candycorn");
-    //$registrationdatafromlrs = array_merge($registrationdatafromlrs, $candy);
-    //The results come back as nested array under more then statments. We only want statements, and we want them separated into unique statments
-/////OOOOHHHHH registrationdatafromlrs is an OBJECT!!!!
-//so a foreach here instead of a for???
-    //$resultChunked = array_chunk($registrationdatafromlrs[0]["data"], 1);
-        
-
-
-    
-    //Now we need 
-
-    $table->data = $registrationdatafromlrs;
- 
-    //MB
-    //This builds the table, it uses a moodle made fucntion to do so,
-    //I'm going to see if its..wait, look above, it may use moodle method to build
-    //the table BUT it builds it with the data above. 
-    //So I can either try to adjust data above or try to write a script to activate
-    //on clicking a row AFTER table built
-
-    echo html_writer::table($table);
-
-    //MB
-    //So I KNOW we don't need this! We start new atempts on the next page
-    
-    //This builds the start new reg button - MB
     // Needs to come after previous attempts so a non-sighted user can hear launch options.
     if ($cmi5launch->cmi5multipleregs) {
         echo "<p id='cmi5launch_newattempt'><a tabindex=\"0\"
@@ -339,6 +235,110 @@ if ($lrsrespond == 200) {
 }
 //*/
 
+//Here is where the table is outlined
+//Here is where I can change the headers
+$table = new html_table();
+//MB
+//I think I will change the table id, doesn't seem to be defined elsewhere
+$table->id = 'cmi5launch_autable';
+$table->caption = get_string('AUtableheader', 'cmi5launch');
+$table->head = array(
+    get_string('cmi5launchviewAUname', 'cmi5launch'),
+    get_string('cmi5launchviewstatus', 'cmi5launch'),
+    get_string('cmi5launchviewregistrationheader', 'cmi5launch'),
+
+);
+
+echo"<br>";
+    echo" ok but sighhhhh what is aus  here?    ";
+    var_dump($aus);
+    echo"<br>";
+
+//What if we use a diff type array?
+$length = count($aus);
+//Should be an array of our table objects
+$tableData = array();
+$tableData2 = array();
+//The problem is the table object is making these strings instead of arrays
+//but its an OBJECt, so lets use its properties?
+$tableObject = new stdClass();
+$tableObject->au = array('title'=>'', 'progress'=>'');
+$tableObject->link = '';
+
+ //'au' = array ("title" , "progress"), 'link') );
+//Ok, so we are now dumping a huge amount into table, lets refine:
+//Do what THEY ARE doing!!! SORT BY KEY VALUE
+/*
+foreach ($aus as $key => $item) {
+
+    echo"<br>";
+    echo"I DONT UNDERSTNAD!~ IT SHOULD BE ARRAY???";
+    var_dum((array)($aus[$key]) );
+    echo"<br>";
+    $au = (array)($aus[$key]);
+    //OF COURSE!!! U=ITS MY OBJECT!!! lets try decodeing it
+
+    if (!is_array($au)) {
+        $reason = "Excepted array, found " . "";
+        throw new moodle_exception($reason, 'cmi5launch', '', $warnings[$reason]);
+    }
+    array_push(
+        //We need to feed this an array? Maybe a one level array wioth the script to
+        //send it to new page? But that's what 'onlick' here does....
+        //MB //weel it still need the link to the au page riht?
+        //section one, section two, etc
+        $tableData[$au['id'] ],
+        "<a tabindex=\"0\" id='cmi5relaunch_attempt'
+            onkeyup=\"key_test('". "view" ."')\" onclick=\"mod_cmi5launch_launchexperience('". "view ". "')\" style='cursor: pointer;'>"
+            . get_string('cmi5launchviewlaunchlink', 'cmi5launch') . "</a>"
+        );
+    $au['created'] = date_format(
+        date_create($registrationdatafromlrs[$key]['created']),
+        'D, d M Y H:i:s'
+    );
+    $registrationdatafromlrs[$key]['lastlaunched'] = date_format(
+        date_create($registrationdatafromlrs[$key]['lastlaunched']),
+        'D, d M Y H:i:s'
+    );
+
+}*/
+foreach ($aus as $key => $item) {
+
+    $au = (array)($aus[$key]);
+    //OF COURSE!!! U=ITS MY OBJECT!!! lets try decodeing it
+
+    if (!is_array($au)) {
+        $reason = "Excepted array, found " . "";
+        throw new moodle_exception($reason, 'cmi5launch', '', $warnings[$reason]);
+    }
+    
+           
+    //$au['id']
+    $registrationFromAu = array();
+    $auInfo = array();
+    $auInfo[] = "Trying hard!";
+    $auInfo = $au['title'][0]['text'];    
+    $registrationFromAu[] = $auInfo;
+    
+    $tableData2[] = $registrationFromAu;
+    $tableData2[]= "<a tabindex=\"0\" id='cmi5relaunch_attempt'
+    onkeyup=\"key_test('". "view" ."')\" onclick=\"mod_cmi5launch_launchexperience('". "view ". "')\" style='cursor: pointer;'>"
+    . get_string('cmi5launchviewlaunchlink', 'cmi5launch') . "</a>"
+; 
+}
+
+//}
+
+echo"<br>";
+    echo" ok but what is table au here?    ";
+    var_dump($tableData2);
+    echo"<br>";
+
+//This feeds the table, note registrationdatafromlrs is anOBJECT, so maybe I can foreach loop through au objects
+$table->data = $tableData2;
+//Ok, this makes the table:
+echo html_writer::table($table);
+
 // Add a form to be posted based on the attempt selected.
 //I don't think we need this, posting a form would be to activate launch.php and
 //we are really just linking yeah? 
@@ -351,7 +351,8 @@ if ($lrsrespond == 200) {
         <input id="n" name="n" type="hidden" value="<?php echo $n ?>">
     </form>
 
-
 <?php
 
 echo $OUTPUT->footer();
+
+
