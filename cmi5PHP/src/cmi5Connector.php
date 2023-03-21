@@ -19,82 +19,80 @@ class cmi5Connectors{
 	return [$this, 'retrieveAus'];
  }
     public function retrieveAUs($returnedInfo, $record){
-        //Who should call this func? create course in this class?
-        //or maybe moodle itself in lib.php....hmmmm...
-        //It's nott added to a table until lib right, righto,...
-        //so maybe instead of parsing ANUYTHING in LIB.php it would be better
-        //to make this a "parseCourse" thiny and do it ALL, then it's aded to the 
+     
         //tab le .......HEYYYY There is mprethan one LMSID as wekk!
 
-	   //I see its null! Lets see what it is here
-	/*   echo"<br>";
-		echo"Entered retrieveAus, What is it here?";
-		echo" " . json_encode($returnedInfo);
-		echo"<br>";
-	*/
+        $returnedInfo = json_decode($returnedInfo, true);
+	
+      
         //The results come back as nested array under more then statments. We only want statements, and we want them separated into unique statments
         $resultChunked = array_chunk($returnedInfo["metadata"]["aus"], 1);
-/*
-	   echo"<br>";
-	   echo"Well welll welll, whats this  ";
-	   echo"    " . json_encode($resultChunked);
-	   echo"<br>";
-	  
-	   echo"<br>";
-		echo"Okkayyyyy" . json_encode($resultChunked[0]);
-	   echo"<br>";
-	   */
-	   $tables = new cmi5Tables;
+
+
+        //TODO, any benefit in saving some info to DB here?
+	   /*
+       $tables = new cmi5Tables;
 	        //bring in functions from class cmi5_table_connectors
     	    $populateTable = $tables->getPopulateTable();
+        */
 
 	    //These values wqonts changge based on au so do here
 		//In FACT, if we are goin to make this where tables stored
 		//Maybe store it then aus, but look at that later TODO
+
+        /*
+        echo"<br>";
+        echo"ResultChunked: ";
+        var_dump($resultChunked["id"]);
+        echo"<br>";
+        echo"<br>";
+        echo"I'm trying tooo gget the course id here: ";
+        var_dump($returnedInfo["id"]);
+        echo"<br>";
+*/
 	    $record->courseid = $returnedInfo["id"];
-		$maybe = $record->courseid;
-/*	    echo"<br>";
-        echo"<br>";
-        echo"WHAT IS ID HERE???? &&&&&&&&& ". $maybe . " &&&&&&&&";
-        echo"<br>";
-*/	
+
 		$length = count($resultChunked);
 		$courseAus = array( );
-		$testObjectAu = array();
+		//$testObjectAu = array();
         //Why is iteration unreachable? It's reachable in the other test file
         for($i = 0; $i < $length; $i++){
-            //Ok, now what do we want this to DO, we want it to save all the
-            //LMS AU and stuff to table cmi5_urls right? An entry for each AU?
-            //I wonder if it would be better to save them as array key>value
-            //such as AU>au url, but we still need passed and stuff, so I think this is good
-            //
-/*			echo"<br>";
-			echo"ok, now all broken up we should have 8 separate aus ";
-			var_dump($resultChunked[$i]);
-			echo"<br>";
-			echo"so the au is sssssss --->>" ;
-			var_dump($resultChunked[$i][0]['auIndex']);
-			echo"<br>";
-*/
+      
+            
 			$au = $resultChunked[$i][0]['auIndex'];
-
-			//ok, it is now separating the au's so now we want the au for asking for url
-			//which i beleiove is best taken from end of lmsID
+           /*
+            echo"<br>";
+            echo"Ok, what is au here>? ";
+            var_dump($au);
+            echo"<br>";
+			*/
+            
+            //ok, it is now separating the au's so now we want the au for asking for url
+			
+            //which i beleiove is best taken from end of lmsID
 			//right?
 			//THEY HAVEAN AU INDEX!!!! LETS TRY THAT!!!!
+            //TODO, do we want to save this to table, why is this here?
 			$record->auid = $au;
 
 			//$populateTable($record, "cmi5_urls");
 			$courseAus[] = $au;
-			$testObjectAu[] = $auObject;
+			//$testObjectAu[] = $auObject;
 			//echo"<br>";
 			//echo"Hows the array cominG?";
 			
-		//	var_dump($testObjectAu);
-		//	echo"<br>";
         }
+            //echo"<br>";
+			//echo"What is course ID here ";
+            
+            //IT's an array of ints
+            
+            //var_dump($courseAus);
+			//echo"<br>";
+		
+			
 
-	   	return $testObjectAu;
+	   	return $courseAus;
         //Whaty is returned info here
         //var_dump($returnedInfo);
         //Or wait!! The entire course info is saved right? So maybe
@@ -279,7 +277,8 @@ class cmi5Connectors{
 		
 		for($i = 0; $i < $length; $i++){
 
-			$au = $courseAus[$i]->au;
+            //Here it is trying to read an au property from my array of ints
+			$au = $courseAus[$i];
 		
 
 
@@ -320,7 +319,7 @@ class cmi5Connectors{
 
 	   //to bring in functions from class cmi5Connector
 		$connectors = new cmi5Tables;
-		$saveUrl = $connectors->getSaveAuURLs();
+		$saveUrl = $connectors->getSaveURL();
 
 	
 

@@ -121,10 +121,17 @@ class cmi5Tables
 
         $table = "cmi5launch_player";
 
+        
+
         //Retrieve URL information from $urlInfo object
         $urlDecoded = json_decode($urlInfo, true);
         $url = $urlDecoded['url'];
+        
+        
+        //Parse url for info such as regid
         parse_str($url, $urlInfo);
+        
+
         $regid = $urlInfo['registration'];
         $returnUrl = $retUrl;
         $homepage = $homeUrl;

@@ -31,6 +31,8 @@ require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/Progress.php");
 require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/cmi5Connector.php");
 require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/cmi5_table_connectors.php");
 require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/ausHelpers.php");
+//Classes for connecting to Progress class - MB
+require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/Progress.php");
 
 //MB
     //bring in functions from classes cmi5Connector/Cmi5Tables
@@ -165,10 +167,8 @@ if ($cmi5launch->intro) {
 <?php
 
 //Mb
-//We shouldn't need any of this on this side. registrations being next page?
-//TRIHT! BECAUSE you see, even though each section WILL have reg
-//Thsoe are created on start new which is on new page
-
+//Actually! We DO for like progress? Unless we store tht elsewhere! Like should it be checked
+//So we can
 //Start at 1, if continuing old attempt it will draw previous regid from LRS
 $registrationid = 1;
 
@@ -192,13 +192,12 @@ if ($lrsrespond != 200 && $lrsrespond != 404) {
 }
 //MB
  
-//////Ummmmmmmmmmmm, this is for AU right? oh, except the dang done or 
-//not.....ugh
-//  bring in functions from classes cmi5Connector/Cmi5Tables
+
+//  bring in functions from classes cmi5Connector/Cmi5Tables/Progress
     $progress = new progress;
 
-    //bring in functions from class cmi5_table_connectors
-    $getProgress = $progress->getRetrieveStatement();
+    //
+   // $getProgress = $progress->getRetrieveStatement();
 
     //IT helps to CALL the function sheik lol
    ////////////// $currentProgress = $getProgress($regId, $id);
@@ -209,11 +208,14 @@ if ($lrsrespond != 200 && $lrsrespond != 404) {
 //Hey! IS regid a tatmentid???
 if ($lrsrespond == 200) {
 
+    //Get session info from LRS
     $registrationdatafromlrs = json_decode($getregistrationdatafromlrsstate->content->getContent(), true);
+	
+    //we need id to get progress
+	global $cmi5launch;
+    $id = $cmi5launch->id;
 
-    //Array to hold verbs and be returned
-    $progress = array();
-
+   
     // Needs to come after previous attempts so a non-sighted user can hear launch options.
     if ($cmi5launch->cmi5multipleregs) {
         echo "<p id='cmi5launch_newattempt'><a tabindex=\"0\"
@@ -224,16 +226,13 @@ if ($lrsrespond == 200) {
             . "</a></p>";
     }
     
-} else {
-    echo "<p tabindex=\"0\"
-        onkeyup=\"key_test('".$registrationid."')\"
-        id='cmi5launch_newattempt'><a onclick=\"mod_cmi5launch_launchexperience('"
-        . $registrationid
-        . "')\" style=\"cursor: pointer;\">"
-        . get_string('cmi5launch_attempt', 'cmi5launch')
-        . "</a></p>";
-}
-//*/
+   // echo"What iss the returned data here and how can we use it?";
+    //var_dump($getregistrationdatafromlrsstate);
+    //echo"<br>";
+//
+
+//Here is whercontent/protecred seems to be a niv elong string
+//or array holding info basically, regid, started, 
 
 //Here is where the table is outlined
 //Here is where I can change the headers
@@ -249,11 +248,36 @@ $table->head = array(
 
 );
 
+///////////////////
+////Lets test
+//$cmi5launch;
 
-$tableData = array();
+//bring in functions from class cmi5_table_connectors
+//Get retrieve statment works but not getRetrieveProgress cause its in progress	
 
+//THIS is what works in auview lets see what it returns
+ $getProgress = $progress->getRetrieveStatement();
+
+//This is new one that takes lrs info and sorts regids athen sends to lrs
+  ////// $getProgress = $progress->getRetrieveProgress();
+
+//$getCompletion = $progress->getCompletion();
+	////$getCom = $progress->getRequestCompleted();
+    
+    //LEts get the LRS info
+    $getLRS = $progress->getRequestLRSInfo();
+
+
+    $tableData = array();
+
+
+$resultDecoded = $getLRS($registrationdatafromlrs, $id);
+
+
+$resultChunked = array_chunk($resultDecoded, 1);
+
+//For each au
 foreach ($aus as $key => $item) {
-
     //Retrieve individual AU as array
     $au = (array)($aus[$key]);
 
@@ -263,10 +287,97 @@ foreach ($aus as $key => $item) {
         throw new moodle_exception($reason, 'cmi5launch', '', $warnings[$reason]);
     }
 
+    //We can match on lmsId!! IT matches Object->id from lrs chunked
+    $auId = $au['lmsId'];
+	
+    //Loop through the statements and match with the LRS statments whose object/id matches the aus lmsID
+    
+    //array to hold list of relevant registrations
+    $relevantReg = array();
+
+    //This is the info back from the lrs
+    foreach($resultDecoded as $result => $i){
+            //i is each separate statment
+            //We don't know the regid, but need it because it's the first array key, 
+            //sosimply retrieve the key itself.
+            //current regid
+            $regid = array_key_first($i);
+
+            //If the lmsId matches the object id, then this reg is applicable to this au 
+            if($auId==$i[$regid][0]["object"]["id"]){
+
+                //Therefore we want THIS verb
+                $getVerb = $progress->retrieveVerbs($i, $regid);
+
+            $verbs[] = $getVerb;
+
+            //is the id NOT the regid? Is thats whats going on??
+            //yEP! that was your prob! chnae below to regid, we want above to be what it is
+            $relevantReg[] = $regid;
+        }
+    }
+    var_dump($relevantReg == null);
+
+    //So like if it is NA we can save time and just print NA on screen
+    $auMoveon = $au['moveOn'];
+        //This is different than whether to display in proress or not,
+            //If the session hasn't been started there will be no data, so THAT
+            //will be inprogress, this only applis IF THERE HAS BEEN data to determine if it is 
+            //completd or pass or just 'in proress'
+            //Then we don't need to worry or look into it at all!
+            if ($auMoveon == "NotApplicable") {
+                //If it is anything else then it needs to be investigated
+                $auStatus = "viewed";
+            }
+            else{
+                //Ok, it is something other than na, which means it is some form of 
+                // completed and/or passed
+    //If relevant re is not null, then it found some session ids. If those exist then this
+    //au has been launched and is therefore 'in progress' or 'completed'
+    //If this IS NULL then the au has not been attempted and we can mark it as such
+        if (!$relevantReg == null) {
+
+            
+            $completed = $progress->getCompletion();
+
+            $com = $completed($auMoveon, $verbs);
+            echo "<br>";
+		echo "ANNNNNND what is being returned???";
+		echo "<br>";
+		var_dump($com);
+		echo "<br>";
+
+        //If com is returned true we moveON! if not, its in progress
+            if($com == true){
+                $auStatus = "Completed";
+            }
+            else{
+                $auStatus = "In Progress";
+            }
+
+            }
+            //If relevenat reg is null than this is not attmepted
+            else{
+                $auStatus = "Not attempted";
+            }
+            //formatted this way: CompletedOrPassed or CompletedAndPassed, etc
+            //var_dump($auMoveon)
+
+            //List of verbs that may apply toward completuion
+            $verbs = array();
+
+        }
+        
+
     //Create array of wanted info
     $auInfo = array();
     $auInfo [] = $au['title'][0]['text'];
-    $auInfo[] = "Put progress here!";
+
+    //Ok lets see if this works
+//    $auInfo[] = "Put progress here!";
+    $auInfo[] = ($auStatus);
+
+
     $auInfo [] = "<a tabindex=\"0\" id='cmi5relaunch_attempt'
     onkeyup=\"key_test('". "view" ."')\" onclick=\"mod_cmi5launch_launchexperience('". "view ". "')\" style='cursor: pointer;'>"
     . get_string('cmi5launchviewlaunchlink', 'cmi5launch') . "</a>"
@@ -277,7 +388,16 @@ foreach ($aus as $key => $item) {
    
 }
 
-//}
+
+} else {
+    echo "<p tabindex=\"0\"
+        onkeyup=\"key_test('".$registrationid."')\"
+        id='cmi5launch_newattempt'><a onclick=\"mod_cmi5launch_launchexperience('"
+        . $registrationid
+        . "')\" style=\"cursor: pointer;\">"
+        . get_string('cmi5launch_attempt', 'cmi5launch')
+        . "</a></p>";
+}
 
 
 //This feeds the table, note registrationdatafromlrs is anOBJECT, so maybe I can foreach loop through au objects
@@ -300,5 +420,3 @@ echo html_writer::table($table);
 <?php
 
 echo $OUTPUT->footer();
-
-
