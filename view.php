@@ -98,6 +98,11 @@ echo"<br>";
 */
 $aus = $createAUs($auList);
 
+echo "<br>";
+echo "But why iss it null? What is going on?";
+var_dump($aus);
+echo "<br>";
+
 if ($cmi5launch->intro) { 
     // Conditions to show the intro can change to look for own settings or whatever.
     echo $OUTPUT->box(
@@ -276,10 +281,19 @@ $resultDecoded = $getLRS($registrationdatafromlrs, $id);
 
 $resultChunked = array_chunk($resultDecoded, 1);
 
+
+
+
 //For each au
 foreach ($aus as $key => $item) {
     //Retrieve individual AU as array
     $au = (array)($aus[$key]);
+
+    echo "<br>";
+echo "ANNNNNND what is au here returned???";
+echo "<br>";
+var_dump($au);
+echo "<br>";
 
     //Verify object
     if (!is_array($au)) {
@@ -341,11 +355,6 @@ foreach ($aus as $key => $item) {
             $completed = $progress->getCompletion();
 
             $com = $completed($auMoveon, $verbs);
-            echo "<br>";
-		echo "ANNNNNND what is being returned???";
-		echo "<br>";
-		var_dump($com);
-		echo "<br>";
 
         //If com is returned true we moveON! if not, its in progress
             if($com == true){
@@ -387,9 +396,16 @@ foreach ($aus as $key => $item) {
     $tableData[] = $auInfo;
    
 }
-
+//This feeds the table, note registrationdatafromlrs is anOBJECT, so maybe I can foreach loop through au objects
+$table->data = $tableData;
+//Ok, this makes the table:
+echo html_writer::table($table);
 
 } else {
+
+    //Forgot when their is nothing the table should be empty but still needs to be reated
+    //$tableData = array();
+//wait
     echo "<p tabindex=\"0\"
         onkeyup=\"key_test('".$registrationid."')\"
         id='cmi5launch_newattempt'><a onclick=\"mod_cmi5launch_launchexperience('"
@@ -400,10 +416,7 @@ foreach ($aus as $key => $item) {
 }
 
 
-//This feeds the table, note registrationdatafromlrs is anOBJECT, so maybe I can foreach loop through au objects
-$table->data = $tableData;
-//Ok, this makes the table:
-echo html_writer::table($table);
+
 
 // Add a form to be posted based on the attempt selected.
 //I don't think we need this, posting a form would be to activate launch.php and

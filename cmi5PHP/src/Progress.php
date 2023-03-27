@@ -272,16 +272,18 @@ class progress{
 	public function requestLRSinfo($regId, $id){
 
 		//Array to hold result
-		$result = array();		
-		foreach ($regId as $id => $info) {
+		$result = array();
+
+		//Somes times when this is called, ffor instance from AUview.php
+		//IT's a single reg id not an array. Below needs an array, so check and create array if need be
+		if (!is_array($regId)) {
 			//When searching by reg id, which is the option available to Moodle, many results are returned, so iterating through them is necessary
 			$data = array(
-				'registration' => $id
+				'registration' => $regId
 			);
 
-			$statements = $this->sendRequestToLRS($data, $id);
+			$statements = $this->sendRequestToLRS($data, $regId);
 			//The results come back as nested array under more then statments. We only want statements, and we want them separated into unique statments
-
 			$statement = array_chunk($statements["statements"], 1);
 
 			$length = count($statement);
@@ -290,9 +292,31 @@ class progress{
 			
 			//This separates the larger statment into the separete sessions and verbs
 				$current = ($statement[$i]);
-			array_push($result, array ($id => $current) );
+			array_push($result, array ($regId => $current) );
 			}
+		}else{
+			foreach ($regId as $id => $info) {
 
+	
+				//When searching by reg id, which is the option available to Moodle, many results are returned, so iterating through them is necessary
+				$data = array(
+					'registration' => $id
+				);
+
+				$statements = $this->sendRequestToLRS($data, $id);
+				//The results come back as nested array under more then statments. We only want statements, and we want them separated into unique statments
+
+				$statement = array_chunk($statements["statements"], 1);
+
+				$length = count($statement);
+
+				for ($i = 0; $i < $length; $i++) {
+
+					//This separates the larger statment into the separete sessions and verbs
+					$current = ($statement[$i]);
+					array_push($result, array($id => $current));
+				}
+			}
 		
 
 	}
@@ -353,10 +377,16 @@ class progress{
 	 * @param mixed $i - the registration id
 	 * @return mixed - actor
 	 */
-	public function retrieveActor($resultChunked, $i){
+	public function retrieveActor($info, $regid){
 
-		$actor = $resultChunked[$i][0]["actor"]["account"]["name"];
-		//	echo"Actor is : " . $actor;
+
+		echo "<br>";
+		echo "In retreive actor";
+		echo "what is freaking array her?";
+		var_dump($info);
+		echo "<br>";
+		$actor = $info[$regid][0]["actor"]["account"]["name"];
+			echo"Actor is : " . $actor;
 		return $actor;
 	}
 
@@ -368,18 +398,7 @@ class progress{
 	 */
 	public function retrieveVerbsOrig($resultChunked, $i){
 
-		echo "<br>";
-		echo "11111111111111111111111";
-		echo "what is freaking resultChunked her?";
-		var_dump($resultChunked);
-		echo "<br>";
-		echo "<br>";
-		echo "2222222222222222222";
-		echo "what is freaking bnit and pieces here?";
-		var_dump($resultChunked[0][0]);
-		echo "2222222222222222222222222";
-		echo "<br>";
-		echo "<br>";
+
 		//Some verbs do not have an easy to display 'language' option, we need to check if 'display' is present			
 		$verbInfo = $resultChunked[0][0][$i]["statements"][0]["verb"];
 		$display = array_key_exists("display", $verbInfo);
@@ -476,10 +495,20 @@ class progress{
 
 	//THis is what AUVIEW calls successully to get info
 	//
+	//And is not currently being successful
+	//sooooo
 	/** */
-	public function retrieveStatement($regId, $id){
+	public function retrieveStatement($regId, $id)
+	{
 
-	
+		echo "<br>";
+		echo "I need to make sure the info is here and follow to find eror";
+		var_dump($regId);
+		echo "<br>";
+		echo "Abov eis regid and below is id";
+		var_dump($id);
+		echo "<br>";
+
 		//Array to hold verbs and be returned
 		$progressUpdate = array();
 
@@ -488,34 +517,86 @@ class progress{
 
 		$resultDecoded = $this->requestLRSinfo($regId, $id);
 
+		echo "<br>";
+		echo "WHAT is orig resoltdecoded";
+		var_dump($resultDecoded);
+		echo "<br>";
+
 		//The results come back as nested array under more then statments. We only want statements, and we want them separated into unique statments
-		$resultChunked = array_chunk($resultDecoded["statements"], 1);
-		echo"<br>";
-        echo "I NED THIS BEFORE FORMATIIN";
-        var_dump($resultChunked);
-        echo"<br>";
+		//Well, i think because it is checked for statements before? Maybe this can go?
+		//$resultChunked = array_chunk($resultDecoded, 1);
+		//NO THIS isnt the answer! I remember there was a way to do this right? We want to et past the 0, I have a way somewhere,
+		//I did this before
+		echo "<br>";
+		//echo "Ok, so is it coming back???";
+		//var_dump($resultChunked);
+		echo "<br>";
 
+		//LEts try without resultChunked with JUST orig resutls decoded
+		//Because it would be one less nest of a '0'
+		//Also we can't just take the first object, byt making a new array assigned to value of 0,,
+		//because WHAT if there are moer than one regid? IT would then need 0, 1, 2 etc
 
-		$length = count($resultChunked);
-		
+		//Ok, so then this should be resultDecoded, not chunked? Uh lets just change it to chunked on 522 and save changingg
+		$length = count($resultDecoded);
+
+		//If length is resultDecod, it should be amount of regids
+
 		//Why is iteration unreachable? It's reachable in the other test file
-		for($i = 0; $i < $length; $i++){
+		//Maybe better to make this a foreach? Cause it may be diff lengts?
 
-			$actor = $this->retrieveActor($resultChunked, $i);
-			$verb = $this->retrieveVerbs($resultChunked, $i);
-			$object = $this->retrieveObject($resultChunked, $i);
-			$date = $this->retrieveTimestamp($resultChunked, $i);
+		//Maybe DO use this form, cause then we can use the 'i' number to select the WHOLE regid array, and THAT can be parsed accordingly
+		for ($i = 0; $i < $length; $i++) {
 
-			//Maybe make this an overloaded func that can print this and /or just verbs
-			//Like if you pass in verbs it gives only verbs
-			//Wait....this is the above smh
-			//BUT, this is the only one with the resultChunked info, so lets pass back shtuff
-			//and let it have the string stuff added later, then easy to parse
-			//Could even pas as actor=>actor
-			//OR object=> actor, verb, date. Then we can sort it by au!
-			$progressUpdate[] = "$actor $verb $object on $date";
-		}		
-	
+			//Now we want to have a second iteration through the regid array BECAUSE there may be more than one verb per array
+			//so maybe an if then//
+			//or maybe just make the progress array and make array of it too,
+
+			$currentRegid = $resultDecoded[$i];
+//Maybe not needed, as each regid IS doing it's own thing, even same regid mutlples as diff
+
+		//	foreach ($currentRegid as $regid => $regInfo) {
+
+
+				echo "<br>";
+				echo "OK, so following hsoulld be regid whole array??!?!?";
+				echo "<br>";
+				var_dump($currentRegid);
+				echo "<br>";
+				echo "What is regID?!?!?";
+				echo "<br>";
+//				var_dump($regid);
+				echo "<br>";
+				echo "What is reginfo?!?!?";
+				echo "<br>";
+//				var_dump($regInfo);
+				echo "<br>";
+		//i is each separate statment
+            //We don't know the regid, but need it because it's the first array key, 
+            //sosimply retrieve the key itself.
+            //current regid
+            $regid = array_key_first($currentRegid);
+				//Now to parse the diff verbs, maybe array chunk on 'id'?
+				$actor = $this->retrieveActor($currentRegid, $regid);
+				$verb = $this->retrieveVerbs($currentRegid, $regid);
+				$object = $this->retrieveObject($currentRegid, $regid);
+				$date = $this->retrieveTimestamp($currentRegid, $regid);
+
+				//Maybe make this an overloaded func that can print this and /or just verbs
+				//Like if you pass in verbs it gives only verbs
+				//Wait....this is the above smh
+				//BUT, this is the only one with the resultChunked info, so lets pass back shtuff
+				//and let it have the string stuff added later, then easy to parse
+				//Could even pas as actor=>actor
+				//OR object=> actor, verb, date. Then we can sort it by au!
+				$progressUpdate[] = "$actor $verb $object on $date";
+			//}
+			echo "What is progress UPDATE?????  ?? ?  ?!?!?";
+			echo "<br>";
+			var_dump($progressUpdate);
+			echo "<br>";
+			
+		}
 		return $progressUpdate;
 	}
 

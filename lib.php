@@ -597,12 +597,14 @@ function cmi5launch_process_new_package($cmi5launch) {
 
 
     $record->courseinfo = $courseResults;
-	$returnedInfo = json_decode($courseResults, true);
     
+    $returnedInfo = json_decode($courseResults, true);
+
     //TODO - IS there a better way to do this? I hate it is decoded then encoded
     //Seems repetitive but the bottom needs decoded but to store needs encoded
     //Maybe AUs need to be encoded here 
     $aus = json_encode($retrieveAus($returnedInfo));
+
     $record->aus = $aus;
 
     //Retrieve lmsId of course

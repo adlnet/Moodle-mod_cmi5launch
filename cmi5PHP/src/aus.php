@@ -36,6 +36,7 @@ function __construct($statement){
   //I assume these are saving if the keys mactch the AU properties
   foreach($statement as $key => $value){
 		$this->$key = ($value);
+  
 	}	
 
 }

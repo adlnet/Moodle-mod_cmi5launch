@@ -28,17 +28,17 @@ class Au_Helpers {
 		{
 
 			//The results come back as nested array under more then statments. We only want statements, and we want them separated into unique statments
-			$resultChunked = array_chunk($returnedInfo["metadata"]["aus"], 1);
+			$resultChunked = array_chunk($returnedInfo["metadata"]["aus"], 1,);
 			//The info has now been broken into chunks
-			//Return the AU with chunks
-			$newAus = $this->createAUs($resultChunked);
-
+			//Return the AU with the chuncks, but start at 0 because array_chunk returns an array, all will be 
+			//nestled under 0
+			$newAus = $this->createAUs($resultChunked[0]);
+			
 			return $newAus;
 		}
 
 		function createAUs($auStatements)
 		{
-
 			//So it should be fed an array of statements that then assigns the values to 
 			//several aus, and then returns the au objects! (array of objects)
 
@@ -49,10 +49,10 @@ class Au_Helpers {
 			for ($i = 0; $i < count($auStatements); $i++) {
 				//No it IS needed! beacuase we want to do this for each statment
 				$statement = $auStatements[$i];
-
+				
 				//Maybe just combine 45 and 48? TODO
 				$au = new au($statement);
-
+				
 				//assign the newly created au to the return array
 				$newAus[] = $au;
 
