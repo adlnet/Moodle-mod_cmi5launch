@@ -380,13 +380,8 @@ class progress{
 	public function retrieveActor($info, $regid){
 
 
-		echo "<br>";
-		echo "In retreive actor";
-		echo "what is freaking array her?";
-		var_dump($info);
-		echo "<br>";
 		$actor = $info[$regid][0]["actor"]["account"]["name"];
-			echo"Actor is : " . $actor;
+
 		return $actor;
 	}
 
@@ -501,13 +496,6 @@ class progress{
 	public function retrieveStatement($regId, $id)
 	{
 
-		echo "<br>";
-		echo "I need to make sure the info is here and follow to find eror";
-		var_dump($regId);
-		echo "<br>";
-		echo "Abov eis regid and below is id";
-		var_dump($id);
-		echo "<br>";
 
 		//Array to hold verbs and be returned
 		$progressUpdate = array();
@@ -517,20 +505,12 @@ class progress{
 
 		$resultDecoded = $this->requestLRSinfo($regId, $id);
 
-		echo "<br>";
-		echo "WHAT is orig resoltdecoded";
-		var_dump($resultDecoded);
-		echo "<br>";
 
 		//The results come back as nested array under more then statments. We only want statements, and we want them separated into unique statments
 		//Well, i think because it is checked for statements before? Maybe this can go?
 		//$resultChunked = array_chunk($resultDecoded, 1);
 		//NO THIS isnt the answer! I remember there was a way to do this right? We want to et past the 0, I have a way somewhere,
-		//I did this before
-		echo "<br>";
-		//echo "Ok, so is it coming back???";
-		//var_dump($resultChunked);
-		echo "<br>";
+		
 
 		//LEts try without resultChunked with JUST orig resutls decoded
 		//Because it would be one less nest of a '0'
@@ -557,20 +537,6 @@ class progress{
 
 		//	foreach ($currentRegid as $regid => $regInfo) {
 
-
-				echo "<br>";
-				echo "OK, so following hsoulld be regid whole array??!?!?";
-				echo "<br>";
-				var_dump($currentRegid);
-				echo "<br>";
-				echo "What is regID?!?!?";
-				echo "<br>";
-//				var_dump($regid);
-				echo "<br>";
-				echo "What is reginfo?!?!?";
-				echo "<br>";
-//				var_dump($regInfo);
-				echo "<br>";
 		//i is each separate statment
             //We don't know the regid, but need it because it's the first array key, 
             //sosimply retrieve the key itself.
@@ -591,10 +557,7 @@ class progress{
 				//OR object=> actor, verb, date. Then we can sort it by au!
 				$progressUpdate[] = "$actor $verb $object on $date";
 			//}
-			echo "What is progress UPDATE?????  ?? ?  ?!?!?";
-			echo "<br>";
-			var_dump($progressUpdate);
-			echo "<br>";
+		
 			
 		}
 		return $progressUpdate;

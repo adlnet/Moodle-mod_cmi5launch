@@ -551,7 +551,8 @@ function cmi5launch_process_new_package($cmi5launch) {
 	$connectors = new cmi5Connectors;
 	$tables = new cmi5Tables;
     $aus_helpers = new Au_Helpers;
-	//bring in functions from class cmi5_table_connectors
+
+	//bring in functions from class cmi5_table_connectors and AU helpers
 	$createCourse = $connectors->getCreateCourse();
     $retrieveAus = $aus_helpers-> getRetrieveAus();
 	$populateTable = $tables->getPopulateTable();
@@ -592,29 +593,20 @@ function cmi5launch_process_new_package($cmi5launch) {
 
 
 	//Take the results of created course and save new course id to table
-    //MB
-    //Ok I think here is where we want to e tthe AUs?
-
-
     $record->courseinfo = $courseResults;
     
     $returnedInfo = json_decode($courseResults, true);
 
-    //TODO - IS there a better way to do this? I hate it is decoded then encoded
-    //Seems repetitive but the bottom needs decoded but to store needs encoded
-    //Maybe AUs need to be encoded here 
+    //Retrieve the courses AUs and save to record
     $aus = json_encode($retrieveAus($returnedInfo));
 
     $record->aus = $aus;
 
-    //Retrieve lmsId of course
+    //Retrieve the lmsId of course
     $lmsId = $returnedInfo["lmsId"];
     $record->courseid = $returnedInfo["id"];
     $record->cmi5activityid = $lmsId;
 	//create url for sending to when requesting launch url for course 
-	//See if we save the AUs here and dynamically crfeate url
-    //I could make this a BASE url and only the end change? so like leave
-    //The trailing forward slash and later chuck your au num unto end?
     $url = $record->cmi5playerurl . "/api/v1/". $record->courseid. "/launch-url/";
 	$record->launchurl = $url;
     	

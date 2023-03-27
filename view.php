@@ -24,15 +24,13 @@
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require('header.php');
 
-//Classes for connecting to Progress class - MB
+//For connecting to Progress class - MB
 require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/Progress.php");
 
 //Classes for connecting to CMI5 player
 require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/cmi5Connector.php");
 require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/cmi5_table_connectors.php");
 require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/ausHelpers.php");
-//Classes for connecting to Progress class - MB
-require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/Progress.php");
 
 //MB
     //bring in functions from classes cmi5Connector/Cmi5Tables
@@ -98,10 +96,6 @@ echo"<br>";
 */
 $aus = $createAUs($auList);
 
-echo "<br>";
-echo "But why iss it null? What is going on?";
-var_dump($aus);
-echo "<br>";
 
 if ($cmi5launch->intro) { 
     // Conditions to show the intro can change to look for own settings or whatever.
@@ -289,11 +283,6 @@ foreach ($aus as $key => $item) {
     //Retrieve individual AU as array
     $au = (array)($aus[$key]);
 
-    echo "<br>";
-echo "ANNNNNND what is au here returned???";
-echo "<br>";
-var_dump($au);
-echo "<br>";
 
     //Verify object
     if (!is_array($au)) {
