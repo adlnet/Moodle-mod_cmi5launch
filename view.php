@@ -32,14 +32,14 @@ require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/cmi5Connector.php");
 require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/cmi5_table_connectors.php");
 require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/ausHelpers.php");
 
-    //bring in functions from classes cmi5Connector/Cmi5Tables
-    $progress = new progress;
-    $auHelper = new Au_Helpers;
-    //bring in functions from class cmi5_table_connectors and AU helpers
-    $getProgress = $progress->getRetrieveStatement();
-    $createAUs = $auHelper->getCreateAUs();
-    $connectors = new cmi5Connectors;
-    $tables = new cmi5Tables;
+//bring in functions from classes cmi5Connector/Cmi5Tables
+$progress = new progress;
+$auHelper = new Au_Helpers;
+//bring in functions from class cmi5_table_connectors and AU helpers
+$getProgress = $progress->getRetrieveStatement();
+$createAUs = $auHelper->getCreateAUs();
+$connectors = new cmi5Connectors;
+$tables = new cmi5Tables;
 
 // Trigger module viewed event.
 $event = \mod_cmi5launch\event\course_module_viewed::create(array(
@@ -58,19 +58,20 @@ $PAGE->set_context($context);
 
 $PAGE->requires->jquery();
 
+
 // Output starts here.
 echo $OUTPUT->header();
 
 global $cmi5launch;
-//Take the results of created course and save new course id to table
 
 // Reload cmi5 instance.
 $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
 
 //Retrieve saved AUs
 $auList = json_decode($record->aus, true);
-$aus = $createAUs($auList);
 
+
+$aus = $createAUs($auList);
 
 if ($cmi5launch->intro) { 
     // Conditions to show the intro can change to look for own settings or whatever.
@@ -90,21 +91,28 @@ if ($cmi5launch->intro) {
         
             //Onclick calls this
             if (event.keyCode === 13 || event.keyCode === 32) {
-                //MBMBMBMBMB
-                //This needs to be looked into, it is not loading auview correctly
-                //problem with the id and course stuff in search params (at bottom of page)
 
                 mod_cmi5launch_launchexperience(registration);
           
             }
         }
+
+        //Maybe another function? Gosh will we need another launch PAGE
+        //Probably not, an if/else should help
         
         //function to be run on onclick
-
         // Function to run when the experience is launched.
-        function mod_cmi5launch_launchexperience(registration) {
+        function mod_cmi5launch_launchexperience(registration, auID) {
+            //THIS is where the next page gets the thingy!!!!
             // Set the form paramters.
-            $('#launchform_registration').val(registration);
+            console.log("Can I see this?");
+            $('#AU_view').val(registration);
+            $('#AU_view_id').val(auID);
+            //Can I set MORE params here? Same way?
+            //Or do I need to? Is just it being passed in enough?
+            //Or can we have both and filter with it, I can change wha tis 
+            //passed in
+
             // Post it.
             $('#launchform').submit();
             // Remove the launch links.
@@ -209,7 +217,7 @@ $resultDecoded = $getLRS($registrationdatafromlrs, $cmid);
 foreach ($aus as $key => $item) {
     //Retrieve individual AU as array
     $au = (array)($aus[$key]);
-
+  
     //Verify object
     if (!is_array($au)) {
         $reason = "Excepted array, found " . $au;
@@ -226,9 +234,9 @@ foreach ($aus as $key => $item) {
 
     //This is the info back from the lrs
     foreach($resultDecoded as $result => $i){
-            //i is each separate statment
+            //i is each separate statement
             //We don't know the regid, but need it because it's the first array key, 
-            //sosimply retrieve the key itself.
+            //so simply retrieve the key itself.
             //current regid
             $regid = array_key_first($i);
 
@@ -254,27 +262,27 @@ foreach ($aus as $key => $item) {
     //If relevant registrations are not null, then it found some session ids. If those exist then this
     //AU has been launched and is therefore 'in progress' or 'completed'
     //If this IS NULL then the AU has not been attempted and we can mark it as such
-        if (!$relevantReg == null) {
+            if (!$relevantReg == null) {
 
-            $getCompleted = $progress->getCompletion();
+                $getCompleted = $progress->getCompletion();
 
-            $completed = $getCompleted($auMoveon, $verbs);
+                $completed = $getCompleted($auMoveon, $verbs);
 
-        //If completed is returned true we move on. If not, its in progress
-            if($completed == true){
+            //If completed is returned true we move on. If not, its in progress
+                if($completed == true){
 
-                $auStatus = "Completed";
+                    $auStatus = "Completed";
+                }
+                else{
+                
+                    $auStatus = "In Progress";
+                }
+
             }
+            //If relevenat reg is null than this is not attmepted
             else{
-            
-                $auStatus = "In Progress";
+                    $auStatus = "Not attempted";
             }
-
-        }
-        //If relevenat reg is null than this is not attmepted
-        else{
-                $auStatus = "Not attempted";
-        }
 
     }
     
@@ -284,13 +292,38 @@ foreach ($aus as $key => $item) {
     //Create array of info to place in tablee
     $auInfo = array();
 
-    //Assign au name and progress
+    
+
+        //Assign au name and progress
     $auInfo [] = $au['title'][0]['text'];
     $auInfo[] = ($auStatus);
 
+
+
+    //So HERE we want it to only pull up the AUs info, maybe pass in
+    //instead of view? 
+
+    //Maybe pass it the au indeex?? I dunno
+    //Au index IS needed tto call riht course though right!
+    $auIndex = $au['auIndex'];
+
+    //Well could I pass as a string?
+    //A JSON ENCODED strin!
+     //   $regForAUview = json_encode($relevantReg);
+        //Because it is a string Jquery, he qoutation marks from json encode are causing an issue.
+        //Other eays? Maybe fla changes or serialize?
+       // $regForAUview = serialize($relevantReg);
+        //NO still qoutes, lets rty implode and use a character that 
+        //shouldnt mess with html
+        $regForAUview = implode(",", $relevantReg);
+        //We should be able to explode again riht? 
+        //I think we have a winner! LEts just see if we can appropriately adjust on next page
+       //If I pass relevantReg through here, will htat make it avaialbel to auviews?
+    //maybe only show THESE
+        $auID = 0;
     //Assign au link to auviews
     $auInfo [] = "<a tabindex=\"0\" id='cmi5relaunch_attempt'
-    onkeyup=\"key_test('". "view" ."')\" onclick=\"mod_cmi5launch_launchexperience('". "view ". "')\" style='cursor: pointer;'>"
+    onkeyup=\"key_test('". $regForAUview . "')\" onclick=\"mod_cmi5launch_launchexperience('". $regForAUview .  "')\" style='cursor: pointer;'>"
     . get_string('cmi5launchviewlaunchlink', 'cmi5launch') . "</a>"
     ;   
     
@@ -304,19 +337,34 @@ $table->data = $tableData;
 //Ok, this makes the table:
 echo html_writer::table($table);
 
-} else {
-
+} 
+/*
+else {
+*/
+    //MB 
+    //I think this is the issue, the table actually SHOULDN'T be empty, it still needs to display au and their progress/view link
+    ///So just remove else? 
     //No registrations, the table should be empty but still needs to be created
-    echo "<p tabindex=\"0\"
-        onkeyup=\"key_test('".$registrationid."')\"
+   //It IS passing in registrationid! That's why its one! Soooooo
+   //Maybe 
+
+   //Start new button/ if we keep this, just um be AU 0 and start from 0?
+$auID = "0";
+$registrationid = "1";
+$info = array($auID, $registrationid);
+$infoForNextPage = implode(",", $infoForNextPage);
+
+   echo "<p tabindex=\"0\"
+        onkeyup=\"key_test('" . $infoForNextPage . "')\"
         id='cmi5launch_newattempt'><a onclick=\"mod_cmi5launch_launchexperience('"
-        . $registrationid
-        . "')\" style=\"cursor: pointer;\">"
+        . $infoForNextPage .
+        "')\" style=\"cursor: pointer;\">"
         . get_string('cmi5launch_attempt', 'cmi5launch')
         . "</a></p>";
-}
 
-
+        /*
+    }
+*/
 // Add a form to be posted based on the attempt selected.
 //I don't think we need this, posting a form would be to activate launch.php and
 //we are really just linking yeah? 
@@ -325,6 +373,7 @@ echo html_writer::table($table);
  
     <form id="launchform" action="AUview.php" method="get">
         <input id="AU_view" name="AU_view" type="hidden" value="default">
+        <input id="AU_view_id" name="AU_view_id" type="hidden" value="default">
         <input id="id" name="id" type="hidden" value="<?php echo $id ?>">
         <input id="n" name="n" type="hidden" value="<?php echo $n ?>">
     </form>

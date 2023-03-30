@@ -108,148 +108,209 @@ if ($cmi5launch->intro) { // Conditions to show the intro can change to look for
     </script>
 <?php
 
+//TODO
+//Ask florian if he thinks LRS should be queired on this pae or only the previous for speed?
+//Seeing as browser opens class in diff window, might bee good to query on BOTH pages for updates
 
-//Start at 1, if continuing old attempt it will draw previous regid from LRS
-$registrationid = 1;
+//Ok, so lets see if this helps with only displaying the relevant regs
+    //
+    //I think this brings it over from previous ppae
+    //and now should we decode? YES! To make it array
+   // $relevantReg = unserialize(required_param('AU_view', PARAM_TEXT), true );
+//try with explode
 
-$getregistrationdatafromlrsstate = cmi5launch_get_global_parameters_and_get_state(
-    "http://cmi5api.co.uk/stateapikeys/registrations"
-);
 
-$lrsrespond = $getregistrationdatafromlrsstate->httpResponse['status'];
 
-if ($lrsrespond != 200 && $lrsrespond != 404) {
-    // On clicking new attempt, save the registration details to the LRS State and launch a new attempt.
-    echo "<div class='alert alert-error'>" . get_string('cmi5launch_notavailable', 'cmi5launch') . "</div>";
+$fromView = required_param('AU_view', PARAM_TEXT);
+$regAndId = explode(",", $fromView);
+//First or 0 is always auid
+$auID = $viewArray[0];
+//maybe pop or somehting to take first and rest be the same array? 
+$auID = array_shift($regAndId);
+echo "<br>";
+echo "Whats id, did it work? ";
+var_dump($viewArray);
+echo "<br>";
 
-    if ($CFG->debug == 32767) {
-        echo "<p>Error attempting to get registration data from State API.</p>";
-        echo "<pre>";
-       var_dump($getregistrationdatafromlrsstate);
-        echo "</pre>";
-    }
-    die();
+if ($regAndId == "") {
+    $relevantReg = null;//There are no relevant registrations
+} elseif($regAndId == "1") {
+    //There ARE relevant registrations, place in an array
+    $relevantReg = null;
+}else {
+    //There ARE relevant registrations, place in an array
+    $relevantReg = explode(",", $regAndId);
 }
-//MB
-	//bring in functions from classes cmi5Connector/Cmi5Tables
-	$progress = new progress;
+
+    //if (empty($registrationid)) {
+  //  echo "<div class='alert alert-error'>" . get_string('cmi5launch_regidempty', 'cmi5launch') . "</div>";
+//}
+    //If it is NOT null there are relevent regs! To either retrieve from lrs or move over? Whats best to do this? Get
+    //on previous page or requery? Cause I reckon 
+if (!$relevantReg == null) {
+    
+
+    //Start at 1, if continuing old attempt it will draw previous regid from LRS
+    $registrationid = 1;
+
+    $getregistrationdatafromlrsstate = cmi5launch_get_global_parameters_and_get_state(
+        "http://cmi5api.co.uk/stateapikeys/registrations"
+    );
+
+    $lrsrespond = $getregistrationdatafromlrsstate->httpResponse['status'];
+
+    if ($lrsrespond != 200 && $lrsrespond != 404) {
+        // On clicking new attempt, save the registration details to the LRS State and launch a new attempt.
+        echo "<div class='alert alert-error'>" . get_string('cmi5launch_notavailable', 'cmi5launch') . "</div>";
+
+        if ($CFG->debug == 32767) {
+            echo "<p>Error attempting to get registration data from State API.</p>";
+            echo "<pre>";
+            var_dump($getregistrationdatafromlrsstate);
+            echo "</pre>";
+        }
+        die();
+    }
+    //MB
+    //bring in functions from classes cmi5Connector/Cmi5Tables
+    $progress = new progress;
 
     //bring in functions from class cmi5_table_connectors
-	$getProgress = $progress->getRetrieveStatement();
+    $getProgress = $progress->getRetrieveStatement();
 
-//MB
-//Ok, here is where I want to put progress in the tables here.
-//so here is a good place to see what params are available to pass in,
-//Hey! IS regid a tatmentid???
-if ($lrsrespond == 200) {
+    //MB
+    //Ok, here is where I want to put progress in the tables here.
+    //so here is a good place to see what params are available to pass in,
+    //Hey! IS regid a tatmentid???
+    if ($lrsrespond == 200) {
 
-    $registrationdatafromlrs = json_decode($getregistrationdatafromlrsstate->content->getContent(), true);
+        $registrationdatafromlrs = json_decode($getregistrationdatafromlrsstate->content->getContent(), true);
 
-    //Array to hold verbs and be returned
-	$progress = array();
+        //Array to hold verbs and be returned
+        $progress = array();
 
 
-    ///////WAIT MB
-    //What if we make a 'progress key' HERE. Then we can just pop later?
-    //Or hell, pop here!!!!
-    //Populate table with previous experiences
-    global $cmi5launch;
-    foreach ($registrationdatafromlrs as $key => $item) {
-        if (!is_array($registrationdatafromlrs[$key])) {
-            $reason = "Excepted array, found " . $registrationdatafromlrs[$key];
-            throw new moodle_exception($reason, 'cmi5launch', '', $warnings[$reason]);
-        }
-        array_push(
-            $registrationdatafromlrs[$key],
-            "<a tabindex=\"0\" id='cmi5relaunch_attempt'
-            onkeyup=\"key_test('".$key."')\" onclick=\"mod_cmi5launch_launchexperience('".$key. "')\" style='cursor: pointer;'>"
-            . get_string('cmi5launchviewlaunchlink', 'cmi5launch') . "</a>"
-        );
-        $registrationdatafromlrs[$key]['created'] = date_format(
-            date_create($registrationdatafromlrs[$key]['created']),
-            'D, d M Y H:i:s'
-        );
-        $registrationdatafromlrs[$key]['lastlaunched'] = date_format(
-            date_create($registrationdatafromlrs[$key]['lastlaunched']),
-            'D, d M Y H:i:s'
-        );
-        //YES!! Maybe I can have an array.push here and call my progress clas! So simple!!!
-        $registrationdatafromlrs[$key]['progress'] = 
-           ("<pre>". implode( "\n ", $getProgress($key, $cmi5launch->id)) ."</pre>" );
-         //   echo "<ul><li>" . implode("</li><li>", $getProgress) . "</li></ul>";
+        ///////WAIT MB
+        //What if we make a 'progress key' HERE. Then we can just pop later?
+        //Or hell, pop here!!!!
+        //Populate table with previous experiences
+        global $cmi5launch;
+
+        //Now what if we go through OUR array from previous page instead of theirs
+        foreach($relevantReg as $key){
+        //        foreach ($registrationdatafromlrs as $key => $item) {
+          /*  if (!is_array($registrationdatafromlrs[$key])) {
+                $reason = "Excepted array, found " . $registrationdatafromlrs[$key];
+                throw new moodle_exception($reason, 'cmi5launch', '', $warnings[$reason]);
+            }*/
+            array_push(
+                $registrationdatafromlrs[$key],
+                "<a tabindex=\"0\" id='cmi5relaunch_attempt'
+                onkeyup=\"key_test('" . $key . "')\" onclick=\"mod_cmi5launch_launchexperience('" . $key . "')\" style='cursor: pointer;'>"
+                . get_string('cmi5launchviewlaunchlink', 'cmi5launch') . "</a>"
+            );
+            $registrationdatafromlrs[$key]['created'] = date_format(
+                date_create($registrationdatafromlrs[$key]['created']),
+                'D, d M Y H:i:s'
+            );
+            $registrationdatafromlrs[$key]['lastlaunched'] = date_format(
+                date_create($registrationdatafromlrs[$key]['lastlaunched']),
+                'D, d M Y H:i:s'
+            );
+            //YES!! Maybe I can have an array.push here and call my progress clas! So simple!!!
+            $registrationdatafromlrs[$key]['progress'] =
+                ("<pre>" . implode("\n ", $getProgress($key, $cmi5launch->id)) . "</pre>");
+            //   echo "<ul><li>" . implode("</li><li>", $getProgress) . "</li></ul>";
             //Dangit! But if we pass back array then it can't convert
             //HERE!!! dangit!
             //Do we need a foreach here to or in the getprogress? Only seems
             //to have most recent verb
-        
-    }
 
-    //Here is where it is making the table....so what we want is this
-    //When you click on one of the rows (they are separate when you hover)
-    //We want it to dropdown and reveal all that session history with our 
-    //brand new progress getter. So we need to
-    //MAke each row clickable and 
-    //make each row able to drop down,
-    //make the rows call the progress getter,
-    //populate the dropped down row with the proggress 
-   
-    //MB - below builds the table, so we need to add the header for progress here
+        }
 
-    $table = new html_table();
-    $table->id = 'cmi5launch_attempttable';
-    $table->caption = get_string('modulenameplural', 'cmi5launch');
-    $table->head = array(
-        get_string('cmi5launchviewfirstlaunched', 'cmi5launch'),
-        get_string('cmi5launchviewlastlaunched', 'cmi5launch'),
-        get_string('cmi5launchviewlaunchlinkheader', 'cmi5launch'),
-        get_string('cmi5launchviewprogress', 'cmi5launch'),
+        //Here is where it is making the table....so what we want is this
+        //When you click on one of the rows (they are separate when you hover)
+        //We want it to dropdown and reveal all that session history with our 
+        //brand new progress getter. So we need to
+        //MAke each row clickable and 
+        //make each row able to drop down,
+        //make the rows call the progress getter,
+        //populate the dropped down row with the proggress 
 
-    );
+        //MB - below builds the table, so we need to add the header for progress here
 
-    //mb table data takes arrays, can I adjus theirs?
-   // $candy = array("truffle" => "candycorn");
-    //$registrationdatafromlrs = array_merge($registrationdatafromlrs, $candy);
-    //The results come back as nested array under more then statments. We only want statements, and we want them separated into unique statments
-/////OOOOHHHHH registrationdatafromlrs is an OBJECT!!!!
-//so a foreach here instead of a for???
-    //$resultChunked = array_chunk($registrationdatafromlrs[0]["data"], 1);
-        
+        $table = new html_table();
+        $table->id = 'cmi5launch_attempttable';
+        $table->caption = get_string('modulenameplural', 'cmi5launch');
+        $table->head = array(
+            get_string('cmi5launchviewfirstlaunched', 'cmi5launch'),
+            get_string('cmi5launchviewlastlaunched', 'cmi5launch'),
+            get_string('cmi5launchviewlaunchlinkheader', 'cmi5launch'),
+            get_string('cmi5launchviewprogress', 'cmi5launch'),
+
+        );
+
+        //mb table data takes arrays, can I adjus theirs?
+        // $candy = array("truffle" => "candycorn");
+        //$registrationdatafromlrs = array_merge($registrationdatafromlrs, $candy);
+        //The results come back as nested array under more then statments. We only want statements, and we want them separated into unique statments
+        /////OOOOHHHHH registrationdatafromlrs is an OBJECT!!!!
+        //so a foreach here instead of a for???
+        //$resultChunked = array_chunk($registrationdatafromlrs[0]["data"], 1);
 
 
-    
-    //Now we need 
 
-    $table->data = $registrationdatafromlrs;
- 
-    //MB
-    //This builds the table, it uses a moodle made fucntion to do so,
-    //I'm going to see if its..wait, look above, it may use moodle method to build
-    //the table BUT it builds it with the data above. 
-    //So I can either try to adjust data above or try to write a script to activate
-    //on clicking a row AFTER table built
 
-    echo html_writer::table($table);
+        //Now we need 
 
-    //This builds the start new reg button - MB
-    // Needs to come after previous attempts so a non-sighted user can hear launch options.
-    if ($cmi5launch->cmi5multipleregs) {
-        echo "<p id='cmi5launch_newattempt'><a tabindex=\"0\"
-        onkeyup=\"key_test('".$registrationid ."')\" onclick=\"mod_cmi5launch_launchexperience('"
-            . $registrationid 
+        $table->data = $registrationdatafromlrs;
+
+        //MB
+        //This builds the table, it uses a moodle made fucntion to do so,
+        //I'm going to see if its..wait, look above, it may use moodle method to build
+        //the table BUT it builds it with the data above. 
+        //So I can either try to adjust data above or try to write a script to activate
+        //on clicking a row AFTER table built
+
+        echo html_writer::table($table);
+
+        //This builds the start new reg button - MB
+        // Needs to come after previous attempts so a non-sighted user can hear launch options.
+        if ($cmi5launch->cmi5multipleregs) {
+            echo "<p id='cmi5launch_newattempt'><a tabindex=\"0\"
+            onkeyup=\"key_test('" . $registrationid . "')\" onclick=\"mod_cmi5launch_launchexperience('"
+                . $registrationid
+                . "')\" style=\"cursor: pointer;\">"
+                . get_string('cmi5launch_attempt', 'cmi5launch')
+                . "</a></p>";
+        }
+
+    } 
+    //Honestly is this needed here? 
+    /*else {
+        //This is a new attempt, set registraion id to one
+        $registrationid = 1;
+        echo "<p tabindex=\"0\"
+            onkeyup=\"key_test('" . $registrationid . "')\"
+            id='cmi5launch_newattempt'><a onclick=\"mod_cmi5launch_launchexperience('"
+            . $registrationid
             . "')\" style=\"cursor: pointer;\">"
             . get_string('cmi5launch_attempt', 'cmi5launch')
             . "</a></p>";
-    }
-
-} else {
+    }*/
+}
+else {
+    //This is a new attempt, set registraion id to one
+    $registrationid = 1;
     echo "<p tabindex=\"0\"
-        onkeyup=\"key_test('".$registrationid."')\"
+        onkeyup=\"key_test('" . $registrationid . "')\"
         id='cmi5launch_newattempt'><a onclick=\"mod_cmi5launch_launchexperience('"
         . $registrationid
         . "')\" style=\"cursor: pointer;\">"
         . get_string('cmi5launch_attempt', 'cmi5launch')
         . "</a></p>";
-}
+
+}//End my trial if/else
 
 // Add a form to be posted based on the attempt selected.
 ?>

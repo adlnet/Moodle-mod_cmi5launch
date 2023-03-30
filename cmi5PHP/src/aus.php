@@ -35,7 +35,13 @@ function __construct($statement){
   //I THINK this is taking an array and assigning the arrays values to it's keys
   //I assume these are saving if the keys mactch the AU properties
   foreach($statement as $key => $value){
-		$this->$key = ($value);
+    
+    //The problem is the key is showing as 0 when its passed in
+   
+///Hmmmmmmm it is duplicationin everything
+    $this->$key = ($value);
+
+
   
 	}	
 

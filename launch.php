@@ -36,8 +36,10 @@ $event->add_record_snapshot('course_modules', $cm);
 $event->add_record_snapshot('cmi5launch', $cmi5launch);
 $event->trigger();
 
-
+//MB
+//Might this be a good way? Maybe it can check session or regid numbers for what to display?
 //Retrieve registration id (from view.php)
+//Is there a way ot send only the regid for certain aus?
 $registrationid = required_param('launchform_registration', PARAM_TEXT);
 if (empty($registrationid)) {
     echo "<div class='alert alert-error'>".get_string('cmi5launch_regidempty', 'cmi5launch')."</div>";

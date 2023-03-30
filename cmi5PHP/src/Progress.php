@@ -35,12 +35,7 @@ class progress{
 
 		//Return this bool to let cqaller know if it is moveon worthy
 		$moveOn = true | false;
-//Firstprint the verbs so I can make sure this wokrs
-		echo "<br>";
-		echo "Hi there@ Hello, I'm a list of verbs";
-		echo "<br>";
-		var_dump($verbs);
-		echo "<br>";
+
 
 		//These will keep track of completed and passed being found
 		$completedFound = true | false;
