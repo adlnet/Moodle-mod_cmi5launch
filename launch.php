@@ -40,7 +40,11 @@ $event->trigger();
 //Might this be a good way? Maybe it can check session or regid numbers for what to display?
 //Retrieve registration id (from view.php)
 //Is there a way ot send only the regid for certain aus?
-$registrationid = required_param('launchform_registration', PARAM_TEXT);
+$fromAUview = required_param('launchform_registration', PARAM_TEXT);
+$regAndId = explode(",", $fromAUview);
+$auID = array_shift($regAndId);
+$registrationid = $regAndId[0];
+
 if (empty($registrationid)) {
     echo "<div class='alert alert-error'>".get_string('cmi5launch_regidempty', 'cmi5launch')."</div>";
 
@@ -62,7 +66,7 @@ elseif($registrationid == 1)
     $retrieveUrl = $connectors->getRetrieveUrl();
 
 	//Retrieve launch URL from CMI5 player
-	$url = $retrieveUrl($cmi5launch->id, $returnUrl);
+	$url = $retrieveUrl($cmi5launch->id, $returnUrl, $auID);
 	//urlInfo is one big string so
 	parse_str($url, $urlInfo);
 	//Retrieve registration id from end of parsed URL

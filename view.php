@@ -102,12 +102,10 @@ if ($cmi5launch->intro) {
         
         //function to be run on onclick
         // Function to run when the experience is launched.
-        function mod_cmi5launch_launchexperience(registration, auID) {
+        function mod_cmi5launch_launchexperience(registrationInfo) {
             //THIS is where the next page gets the thingy!!!!
             // Set the form paramters.
-            console.log("Can I see this?");
-            $('#AU_view').val(registration);
-            $('#AU_view_id').val(auID);
+            $('#AU_view').val(registrationInfo);
             //Can I set MORE params here? Same way?
             //Or do I need to? Is just it being passed in enough?
             //Or can we have both and filter with it, I can change wha tis 
@@ -116,8 +114,10 @@ if ($cmi5launch->intro) {
             // Post it.
             $('#launchform').submit();
             // Remove the launch links.
+            $('#cmi5launch_autable').remove();////
             $('#cmi5launch_newattempt').remove();
             $('#cmi5launch_attempttable').remove();
+            $('#cmi5launch_attempt').remove();
             //Add some new content.
             if (!$('#cmi5launch_status').length) {
                 var message = "<? echo get_string('cmi5launch_progress', 'cmi5launch'); ?>";
@@ -180,6 +180,9 @@ if ($lrsrespond == 200) {
 	global $cmi5launch;
     $cmid = $cmi5launch->id;
 
+       ////Ok so I dont think we want this, I checked with Florian, after its pretty I'll verify with Andy
+   // For now...
+   /*
     // Needs to come after previous attempts so a non-sighted user can hear launch options.
     if ($cmi5launch->cmi5multipleregs) {
         echo "<p id='cmi5launch_newattempt'><a tabindex=\"0\"
@@ -189,6 +192,8 @@ if ($lrsrespond == 200) {
             . get_string('cmi5launch_attempt', 'cmi5launch')
             . "</a></p>";
     }
+    */
+
 
 //Here is where the table is outlined
 $table = new html_table();
@@ -320,10 +325,14 @@ foreach ($aus as $key => $item) {
         //I think we have a winner! LEts just see if we can appropriately adjust on next page
        //If I pass relevantReg through here, will htat make it avaialbel to auviews?
     //maybe only show THESE
-        $auID = 0;
-    //Assign au link to auviews
+        //ReleventRe needs to be a string itself so it can all be one string to go to next pae throuh jquery 
+        
+    $regForNextPage = implode(',', $relevantReg);
+        $infoForNextPage = $auIndex . "," . $regForNextPage;
+        
+//Assign au link to auviews
     $auInfo [] = "<a tabindex=\"0\" id='cmi5relaunch_attempt'
-    onkeyup=\"key_test('". $regForAUview . "')\" onclick=\"mod_cmi5launch_launchexperience('". $regForAUview .  "')\" style='cursor: pointer;'>"
+    onkeyup=\"key_test('". $infoForNextPage . "')\" onclick=\"mod_cmi5launch_launchexperience('". $infoForNextPage .  "')\" style='cursor: pointer;'>"
     . get_string('cmi5launchviewlaunchlink', 'cmi5launch') . "</a>"
     ;   
     
@@ -348,11 +357,17 @@ else {
    //It IS passing in registrationid! That's why its one! Soooooo
    //Maybe 
 
+
+   ////Ok so I dont think we want this, I checked with Florian, after its pretty I'll verify with Andy
+   // For now...
+   /*
    //Start new button/ if we keep this, just um be AU 0 and start from 0?
 $auID = "0";
 $registrationid = "1";
-$info = array($auID, $registrationid);
-$infoForNextPage = implode(",", $infoForNextPage);
+//If auid is first always then it doesn't matter how many reg
+//they are naything after 0
+$info = array("au" => $auID, "reg" => $registrationid);
+$infoForNextPage = implode(",", $info);
 
    echo "<p tabindex=\"0\"
         onkeyup=\"key_test('" . $infoForNextPage . "')\"
@@ -365,6 +380,7 @@ $infoForNextPage = implode(",", $infoForNextPage);
         /*
     }
 */
+
 // Add a form to be posted based on the attempt selected.
 //I don't think we need this, posting a form would be to activate launch.php and
 //we are really just linking yeah? 

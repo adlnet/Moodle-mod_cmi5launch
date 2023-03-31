@@ -230,8 +230,9 @@ class cmi5Connectors{
     //@return $url - The launch URL returned from cmi5 player
     ////////
     //Trying somehting new, maybe just pass in id instead of above params?
-    public function retrieveUrl($id, $retUrl){
-		global $DB;
+    public function retrieveUrl($id, $retUrl, $auID){
+		
+        global $DB;
 
 		//Retrieve actor record, this enables correct actor info for URL storage
 		$record = $DB->get_record("cmi5launch", array('id' => $id));
@@ -270,6 +271,8 @@ class cmi5Connectors{
         //Wait, it can have the same name riht? Cause its a local func
         //Although should this go in tables or aus??
 
+        /* I don't think we need this we only want one au, what was passed in
+
         $courseAus = $this->retrieveAUs($courseResults, $record);
 		//Now that we have the array get length and start getting separate URL!!!
 		$length = count($courseAus);
@@ -281,8 +284,9 @@ class cmi5Connectors{
 			$au = $courseAus[$i];
 		
 
+*/
 
-	    $url = $playerUrl . "/api/v1/course/" . $courseId  ."/launch-url/" . $au;
+	    $url = $playerUrl . "/api/v1/course/" . $courseId  ."/launch-url/" . $auID;
 
         //the body of the request must be made as array first
         $data = array(
@@ -329,7 +333,7 @@ class cmi5Connectors{
 		//Only return the URL
 		$urlDecoded = json_decode($launchResponse, true);
 		$url = $urlDecoded['url'];
-	};//end of my trial for length new url thingy
+	//};//end of my trial for length new url thingy
         //return response
         return $url;
     }

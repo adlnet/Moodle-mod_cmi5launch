@@ -80,7 +80,7 @@ if ($cmi5launch->intro) { // Conditions to show the intro can change to look for
             $('#launchform').submit();
             // Remove the launch links.
             $('#cmi5launch_newattempt').remove();
-            $('#cmi5launch_attempttable').remove();
+            $('#cmi5launch_auSessionTable').remove();
             //Add some new content.
             if (!$('#cmi5launch_status').length) {
                 var message = "<?php echo get_string('cmi5launch_progress', 'cmi5launch'); ?>";
@@ -123,31 +123,27 @@ if ($cmi5launch->intro) { // Conditions to show the intro can change to look for
 
 $fromView = required_param('AU_view', PARAM_TEXT);
 $regAndId = explode(",", $fromView);
+
 //First or 0 is always auid
-$auID = $viewArray[0];
+//$auID = $viewArray[0];
 //maybe pop or somehting to take first and rest be the same array? 
 $auID = array_shift($regAndId);
-echo "<br>";
-echo "Whats id, did it work? ";
-var_dump($viewArray);
-echo "<br>";
 
-if ($regAndId == "") {
-    $relevantReg = null;//There are no relevant registrations
-} elseif($regAndId == "1") {
-    //There ARE relevant registrations, place in an array
-    $relevantReg = null;
-}else {
-    //There ARE relevant registrations, place in an array
-    $relevantReg = explode(",", $regAndId);
-}
+
+//If there were no regids there will be an array with 1 element left 
+//That element will be an mepty string.
+if ($regAndId[0] == "") {
+    $regAndId = null;//There are no relevant registrations
+}else{
+    
+} 
 
     //if (empty($registrationid)) {
   //  echo "<div class='alert alert-error'>" . get_string('cmi5launch_regidempty', 'cmi5launch') . "</div>";
 //}
     //If it is NOT null there are relevent regs! To either retrieve from lrs or move over? Whats best to do this? Get
     //on previous page or requery? Cause I reckon 
-if (!$relevantReg == null) {
+if (!$regAndId == null) {
     
 
     //Start at 1, if continuing old attempt it will draw previous regid from LRS
@@ -186,9 +182,24 @@ if (!$relevantReg == null) {
 
         $registrationdatafromlrs = json_decode($getregistrationdatafromlrsstate->content->getContent(), true);
 
+        //AHA! Wha tis registration data! Does it have an extra field!!!!
+        echo "<br>";
+        echo "What is registrationdatafrom lrs-----: ";
+        var_dump($registrationdatafromlrs);
+        echo "<br>";
         //Array to hold verbs and be returned
         $progress = array();
-
+        echo "<br>";
+        echo "Ok, but there were three in registration for whatever, howmay in the LOOP! ";
+        var_dump($regAndId);
+        //This may be it, there are ectra in loop cause it saves every reg id but some of these verbs are for the SAME one!
+        //We need to maybe still loop through LRS
+        //WE went this way cause we dont want ALL the data from lrs I think
+        //Is there a way to remove dups from arrays????
+        //lets try
+        $regAndId = array_unique($regAndId);
+        //Yep that was it! more regid than needed
+        echo "<br>";
 
         ///////WAIT MB
         //What if we make a 'progress key' HERE. Then we can just pop later?
@@ -197,7 +208,7 @@ if (!$relevantReg == null) {
         global $cmi5launch;
 
         //Now what if we go through OUR array from previous page instead of theirs
-        foreach($relevantReg as $key){
+        foreach($regAndId as $key){
         //        foreach ($registrationdatafromlrs as $key => $item) {
           /*  if (!is_array($registrationdatafromlrs[$key])) {
                 $reason = "Excepted array, found " . $registrationdatafromlrs[$key];
@@ -228,19 +239,11 @@ if (!$relevantReg == null) {
 
         }
 
-        //Here is where it is making the table....so what we want is this
-        //When you click on one of the rows (they are separate when you hover)
-        //We want it to dropdown and reveal all that session history with our 
-        //brand new progress getter. So we need to
-        //MAke each row clickable and 
-        //make each row able to drop down,
-        //make the rows call the progress getter,
-        //populate the dropped down row with the proggress 
-
+        
         //MB - below builds the table, so we need to add the header for progress here
 
         $table = new html_table();
-        $table->id = 'cmi5launch_attempttable';
+        $table->id = 'cmi5launch_auSessionTable';
         $table->caption = get_string('modulenameplural', 'cmi5launch');
         $table->head = array(
             get_string('cmi5launchviewfirstlaunched', 'cmi5launch'),
@@ -274,16 +277,22 @@ if (!$relevantReg == null) {
 
         echo html_writer::table($table);
 
+    
+        //Nope not this either!
+        $infoForNextPage = $auID . "," . $registrationid;
+    
         //This builds the start new reg button - MB
         // Needs to come after previous attempts so a non-sighted user can hear launch options.
         if ($cmi5launch->cmi5multipleregs) {
             echo "<p id='cmi5launch_newattempt'><a tabindex=\"0\"
-            onkeyup=\"key_test('" . $registrationid . "')\" onclick=\"mod_cmi5launch_launchexperience('"
-                . $registrationid
+            onkeyup=\"key_test('" . $infoForNextPage . "')\" onclick=\"mod_cmi5launch_launchexperience('"
+                . $infoForNextPage
                 . "')\" style=\"cursor: pointer;\">"
                 . get_string('cmi5launch_attempt', 'cmi5launch')
                 . "</a></p>";
         }
+////////////////////////
+        
 
     } 
     //Honestly is this needed here? 
@@ -300,17 +309,26 @@ if (!$relevantReg == null) {
     }*/
 }
 else {
+    
+    //ITs not this one causing the problem! This is what appears on empty new ones.
+
     //This is a new attempt, set registraion id to one
     $registrationid = 1;
+
+    //Create a string to pass the auid and reg to next pager (launch)
+    $infoForNextPage = $auID . "," . $registrationid;
+
+
     echo "<p tabindex=\"0\"
-        onkeyup=\"key_test('" . $registrationid . "')\"
+        onkeyup=\"key_test('" . $infoForNextPage . "')\"
         id='cmi5launch_newattempt'><a onclick=\"mod_cmi5launch_launchexperience('"
-        . $registrationid
+        . $infoForNextPage
         . "')\" style=\"cursor: pointer;\">"
         . get_string('cmi5launch_attempt', 'cmi5launch')
         . "</a></p>";
-
+/////////////////////////////////////////
 }//End my trial if/else
+
 
 // Add a form to be posted based on the attempt selected.
 ?>
