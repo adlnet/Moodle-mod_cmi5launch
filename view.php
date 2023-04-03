@@ -152,13 +152,20 @@ if ($cmi5launch->intro) {
 //Start at 1, if continuing old attempt it will draw previous regid from LRS
 $registrationid = 1;
 
+//No longer needed?
+
 $getregistrationdatafromlrsstate = cmi5launch_get_global_parameters_and_get_state(
     "http://cmi5api.co.uk/stateapikeys/registrations"
 );
-
+/*
 $lrsrespond = $getregistrationdatafromlrsstate->httpResponse['status'];
+*/
+//echo "What is lrs respond??";
+//var_dump($lrsrespond);
 
-if ($lrsrespond != 200 && $lrsrespond != 404) {
+/*
+
+if ($lrsrespond != 200 /* && $lrsrespond != 404) {
     // On clicking new attempt, save the registration details to the LRS State and launch a new attempt.
     echo "<div class='alert alert-error'>" . get_string('cmi5launch_notavailable', 'cmi5launch') . "</div>";
 
@@ -171,8 +178,13 @@ if ($lrsrespond != 200 && $lrsrespond != 404) {
     die();
 }
 
-if ($lrsrespond == 200) {
-
+if ($lrsrespond == 200) { 
+    */
+    /*
+echo "<br>";
+echo "I am so confused, what is this???";
+var_dump($getregistrationdatafromlrsstate);
+*/
     //Get session info from LRS
     $registrationdatafromlrs = json_decode($getregistrationdatafromlrsstate->content->getContent(), true);
 	
@@ -346,7 +358,7 @@ $table->data = $tableData;
 //Ok, this makes the table:
 echo html_writer::table($table);
 
-} 
+///////////////} 
 /*
 else {
 */

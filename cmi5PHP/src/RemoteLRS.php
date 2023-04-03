@@ -693,6 +693,8 @@ class RemoteLRS implements LRSInterface
                     'agent'    => $agent,
                 )
             );
+
+
             if (isset($registration)) {
                 $doc->setRegistration($registration);
             }

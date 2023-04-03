@@ -155,6 +155,7 @@ if (!$regAndId == null) {
 
     $lrsrespond = $getregistrationdatafromlrsstate->httpResponse['status'];
 
+
     if ($lrsrespond != 200 && $lrsrespond != 404) {
         // On clicking new attempt, save the registration details to the LRS State and launch a new attempt.
         echo "<div class='alert alert-error'>" . get_string('cmi5launch_notavailable', 'cmi5launch') . "</div>";
@@ -183,90 +184,98 @@ if (!$regAndId == null) {
         $registrationdatafromlrs = json_decode($getregistrationdatafromlrsstate->content->getContent(), true);
 
         //AHA! Wha tis registration data! Does it have an extra field!!!!
-        echo "<br>";
-        echo "What is registrationdatafrom lrs-----: ";
-        var_dump($registrationdatafromlrs);
-        echo "<br>";
+       
         //Array to hold verbs and be returned
         $progress = array();
-        echo "<br>";
-        echo "Ok, but there were three in registration for whatever, howmay in the LOOP! ";
-        var_dump($regAndId);
+     
         //This may be it, there are ectra in loop cause it saves every reg id but some of these verbs are for the SAME one!
         //We need to maybe still loop through LRS
         //WE went this way cause we dont want ALL the data from lrs I think
         //Is there a way to remove dups from arrays????
         //lets try
         $regAndId = array_unique($regAndId);
-        //Yep that was it! more regid than needed
-        echo "<br>";
+      
 
         ///////WAIT MB
         //What if we make a 'progress key' HERE. Then we can just pop later?
         //Or hell, pop here!!!!
         //Populate table with previous experiences
         global $cmi5launch;
+       
 
+        
+        //Array to hold info for table population
+        $tableData = array();
+
+    //MB - below builds the table, so we need to add the header for progress here
+
+    $table = new html_table();
+    $table->id = 'cmi5launch_auSessionTable';
+    $table->caption = get_string('modulenameplural', 'cmi5launch');
+    $table->head = array(
+        get_string('cmi5launchviewfirstlaunched', 'cmi5launch'),
+        get_string('cmi5launchviewlastlaunched', 'cmi5launch'),
+        get_string('cmi5launchviewlaunchlinkheader', 'cmi5launch'),
+        get_string('cmi5launchviewprogress', 'cmi5launch'),
+
+    );
+    //THATS IT!!! It's duplicating cause itis goinng thouh ALL regs even dupes. 
+    //SO lets see if there is a way to remove dupe
+       // $regAndId = array_unique($regAndId);
+       
         //Now what if we go through OUR array from previous page instead of theirs
-        foreach($regAndId as $key){
+        foreach($regAndId as $regId){
+
+            //array to hold data for table
+        $sessionInfo = array();
+
         //        foreach ($registrationdatafromlrs as $key => $item) {
           /*  if (!is_array($registrationdatafromlrs[$key])) {
                 $reason = "Excepted array, found " . $registrationdatafromlrs[$key];
                 throw new moodle_exception($reason, 'cmi5launch', '', $warnings[$reason]);
             }*/
-            array_push(
-                $registrationdatafromlrs[$key],
-                "<a tabindex=\"0\" id='cmi5relaunch_attempt'
-                onkeyup=\"key_test('" . $key . "')\" onclick=\"mod_cmi5launch_launchexperience('" . $key . "')\" style='cursor: pointer;'>"
-                . get_string('cmi5launchviewlaunchlink', 'cmi5launch') . "</a>"
-            );
-            $registrationdatafromlrs[$key]['created'] = date_format(
-                date_create($registrationdatafromlrs[$key]['created']),
+           // array_push(
+        
+           $sessionInfo [] = date_format(
+                date_create($registrationdatafromlrs[$regId]['created']),
                 'D, d M Y H:i:s'
             );
-            $registrationdatafromlrs[$key]['lastlaunched'] = date_format(
-                date_create($registrationdatafromlrs[$key]['lastlaunched']),
+            $sessionInfo [] =  date_format(
+                date_create($registrationdatafromlrs[$regId]['lastlaunched']),
                 'D, d M Y H:i:s'
             );
+  
+              //Create a string to pass the auid and reg to next pager (launch)
+                    $infoForNextPage = $auID . "," . $regId;
+            echo "<br>";
+            echo "within the session loop, what is it here??";
+            var_dump($infoForNextPage);
+            echo "<br>";
+                
             //YES!! Maybe I can have an array.push here and call my progress clas! So simple!!!
-            $registrationdatafromlrs[$key]['progress'] =
-                ("<pre>" . implode("\n ", $getProgress($key, $cmi5launch->id)) . "</pre>");
-            //   echo "<ul><li>" . implode("</li><li>", $getProgress) . "</li></ul>";
-            //Dangit! But if we pass back array then it can't convert
-            //HERE!!! dangit!
-            //Do we need a foreach here to or in the getprogress? Only seems
-            //to have most recent verb
+            $sessionInfo [] =
+                ("<pre>" . implode("\n ", $getProgress($regId, $cmi5launch->id)) . "</pre>");
+        
+                $sessionInfo [] =  /* $registrationdatafromlrs[$regId]*/
+                "<a tabindex=\"0\" id='cmi5relaunch_attempt'
+                onkeyup=\"key_test('" . $infoForNextPage . "')\" onclick=\"mod_cmi5launch_launchexperience('" . $infoForNextPage . "')\" style='cursor: pointer;'>"
+                . get_string('cmi5launchviewlaunchlink', 'cmi5launch') . "</a>"
+           ;
+        
+                //   echo "<ul><li>" . implode("</li><li>", $getProgress) . "</li></ul>";
+            //add to be fed to table
+        $tableData[] = $sessionInfo;          //to have most recent verb
+
 
         }
 
-        
-        //MB - below builds the table, so we need to add the header for progress here
+  
 
-        $table = new html_table();
-        $table->id = 'cmi5launch_auSessionTable';
-        $table->caption = get_string('modulenameplural', 'cmi5launch');
-        $table->head = array(
-            get_string('cmi5launchviewfirstlaunched', 'cmi5launch'),
-            get_string('cmi5launchviewlastlaunched', 'cmi5launch'),
-            get_string('cmi5launchviewlaunchlinkheader', 'cmi5launch'),
-            get_string('cmi5launchviewprogress', 'cmi5launch'),
-
-        );
-
-        //mb table data takes arrays, can I adjus theirs?
-        // $candy = array("truffle" => "candycorn");
-        //$registrationdatafromlrs = array_merge($registrationdatafromlrs, $candy);
-        //The results come back as nested array under more then statments. We only want statements, and we want them separated into unique statments
-        /////OOOOHHHHH registrationdatafromlrs is an OBJECT!!!!
-        //so a foreach here instead of a for???
-        //$resultChunked = array_chunk($registrationdatafromlrs[0]["data"], 1);
-
-
-
+    
 
         //Now we need 
 
-        $table->data = $registrationdatafromlrs;
+        $table->data = $tableData;
 
         //MB
         //This builds the table, it uses a moodle made fucntion to do so,
@@ -317,7 +326,9 @@ else {
 
     //Create a string to pass the auid and reg to next pager (launch)
     $infoForNextPage = $auID . "," . $registrationid;
-
+    echo "what is it ON other page: is it cause the view button isn't attached to start new?";
+    var_dump($infoForNextPage);
+    echo "<br>";
 
     echo "<p tabindex=\"0\"
         onkeyup=\"key_test('" . $infoForNextPage . "')\"
@@ -334,6 +345,7 @@ else {
 ?>
     <form id="launchform" action="launch.php" method="get" target="_blank">
         <input id="launchform_registration" name="launchform_registration" type="hidden" value="default">
+
         <input id="id" name="id" type="hidden" value="<?php echo $id ?>">
         <input id="n" name="n" type="hidden" value="<?php echo $n ?>">
     </form>

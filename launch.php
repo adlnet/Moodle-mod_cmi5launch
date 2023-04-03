@@ -41,7 +41,20 @@ $event->trigger();
 //Retrieve registration id (from view.php)
 //Is there a way ot send only the regid for certain aus?
 $fromAUview = required_param('launchform_registration', PARAM_TEXT);
+
+echo "<br>";
+
+echo "what is it straight frpm other page:";
+var_dump($fromAUview);
+echo "<br>";
+///ok the au is not coming so lets check previous page
 $regAndId = explode(",", $fromAUview);
+///WAIT we dont need it anymore this is straight from au view right?
+//Butit needs it for launch riht?
+echo "If your brains made that wayyy:";
+var_dump($regAndId);
+
+//Off ocurse, the 0 is the aaauid, something has one wrong here
 $auID = array_shift($regAndId);
 $registrationid = $regAndId[0];
 
