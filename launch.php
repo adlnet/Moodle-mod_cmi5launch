@@ -17,8 +17,7 @@
 /**
  * launches the experience with the requested registration
  *
- * @package mod_cmi5launch
- * @copyright  2013 Andrew Downes
+ * @copyright  2023 Megan Bohland
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -36,27 +35,38 @@ $event->add_record_snapshot('course_modules', $cm);
 $event->add_record_snapshot('cmi5launch', $cmi5launch);
 $event->trigger();
 
-//MB
-//Might this be a good way? Maybe it can check session or regid numbers for what to display?
-//Retrieve registration id (from view.php)
-//Is there a way ot send only the regid for certain aus?
+//Retrieve registration id and au index (from AUview.php)
 $fromAUview = required_param('launchform_registration', PARAM_TEXT);
 
-echo "<br>";
-
-echo "what is it straight frpm other page:";
-var_dump($fromAUview);
-echo "<br>";
-///ok the au is not coming so lets check previous page
+/*
+//todo
+//this will change cause there will only be ONE regid going forward
+//Break it into array (AU is first index)
 $regAndId = explode(",", $fromAUview);
-///WAIT we dont need it anymore this is straight from au view right?
-//Butit needs it for launch riht?
-echo "If your brains made that wayyy:";
-var_dump($regAndId);
-
-//Off ocurse, the 0 is the aaauid, something has one wrong here
+//Retrieve the AU ID 
 $auID = array_shift($regAndId);
+//Now the registration ID, it should be the first element in the array after AU ID was taken
 $registrationid = $regAndId[0];
+*/
+
+
+//Break it into array (AU is first index)
+$regAndId = explode(",", $fromAUview);
+//Retrieve AU ID
+$auID = array_shift($regAndId);
+
+echo "<br>";
+echo"Okdokey what is AU ID? What is it coming from the previous pae as? THIS IS LAUNCH";
+var_dump($auID);
+echo "<br>";
+
+
+ // Reload cmi5 instance.
+ $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
+//Ok what is record here?
+$registrationid = $record->registrationid;
+
+
 
 if (empty($registrationid)) {
     echo "<div class='alert alert-error'>".get_string('cmi5launch_regidempty', 'cmi5launch')."</div>";
@@ -67,23 +77,22 @@ if (empty($registrationid)) {
     }
     die();
 }
+//todo
+//this will change, it shoulkd never be one now???
+//or wait!
+ //is this what needs to be moved to view.php??
+
 //If it's 1 than the "Start New Registration" was pushed
+//TODO
+//This won't ever be one, it will be the one reg, so I guess we need to check
+//if its null or not? 
 elseif($registrationid == 1)
 {
-	//to bring in functions from class cmi5Connector
-	$connectors = new cmi5Connectors;
-
-    //Build url to pass as returnUrl
-    $returnUrl = $CFG->wwwroot .'/mod/cmi5launch/view.php'. '?id=' .$cm->id;
-
-    $retrieveUrl = $connectors->getRetrieveUrl();
-
-	//Retrieve launch URL from CMI5 player
-	$url = $retrieveUrl($cmi5launch->id, $returnUrl, $auID);
-	//urlInfo is one big string so
-	parse_str($url, $urlInfo);
-	//Retrieve registration id from end of parsed URL
-	$registrationid = $urlInfo['registration'];
+	
+    //So THIS stays here? Right, this changes based on AU
+    
+	//Maybe her eit can retrieve the reid from the table instead of generating
+   
 }
 
 // Save a record of this registration to the LRS state API.
@@ -92,6 +101,7 @@ $getregistrationdatafromlrsstate = cmi5launch_get_global_parameters_and_get_stat
 );
 $errorhtml = "<div class='alert alert-error'>".get_string('cmi5launch_notavailable', 'cmi5launch')."</div>";
 $lrsrespond = $getregistrationdatafromlrsstate->httpResponse['status'];
+
 //Unable to connect to LRS
 if ($lrsrespond != 200 && $lrsrespond != 404) {
     // Failed to connect to LRS.
@@ -203,6 +213,11 @@ if ($lrsrespond != 204) {
 $completion = new completion_info($course);
 $completion->set_module_viewed($cm);
 
-header("Location: ". cmi5launch_get_launch_url($registrationid));
+//Is it this????
+//I think it may be!!!
+
+
+header("Location: ". cmi5launch_get_launch_url($registrationid, $auID));
 
 exit;
+

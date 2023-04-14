@@ -15,18 +15,19 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Prints a particular instance of cmi5launch
+ * Prints an AUs session information annd allows retreival of session or start of new one. 
  *
- * @package mod_cmi5launch
- * @copyright  2013 Andrew Downes
+ * @copyright  2023 Megan Bohland
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require('header.php');
 
-//Classes for connecting to Progress class - MB
+//For connecting to Progress class - MB
 require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/Progress.php");
 
+global $cmi5launch;
 
 // Trigger module viewed event.
 $event = \mod_cmi5launch\event\course_module_viewed::create(array(
@@ -39,12 +40,10 @@ $event->add_record_snapshot('course_modules', $cm);
 $event->trigger();
 
 // Print the page header.
-
 $PAGE->set_url('/mod/cmi5launch/view.php', array('id' => $cm->id));
 $PAGE->set_title(format_string($cmi5launch->name));
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($context);
-
 $PAGE->requires->jquery();
 
 // Output starts here.
@@ -78,9 +77,15 @@ if ($cmi5launch->intro) { // Conditions to show the intro can change to look for
             $('#launchform_registration').val(registration);
             // Post it.
             $('#launchform').submit();
+            
+            //MB
+            //Still needed?
+            /* 
             // Remove the launch links.
             $('#cmi5launch_newattempt').remove();
             $('#cmi5launch_auSessionTable').remove();
+            */
+            
             //Add some new content.
             if (!$('#cmi5launch_status').length) {
                 var message = "<?php echo get_string('cmi5launch_progress', 'cmi5launch'); ?>";
@@ -108,47 +113,50 @@ if ($cmi5launch->intro) { // Conditions to show the intro can change to look for
     </script>
 <?php
 
-//TODO
-//Ask florian if he thinks LRS should be queired on this pae or only the previous for speed?
-//Seeing as browser opens class in diff window, might bee good to query on BOTH pages for updates
 
-//Ok, so lets see if this helps with only displaying the relevant regs
-    //
-    //I think this brings it over from previous ppae
-    //and now should we decode? YES! To make it array
-   // $relevantReg = unserialize(required_param('AU_view', PARAM_TEXT), true );
-//try with explode
-
-
-
+//Retrieve the registration AND au ID from view.php
 $fromView = required_param('AU_view', PARAM_TEXT);
+//Break it into array (AU is first index)
 $regAndId = explode(",", $fromView);
-
-//First or 0 is always auid
-//$auID = $viewArray[0];
-//maybe pop or somehting to take first and rest be the same array? 
+//Retrieve AU ID
 $auID = array_shift($regAndId);
+
+echo "<br>";
+echo"Okdokey what is AU ID? What is it coming from the previous pae as?";
+var_dump($auID);
+echo "<br>";
+
+//TODO
+//Maybe the only thing we need then is to retreive the AUID or sessionid and pull in
+//the regid rom table
+
+ // Reload cmi5 instance.
+ $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
+//Ok what is record here?
+$regid = $record->registrationid;
+echo "<br>";
+echo "Ok, what is record, we need to get regid?";
+var_dump($regid);
+echo "<br>";
 
 
 //If there were no regids there will be an array with 1 element left 
-//That element will be an mepty string.
+//That element will be an empty string.
 if ($regAndId[0] == "") {
-    $regAndId = null;//There are no relevant registrations
-}else{
-    
-} 
+    $regAndId = null; //There are no relevant registrations
+}
 
-    //if (empty($registrationid)) {
-  //  echo "<div class='alert alert-error'>" . get_string('cmi5launch_regidempty', 'cmi5launch') . "</div>";
-//}
-    //If it is NOT null there are relevent regs! To either retrieve from lrs or move over? Whats best to do this? Get
-    //on previous page or requery? Cause I reckon 
+
+//If it is NOT null there are relevent registrations
 if (!$regAndId == null) {
     
-
+    //Ok so ideally going forward this should not be one, it should be
+    //the one that is created on previous page view.php
+    //I'll take it out now, crashing is probably better than creating new ids.
+    /*
     //Start at 1, if continuing old attempt it will draw previous regid from LRS
     $registrationid = 1;
-
+*/
     $getregistrationdatafromlrsstate = cmi5launch_get_global_parameters_and_get_state(
         "http://cmi5api.co.uk/stateapikeys/registrations"
     );
@@ -171,72 +179,43 @@ if (!$regAndId == null) {
     //MB
     //bring in functions from classes cmi5Connector/Cmi5Tables
     $progress = new progress;
-
-    //bring in functions from class cmi5_table_connectors
     $getProgress = $progress->getRetrieveStatement();
 
-    //MB
-    //Ok, here is where I want to put progress in the tables here.
-    //so here is a good place to see what params are available to pass in,
-    //Hey! IS regid a tatmentid???
     if ($lrsrespond == 200) {
 
         $registrationdatafromlrs = json_decode($getregistrationdatafromlrsstate->content->getContent(), true);
 
-        //AHA! Wha tis registration data! Does it have an extra field!!!!
-       
         //Array to hold verbs and be returned
         $progress = array();
      
-        //This may be it, there are ectra in loop cause it saves every reg id but some of these verbs are for the SAME one!
-        //We need to maybe still loop through LRS
-        //WE went this way cause we dont want ALL the data from lrs I think
-        //Is there a way to remove dups from arrays????
-        //lets try
+        //Remove dupliicate registration IDs
         $regAndId = array_unique($regAndId);
-      
 
-        ///////WAIT MB
-        //What if we make a 'progress key' HERE. Then we can just pop later?
-        //Or hell, pop here!!!!
-        //Populate table with previous experiences
-        global $cmi5launch;
-       
-
-        
         //Array to hold info for table population
         $tableData = array();
 
-    //MB - below builds the table, so we need to add the header for progress here
-
-    $table = new html_table();
-    $table->id = 'cmi5launch_auSessionTable';
-    $table->caption = get_string('modulenameplural', 'cmi5launch');
-    $table->head = array(
-        get_string('cmi5launchviewfirstlaunched', 'cmi5launch'),
-        get_string('cmi5launchviewlastlaunched', 'cmi5launch'),
-        get_string('cmi5launchviewlaunchlinkheader', 'cmi5launch'),
-        get_string('cmi5launchviewprogress', 'cmi5launch'),
-
-    );
-    //THATS IT!!! It's duplicating cause itis goinng thouh ALL regs even dupes. 
-    //SO lets see if there is a way to remove dupe
-       // $regAndId = array_unique($regAndId);
-       
-        //Now what if we go through OUR array from previous page instead of theirs
-        foreach($regAndId as $regId){
+        //Build table
+        $table = new html_table();
+        $table->id = 'cmi5launch_auSessionTable';
+        $table->caption = get_string('modulenameplural', 'cmi5launch');
+        $table->head = array(
+            get_string('cmi5launchviewfirstlaunched', 'cmi5launch'),
+            get_string('cmi5launchviewlastlaunched', 'cmi5launch'),
+            get_string('cmi5launchviewprogress', 'cmi5launch'),
+            get_string('cmi5launchviewlaunchlinkheader', 'cmi5launch'),
+        );
+   
+        //Ok here, so there is nothing innnn the dan
+        //Loop through unique registration ids
+       //No longer loop, just use regid ?
+       //We still need a way to sort info from lrs, something to separate aus 
+//maybe the lmsid???
+       foreach($regAndId as $regId){
 
             //array to hold data for table
-        $sessionInfo = array();
-
-        //        foreach ($registrationdatafromlrs as $key => $item) {
-          /*  if (!is_array($registrationdatafromlrs[$key])) {
-                $reason = "Excepted array, found " . $registrationdatafromlrs[$key];
-                throw new moodle_exception($reason, 'cmi5launch', '', $warnings[$reason]);
-            }*/
-           // array_push(
-        
-           $sessionInfo [] = date_format(
+            $sessionInfo = array();
+            
+            $sessionInfo [] = date_format(
                 date_create($registrationdatafromlrs[$regId]['created']),
                 'D, d M Y H:i:s'
             );
@@ -245,51 +224,32 @@ if (!$regAndId == null) {
                 'D, d M Y H:i:s'
             );
   
-              //Create a string to pass the auid and reg to next pager (launch)
-                    $infoForNextPage = $auID . "," . $regId;
             echo "<br>";
-            echo "within the session loop, what is it here??";
-            var_dump($infoForNextPage);
-            echo "<br>";
-                
-            //YES!! Maybe I can have an array.push here and call my progress clas! So simple!!!
+echo"Okdokey what is AU ID? Wht is it goin tom the next page as?";
+var_dump($auID);
+echo "<br>";
+
+            //Create a string to pass the AU ID and registration to next page (launch.ph)
+            $infoForNextPage = $auID; // . "," . $regId;
+         
             $sessionInfo [] =
                 ("<pre>" . implode("\n ", $getProgress($regId, $cmi5launch->id)) . "</pre>");
         
-                $sessionInfo [] =  /* $registrationdatafromlrs[$regId]*/
+            $sessionInfo [] =
                 "<a tabindex=\"0\" id='cmi5relaunch_attempt'
                 onkeyup=\"key_test('" . $infoForNextPage . "')\" onclick=\"mod_cmi5launch_launchexperience('" . $infoForNextPage . "')\" style='cursor: pointer;'>"
                 . get_string('cmi5launchviewlaunchlink', 'cmi5launch') . "</a>"
            ;
         
-                //   echo "<ul><li>" . implode("</li><li>", $getProgress) . "</li></ul>";
-            //add to be fed to table
-        $tableData[] = $sessionInfo;          //to have most recent verb
-
-
+        //add to be fed to table
+        $tableData[] = $sessionInfo;         
         }
-
-  
-
-    
-
-        //Now we need 
 
         $table->data = $tableData;
 
-        //MB
-        //This builds the table, it uses a moodle made fucntion to do so,
-        //I'm going to see if its..wait, look above, it may use moodle method to build
-        //the table BUT it builds it with the data above. 
-        //So I can either try to adjust data above or try to write a script to activate
-        //on clicking a row AFTER table built
 
         echo html_writer::table($table);
 
-    
-        //Nope not this either!
-        $infoForNextPage = $auID . "," . $registrationid;
-    
         //This builds the start new reg button - MB
         // Needs to come after previous attempts so a non-sighted user can hear launch options.
         if ($cmi5launch->cmi5multipleregs) {
@@ -300,8 +260,6 @@ if (!$regAndId == null) {
                 . get_string('cmi5launch_attempt', 'cmi5launch')
                 . "</a></p>";
         }
-////////////////////////
-        
 
     } 
     //Honestly is this needed here? 
@@ -319,16 +277,17 @@ if (!$regAndId == null) {
 }
 else {
     
-    //ITs not this one causing the problem! This is what appears on empty new ones.
-
-    //This is a new attempt, set registraion id to one
+       //Ok so ideally going forward this should not be one, it should be
+    //the one that is created on previous page view.php
+    //I'll take it out now, crashing is probably better than creating new ids.
+    /*
+    //Start at 1, if continuing old attempt it will draw previous regid from LRS
     $registrationid = 1;
+*/
 
-    //Create a string to pass the auid and reg to next pager (launch)
-    $infoForNextPage = $auID . "," . $registrationid;
-    echo "what is it ON other page: is it cause the view button isn't attached to start new?";
-    var_dump($infoForNextPage);
-    echo "<br>";
+    //Create a string to pass the auid and reg to next page (launch.php)
+    $infoForNextPage = $auID; // . "," . $regId;
+   
 
     echo "<p tabindex=\"0\"
         onkeyup=\"key_test('" . $infoForNextPage . "')\"
@@ -337,15 +296,13 @@ else {
         . "')\" style=\"cursor: pointer;\">"
         . get_string('cmi5launch_attempt', 'cmi5launch')
         . "</a></p>";
-/////////////////////////////////////////
-}//End my trial if/else
+}
 
 
 // Add a form to be posted based on the attempt selected.
 ?>
     <form id="launchform" action="launch.php" method="get" target="_blank">
         <input id="launchform_registration" name="launchform_registration" type="hidden" value="default">
-
         <input id="id" name="id" type="hidden" value="<?php echo $id ?>">
         <input id="n" name="n" type="hidden" value="<?php echo $n ?>">
     </form>

@@ -223,13 +223,12 @@ class cmi5Connectors{
 
 }
 
-    ///Function to retrieve a launch URL for course
+    ///Function to retrieve a launch URL for an AU
     //@param $id -Actor id to find correct info for url request
     //@param $retUrl - returnUrl to pass to cmi5 in request
-    //@param $id -Actor id to find correct info for url request
+    //@param $auID -AU id to pass to cmi5 for url request
     //@return $url - The launch URL returned from cmi5 player
     ////////
-    //Trying somehting new, maybe just pass in id instead of above params?
     public function retrieveUrl($id, $retUrl, $auID){
 		
         global $DB;
@@ -246,46 +245,7 @@ class cmi5Connectors{
 		$playerUrl = $settings['cmi5launchplayerurl'];
 		$courseId = $record->courseid;
 
-        //MB
-        //see here right here! IT is sending 0 as in thats the plain thing?
-        //We could parse the aus and use them ehre? then iterate throught them
-        //so like func that parses is called,
-        //it returnes array?
-        //arrray iterates through them, saving to table,
-        //below here retreives ALL the urls
-        //But then like, which one does it know to return?
-        //That's where the tree comes in right?
-        //Or maybe it's not done here at all, it's done elsewhere and here 
-        //is where it picks what au it wants and sends off for launch url?
-	   	//MB
-		//needs course REsults/records 
-		//Should the retrieve aus go here?
-		//This is the retreive URL, so it can get the urls
-		//as well...
-		$courseResults = $record->courseinfo;
-	
-		//This currently retreives ana rray of the AU numbers,
-		//TODO - do we want each number to also have the entire 'au info'? Or just numbers?
-		//This needs to be a different jkind of retrieval. The retrieve URL NOW is actually creating them, this needs to ull
-        //them from tables
-        //Wait, it can have the same name riht? Cause its a local func
-        //Although should this go in tables or aus??
-
-        /* I don't think we need this we only want one au, what was passed in
-
-        $courseAus = $this->retrieveAUs($courseResults, $record);
-		//Now that we have the array get length and start getting separate URL!!!
-		$length = count($courseAus);
-		//Ok, now its an ARRAY of objects, to get au 'number' we want object->au
-		
-		for($i = 0; $i < $length; $i++){
-
-            //Here it is trying to read an au property from my array of ints
-			$au = $courseAus[$i];
-		
-
-*/
-
+        //Build URL for launch URL request
 	    $url = $playerUrl . "/api/v1/course/" . $courseId  ."/launch-url/" . $auID;
 
         //the body of the request must be made as array first
@@ -321,6 +281,9 @@ class cmi5Connectors{
         //sends the stream to the specified URL and stores results (the false is use_include_path, which we dont want in this case, we want to go to the url)
         $launchResponse = file_get_contents( $url, false, $context );
 
+        //try moving these out of func to view.php
+
+        /*
 	   //to bring in functions from class cmi5Connector
 		$connectors = new cmi5Tables;
 		$saveUrl = $connectors->getSaveURL();
@@ -329,13 +292,18 @@ class cmi5Connectors{
 
         //Save the returned info to the correct table
 		$saveUrl($id, $launchResponse, $returnUrl, $homepage);
-		
+		*/
 		//Only return the URL
 		$urlDecoded = json_decode($launchResponse, true);
-		$url = $urlDecoded['url'];
+		//$url = $urlDecoded['url'];
 	//};//end of my trial for length new url thingy
         //return response
-        return $url;
+
+        //What is we return the launch response? 
+        /////// changing to return plain launchresponsereturn $url;
+
+        return $urlDecoded;
+
     }
 
 

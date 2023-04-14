@@ -15,16 +15,14 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Prints a particular instance of cmi5launch
- *
- * @package mod_cmi5launch
- * @copyright  2013 Andrew Downes
+ * Displays the AU's of a course and their progress
+ * @copyright  2023 Megan Bohland
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require('header.php');
 
-//For connecting to Progress class - MB
+//For connecting to Progress class 
 require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/Progress.php");
 
 //Classes for connecting to CMI5 player
@@ -35,11 +33,13 @@ require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/ausHelpers.php");
 //bring in functions from classes cmi5Connector/Cmi5Tables
 $progress = new progress;
 $auHelper = new Au_Helpers;
-//bring in functions from class cmi5_table_connectors and AU helpers
+//bring in functions from class Progress and AU helpers
 $getProgress = $progress->getRetrieveStatement();
 $createAUs = $auHelper->getCreateAUs();
 $connectors = new cmi5Connectors;
 $tables = new cmi5Tables;
+
+global $cmi5launch;
 
 // Trigger module viewed event.
 $event = \mod_cmi5launch\event\course_module_viewed::create(array(
@@ -58,19 +58,14 @@ $PAGE->set_context($context);
 
 $PAGE->requires->jquery();
 
-
 // Output starts here.
 echo $OUTPUT->header();
-
-global $cmi5launch;
 
 // Reload cmi5 instance.
 $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
 
 //Retrieve saved AUs
 $auList = json_decode($record->aus, true);
-
-
 $aus = $createAUs($auList);
 
 if ($cmi5launch->intro) { 
@@ -97,27 +92,23 @@ if ($cmi5launch->intro) {
             }
         }
 
-        //Maybe another function? Gosh will we need another launch PAGE
-        //Probably not, an if/else should help
-        
-        //function to be run on onclick
-        // Function to run when the experience is launched.
+        // Function to run when the experience is launched (on click).
         function mod_cmi5launch_launchexperience(registrationInfo) {
-            //THIS is where the next page gets the thingy!!!!
+
             // Set the form paramters.
             $('#AU_view').val(registrationInfo);
-            //Can I set MORE params here? Same way?
-            //Or do I need to? Is just it being passed in enough?
-            //Or can we have both and filter with it, I can change wha tis 
-            //passed in
 
             // Post it.
             $('#launchform').submit();
+
+            //TODO, remove these? 
             // Remove the launch links.
+/*
             $('#cmi5launch_autable').remove();////
             $('#cmi5launch_newattempt').remove();
             $('#cmi5launch_attempttable').remove();
             $('#cmi5launch_attempt').remove();
+  */
             //Add some new content.
             if (!$('#cmi5launch_status').length) {
                 var message = "<? echo get_string('cmi5launch_progress', 'cmi5launch'); ?>";
@@ -138,9 +129,8 @@ if ($cmi5launch->intro) {
         //*/
 
         // TODO: there may be a better way to check completion. Out of scope for current project.
-        //MB
-        //Someone elses TODO! But this IS in scope of THIS? PromiseRejectionEvent//
-        //Maybe a good place to put the red/green/yellow update stuff
+        //MB - Someone elses todo, may be worth looking into
+    
         $(document).ready(function() {
             setInterval(function() {
                 $('#cmi5launch_completioncheck').load('completion_check.php?id=<?php echo $id ?>&n=<?php echo $n ?>');
@@ -148,24 +138,111 @@ if ($cmi5launch->intro) {
         });
     </script>
 <?php
+//This will change eventually, because we always want it to be one thing and that one thing generated
+//on this page
 
 //Start at 1, if continuing old attempt it will draw previous regid from LRS
-$registrationid = 1;
+//$registrationid = 1;
 
-//No longer needed?
+//THIS should be what we need! Moved it from launch.php
+
+
+//to bring in functions from class cmi5Connector
+$connectors = new cmi5Connectors;
+
+//Get retrieve URL function
+$retrieveUrl = $connectors->getRetrieveUrl();
+//Build url to pass as returnUrl
+$returnUrl = $CFG->wwwroot .'/mod/cmi5launch/view.php'. '?id=' .$cm->id;
+
+//Because we want to use the cmi5 to create the reg id we need to get it from
+//the launch url request. We will send it au id 0, this will create a base launch url
+//on the whole course. since 0 is beginning index
+$auID = 0;
+
+//to bring in functions from class cmi5Connector
+$connectors = new cmi5Tables;
+$saveUrl = $connectors->getSaveURL();
+
+
+//Retrieve launch URL from CMI5 player (this is the URL used to retrieve the course and regid)
+$urlDecoded = $retrieveUrl($cmi5launch->id, $returnUrl, $auID); 
+
+//Retreive the url from launch response
+////Nermind, its decoded in retrievURl before returning
+//$urlDecoded = json_decode($launchResponse, true);
+
+
+$url = $urlDecoded['url'];
+
+
+//urlInfo is one big string so
+ parse_str($url, $urlInfo);
+
+ //Cmi5 is always goin to return a regid, we only want the first one
+ //So check if one has been saved yet, if NOT then csaaave
+if ($record->registrationid == null) {
+
+
+
+    //Retrieve registration id from end of parsed URL
+    $registrationid = $urlInfo['registration'];
+    ///AHA!! IT's making this dang thing everytime
+//AHYA
+//What is we check if record->registrationid has something there or not
+
+    //Ok, the urlinfo we are passing in doesn't seem to be the same as what we are replacing
+    //so like it looks like it is looking for info like the course return info, but it's ok to be blank right?
+    //cause like...it's saving it in other places too. maybe wrap in a try catch?
+
+    //Save the returned info to the correct table
+    $saveUrl($cmi5launch->id, $urlDecoded, $returnUrl, $registrationid);
+
+
+    //Now this is the regid we want to use THROUGHOUT, and we will
+    //need to use the way we retreive as well to take off the old ones
+    //because unfortauntely each launch request will come with regid
+
+    //Ok, the regid is saved to the tableeee cmi5launch_player in the above
+    // 'retrieveURL func. In it, after retreivin the url, it also saves infop to the taBLE WITH SAVEurls
+
+    //Interesting, it is saving to CMI5Launch_player. I reckon we should save it  to cmi5l;aunch
+//you know what? Lets just make a function if import record doesn't work! I mean we are just savin to a table, 
+//no bigggee
+    $table = "cmi5launch";
+    //Update RegID
+    $record->registrationid = $registrationid;
+    //Update the DB
+    $DB->update_record($table, $record, true);
+}else{
+    $registrationid = $record->registrationid;
+}
+
+echo "<br>";
+echo "Ok, what is , we need to get regid?";
+var_dump($registrationid);
+echo "<br>";
+
+//Ok, so what is being sent that we are etting a 404?
 
 $getregistrationdatafromlrsstate = cmi5launch_get_global_parameters_and_get_state(
     "http://cmi5api.co.uk/stateapikeys/registrations"
 );
-/*
+
+//echo "OK, where is the reg bein made? what is registration data here? ";
+//var_dump($getregistrationdatafromlrsstate);
+//echo "<br>";
+
+//I think we need to let it go forward on a 404, because it 404s if no data is saved yet
+//But maybe now that the reg 
+
 $lrsrespond = $getregistrationdatafromlrsstate->httpResponse['status'];
-*/
-//echo "What is lrs respond??";
-//var_dump($lrsrespond);
 
-/*
+    //Array to hold info for table population
+    $tableData = array();
 
-if ($lrsrespond != 200 /* && $lrsrespond != 404) {
+
+if ($lrsrespond != 200 && $lrsrespond != 404) {
     // On clicking new attempt, save the registration details to the LRS State and launch a new attempt.
     echo "<div class='alert alert-error'>" . get_string('cmi5launch_notavailable', 'cmi5launch') . "</div>";
 
@@ -178,87 +255,97 @@ if ($lrsrespond != 200 /* && $lrsrespond != 404) {
     die();
 }
 
-if ($lrsrespond == 200) { 
-    */
-    /*
-echo "<br>";
-echo "I am so confused, what is this???";
-var_dump($getregistrationdatafromlrsstate);
-*/
+//if ($lrsrespond == 200) {
+
     //Get session info from LRS
     $registrationdatafromlrs = json_decode($getregistrationdatafromlrsstate->content->getContent(), true);
-	
+
+    echo "OK, what does it have here?  ";
+    var_dump($registrationdatafromlrs);
+    echo "<br>";
+//    echo "OK, does it have id ";
+//var_dump($cmi5launch->id);
+//echo "<br>";
+
     //We need id to get progress
-	global $cmi5launch;
     $cmid = $cmi5launch->id;
 
-       ////Ok so I dont think we want this, I checked with Florian, after its pretty I'll verify with Andy
-   // For now...
-   /*
+    ////Wait to see about meeting today, this may be needed. It's the start reg
+    /*
     // Needs to come after previous attempts so a non-sighted user can hear launch options.
     if ($cmi5launch->cmi5multipleregs) {
-        echo "<p id='cmi5launch_newattempt'><a tabindex=\"0\"
-        onkeyup=\"key_test('".$registrationid ."')\" onclick=\"mod_cmi5launch_launchexperience('"
-            . $registrationid 
-            . "')\" style=\"cursor: pointer;\">"
-            . get_string('cmi5launch_attempt', 'cmi5launch')
-            . "</a></p>";
+    echo "<p id='cmi5launch_newattempt'><a tabindex=\"0\"
+    onkeyup=\"key_test('".$registrationid ."')\" onclick=\"mod_cmi5launch_launchexperience('"
+    . $registrationid 
+    . "')\" style=\"cursor: pointer;\">"
+    . get_string('cmi5launch_attempt', 'cmi5launch')
+    . "</a></p>";
     }
     */
 
+    //Create table
+    $table = new html_table();
+    $table->id = 'cmi5launch_autable';
+    $table->caption = get_string('AUtableheader', 'cmi5launch');
+    $table->head = array(
+        get_string('cmi5launchviewAUname', 'cmi5launch'),
+        get_string('cmi5launchviewstatus', 'cmi5launch'),
+        get_string('cmi5launchviewregistrationheader', 'cmi5launch'),
 
-//Here is where the table is outlined
-$table = new html_table();
-//MB
-//I think I will change the table id, doesn't seem to be defined elsewhere
-$table->id = 'cmi5launch_autable';
-$table->caption = get_string('AUtableheader', 'cmi5launch');
-$table->head = array(
-    get_string('cmi5launchviewAUname', 'cmi5launch'),
-    get_string('cmi5launchviewstatus', 'cmi5launch'),
-    get_string('cmi5launchviewregistrationheader', 'cmi5launch'),
+    );
 
-);
+    //Get the LRS info
+    $getLRS = $progress->getRequestLRSInfo();
 
 
-//Get the LRS info
-$getLRS = $progress->getRequestLRSInfo();
 
-//Array to hold info for table population
-$tableData = array();
+    //Retrieve LRS session info
+    $resultDecoded = $getLRS($registrationdatafromlrs, $cmid);
 
-//Retrieve LRS session info
-$resultDecoded = $getLRS($registrationdatafromlrs, $cmid);
+    //For each au
+    foreach ($aus as $key => $item) {
+echo"<br>";
+    echo "Ok, what is key here? --------";
+    var_dump($key);
+    echo"<br>";
+echo"And what is item??? @@@@@@";
+    var_dump($item);
+    echo"<br>";
 
-//For each au
-foreach ($aus as $key => $item) {
-    //Retrieve individual AU as array
-    $au = (array)($aus[$key]);
-  
-    //Verify object
-    if (!is_array($au)) {
-        $reason = "Excepted array, found " . $au;
-        throw new moodle_exception($reason, 'cmi5launch', '', $warnings[$reason]);
-    }
 
-    //Match on lmsId. This ties the au to the session info from LRS.
-    //It matches Object->id from lrs chunked
-    $auId = $au['lmsId'];
-	
-    //Loop through the statements and match with the LRS statments whose object/id matches the aus lmsID
-    //Array to hold list of relevant registrations
-    $relevantReg = array();
+        //Retrieve individual AU as array
+        $au = (array) ($aus[$key]);
 
-    //This is the info back from the lrs
-    foreach($resultDecoded as $result => $i){
+        //Verify object
+        if (!is_array($au)) {
+            $reason = "Excepted array, found " . $au;
+            throw new moodle_exception($reason, 'cmi5launch', '', $warnings[$reason]);
+        }
+
+        //Retrieve AU's lmsID
+        $auId = $au['lmsId'];
+        
+        
+        //Loop through the statements and match with the LRS statments whose object/id matches the aus lmsID
+        //Match on lmsId. This ties the au to the session info from LRS.
+        //It matches Object->id from lrs chunked
+        
+        //Array to hold list of relevant registrations
+        //todo
+        //sOOOO, WE NOlonger need to keep a lis tof registrations but insteD
+        //MAYBE ON LMS id? or CONTEXT>EXT>SESSIONid
+        $relevantReg = array();
+
+        //This is the info back from the lrs
+        foreach ($resultDecoded as $result => $i) {
             //i is each separate statement
             //We don't know the regid, but need it because it's the first array key, 
             //so simply retrieve the key itself.
             //current regid
             $regid = array_key_first($i);
 
-            //If the lmsId matches the object id, then this reg is applicable to this au 
-            if($auId==$i[$regid][0]["object"]["id"]){
+            //If the lmsId matches the object id, then this registration is applicable to this au 
+            if ($auId == $i[$regid][0]["object"]["id"]) {
 
                 //Therefore we want this verb
                 $getVerb = $progress->retrieveVerbs($i, $regid);
@@ -267,114 +354,83 @@ foreach ($aus as $key => $item) {
 
                 $relevantReg[] = $regid;
             }
-    }
+        }
 
-    //Retreive AUs moveon specification
-    $auMoveon = $au['moveOn'];
+        //Retreive AUs moveon specification
+        $auMoveon = $au['moveOn'];
         //If moveon is not applicable, then we don't need to check it's progress, it's just viewed or not
         if ($auMoveon == "NotApplicable") {
-                $auStatus = "viewed";
-        }
-        else{
-    //If relevant registrations are not null, then it found some session ids. If those exist then this
-    //AU has been launched and is therefore 'in progress' or 'completed'
-    //If this IS NULL then the AU has not been attempted and we can mark it as such
+            $auStatus = "viewed";
+        } else {
+            //If relevant registrations are not null, then it found some session ids. If those exist then this
+            //AU has been launched and is therefore 'in progress' or 'completed'
+            //If this IS NULL then the AU has not been attempted and we can mark it as such
             if (!$relevantReg == null) {
 
                 $getCompleted = $progress->getCompletion();
 
                 $completed = $getCompleted($auMoveon, $verbs);
 
-            //If completed is returned true we move on. If not, its in progress
-                if($completed == true){
+                //If completed is returned true we move on. If not, its in progress
+                if ($completed == true) {
 
                     $auStatus = "Completed";
-                }
-                else{
-                
+                } else {
+
                     $auStatus = "In Progress";
                 }
 
             }
             //If relevenat reg is null than this is not attmepted
-            else{
-                    $auStatus = "Not attempted";
+            else {
+                $auStatus = "Not attempted";
             }
 
-    }
-    
-    //List of verbs that may apply toward completuion
-    $verbs = array();
+        }
 
-    //Create array of info to place in tablee
-    $auInfo = array();
+        //List of verbs that may apply toward completion
+        $verbs = array();
 
-    
+        //Create array of info to place in table
+        $auInfo = array();
 
-        //Assign au name and progress
-    $auInfo [] = $au['title'][0]['text'];
-    $auInfo[] = ($auStatus);
+        //Assign au name, progress, and index
+        $auInfo[] = $au['title'][0]['text'];
+        $auInfo[] = ($auStatus);
+        $auIndex = $au['auIndex'];
 
-
-
-    //So HERE we want it to only pull up the AUs info, maybe pass in
-    //instead of view? 
-
-    //Maybe pass it the au indeex?? I dunno
-    //Au index IS needed tto call riht course though right!
-    $auIndex = $au['auIndex'];
-
-    //Well could I pass as a string?
-    //A JSON ENCODED strin!
-     //   $regForAUview = json_encode($relevantReg);
-        //Because it is a string Jquery, he qoutation marks from json encode are causing an issue.
-        //Other eays? Maybe fla changes or serialize?
-       // $regForAUview = serialize($relevantReg);
-        //NO still qoutes, lets rty implode and use a character that 
-        //shouldnt mess with html
-        $regForAUview = implode(",", $relevantReg);
-        //We should be able to explode again riht? 
-        //I think we have a winner! LEts just see if we can appropriately adjust on next page
-       //If I pass relevantReg through here, will htat make it avaialbel to auviews?
-    //maybe only show THESE
-        //ReleventRe needs to be a string itself so it can all be one string to go to next pae throuh jquery 
-        
-    $regForNextPage = implode(',', $relevantReg);
+        //ReleventReg and AU index needs to be a string to pass as variable to next page
+        $regForNextPage = implode(',', $relevantReg);
         $infoForNextPage = $auIndex . "," . $regForNextPage;
-        
-//Assign au link to auviews
-    $auInfo [] = "<a tabindex=\"0\" id='cmi5relaunch_attempt'
-    onkeyup=\"key_test('". $infoForNextPage . "')\" onclick=\"mod_cmi5launch_launchexperience('". $infoForNextPage .  "')\" style='cursor: pointer;'>"
-    . get_string('cmi5launchviewlaunchlink', 'cmi5launch') . "</a>"
-    ;   
-    
-    //add to be fed to table
-    $tableData[] = $auInfo;
-   
-}
 
+        //Assign au link to auviews
+        $auInfo[] = "<a tabindex=\"0\" id='cmi5relaunch_attempt'
+    onkeyup=\"key_test('" . $infoForNextPage . "')\" onclick=\"mod_cmi5launch_launchexperience('" . $infoForNextPage . "')\" style='cursor: pointer;'>"
+            . get_string('cmi5launchviewlaunchlink', 'cmi5launch') . "</a>"
+        ;
+
+        //add to be fed to table
+        $tableData[] = $auInfo;
+
+    }
 //This feeds the table, note registrationdatafromlrs is an OBJECT
 $table->data = $tableData;
-//Ok, this makes the table:
+
 echo html_writer::table($table);
+//} old if end
+
+
 
 ///////////////} 
 /*
 else {
 */
     //MB 
-    //I think this is the issue, the table actually SHOULDN'T be empty, it still needs to display au and their progress/view link
-    ///So just remove else? 
-    //No registrations, the table should be empty but still needs to be created
-   //It IS passing in registrationid! That's why its one! Soooooo
-   //Maybe 
-
-
-   ////Ok so I dont think we want this, I checked with Florian, after its pretty I'll verify with Andy
-   // For now...
+   //Check with Andy and Florian on this in meeting today. It's the start new registration button
    /*
    //Start new button/ if we keep this, just um be AU 0 and start from 0?
-$auID = "0";
+    //If we keep what auID do we want? 
+   $auID = "0";
 $registrationid = "1";
 //If auid is first always then it doesn't matter how many reg
 //they are naything after 0
@@ -394,8 +450,6 @@ $infoForNextPage = implode(",", $info);
 */
 
 // Add a form to be posted based on the attempt selected.
-//I don't think we need this, posting a form would be to activate launch.php and
-//we are really just linking yeah? 
 ?>
 
  

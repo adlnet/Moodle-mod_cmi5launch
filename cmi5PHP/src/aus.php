@@ -1,16 +1,35 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ *Class to handle Assignable Units 
+ *
+ * @copyright  2023 Megan Bohland
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 class Au {
   // Properties
   public $id, $url, $type, $lmsId = [], $title, $moveOn, $auIndex, $parents, $objectives, $description = [], $activityType, $launchMethod, $masteryScore;
 
+  //These may be needed later if AU's become part of a block to keep track of 
+  //being finished.
   public $progress;
   
-  public $completed2, $passed2, $inProgress2, $noAttempt = true|false;
-
-  //So here I will check for the first two verbs and update them if found
-  //I will dump all info in info
-  //If they are not found I will dump into the third
-  //If none found it will just be no attempt
+  public  $noAttempt = true|false;
   public $completed = array('finished'=> true|false, 'info' =>"");
   public $passed = array('finished'=> true|false, 'info' =>"");
   public $inProgress = array('finished'=> true|false, 'info' =>"");
@@ -23,26 +42,12 @@ class Au {
     return $this->name;
   }
 
-//Should a function to evluate progress be here? Or just to change the 
-//true/false properties?
-
-
-//feed the construct an array of statement(s)
-//WAIT, if this is called individually, then feed it ONE group of statement
+//Constructs AUs. IS fed array and where array key matches property, sets the property.  
 function __construct($statement){
 
-  //why didn't i make comments?!?! UGH
-  //I THINK this is taking an array and assigning the arrays values to it's keys
-  //I assume these are saving if the keys mactch the AU properties
   foreach($statement as $key => $value){
     
-    //The problem is the key is showing as 0 when its passed in
-   
-///Hmmmmmmm it is duplicationin everything
     $this->$key = ($value);
-
-
-  
 	}	
 
 }

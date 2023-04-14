@@ -28,6 +28,11 @@
 defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->dirroot/mod/cmi5launch/lib.php");
 
+//Classes for connecting to CMI5 player
+require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/cmi5Connector.php");
+require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/cmi5_table_connectors.php");
+
+
 /**
  * Send a statement that the activity was launched.
  * This is useful for debugging - if the 'launched' statement is present in the LRS, you know the activity was at least launched.
@@ -124,7 +129,7 @@ function cmi5_launched_statement($registrationid) {
  * @param string/UUID $registrationid The cmi5 Registration UUID associated with the launch.
  * @return string launch link including querystring.
  */
-function cmi5launch_get_launch_url($registrationuuid) {
+function cmi5launch_get_launch_url($registrationuuid, $auID) {
     global $cmi5launch, $CFG, $DB;
     $cmi5launchsettings = cmi5launch_settings($cmi5launch->id);
     $expiry = new DateTime('NOW');
@@ -166,9 +171,36 @@ function cmi5launch_get_launch_url($registrationuuid) {
             break;
     }
 
-	//Retrieve launch url
+
+    echo "<br>";
+    echo"Ok what is regid and why is it not finding record? Cause I took away saveurl?";
+    var_dump($registrationuuid);
+    echo "<br>";
+
+    //Retrieve launch url
+    //HERE! It is getting the url
+    //Which we cnahged tpo get reg, at sopme point it needs to change back....
 	$record = $DB->get_record("cmi5launch_player", array('registrationid' => $registrationuuid));
-	$rtnstring = $record->launchurl;
+
+//yeah we ill pass in au id here and call url ourselves.instead of pulling from table
+//    $rtnstring = $record->launchurl;
+//yeah we need to save it to the other table OR use the reg table??
+
+//to bring in functions from class cmi5Connector
+$connectors = new cmi5Connectors;
+
+//Get retrieve URL function
+$retrieveUrl = $connectors->getRetrieveUrl();
+
+//Maybe its own func?? or we can get this url from table (return)
+//Retrieve launch URL from CMI5 player (this is the URL used to retrieve the course and regid)
+$returnUrl = $record->returnurl;
+
+//and well brin in auid from previous pae
+$urlDecoded = $retrieveUrl($cmi5launch->id, $returnUrl, $auID); 
+
+//returns launch response, get url from it
+$rtnstring = $urlDecoded['url'];
 
 	return $rtnstring;
 }
