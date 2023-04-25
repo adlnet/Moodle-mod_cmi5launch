@@ -34,7 +34,6 @@ require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/ausHelpers.php");
 $progress = new progress;
 $auHelper = new Au_Helpers;
 //bring in functions from class Progress and AU helpers
-$getProgress = $progress->getRetrieveStatement();
 $createAUs = $auHelper->getCreateAUs();
 $connectors = new cmi5Connectors;
 $tables = new cmi5Tables;
@@ -138,109 +137,43 @@ if ($cmi5launch->intro) {
         });
     </script>
 <?php
-//This will change eventually, because we always want it to be one thing and that one thing generated
-//on this page
-
-//Start at 1, if continuing old attempt it will draw previous regid from LRS
-//$registrationid = 1;
-
-//THIS should be what we need! Moved it from launch.php
-
 
 //to bring in functions from class cmi5Connector
 $connectors = new cmi5Connectors;
 
-//Get retrieve URL function
-$retrieveUrl = $connectors->getRetrieveUrl();
+
 //Build url to pass as returnUrl
 $returnUrl = $CFG->wwwroot .'/mod/cmi5launch/view.php'. '?id=' .$cm->id;
 
-//Because we want to use the cmi5 to create the reg id we need to get it from
-//the launch url request. We will send it au id 0, this will create a base launch url
-//on the whole course. since 0 is beginning index
-$auID = 0;
+//Should never be null
+if ( $record->registrationid == null) {
 
-//to bring in functions from class cmi5Connector
-$connectors = new cmi5Tables;
-$saveUrl = $connectors->getSaveURL();
-
-
-//Retrieve launch URL from CMI5 player (this is the URL used to retrieve the course and regid)
-$urlDecoded = $retrieveUrl($cmi5launch->id, $returnUrl, $auID); 
-
-//Retreive the url from launch response
-////Nermind, its decoded in retrievURl before returning
-//$urlDecoded = json_decode($launchResponse, true);
-
-
-$url = $urlDecoded['url'];
-
-
-//urlInfo is one big string so
- parse_str($url, $urlInfo);
-
- //Cmi5 is always goin to return a regid, we only want the first one
- //So check if one has been saved yet, if NOT then csaaave
-if ($record->registrationid == null) {
-
-
-
-    //Retrieve registration id from end of parsed URL
-    $registrationid = $urlInfo['registration'];
-    ///AHA!! IT's making this dang thing everytime
-//AHYA
-//What is we check if record->registrationid has something there or not
-
-    //Ok, the urlinfo we are passing in doesn't seem to be the same as what we are replacing
-    //so like it looks like it is looking for info like the course return info, but it's ok to be blank right?
-    //cause like...it's saving it in other places too. maybe wrap in a try catch?
-
-    //Save the returned info to the correct table
-    $saveUrl($cmi5launch->id, $urlDecoded, $returnUrl, $registrationid);
-
-
-    //Now this is the regid we want to use THROUGHOUT, and we will
-    //need to use the way we retreive as well to take off the old ones
-    //because unfortauntely each launch request will come with regid
-
-    //Ok, the regid is saved to the tableeee cmi5launch_player in the above
-    // 'retrieveURL func. In it, after retreivin the url, it also saves infop to the taBLE WITH SAVEurls
-
-    //Interesting, it is saving to CMI5Launch_player. I reckon we should save it  to cmi5l;aunch
-//you know what? Lets just make a function if import record doesn't work! I mean we are just savin to a table, 
-//no bigggee
-    $table = "cmi5launch";
-    //Update RegID
-    $record->registrationid = $registrationid;
-    //Update the DB
-    $DB->update_record($table, $record, true);
-}else{
-    $registrationid = $record->registrationid;
+	echo "<p>Error attempting to get registration ID from DB. Registration ID is :  </p>";
+     echo "<pre>";
+     var_dump($record->registrationid);
+     echo "</pre>";
+	
+} else{
+	//Get registration id from record (it was made when course was)
+	$registrationID = $record->registrationid; 
 }
 
-echo "<br>";
-echo "Ok, what is , we need to get regid?";
-var_dump($registrationid);
-echo "<br>";
+    $table = "cmi5launch";
+    //Save the returnurl
+	$record->returnurl = $returnUrl;
+    //Update RegID
+    //Update the DB
+    $DB->update_record($table, $record, true);
 
-//Ok, so what is being sent that we are etting a 404?
-
+//Retreive LRS info    
 $getregistrationdatafromlrsstate = cmi5launch_get_global_parameters_and_get_state(
     "http://cmi5api.co.uk/stateapikeys/registrations"
 );
-
-//echo "OK, where is the reg bein made? what is registration data here? ";
-//var_dump($getregistrationdatafromlrsstate);
-//echo "<br>";
-
-//I think we need to let it go forward on a 404, because it 404s if no data is saved yet
-//But maybe now that the reg 
-
+//Parse for http response
 $lrsrespond = $getregistrationdatafromlrsstate->httpResponse['status'];
 
-    //Array to hold info for table population
-    $tableData = array();
-
+//Array to hold info for table population
+$tableData = array();
 
 if ($lrsrespond != 200 && $lrsrespond != 404) {
     // On clicking new attempt, save the registration details to the LRS State and launch a new attempt.
@@ -255,64 +188,32 @@ if ($lrsrespond != 200 && $lrsrespond != 404) {
     die();
 }
 
-//if ($lrsrespond == 200) {
+//Get session info from LRS
+//If there is no previous attempts, this will return a 404 error, no state found.
+//So we do not necessarilly need a 200 response.
+$registrationdatafromlrs = json_decode($getregistrationdatafromlrsstate->content->getContent(), true);
 
-    //Get session info from LRS
-    $registrationdatafromlrs = json_decode($getregistrationdatafromlrsstate->content->getContent(), true);
+//We need id to get progress
+$cmid = $cmi5launch->id;
 
-    echo "OK, what does it have here?  ";
-    var_dump($registrationdatafromlrs);
-    echo "<br>";
-//    echo "OK, does it have id ";
-//var_dump($cmi5launch->id);
-//echo "<br>";
+//Create table
+$table = new html_table();
+$table->id = 'cmi5launch_autable';
+$table->caption = get_string('AUtableheader', 'cmi5launch');
+$table->head = array(
+	get_string('cmi5launchviewAUname', 'cmi5launch'),
+	get_string('cmi5launchviewstatus', 'cmi5launch'),
+	get_string('cmi5launchviewregistrationheader', 'cmi5launch'),
 
-    //We need id to get progress
-    $cmid = $cmi5launch->id;
+);
 
-    ////Wait to see about meeting today, this may be needed. It's the start reg
-    /*
-    // Needs to come after previous attempts so a non-sighted user can hear launch options.
-    if ($cmi5launch->cmi5multipleregs) {
-    echo "<p id='cmi5launch_newattempt'><a tabindex=\"0\"
-    onkeyup=\"key_test('".$registrationid ."')\" onclick=\"mod_cmi5launch_launchexperience('"
-    . $registrationid 
-    . "')\" style=\"cursor: pointer;\">"
-    . get_string('cmi5launch_attempt', 'cmi5launch')
-    . "</a></p>";
-    }
-    */
-
-    //Create table
-    $table = new html_table();
-    $table->id = 'cmi5launch_autable';
-    $table->caption = get_string('AUtableheader', 'cmi5launch');
-    $table->head = array(
-        get_string('cmi5launchviewAUname', 'cmi5launch'),
-        get_string('cmi5launchviewstatus', 'cmi5launch'),
-        get_string('cmi5launchviewregistrationheader', 'cmi5launch'),
-
-    );
-
-    //Get the LRS info
-    $getLRS = $progress->getRequestLRSInfo();
-
-
-
-    //Retrieve LRS session info
-    $resultDecoded = $getLRS($registrationdatafromlrs, $cmid);
+//Get the LRS info (progress)
+//Retrieve LRS session info
+$getLRS = $progress->getRequestLRSInfo();
+$resultDecoded = $getLRS($registrationdatafromlrs, $cmid);
 
     //For each au
     foreach ($aus as $key => $item) {
-echo"<br>";
-    echo "Ok, what is key here? --------";
-    var_dump($key);
-    echo"<br>";
-echo"And what is item??? @@@@@@";
-    var_dump($item);
-    echo"<br>";
-
-
         //Retrieve individual AU as array
         $au = (array) ($aus[$key]);
 
@@ -324,8 +225,14 @@ echo"And what is item??? @@@@@@";
 
         //Retrieve AU's lmsID
         $auId = $au['lmsId'];
-        
-        
+/*
+	echo "<br>";
+	echo "<br>";
+	echo "Okey pokey, what is auID aka lmsId?";
+	var_dump($auId);
+	echo "<br>";
+	echo "<br>";
+*/
         //Loop through the statements and match with the LRS statments whose object/id matches the aus lmsID
         //Match on lmsId. This ties the au to the session info from LRS.
         //It matches Object->id from lrs chunked
@@ -334,25 +241,29 @@ echo"And what is item??? @@@@@@";
         //todo
         //sOOOO, WE NOlonger need to keep a lis tof registrations but insteD
         //MAYBE ON LMS id? or CONTEXT>EXT>SESSIONid
-        $relevantReg = array();
+      ///Trying with object oid 
+	   $relevantObjId = array();
 
         //This is the info back from the lrs
         foreach ($resultDecoded as $result => $i) {
-            //i is each separate statement
-            //We don't know the regid, but need it because it's the first array key, 
-            //so simply retrieve the key itself.
-            //current regid
-            $regid = array_key_first($i);
+/*
+		echo "<br>";
+	echo "Annnnd as we loop through resultDecoded, what is i[$registrationID][0][object][id]  aka objectId";
+	var_dump($i[$registrationID][0]["object"]["id"]);
+	echo "<br>";
+	*/
 
             //If the lmsId matches the object id, then this registration is applicable to this au 
-            if ($auId == $i[$regid][0]["object"]["id"]) {
+           //Maybe oinstead of re array we use object id? or lmsid? Lets try object??		  
+		 if ($auId == $i[$registrationID][0]["object"]["id"]) {
 
                 //Therefore we want this verb
-                $getVerb = $progress->retrieveVerbs($i, $regid);
+                $getVerb = $progress->retrieveVerbs($i, $registrationID);
 
                 $verbs[] = $getVerb;
 
-                $relevantReg[] = $regid;
+			 //Would this still work with the registration id?
+            	 $relevantObjId[] = $i[$registrationID][0]["object"]["id"];
             }
         }
 
@@ -365,7 +276,9 @@ echo"And what is item??? @@@@@@";
             //If relevant registrations are not null, then it found some session ids. If those exist then this
             //AU has been launched and is therefore 'in progress' or 'completed'
             //If this IS NULL then the AU has not been attempted and we can mark it as such
-            if (!$relevantReg == null) {
+     //hmmm we may needa diff if here
+	///Trying with object id array instead
+	       if (!$relevantObjId == null) {
 
                 $getCompleted = $progress->getCompletion();
 
@@ -400,7 +313,8 @@ echo"And what is item??? @@@@@@";
         $auIndex = $au['auIndex'];
 
         //ReleventReg and AU index needs to be a string to pass as variable to next page
-        $regForNextPage = implode(',', $relevantReg);
+      ///Trying with object id  
+	   $regForNextPage = implode(',', $relevantObjId);
         $infoForNextPage = $auIndex . "," . $regForNextPage;
 
         //Assign au link to auviews

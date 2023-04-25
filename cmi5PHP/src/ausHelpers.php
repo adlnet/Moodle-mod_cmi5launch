@@ -47,21 +47,16 @@ class Au_Helpers {
 			//So it should be fed an array of statements that then assigns the values to 
 			//several aus, and then returns the au objects! (array of objects)
 
-			//MNeeds to return our new AU objects
+			//Needs to return our new AU objects
 			$newAus = array();
 
-			//Maybe a foreach would be betteR?
-			//First get length of array passed in...wait not needed with a foreach?
 			//for ($i = 0; $i < count($auStatements); $i++) {
 			foreach($auStatements as $int => $info){
 			
-				//No it IS needed! beacuase we want to do this for each statment
 				//The aus come back decoded from DB nestled in an array, so they are the first key,
 				//which is '0'
 				$statement = $info[0];
 			
-			//The statement is still nestled in a 0, that 0 is the first key....why?
-
 				//Maybe just combine 45 and 48? TODO
 				$au = new au($statement);
 				

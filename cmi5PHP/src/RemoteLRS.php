@@ -364,9 +364,10 @@ class RemoteLRS implements LRSInterface
         }
 
         //Ok, trial- MB
-        global $DB;
+       //Triaal for what megan? smh
+        // global $DB;
 
-        $DB->set_field("trial", "statement", $statement, null);
+       // $DB->set_field("trial", "statement", $statement, null);
 
         ///////
 
@@ -389,7 +390,7 @@ class RemoteLRS implements LRSInterface
         }
 
         $response = $this->sendRequest($method, 'statements', $requestCfg);
-
+        
         if ($response->success) {
             if (! $statement->hasId()) {
                 $parsed_content = json_decode($response->content, true);
@@ -456,6 +457,9 @@ class RemoteLRS implements LRSInterface
         return $response;
     }
 
+    //TODO INVEST
+    //
+    //Is this a freaking retreiveStatment, like I made for progress?
     public function retrieveStatement($id, $options = array()) {
         if (! isset($options['voided'])) {
             $options['voided'] = false;

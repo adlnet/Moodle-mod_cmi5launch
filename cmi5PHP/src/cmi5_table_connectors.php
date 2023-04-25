@@ -210,16 +210,8 @@ echo "<br>";
     *////////    
     public function populateTable($record, $table)
     {
-/*
-	echo"<br>";
-	echo"<br>";
-	echo"Pop table entered";
-	echo"Record AUS are : -------- . " . $record->aus;
-	echo"<br>";
-	echo"<br>";
-  
-	*/
-	global $DB;
+
+	    global $DB;
         //Id to create/update record
         $id = $record->id;
         

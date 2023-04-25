@@ -170,39 +170,28 @@ function cmi5launch_get_launch_url($registrationuuid, $auID) {
             $basicauth = base64_encode($basiclogin.":".$basicpass);
             break;
     }
-
-
-    echo "<br>";
-    echo"Ok what is regid and why is it not finding record? Cause I took away saveurl?";
-    var_dump($registrationuuid);
-    echo "<br>";
-
-    //Retrieve launch url
-    //HERE! It is getting the url
-    //Which we cnahged tpo get reg, at sopme point it needs to change back....
-	$record = $DB->get_record("cmi5launch_player", array('registrationid' => $registrationuuid));
-
-//yeah we ill pass in au id here and call url ourselves.instead of pulling from table
-//    $rtnstring = $record->launchurl;
-//yeah we need to save it to the other table OR use the reg table??
-
 //to bring in functions from class cmi5Connector
 $connectors = new cmi5Connectors;
 
 //Get retrieve URL function
 $retrieveUrl = $connectors->getRetrieveUrl();
+//Retrieve launch urls
+//OK! HERE! we need to call retrieve url here!
+//OR NOT-smh this is locallib? Did I think I was on a diff page  or something
+//Ohhhhh of course, this is called by launch.php, it does go here
+//But we don't neex the 'if' that is handled in retrieve utl
 
-//Maybe its own func?? or we can get this url from table (return)
-//Retrieve launch URL from CMI5 player (this is the URL used to retrieve the course and regid)
-$returnUrl = $record->returnurl;
 
-//and well brin in auid from previous pae
-$urlDecoded = $retrieveUrl($cmi5launch->id, $returnUrl, $auID); 
+//$record = $DB->get_record("cmi5launch_player", array('registrationid' => $registrationuuid));
+$rtnstring = $retrieveUrl($cmi5launch->id, $auID); 
 
-//returns launch response, get url from it
-$rtnstring = $urlDecoded['url'];
 
-	return $rtnstring;
+
+//$rtnstring = $record->launchurl;
+
+//MB - gosh dangit! Where is au being tacked on!
+//AH, it's not, I'm missing something
+return $rtnstring;
 }
 
 /**
