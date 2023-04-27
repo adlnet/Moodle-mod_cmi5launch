@@ -7,13 +7,13 @@ A plug in for Moodle that allows the launch of cmi5 content which is then played
 
 To use this plugin you will need the following:
 
-* Moodle 4 fully set up and running on a server that you have ftp access to 
+* Moodle 4.0+
 * Login details for the admin account 
 * A Moodle course setup where you would like to add the activity
-* A piece of cmi5 compliant e-learning that also implements the launch mechanism outlined HERE, for example e-learning produced using Articulate Storyline or Adobe Captivate. This should be put on the internet somewhere, perhaps on your Moodle server. 
-* A cmi5 compliant LRS (this plugin has been tested with Wax and SCORM Cloud) 
+* A piece of cmi5 compliant e-learning that also implements the launch mechanism, for example e-learning produced using Articulate Storyline or Adobe Captivate and packaged as a .zip file
+* A cmi5 compliant LRS
 * A running instance of the cmi5 player (https://github.com/adlnet/CATAPULT/tree/main/player)
-* A copy of this plugin.
+* A copy of this plugin
 
 ## Notes
 
@@ -96,9 +96,9 @@ sequenceDiagram
 
 ## User progress
 
-The cmi5 player tracks user progress, however the Moodle application will also want to track progress. Moodle will present the progress details to the user to let them know whether the lesson was completed, or how far along the user is in the lesson.
+The cmi5 player tracks user progress, however the Moodle application will also want to track progress. Moodle will present the progress details to the user to let them know whether the lesson was completed, or how far along the user is in the lesson. This is not implemented yet.
 
-## Introduce a webhook
+### Introduce a webhook
 
 Moodle and cmi5 Player do not currently share a user's progress. One option is for the cmi5 player to ping Moodle via a webhook whenever progress and/or completion has been made.
 
