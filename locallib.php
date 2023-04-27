@@ -172,25 +172,10 @@ function cmi5launch_get_launch_url($registrationuuid, $auID) {
     }
 //to bring in functions from class cmi5Connector
 $connectors = new cmi5Connectors;
-
 //Get retrieve URL function
 $retrieveUrl = $connectors->getRetrieveUrl();
-//Retrieve launch urls
-//OK! HERE! we need to call retrieve url here!
-//OR NOT-smh this is locallib? Did I think I was on a diff page  or something
-//Ohhhhh of course, this is called by launch.php, it does go here
-//But we don't neex the 'if' that is handled in retrieve utl
-
-
-//$record = $DB->get_record("cmi5launch_player", array('registrationid' => $registrationuuid));
 $rtnstring = $retrieveUrl($cmi5launch->id, $auID); 
 
-
-
-//$rtnstring = $record->launchurl;
-
-//MB - gosh dangit! Where is au being tacked on!
-//AH, it's not, I'm missing something
 return $rtnstring;
 }
 

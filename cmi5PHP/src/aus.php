@@ -25,6 +25,14 @@ class Au {
   // Properties
   public $id, $url, $type, $lmsId = [], $title, $moveOn, $auIndex, $parents, $objectives, $description = [], $activityType, $launchMethod, $masteryScore;
 
+  //Holds launch url, this may be the way to have separate sessions.
+  public $launchUrl, $sessionId;
+
+  //Maybe an array will hold info better
+  //I'm thinkig sessionId->launchurl (for that session)
+  public $sessions = array();
+  
+
   //These may be needed later if AU's become part of a block to keep track of 
   //being finished.
   public $progress;
@@ -42,7 +50,7 @@ class Au {
     return $this->name;
   }
 
-//Constructs AUs. IS fed array and where array key matches property, sets the property.  
+//Constructs AUs. Is fed array and where array key matches property, sets the property.  
 function __construct($statement){
 
   foreach($statement as $key => $value){

@@ -26,8 +26,6 @@ class cmi5Connectors{
  }
     public function retrieveAUs($returnedInfo, $record){
      
-        //tab le .......HEYYYY There is mprethan one LMSID as wekk!
-
         $returnedInfo = json_decode($returnedInfo, true);
 	
       
@@ -46,72 +44,22 @@ class cmi5Connectors{
 		//In FACT, if we are goin to make this where tables stored
 		//Maybe store it then aus, but look at that later TODO
 
-        /*
-        echo"<br>";
-        echo"ResultChunked: ";
-        var_dump($resultChunked["id"]);
-        echo"<br>";
-        echo"<br>";
-        echo"I'm trying tooo gget the course id here: ";
-        var_dump($returnedInfo["id"]);
-        echo"<br>";
-*/
+
 	    $record->courseid = $returnedInfo["id"];
 
 		$length = count($resultChunked);
 		$courseAus = array( );
-		//$testObjectAu = array();
-        //Why is iteration unreachable? It's reachable in the other test file
+
         for($i = 0; $i < $length; $i++){
       
-            
 			$au = $resultChunked[$i][0]['auIndex'];
-           /*
-            echo"<br>";
-            echo"Ok, what is au here>? ";
-            var_dump($au);
-            echo"<br>";
-			*/
-            
-            //ok, it is now separating the au's so now we want the au for asking for url
-			
-            //which i beleiove is best taken from end of lmsID
-			//right?
-			//THEY HAVEAN AU INDEX!!!! LETS TRY THAT!!!!
+          
             //TODO, do we want to save this to table, why is this here?
 			$record->auid = $au;
-
-			//$populateTable($record, "cmi5_urls");
 			$courseAus[] = $au;
-			//$testObjectAu[] = $auObject;
-			//echo"<br>";
-			//echo"Hows the array cominG?";
-			
         }
-            //echo"<br>";
-			//echo"What is course ID here ";
-            
-            //IT's an array of ints
-            
-            //var_dump($courseAus);
-			//echo"<br>";
-		
-			
-
-	   	return $courseAus;
-        //Whaty is returned info here
-        //var_dump($returnedInfo);
-        //Or wait!! The entire course info is saved right? So maybe
-        //just  retreive them when needed/ getting the url
-        //Maybe here stores aUs and or in create course? 
-        //Then alter they can be pulled out for launch url
-       // $lmsId = $returnedInfo["lmsId"] . "/au/0";
-       // $record->courseid = $returnedInfo["id"];
-       // $record->cmi5activityid = $lmsId;
-        //create url for sending to when requesting launch url for course 
-        //$url = $record->cmi5playerurl . "/api/v1/". $record->courseid. "/launch-url/0";
-        //$record->launchurl = $url;
     }
+
 
     //Function to create a course
     // @param $id - tenant id in Moodle
@@ -194,27 +142,20 @@ class cmi5Connectors{
     //Function to retreive registration from cmi5 player. This way uses
     //the registration id
     //Registration  is "code" in returned json body
-    //@param $urlToSend - URL to send request to
-    // @param $user - username
-    // @param $pass - password
-    // @param $audience - the name the of the audience using the token,
-    // @param #tenantId - the id of the tenant
+    //@param $registration - registration UUID
+    // @param $id - launch id
     function retrieveRegistrationGet($registration, $id) {
 
 		$settings = cmi5launch_settings($id);
 
-        
-        $actor = $settings['cmi5launchtenantname'];
-        $token = $settings['cmi5launchtenanttoken'];
-        $playerUrl = $settings['cmi5launchplayerurl'];
-        
-        
-        global $CFG;
-      
+		$token = $settings['cmi5launchtenanttoken'];
+		$playerUrl = $settings['cmi5launchplayerurl'];
+
+		global $CFG;
+
         //Build URL for launch URL request
         //Okay it looks like the reurnurk is same level as  
 	    $url = $playerUrl . "/api/v1/registration/" . $registration ;
-
 
 	   ///////////
 	   $options = array(
@@ -223,16 +164,13 @@ class cmi5Connectors{
 		    'header' => array('Authorization: Bearer ' . $token,  
 			   "Content-Type: application/json\r\n" .
 			   "Accept: application/json\r\n")
-		    //'content' => json_encode($data)
 		)
 	 );
-	
-				//the options are here placed into a stream to be sent
-				$context  = stream_context_create($options);
-				
-				//sends the stream to the specified URL and stores results (the false is use_include_path, which we dont want in this case, we want to go to the url)
-				$result = file_get_contents( $url, false, $context );
-				
+		//the options are here placed into a stream to be sent
+		$context  = stream_context_create($options);
+		
+		//sends the stream to the specified URL and stores results (the false is use_include_path, which we dont want in this case, we want to go to the url)
+		$result = file_get_contents( $url, false, $context );
 	 
         if ($result === FALSE){
 
@@ -245,12 +183,11 @@ class cmi5Connectors{
         else{
                $registrationInfo = json_decode($result, true);
     //The returned 'registration info' is a large json 
-    //copde is the registration id we want   
+    //code is the registration id we want   
 			$registration = $registrationInfo["code"];
 			
 			return $registration;
         }
-
     }
 
 
@@ -258,11 +195,8 @@ class cmi5Connectors{
     //the course id and actor name
     //As this is a POST request it returns a new code everytime it is called
     //Registration  is "code" in returned json body
-    //@param $urlToSend - URL to send request to
-    // @param $user - username
-    // @param $pass - password
-    // @param $audience - the name the of the audience using the token,
-    // @param #tenantId - the id of the tenant
+    //@param $courseID
+    // @param $id 
     function retrieveRegistrationPost($courseId, $id){
  
 		$settings = cmi5launch_settings($id);
@@ -277,7 +211,6 @@ class cmi5Connectors{
         //Okay it looks like the return url is same level as  
 	    $url = $playerUrl . "/api/v1/registration" ;
 
-
         //the body of the request must be made as array first
         $data = array(
             'courseId' => $courseId,
@@ -289,7 +222,6 @@ class cmi5Connectors{
             )
         );
         
-	   ///////////
 	   $options = array(
 		'http' => array(
 		    'method'  => 'POST',
@@ -299,14 +231,14 @@ class cmi5Connectors{
 		    'content' => json_encode($data)
 		)
 	 );
-	
-				//the options are here placed into a stream to be sent
-				$context  = stream_context_create($options);
-				
-				//sends the stream to the specified URL and stores results (the false is use_include_path, which we dont want in this case, we want to go to the url)
-				$result = file_get_contents( $url, false, $context );
-				
-	 
+
+		//the options are here placed into a stream to be sent
+		$context  = stream_context_create($options);
+		
+		//sends the stream to the specified URL and stores results (the false is use_include_path, which we dont want in this case, we want to go to the url)
+		$result = file_get_contents( $url, false, $context );
+		
+
         if ($result === FALSE){
 
             if ($CFG->debugdeveloper)  {
@@ -317,20 +249,16 @@ class cmi5Connectors{
         }
         else{
 
-            //Where is it getting the wrong info?
                $registrationInfo = json_decode($result, true);
           
                //The returned 'registration info' is a large json 
-    //copde is the registration id we want   
+		    //code is the registration id we want   
 			$registration = $registrationInfo["code"];
 			
 			return $registration;
         }
-
     }
 
-
-    
      //@param $urlToSend - URL to send request to
     // @param $user - username
     // @param $pass - password
@@ -371,14 +299,12 @@ class cmi5Connectors{
 
     ///Function to retrieve a launch URL for an AU
     //@param $id -Actor id to find correct info for url request
-    //@param $retUrl - returnUrl to pass to cmi5 in request
     //@param $auID -AU id to pass to cmi5 for url request
     //@return $url - The launch URL returned from cmi5 player
     ////////
     public function retrieveUrl($id, $auID){
 		//TODO, this needs to be changed to have an if its one old call, if its not, new call
         //MB
-        //There is a returnurl uin the player table
         global $DB;
 
 		//Retrieve actor record, this enables correct actor info for URL storage
@@ -434,21 +360,12 @@ class cmi5Connectors{
         //sends the stream to the specified URL and stores results (the false is use_include_path, which we dont want in this case, we want to go to the url)
         $launchResponse = file_get_contents( $url, false, $context );
 
-
-		//Only return the URL
+        	//Only return the URL
 		$urlDecoded = json_decode($launchResponse, true);
-		
-
 
 		$url = $urlDecoded['url'];
-	//};//end of my trial for length new url thingy
+
         return $url;
-
-        //What is we return the launch response? 
-        /////// changing to return plain launchresponsereturn $url;
-
-       // return $urlDecoded;
-	
     }
 
 
@@ -521,7 +438,4 @@ class cmi5Connectors{
                 }
     }
 }
-
-
-
     ?>

@@ -590,21 +590,14 @@ function cmi5launch_process_new_package($cmi5launch) {
     $settings = cmi5launch_settings($cmi5launch->id);
     $token = $settings['cmi5launchtenanttoken'];
 
-    //MB
-    //ok so we want to get the regid  returned when a course is imported and save it!!!!!
+    //Create the course and retrieve info for savin to DB
 	$courseResults =  $createCourse($context->id, $token, $packagefile );
-
 
 	//Take the results of created course and save new course id to table
     $record->courseinfo = $courseResults;
     
     $returnedInfo = json_decode($courseResults, true);
-/*
-    echo "<br>";
-    echo "Ok, what is a returned course decoded";
-    var_dump($returnedInfo);
-    echo "<br>";
-*/
+
     //Retrieve the courses AUs and save to record
     $aus = json_encode($retrieveAus($returnedInfo));
 
@@ -613,48 +606,12 @@ function cmi5launch_process_new_package($cmi5launch) {
     //Retrieve the lmsId of course
     $lmsId = $returnedInfo["lmsId"];
 
-    //MB
-    //Ok, so I sent an email to Brian to verify, but I believe the registration Id
-    //we want is the end of lmsID, so we should parse it right?
-    //urlInfo is one big string so
-    //PArse strin isnt working, lets go back to how we get regid
-//Break it into array (AU is first index)
-$regAndId = explode("/", $lmsId);
-//Ok that works and makes regid by itself as LAST item in array,
-
-//Retrieve AU ID
-$regID = array_pop($regAndId);
-
-//PERFECT Now we have regid!!!!
-/*
-    echo"<br>";
-    echo"---------Ok, what the heck is URLURLURK INFOINFO here lets see if we can make them match?";
-        var_dump($regID);
-        echo"<br>";
-  */
-
-    //MB
-    //Ok,                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           
-    
     $record->courseid = $returnedInfo["id"];
-    //If above is course id then we can send that
-    //and send setting or id = ($cmi5launch->id)
-    //MOVE
+    
 	 //retrieve reg
 	 $registration = $getRegistration($returnedInfo["id"], $cmi5launch->id);
 
-     echo "<br>";
-			echo "Ok, what is return url heree then??";
-			var_dump($registration);
-			echo "<br>";
-
     $record->registrationid = $registration;
-
-
-    echo "<br>";
-    echo "Ok, WHAT IS REGISTRATION immediealty in lib.php";
-    var_dump($registration);
-    echo "<br>";
 
     $record->cmi5activityid = $lmsId;
 	//create url for sending to when requesting launch url for course 

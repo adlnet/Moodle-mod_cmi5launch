@@ -38,36 +38,15 @@ $event->trigger();
 //Retrieve registration id and au index (from AUview.php)
 $fromAUview = required_param('launchform_registration', PARAM_TEXT);
 
-
-/*
-//this will change cause there will only be ONE regid going forward
 //Break it into array (AU is first index)
-$regAndId = explode(",", $fromAUview);
-//Retrieve the AU ID 
-$auID = array_shift($regAndId);
-//Now the registration ID, it should be the first element in the array after AU ID was taken
-$registrationid = $regAndId[0];
-*/
-
-
-//Break it into array (AU is first index)
-$regAndId = explode(",", $fromAUview);
+$lmsAndId = explode(",", $fromAUview);
 //Retrieve AU ID
-$auID = array_shift($regAndId);
-
-/*
-echo "<br>";
-echo"Okdokey what is AU ID? What is it coming from the previous pae as? THIS IS LAUNCH";
-var_dump($auID);
-echo "<br>";
-*/
+$auID = array_shift($lmsAndId);
 
  // Reload cmi5 instance.
  $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
-//Ok what is record here?
-$registrationid = $record->registrationid;
-
-
+//Retrieve the registration id
+ $registrationid = $record->registrationid;
 
 if (empty($registrationid)) {
     echo "<div class='alert alert-error'>".get_string('cmi5launch_regidempty', 'cmi5launch')."</div>";
@@ -78,22 +57,12 @@ if (empty($registrationid)) {
     }
     die();
 }
-//todo
-//this will change, it shoulkd never be one now???
-//or wait!
- //is this what needs to be moved to view.php??
 
 //If it's 1 than the "Start New Registration" was pushed
 //TODO
-//This won't ever be one, it will be the one reg, so I guess we need to check
-//if its null or not? 
+//This won't ever be one as registration id is now saved in DB, but later it can use this to specify different launch urls based on
+//separate or new sessions. So leave for now
 if ($registrationid == 1) {
-
-    //Ok, if its one than we need to get the 'id' returned with the launch url request and 
-    //use it to save reggid to tabkle
-    //So THIS stays here? Right, this changes based on AU
-
-    //Maybe her eit can retrieve the reid from the table instead of generating
 
 } else {
 
@@ -194,9 +163,8 @@ if ($registrationid == 1) {
         die();
     }
     /*
-    Moodle used to send a launched statement to LRS. This is no longer needed as CMI%
+    Moodle used to send a launched statement to LRS. This is no longer needed as CMI5
     player handles the tracking. - MB 1/27/23
-    MB - BUT will this help now that we are replacing regid? - 4-17-23
     */
     $savelaunchedstatement = cmi5_launched_statement($registrationid);
 
@@ -212,27 +180,11 @@ if ($registrationid == 1) {
         }
         die();
     }
-    //So 204 is nortmal! This part is ok
-/*
-elseif ($lrsrespond != 404){
-    //Um, could this help, like if we DON't want it to die?
-    //but shouldn't it die rather than go on?
-    echo "<p>getting a 404</p>";
-    echo "<pre>";
-    var_dump($lrsrespond);
-    echo "</pre>";
-    //Wait! ItDOES seem to equal 302, is it not seeing it? Maybe its returned in a diff
-    //category since i fiddles with things?
 
-}
-//////*/
     $completion = new completion_info($course);
     $completion->set_module_viewed($cm);
 
-    //Is it this????
-//I think it may be!!!
-
-} //end else
+} 
 
 header("Location: ". cmi5launch_get_launch_url($registrationid, $auID));
 

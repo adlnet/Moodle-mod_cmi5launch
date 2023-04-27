@@ -87,7 +87,6 @@ if ($cmi5launch->intro) {
             if (event.keyCode === 13 || event.keyCode === 32) {
 
                 mod_cmi5launch_launchexperience(registration);
-          
             }
         }
 
@@ -100,14 +99,6 @@ if ($cmi5launch->intro) {
             // Post it.
             $('#launchform').submit();
 
-            //TODO, remove these? 
-            // Remove the launch links.
-/*
-            $('#cmi5launch_autable').remove();////
-            $('#cmi5launch_newattempt').remove();
-            $('#cmi5launch_attempttable').remove();
-            $('#cmi5launch_attempt').remove();
-  */
             //Add some new content.
             if (!$('#cmi5launch_status').length) {
                 var message = "<? echo get_string('cmi5launch_progress', 'cmi5launch'); ?>";
@@ -141,7 +132,6 @@ if ($cmi5launch->intro) {
 //to bring in functions from class cmi5Connector
 $connectors = new cmi5Connectors;
 
-
 //Build url to pass as returnUrl
 $returnUrl = $CFG->wwwroot .'/mod/cmi5launch/view.php'. '?id=' .$cm->id;
 
@@ -161,7 +151,6 @@ if ( $record->registrationid == null) {
     $table = "cmi5launch";
     //Save the returnurl
 	$record->returnurl = $returnUrl;
-    //Update RegID
     //Update the DB
     $DB->update_record($table, $record, true);
 
@@ -190,7 +179,7 @@ if ($lrsrespond != 200 && $lrsrespond != 404) {
 
 //Get session info from LRS
 //If there is no previous attempts, this will return a 404 error, no state found.
-//So we do not necessarilly need a 200 response.
+//So we do not necessarily need a 200 response.
 $registrationdatafromlrs = json_decode($getregistrationdatafromlrsstate->content->getContent(), true);
 
 //We need id to get progress
@@ -225,36 +214,18 @@ $resultDecoded = $getLRS($registrationdatafromlrs, $cmid);
 
         //Retrieve AU's lmsID
         $auId = $au['lmsId'];
-/*
-	echo "<br>";
-	echo "<br>";
-	echo "Okey pokey, what is auID aka lmsId?";
-	var_dump($auId);
-	echo "<br>";
-	echo "<br>";
-*/
+
         //Loop through the statements and match with the LRS statments whose object/id matches the aus lmsID
         //Match on lmsId. This ties the au to the session info from LRS.
         //It matches Object->id from lrs chunked
         
         //Array to hold list of relevant registrations
-        //todo
-        //sOOOO, WE NOlonger need to keep a lis tof registrations but insteD
-        //MAYBE ON LMS id? or CONTEXT>EXT>SESSIONid
-      ///Trying with object oid 
 	   $relevantObjId = array();
 
         //This is the info back from the lrs
         foreach ($resultDecoded as $result => $i) {
-/*
-		echo "<br>";
-	echo "Annnnd as we loop through resultDecoded, what is i[$registrationID][0][object][id]  aka objectId";
-	var_dump($i[$registrationID][0]["object"]["id"]);
-	echo "<br>";
-	*/
 
             //If the lmsId matches the object id, then this registration is applicable to this au 
-           //Maybe oinstead of re array we use object id? or lmsid? Lets try object??		  
 		 if ($auId == $i[$registrationID][0]["object"]["id"]) {
 
                 //Therefore we want this verb
@@ -262,7 +233,6 @@ $resultDecoded = $getLRS($registrationdatafromlrs, $cmid);
 
                 $verbs[] = $getVerb;
 
-			 //Would this still work with the registration id?
             	 $relevantObjId[] = $i[$registrationID][0]["object"]["id"];
             }
         }
@@ -276,8 +246,6 @@ $resultDecoded = $getLRS($registrationdatafromlrs, $cmid);
             //If relevant registrations are not null, then it found some session ids. If those exist then this
             //AU has been launched and is therefore 'in progress' or 'completed'
             //If this IS NULL then the AU has not been attempted and we can mark it as such
-     //hmmm we may needa diff if here
-	///Trying with object id array instead
 	       if (!$relevantObjId == null) {
 
                 $getCompleted = $progress->getCompletion();
@@ -298,9 +266,7 @@ $resultDecoded = $getLRS($registrationdatafromlrs, $cmid);
             else {
                 $auStatus = "Not attempted";
             }
-
         }
-
         //List of verbs that may apply toward completion
         $verbs = array();
 
@@ -313,7 +279,6 @@ $resultDecoded = $getLRS($registrationdatafromlrs, $cmid);
         $auIndex = $au['auIndex'];
 
         //ReleventReg and AU index needs to be a string to pass as variable to next page
-      ///Trying with object id  
 	   $regForNextPage = implode(',', $relevantObjId);
         $infoForNextPage = $auIndex . "," . $regForNextPage;
 
@@ -322,7 +287,6 @@ $resultDecoded = $getLRS($registrationdatafromlrs, $cmid);
     onkeyup=\"key_test('" . $infoForNextPage . "')\" onclick=\"mod_cmi5launch_launchexperience('" . $infoForNextPage . "')\" style='cursor: pointer;'>"
             . get_string('cmi5launchviewlaunchlink', 'cmi5launch') . "</a>"
         ;
-
         //add to be fed to table
         $tableData[] = $auInfo;
 
@@ -331,49 +295,15 @@ $resultDecoded = $getLRS($registrationdatafromlrs, $cmid);
 $table->data = $tableData;
 
 echo html_writer::table($table);
-//} old if end
-
-
-
-///////////////} 
-/*
-else {
-*/
-    //MB 
-   //Check with Andy and Florian on this in meeting today. It's the start new registration button
-   /*
-   //Start new button/ if we keep this, just um be AU 0 and start from 0?
-    //If we keep what auID do we want? 
-   $auID = "0";
-$registrationid = "1";
-//If auid is first always then it doesn't matter how many reg
-//they are naything after 0
-$info = array("au" => $auID, "reg" => $registrationid);
-$infoForNextPage = implode(",", $info);
-
-   echo "<p tabindex=\"0\"
-        onkeyup=\"key_test('" . $infoForNextPage . "')\"
-        id='cmi5launch_newattempt'><a onclick=\"mod_cmi5launch_launchexperience('"
-        . $infoForNextPage .
-        "')\" style=\"cursor: pointer;\">"
-        . get_string('cmi5launch_attempt', 'cmi5launch')
-        . "</a></p>";
-
-        /*
-    }
-*/
 
 // Add a form to be posted based on the attempt selected.
 ?>
-
- 
     <form id="launchform" action="AUview.php" method="get">
         <input id="AU_view" name="AU_view" type="hidden" value="default">
         <input id="AU_view_id" name="AU_view_id" type="hidden" value="default">
         <input id="id" name="id" type="hidden" value="<?php echo $id ?>">
         <input id="n" name="n" type="hidden" value="<?php echo $n ?>">
     </form>
-
 <?php
 
 echo $OUTPUT->footer();

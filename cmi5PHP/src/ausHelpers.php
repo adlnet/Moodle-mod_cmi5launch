@@ -39,14 +39,14 @@ class Au_Helpers {
 			//it was returning aus then encoding them then creating them again
 		return $resultChunked;
 		}
-
-		//IS THIS being called in TWO places? Might be the problem!!
-		//MB
+		/**
+		 *So it should be fed an array of statements that then assigns the values to 
+		 *several aus, and then returns them as au objects!
+		 * @param mixed $auStatements
+		 * @return array<au>
+		 */
 		function createAUs($auStatements)
 		{
-			//So it should be fed an array of statements that then assigns the values to 
-			//several aus, and then returns the au objects! (array of objects)
-
 			//Needs to return our new AU objects
 			$newAus = array();
 
@@ -62,14 +62,11 @@ class Au_Helpers {
 				
 				//assign the newly created au to the return array
 				$newAus[] = $au;
-
 			}
 
 			//Return our new list of AU!
 			return $newAus;
 		}
-
-
 	}
 
 ?>
