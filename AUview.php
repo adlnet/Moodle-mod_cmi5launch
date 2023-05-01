@@ -116,6 +116,26 @@ $auID = array_shift($lmsAndId);
 //Ok what is record here?
 $regid = $record->registrationid;
 
+///Ok, lets start with a simple test
+//Lets check for the certain capability and display a message if it is found/not found
+//Excellent! The test works, now lets introduce like a flag, and use that to display progress or not
+//Well call it canSEe for now
+$canSee = true | false;
+//now change it based on capability
+$context = context_module::instance($cm->id);
+if (has_capability('mod/cmi5launch:addinstance', $context)) {
+    // Do or display something.
+    echo "<br>";
+    echo "This is someone we want to let see grades/progress!!!";
+    echo "<br>";
+    $canSee = true;
+}else{
+    echo "<br>";
+    echo "This is not someone to see grades! Boo!";
+    echo "<br>";
+    $canSee = false;
+}
+
     //If it is NOT empty there are relevent registrations
     if (!$lmsAndId[0] == "") {
         
@@ -175,15 +195,21 @@ $regid = $record->registrationid;
                 );
 
               //Bring in progress class
-              $progress = new progress;
-              $getProgress = $progress->getRetrieveStatement();
-      
-                //Create a string to pass the AU ID and registration to next page (launch.ph)
-                $infoForNextPage = $auID; // . "," . $regId;
+              //MB
+              //Lets try to only do this if based on canSee
+        if ($canSee == true) {
+            $progress = new progress;
+            $getProgress = $progress->getRetrieveStatement();
 
-                $sessionInfo[] = ("<pre>" . implode("\n ", $getProgress($regid, $cmi5launch->id, $lmsId)) . "</pre>");
+    
 
-                $sessionInfo[] =
+            $sessionInfo[] = ("<pre>" . implode("\n ", $getProgress($regid, $cmi5launch->id, $lmsId)) . "</pre>");
+        }
+
+        //Create a string to pass the AU ID and registration to next page (launch.ph)
+        $infoForNextPage = $auID; // . "," . $regId;
+        
+            $sessionInfo[] =
                     "<a tabindex=\"0\" id='cmi5relaunch_attempt'
                 onkeyup=\"key_test('" . $infoForNextPage . "')\" onclick=\"mod_cmi5launch_launchexperience('" . $infoForNextPage . "')\" style='cursor: pointer;'>"
                     . get_string('cmi5launchviewlaunchlink', 'cmi5launch') . "</a>"

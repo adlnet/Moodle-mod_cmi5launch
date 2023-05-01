@@ -38,8 +38,10 @@ $createAUs = $auHelper->getCreateAUs();
 $connectors = new cmi5Connectors;
 $tables = new cmi5Tables;
 
-global $cmi5launch;
+global $cmi5launch,$user, $mod;
 
+//MB NOTE
+//So look here it is getting 'context' Is this were we can check teacher roles? z
 // Trigger module viewed event.
 $event = \mod_cmi5launch\event\course_module_viewed::create(array(
     'objectid' => $cmi5launch->id,
@@ -60,8 +62,24 @@ $PAGE->requires->jquery();
 // Output starts here.
 echo $OUTPUT->header();
 
+////////////////////////////////////
+
+
+/////////////////////////////////////////
+
+
+
+
+
+
+
+
+
+
 // Reload cmi5 instance.
 $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
+
+
 
 //Retrieve saved AUs
 $auList = json_decode($record->aus, true);
@@ -128,7 +146,12 @@ if ($cmi5launch->intro) {
         });
     </script>
 <?php
+/////////////////////////////////////////////////////////////////////////////////
 
+
+
+
+/////////////////////////////////////////////////////////////////////////////////
 //to bring in functions from class cmi5Connector
 $connectors = new cmi5Connectors;
 
