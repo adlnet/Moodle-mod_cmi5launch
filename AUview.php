@@ -124,14 +124,10 @@ $canSee = true | false;
 //now change it based on capability
 $context = context_module::instance($cm->id);
 if (has_capability('mod/cmi5launch:addinstance', $context)) {
-    // Do or display something.
-    echo "<br>";
-    echo "This is someone we want to let see grades/progress!!!";
-    echo "<br>";
+    //This is someone we want to let see grades/progress!!!";
     $canSee = true;
 }else{
-    echo "<br>";
-    echo "This is not someone to see grades! Boo!";
+    //This is not someone to see grades!";
     echo "<br>";
     $canSee = false;
 }
