@@ -49,6 +49,8 @@ $cmi5launchsettings = null;
 
 // Moodle Core API.
 
+//TOD- htis is where we add  functions for grades we want  suchs as FEATURE_GRADE_HAS_GRADE
+//For now I added those SCORM had, we can whittle this down
 /**
  * Returns the information on whether the module supports a feature
  *
@@ -66,8 +68,18 @@ function cmi5launch_supports($feature) {
             return true;
         case FEATURE_BACKUP_MOODLE2:
             return true;
+            /////////////////
+            case FEATURE_GROUPS:                  return true;
+                case FEATURE_GROUPINGS:               return true;
+                case FEATURE_GRADE_HAS_GRADE:         return true;
+                case FEATURE_GRADE_OUTCOMES:          return true;
+                case FEATURE_SHOW_DESCRIPTION:        return true;
+                case FEATURE_MOD_PURPOSE:             return MOD_PURPOSE_CONTENT;
+        //////////////////////
         default:
             return null;
+
+          
     }
 }
 
@@ -862,4 +874,142 @@ function use_global_cmi5_lrs_settings($instance) {
         return false;
     }
     return true;
+}
+
+//Grade functions
+//TODO - this is a cop of how scorm handles.I got these from SCORM's lib.php
+//We will need to tweak
+/**
+ * Return grade for given user or all users.
+ *
+ * @global stdClass
+ * @global object
+ * @param int $cmi5id id of scorm
+ * @param int $userid optional user id, 0 means all users
+ * @return array array of grades, false if none
+ */
+function scorm_get_user_grades($cmi5, $userid=0) {
+    global $CFG, $DB;
+    //What aer they pulling rom locallib?
+    //Do we need ot pul it as well?
+   // require_once($CFG->dirroot.'/mod/scorm/locallib.php');
+
+    $grades = array();
+    if (empty($userid)) {
+		//We are going to need to make CMI5_tables
+        $scousers = $DB->get_records_select('scorm_scoes_track', "cmi5id=? GROUP BY userid",
+                                            array($cmi5->id), "", "userid,null");
+        if ($scousers) {
+            foreach ($scousers as $scouser) {
+                $grades[$scouser->userid] = new stdClass();
+                $grades[$scouser->userid]->id         = $scouser->userid;
+                $grades[$scouser->userid]->userid     = $scouser->userid;
+                $grades[$scouser->userid]->rawgrade = scorm_grade_user($cmi5, $scouser->userid);
+            }
+        } else {
+            return false;
+        }
+
+    } else {
+        $preattempt = $DB->get_records_select('scorm_scoes_track', "cmi5id=? AND userid=? GROUP BY userid",
+                                                array($cmi5->id, $userid), "", "userid,null");
+        if (!$preattempt) {
+            return false; // No attempt yet.
+        }
+        $grades[$userid] = new stdClass();
+        $grades[$userid]->id         = $userid;
+        $grades[$userid]->userid     = $userid;
+        $grades[$userid]->rawgrade = scorm_grade_user($cmi5, $userid);
+    }
+
+    return $grades;
+}
+
+/**
+ * Update grades in central gradebook
+ *
+ * @category grade
+ * @param object $scorm
+ * @param int $userid specific user only, 0 mean all
+ * @param bool $nullifnone
+ */
+function scorm_update_grades($scorm, $userid=0, $nullifnone=true) {
+    global $CFG;
+    require_once($CFG->libdir.'/gradelib.php');
+    require_once($CFG->libdir.'/completionlib.php');
+
+    if ($grades = scorm_get_user_grades($scorm, $userid)) {
+        scorm_grade_item_update($scorm, $grades);
+        // Set complete.
+        scorm_set_completion($scorm, $userid, COMPLETION_COMPLETE, $grades);
+    } else if ($userid and $nullifnone) {
+        $grade = new stdClass();
+        $grade->userid   = $userid;
+        $grade->rawgrade = null;
+        scorm_grade_item_update($scorm, $grade);
+        // Set incomplete.
+        scorm_set_completion($scorm, $userid, COMPLETION_INCOMPLETE);
+    } else {
+        scorm_grade_item_update($scorm);
+    }
+}
+
+/**
+ * Update/create grade item for given scorm
+ *
+ * @category grade
+ * @uses GRADE_TYPE_VALUE
+ * @uses GRADE_TYPE_NONE
+ * @param object $scorm object with extra cmidnumber
+ * @param mixed $grades optional array/object of grade(s); 'reset' means reset grades in gradebook
+ * @return object grade_item
+ */
+function scorm_grade_item_update($scorm, $grades=null) {
+    global $CFG, $DB;
+    require_once($CFG->dirroot.'/mod/scorm/locallib.php');
+    if (!function_exists('grade_update')) { // Workaround for buggy PHP versions.
+        require_once($CFG->libdir.'/gradelib.php');
+    }
+
+    $params = array('itemname' => $scorm->name);
+    if (isset($scorm->cmidnumber)) {
+        $params['idnumber'] = $scorm->cmidnumber;
+    }
+
+    if ($scorm->grademethod == GRADESCOES) {
+        $maxgrade = $DB->count_records_select('scorm_scoes', 'scorm = ? AND '.
+                                                $DB->sql_isnotempty('scorm_scoes', 'launch', false, true), array($scorm->id));
+        if ($maxgrade) {
+            $params['gradetype'] = GRADE_TYPE_VALUE;
+            $params['grademax']  = $maxgrade;
+            $params['grademin']  = 0;
+        } else {
+            $params['gradetype'] = GRADE_TYPE_NONE;
+        }
+    } else {
+        $params['gradetype'] = GRADE_TYPE_VALUE;
+        $params['grademax']  = $scorm->maxgrade;
+        $params['grademin']  = 0;
+    }
+
+    if ($grades === 'reset') {
+        $params['reset'] = true;
+        $grades = null;
+    }
+
+    return grade_update('mod/scorm', $scorm->course, 'mod', 'scorm', $scorm->id, 0, $grades, $params);
+}
+
+/**
+ * Delete grade item for given scorm
+ *
+ * @category grade
+ * @param object $scorm object
+ * @return object grade_item
+ */
+function scorm_grade_item_delete($scorm) {
+    global $CFG;
+    require_once($CFG->libdir.'/gradelib.php');
+
+    return grade_update('mod/scorm', $scorm->course, 'mod', 'scorm', $scorm->id, 0, null, array('deleted' => 1));
 }
