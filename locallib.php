@@ -510,3 +510,89 @@ function cmi5launch_send_api_request($auth, $method, $url) {
         "status" => $responsecode
     );
 }
+
+//Grade stuff from SCORM
+
+//Move these to top where they belong if they are what we need
+define('GRADESCOES', '0');
+define('GRADEHIGHEST', '1');
+define('GRADEAVERAGE', '2');
+define('GRADESUM', '3');
+
+define('HIGHESTATTEMPT', '0');
+define('AVERAGEATTEMPT', '1');
+define('FIRSTATTEMPT', '2');
+define('LASTATTEMPT', '3');
+
+define('CMI5_FORCEATTEMPT_NO', 0);
+define('CMI5_FORCEATTEMPT_ONCOMPLETE', 1);
+define('CMI5_FORCEATTEMPT_ALWAYS', 2);
+
+define('CMI5_UPDATE_NEVER', '0');
+define('CMI5_UPDATE_EVERYDAY', '2');
+define('CMI5_UPDATE_EVERYTIME', '3');
+
+/**
+ * Returns an array of the array of update frequency options
+ *
+ * @return array an array of update frequency options
+ */
+function cmi5_get_updatefreq_array() {
+    return array(CMI5_UPDATE_NEVER => get_string('never'),
+    CMI5_UPDATE_EVERYDAY => get_string('everyday', 'cmi5launch'),
+    CMI5_UPDATE_EVERYTIME => get_string('everytime', 'cmi5launch'));
+}
+
+/**
+ * Returns an array of the array of what grade options
+ *
+ * @return array an array of what grade options
+ */
+function cmi5_get_grade_method_array() {
+    return array (GRADESCOES => get_string('gradescoes', 'cmi5launch'),
+                  GRADEHIGHEST => get_string('gradehighest', 'cmi5launch'),
+                  GRADEAVERAGE => get_string('gradeaverage', 'cmi5launch'),
+                  GRADESUM => get_string('gradesum', 'cmi5launch'));
+}
+
+
+
+/**
+ * Returns an array of the array of attempt options
+ *
+ * @return array an array of attempt options
+ */
+function cmi5_get_attempts_array() {
+    $attempts = array(0 => get_string('nolimit', 'cmi5launch'),
+                      1 => get_string('attempt1', 'cmi5launch'));
+
+    for ($i = 2; $i <= 6; $i++) {
+        $attempts[$i] = get_string('attemptsx', 'cmi5launch', $i);
+    }
+
+    return $attempts;
+}
+
+/**
+ * Returns an array of the array of what grade options
+ *
+ * @return array an array of what grade options
+ */
+function cmi5_get_what_grade_array() {
+    return array (HIGHESTATTEMPT => get_string('highestattempt', 'cmi5launch'),
+                  AVERAGEATTEMPT => get_string('averageattempt', 'cmi5launch'),
+                  FIRSTATTEMPT => get_string('firstattempt', 'cmi5launch'),
+                  LASTATTEMPT => get_string('lastattempt', 'cmi5launch'));
+}
+
+/**
+ * Returns an array of the force attempt options
+ *
+ * @return array an array of attempt options
+ */
+function cmi5_get_forceattempt_array() {
+    return array(CMI5_FORCEATTEMPT_NO => get_string('no'),
+                 CMI5_FORCEATTEMPT_ONCOMPLETE => get_string('forceattemptoncomplete', 'cmi5launch'),
+                 CMI5_FORCEATTEMPT_ALWAYS => get_string('forceattemptalways', 'cmi5launch'));
+}
+

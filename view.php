@@ -63,24 +63,11 @@ $PAGE->requires->jquery();
 echo $OUTPUT->header();
 
 
-
-
 // Reload cmi5 instance.
 $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
 
 ////////////////////////////////////
-//Can we just call this grade thingy? 
-//$grade = grade_get_course_grades($courseid, $userid_or_ids=null)
 
-//TBH don't know if this is gonna work
-require_once("$CFG->dirroot/lib/grade/querylib.php");
-
-
-$grade = grade_get_course_grades($record->courseid, $userid_or_ids = null);
-echo"<br>";
-echo "Did it wokr?";
-var_dump($grade);
-echo"<br>";
 /////////////////////////////////////////
 
 

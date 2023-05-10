@@ -45,7 +45,7 @@ class Au_Helpers {
 		 * @param mixed $auStatements
 		 * @return array<au>
 		 */
-		function createAUs($auStatements)
+		function createAUs($auStatements, $record)
 		{
 			//Needs to return our new AU objects
 			$newAus = array();
@@ -59,7 +59,9 @@ class Au_Helpers {
 			
 				//Maybe just combine 45 and 48? TODO
 				$au = new au($statement);
-				
+			saveAUs($au, $record);
+				//Save the new AUs to DB? 
+
 				//assign the newly created au to the return array
 				$newAus[] = $au;
 			}
@@ -68,5 +70,86 @@ class Au_Helpers {
 			return $newAus;
 		}
 	}
+
+	    /**
+     * //can we take an AU and just if this matches then this matches and save to table?
+     * @param mixed $id - base id to make sure record is saved to correct actor
+     * @param mixed $urlInfo - urlInfo that was returned from cmi5 such as sessionId, launchWindow, URL
+     * @param mixed $retUrl - Tenants return url for when course window closes.
+     * @return mixed
+     */
+    function saveAUs($auObject, $record)
+    {
+        global $DB, $CFG, $cmi5launch;
+
+
+        $table = "cmi5launch_aus";
+       // $settings = cmi5launch_settings($id);
+
+       // $homepage = $settings['cmi5launchcustomacchp'];
+
+        //$regid = $registrationid;
+        //$returnUrl = $retUrl;
+
+		//We can check for no dupes by AUindex because its numerical, and even if more AUs are added on they won't replacE!!!
+	$auindex = $auObject->auIndex;
+
+        //Make sure record doesn't exist before attempting to create
+        $check = $DB->get_record($table, ['auindex' => $auindex,], '*', IGNORE_MISSING);
+
+        //If false, record doesn't exist, so create  it
+        if (!$check) {
+
+            //Retrieve user settings to apply to newly created record
+            $settings = cmi5launch_settings($record->id);
+            //These will already exist!
+			//$record->tenantname = $settings['cmi5launchtenantname'];
+            //$record->courseid = $settings['cmi5launchtenanttoken'];
+            //$record->cmi5playerurl = $settings['cmi5launchplayerurl'];
+            //$record->sessionid = $urlInfo['id'];
+			
+			foreach($auObject as $key => $value){
+    
+				//Key will be property name
+				//value will be property value
+				
+				//if($auObject->key == );
+				//Wait if shouldnt be needed because we are making the new record	
+				//BUT a diff if may work to not overwrite shtuff
+				if($record->$key == null){
+					//If its null it doesn't exist yet, so won't overwrite (for instance record id)
+				$record->$key = $value;
+				} 
+			}	
+			
+			//$record->launchmethod = $urlInfo['launchMethod'];
+           // $record->launchurl = $urlInfo['url'];
+           //$record->returnUrl = $returnUrl;
+            //Assign new regid
+            //$record->registrationid = $regid;
+            //$record->returnurl = $returnUrl;
+            //$record->homepage = $homepage;
+
+            $DB->import_record($table, $record, true);
+         
+        } else {
+            // If it does exist, update it
+			//Wait, this should NEVER exist
+/*
+                //Retrieve user settings to apply to newly created record
+                $settings = cmi5launch_settings($id);
+                $record->tenantname = $settings['cmi5launchtenantname'];
+                $record->tenanttoken = $settings['cmi5launchtenanttoken'];
+                $record->sessionid = $urlInfo['id'];
+                $record->launchmethod = $urlInfo['launchMethod'];
+                $record->launchurl = $urlInfo['url'];
+                $record->returnUrl = $returnUrl;
+                $record->homepage = $homepage;
+
+			 //Update record in table with newly retrieved tenant data
+                $DB->update_record($table, $record, true);
+  */
+			}
+        }
 
 ?>

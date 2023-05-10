@@ -22,6 +22,11 @@ if ($ADMIN->fulltree) {
     require_once($CFG->dirroot . '/mod/cmi5launch/locallib.php');
     require_once($CFG->dirroot . '/mod/cmi5launch/settingslib.php');
 
+    //MB
+    //From scorm grading stuff
+    $yesno = array(0 => get_string('no'),
+                   1 => get_string('yes'));
+
     // Default display settings.
     $settings->add(new admin_setting_heading('cmi5launch/cmi5launchlrsfieldset',
         get_string('cmi5launchlrsfieldset', 'cmi5launch'),
@@ -95,4 +100,53 @@ if ($ADMIN->fulltree) {
         get_string('cmi5launchtenanttoken_help', 'cmi5launch'),
         get_string('cmi5launchtenanttoken_default', 'cmi5launch'));
     $settings->add($setting);
+
+    //MB
+    //Grade stuff I'm bringing over
+        // Default grade settings.
+        $settings->add(new admin_setting_heading('cmi5launch/gradesettings', get_string('defaultgradesettings', 'cmi5launch'), ''));
+        $settings->add(new admin_setting_configselect('cmi5launch/grademethod',
+            get_string('grademethod', 'cmi5launch'), get_string('grademethoddesc', 'cmi5launch'),
+            GRADEHIGHEST, cmi5_get_grade_method_array()));
+    
+        for ($i = 0; $i <= 100; $i++) {
+            $grades[$i] = "$i";
+        }
+    
+        $settings->add(new admin_setting_configselect('cmi5launch/maxgrade',
+            get_string('maximumgrade'), get_string('maximumgradedesc', 'cmi5launch'), 100, $grades));
+    
+        $settings->add(new admin_setting_heading('cmi5launch/othersettings', get_string('defaultothersettings', 'cmi5launch'), ''));
+    
+        // Default attempts settings.
+        $settings->add(new admin_setting_configselect('cmi5launch/maxattempt',
+            get_string('maximumattempts', 'cmi5launch'), '', '0', cmi5_get_attempts_array()));
+    
+        $settings->add(new admin_setting_configselect('cmi5launch/whatgrade',
+            get_string('whatgrade', 'cmi5launch'), get_string('whatgradedesc', 'cmi5launch'), HIGHESTATTEMPT, cmi5_get_what_grade_array()));
+    
+        $settings->add(new admin_setting_configselect('cmi5launch/forcecompleted',
+            get_string('forcecompleted', 'cmi5launch'), get_string('forcecompleteddesc', 'cmi5launch'), 0, $yesno));
+    
+        $forceattempts = cmi5_get_forceattempt_array();
+        $settings->add(new admin_setting_configselect('cmi5launch/forcenewattempt',
+            get_string('forcenewattempts', 'cmi5launch'), get_string('forcenewattempts_help', 'cmi5launch'), 0, $forceattempts));
+    
+        $settings->add(new admin_setting_configselect('cmi5launch/autocommit',
+        get_string('autocommit', 'cmi5launch'), get_string('autocommitdesc', 'cmi5launch'), 0, $yesno));
+    
+        $settings->add(new admin_setting_configselect('cmi5launch/masteryoverride',
+            get_string('masteryoverride', 'cmi5launch'), get_string('masteryoverridedesc', 'cmi5launch'), 1, $yesno));
+    
+        $settings->add(new admin_setting_configselect('cmi5launch/lastattemptlock',
+            get_string('lastattemptlock', 'cmi5launch'), get_string('lastattemptlockdesc', 'cmi5launch'), 0, $yesno));
+    
+        $settings->add(new admin_setting_configselect('cmi5launch/auto',
+            get_string('autocontinue', 'cmi5launch'), get_string('autocontinuedesc', 'cmi5launch'), 0, $yesno));
+    
+        $settings->add(new admin_setting_configselect('cmi5launch/updatefreq',
+            get_string('updatefreq', 'cmi5launch'), get_string('updatefreqdesc', 'cmi5launch'), 0, cmi5_get_updatefreq_array()));
+    
+
+
 }

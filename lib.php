@@ -49,7 +49,7 @@ $cmi5launchsettings = null;
 
 // Moodle Core API.
 
-//TOD- htis is where we add  functions for grades we want  suchs as FEATURE_GRADE_HAS_GRADE
+//TODO- this is where we add  functions for grades we want  suchs as FEATURE_GRADE_HAS_GRADE
 //For now I added those SCORM had, we can whittle this down
 /**
  * Returns the information on whether the module supports a feature
@@ -610,13 +610,11 @@ function cmi5launch_process_new_package($cmi5launch) {
     
     $returnedInfo = json_decode($courseResults, true);
 
-    //Retrieve the courses AUs and save to record
-    $aus = json_encode($retrieveAus($returnedInfo));
-
-    $record->aus = $aus;
+    
 
     //Retrieve the lmsId of course
     $lmsId = $returnedInfo["lmsId"];
+
 
     $record->courseid = $returnedInfo["id"];
     
@@ -630,7 +628,12 @@ function cmi5launch_process_new_package($cmi5launch) {
     $playerUrl = $settings['cmi5launchplayerurl'];
     $url = $playerUrl . "/api/v1/". $record->courseid. "/launch-url/";
 	$record->launchurl = $url;
-    	
+    
+	//Retrieve the courses AUs and save to record
+	$aus = json_encode($retrieveAus($returnedInfo, $registration));
+
+	$record->aus = $aus;
+
 	//Populate player table with new course info
 	$populateTable($record, 'cmi5launch');
  
@@ -778,6 +781,7 @@ function cmi5launch_get_statements($url, $basiclogin, $basicpass, $version, $act
  * @category cmi5
  * @return cmi5 Agent $agent Agent
  */
+
 function cmi5launch_getactor($instance) {
     global $USER, $CFG;
 
@@ -813,6 +817,7 @@ function cmi5launch_getactor($instance) {
 }
 
 
+
 /**
  * Returns the LRS settings relating to a cmi5 Launch module instance
  *
@@ -821,7 +826,8 @@ function cmi5launch_getactor($instance) {
  * @param string $instance The Moodle id for the cmi5 module instance.
  * @return array LRS settings to use
  */
-function cmi5launch_settings($instance) {
+
+ function cmi5launch_settings($instance) {
     global $DB, $CFG, $cmi5launchsettings;
     
     if (!is_null($cmi5launchsettings)) {
@@ -858,6 +864,7 @@ function cmi5launch_settings($instance) {
     return $expresult;
 }
 
+
 /**
  * Should the global LRS settings be used instead of the instance specific ones?
  *
@@ -866,6 +873,7 @@ function cmi5launch_settings($instance) {
  * @param string $instance The Moodle id for the cmi5 module instance.
  * @return bool
  */
+
 function use_global_cmi5_lrs_settings($instance) {
     global $DB;
     // Determine if there is a row in cmi5launch_lrs matching the current activity id.
@@ -876,8 +884,10 @@ function use_global_cmi5_lrs_settings($instance) {
     return true;
 }
 
+/*
+
 //Grade functions
-//TODO - this is a cop of how scorm handles.I got these from SCORM's lib.php
+//TODO - this is a copy of how scorm handles grades. I got these from SCORM's lib.php
 //We will need to tweak
 /**
  * Return grade for given user or all users.
@@ -888,23 +898,25 @@ function use_global_cmi5_lrs_settings($instance) {
  * @param int $userid optional user id, 0 means all users
  * @return array array of grades, false if none
  */
-function scorm_get_user_grades($cmi5, $userid=0) {
+
+function cmi5_get_user_grades($cmi5launch, $userid=0) {
     global $CFG, $DB;
     //What aer they pulling rom locallib?
     //Do we need ot pul it as well?
    // require_once($CFG->dirroot.'/mod/scorm/locallib.php');
 
     $grades = array();
+
     if (empty($userid)) {
 		//We are going to need to make CMI5_tables
         $scousers = $DB->get_records_select('scorm_scoes_track', "cmi5id=? GROUP BY userid",
-                                            array($cmi5->id), "", "userid,null");
+                                            array($cmi5launch->id), "", "userid,null");
         if ($scousers) {
             foreach ($scousers as $scouser) {
                 $grades[$scouser->userid] = new stdClass();
                 $grades[$scouser->userid]->id         = $scouser->userid;
                 $grades[$scouser->userid]->userid     = $scouser->userid;
-                $grades[$scouser->userid]->rawgrade = scorm_grade_user($cmi5, $scouser->userid);
+                $grades[$scouser->userid]->rawgrade = scorm_grade_user($cmi5launch, $scouser->userid);
             }
         } else {
             return false;
@@ -912,18 +924,19 @@ function scorm_get_user_grades($cmi5, $userid=0) {
 
     } else {
         $preattempt = $DB->get_records_select('scorm_scoes_track', "cmi5id=? AND userid=? GROUP BY userid",
-                                                array($cmi5->id, $userid), "", "userid,null");
+                                                array($cmi5launch->id, $userid), "", "userid,null");
         if (!$preattempt) {
             return false; // No attempt yet.
         }
         $grades[$userid] = new stdClass();
         $grades[$userid]->id         = $userid;
         $grades[$userid]->userid     = $userid;
-        $grades[$userid]->rawgrade = scorm_grade_user($cmi5, $userid);
+        $grades[$userid]->rawgrade = scorm_grade_user($cmi5launch, $userid);
     }
 
     return $grades;
 }
+
 
 /**
  * Update grades in central gradebook
@@ -933,50 +946,72 @@ function scorm_get_user_grades($cmi5, $userid=0) {
  * @param int $userid specific user only, 0 mean all
  * @param bool $nullifnone
  */
-function scorm_update_grades($scorm, $userid=0, $nullifnone=true) {
+
+function cmi5_update_grades($cmi5launch, $userid=0, $nullifnone=true) {
     global $CFG;
+    //can our mod see these?
     require_once($CFG->libdir.'/gradelib.php');
     require_once($CFG->libdir.'/completionlib.php');
 
-    if ($grades = scorm_get_user_grades($scorm, $userid)) {
-        scorm_grade_item_update($scorm, $grades);
+    //llprobably not considering it can't see these funcs, where are these called in scorm orig and we need ot move them to our equivalent
+
+    if ($grades = cmi5_get_user_grades($scorm, $userid)) {
+        cmi5_grade_item_update($scorm, $grades);
         // Set complete.
         scorm_set_completion($scorm, $userid, COMPLETION_COMPLETE, $grades);
     } else if ($userid and $nullifnone) {
         $grade = new stdClass();
         $grade->userid   = $userid;
         $grade->rawgrade = null;
-        scorm_grade_item_update($scorm, $grade);
+        cmi5_grade_item_update($scorm, $grade);
         // Set incomplete.
         scorm_set_completion($scorm, $userid, COMPLETION_INCOMPLETE);
     } else {
-        scorm_grade_item_update($scorm);
+        cmi5_grade_item_update($scorm);
     }
 }
 
+
 /**
- * Update/create grade item for given scorm
+ * Update/create grade item for given cmi5
  *
  * @category grade
  * @uses GRADE_TYPE_VALUE
  * @uses GRADE_TYPE_NONE
- * @param object $scorm object with extra cmidnumber
+ * @param object $scorm object with extra cmidnumber //now cmi5launch
  * @param mixed $grades optional array/object of grade(s); 'reset' means reset grades in gradebook
  * @return object grade_item
  */
-function scorm_grade_item_update($scorm, $grades=null) {
+
+ //Whereever 'scorm' is replace with 'cmi5launch'
+function cmi5_grade_item_update($cmi5launch, $grades=null) {
     global $CFG, $DB;
-    require_once($CFG->dirroot.'/mod/scorm/locallib.php');
+    //Note the SCORM version called it's locallib, we may need to get funcs from there as well and place into 
+    //OUR locallib
+    require_once($CFG->dirroot.'/mod/cmi5launch/locallib.php');
+   
+    //gradelib?? We need to see wha this is 
     if (!function_exists('grade_update')) { // Workaround for buggy PHP versions.
         require_once($CFG->libdir.'/gradelib.php');
     }
 
-    $params = array('itemname' => $scorm->name);
-    if (isset($scorm->cmidnumber)) {
-        $params['idnumber'] = $scorm->cmidnumber;
+    //
+    //so this is getting the scorm id right? Well cmi5 id should work to?
+    $params = array('itemname' => $cmi5launch->name);
+    if (isset($cmi5launch->cmidnumber)) {
+        $params['idnumber'] = $cmi5launch->cmidnumber;
     }
 
-    if ($scorm->grademethod == GRADESCOES) {
+    //HEre scorm is getting the grading method.
+    //This is something we will need to add, I don't think cmi5 objects
+    //have this yet. I KNOW we don't have the DBS and will need those!
+    //Scorm originally pulled from scorm_scoes - SCO being a Sharable Object Model
+ 
+    //Here the grading method is checking if it is a SCO, and then pulls from table
+
+    //BUT it also pulls from PARAM, where are these values set in param?
+ //From searching 'gradetype' it seems these may be admin settings (admin>settings>grades.php). Where can we set theeesE?   
+    if ($cmi5launch->grademethod == GRADESCOES) {
         $maxgrade = $DB->count_records_select('scorm_scoes', 'scorm = ? AND '.
                                                 $DB->sql_isnotempty('scorm_scoes', 'launch', false, true), array($scorm->id));
         if ($maxgrade) {
@@ -988,7 +1023,7 @@ function scorm_grade_item_update($scorm, $grades=null) {
         }
     } else {
         $params['gradetype'] = GRADE_TYPE_VALUE;
-        $params['grademax']  = $scorm->maxgrade;
+        $params['grademax']  = $cmi5launch->maxgrade;
         $params['grademin']  = 0;
     }
 
@@ -996,9 +1031,33 @@ function scorm_grade_item_update($scorm, $grades=null) {
         $params['reset'] = true;
         $grades = null;
     }
-
-    return grade_update('mod/scorm', $scorm->course, 'mod', 'scorm', $scorm->id, 0, $grades, $params);
+    //This is calling grade_update from lib>gradelib.php
+    /*
+    /**
+ * Submit new or update grade; update/create grade_item definition. Grade must have userid specified,
+ * rawgrade and feedback with format are optional. rawgrade NULL means 'Not graded'.
+ * Missing property or key means does not change the existing value.
+ *
+ * Only following grade item properties can be changed 'itemname', 'idnumber', 'gradetype', 'grademax',
+ * 'gra/demin', 'scaleid', 'multfactor', 'plusfactor', 'deleted' and 'hidden'. 'reset' means delete all current grades including locked ones.
+ *
+ * Manual, course or category items can not be updated by this function.
+ *
+ * @category grade
+ * @param string $source Source of the grade such as 'mod/assignment'
+ * @param int    $courseid ID of course
+ * @param string $itemtype Type of grade item. For example, mod or block
+ * @param string $itemmodule More specific then $itemtype. For example, assignment or forum. May be NULL for some item types
+ * @param int    $iteminstance Instance ID of graded item
+ * @param int    $itemnumber Most probably 0. Modules can use other numbers when having more than one grade for each user
+ * @param mixed  $grades Grade (object, array) or several grades (arrays of arrays or objects), NULL if updating grade_item definition only
+ * @param mixed  $itemdetails Object or array describing the grading item, NULL if no change
+ * @param bool   $isbulkupdate If bulk grade update is happening.
+ * @return int Returns GRADE_UPDATE_OK, GRADE_UPDATE_FAILED, GRADE_UPDATE_MULTIPLE or GRADE_UPDATE_ITEM_LOCKED
+    */ 
+    return grade_update('mod/cmi5launch', $cmi5launch->course, 'mod', 'cmi5', $cmi5launch->id, 0, $grades, $params);
 }
+
 
 /**
  * Delete grade item for given scorm
@@ -1007,9 +1066,11 @@ function scorm_grade_item_update($scorm, $grades=null) {
  * @param object $scorm object
  * @return object grade_item
  */
-function scorm_grade_item_delete($scorm) {
+/*
+ function scorm_grade_item_delete($scorm) {
     global $CFG;
     require_once($CFG->libdir.'/gradelib.php');
 
     return grade_update('mod/scorm', $scorm->course, 'mod', 'scorm', $scorm->id, 0, null, array('deleted' => 1));
 }
+*/

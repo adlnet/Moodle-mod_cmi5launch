@@ -71,6 +71,14 @@ If the ID number is not entered for a learner, they will instead be identified b
 Note: If a learner\'s id changes, they will lose access to registrations associated with former ids and completion data may be reset. Reports in your LRS may also be affected.';
 $string['cmi5launchcustomacchp_default'] = 'https://moodle.com';
 
+//Cmi5 grades admin
+// Start Default LRS Admin Settings.
+$string['cmi5launchgradesettings'] = 'Default values for cmi5 Launch Link activity settings';
+$string['cmi5launchgradesettings_help'] = 'These are site-wide, default values used when creating a new activity. Each activity has the ability to override and provide alternative values.';
+
+///
+$string['othersettings'] = 'Additional settings';
+
 //cmi5 player root location
 $string['cmi5launchplayerurl'] = 'cmi5 Player URL';
 $string['cmi5launchplayerurl_help'] = 'The url to communicate with CMI5 player, can include port number(e.g. http://player.example.com or http://localhost:63398). Must NOT include a trailing forward slash.';
@@ -88,6 +96,44 @@ $string['cmi5launchtenantpass_default'] = '';
 $string['cmi5launchtenanttoken'] = 'cmi5 Player: Bearer Token';
 $string['cmi5launchtenanttoken_help'] = 'The cmi5 tenant bearer token (should be a long string).';
 $string['cmi5launchtenanttoken_default'] = '';
+
+//Grading info - MB
+
+//-MB - Not sure if we need ALL of these
+//* No - If a previous attempt is completed, passed or failed, the student will be provided with the option to enter in review mode or start a new attempt.
+//* When previous attempt completed, passed or failed - This relies on the SCORM package setting the status of \'completed\', \'passed\' or \'failed\'.
+//* Always - Each re-entry to the SCORM activity will generate a new attempt and the student will not be returned to the same point they reached in their previous attempt.';
+/*
+$string['forceattemptalways'] = 'Always';
+$string['forceattemptoncomplete'] = 'When previous attempt completed, passed or failed';
+$string['forcejavascript'] = 'Force users to enable JavaScript';
+$string['forcejavascript_desc'] = 'If enabled (recommended) this prevents access to SCORM objects when JavaScript is not supported/enabled in a users browser. If disabled the user may view the SCORM but API communication will fail and no grade information will be saved.';
+$string['forcejavascriptmessage'] = 'JavaScript is required to view this object, please enable JavaScript in your browser and try again.';
+$string['found'] = 'Manifest found';
+$string['frameheight'] = 'The height of the stage frame or window.';
+$string['framewidth'] = 'The width of the stage frame or window.';
+$string['fromleft'] = 'From left';
+$string['fromtop'] = 'From top';
+$string['fullscreen'] = 'Fill the whole screen';*/
+$string['general'] = 'General data';
+$string['gradeaverage'] = 'Average grade';
+$string['gradeforattempt'] = 'Grade for attempt';
+$string['gradehighest'] = 'Highest grade';
+$string['grademethod'] = 'Grading method';
+$string['grademethod_help'] = 'The grading method defines how the grade for a single attempt of the activity is determined.
+
+There are 4 grading methods:
+
+* Learning objects - The number of completed/passed learning objects
+* Highest grade - The highest score obtained in all passed learning objects
+* Average grade - The mean of all the scores
+* Sum grade - The sum of all the scores';
+$string['grademethoddesc'] = 'The grading method defines how the grade for a single attempt of the activity is determined.';
+$string['gradereported'] = 'Grade reported';
+$string['gradesettings'] = 'Grade settings';
+$string['gradescoes'] = 'Learning objects';
+$string['gradesum'] = 'Sum grade';
+
 
 // Start Activity Settings.
 $string['cmi5launchname'] = 'Launch link name';
