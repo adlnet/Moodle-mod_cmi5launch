@@ -569,9 +569,19 @@ function cmi5launch_process_new_package($cmi5launch) {
     $getRegistration = $connectors->getRegistrationPost();
     $retrieveAus = $aus_helpers-> getRetrieveAus();
 	$populateTable = $tables->getPopulateTable();
+    $saveAUs = $aus_helpers->getSaveAUs();
+    $createAUs = $aus_helpers->getCreateAUs();
     
     // Reload cmi5 instance.
     $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
+
+    echo"<br>";
+        echo "id is" . $cmi5launch->id;
+        echo"<br>";
+        echo"<br>";
+        echo "what are record fields is   ";
+    var_dump($record);
+        echo"<br>";
 
     $fs = get_file_storage();
 
@@ -626,17 +636,31 @@ function cmi5launch_process_new_package($cmi5launch) {
     $record->cmi5activityid = $lmsId;
 	//create url for sending to when requesting launch url for course 
     $playerUrl = $settings['cmi5launchplayerurl'];
+    $tenantname = $settings['cmi5launchtenantname'];
     $url = $playerUrl . "/api/v1/". $record->courseid. "/launch-url/";
 	$record->launchurl = $url;
     
 	//Retrieve the courses AUs and save to record
-	$aus = json_encode($retrieveAus($returnedInfo, $registration));
+	$aus = ($retrieveAus($returnedInfo));
 
-	$record->aus = $aus;
+    //Maybe this isnt needed anymore???
+	//$record->aus = json_encode($aus);
+//Because it is array here and needs toi be made into au objectS!
+
+
+    //Maybe better to save AUs here and feed it the array returned by retreieveAUS
+
+				$auIDs = $saveAUs($createAUs($aus), $record);
+
+
+                $record->aus = (json_encode($auIDs));
+
 
 	//Populate player table with new course info
-	$populateTable($record, 'cmi5launch');
- 
+	//Is this causing the dupe??
+    $populateTable($record, 'cmi5launch');
+    $DB->update_record('cmi5launch', $record, true);
+
     $fs->delete_area_files($context->id, 'mod_cmi5launch', 'content');
 
     $packer = get_file_packer('application/zip');

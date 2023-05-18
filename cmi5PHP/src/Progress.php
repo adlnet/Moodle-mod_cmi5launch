@@ -505,6 +505,10 @@ class progress{
 
 			foreach($resultDecoded as $singleStatment){
 
+			echo "<br>";
+			echo "I need to see a statement again &&&&&&&&&&&&&&&&&&&";
+			var_dump($singleStatment);
+			echo "<br>";
 				$currentLmsId = $singleStatment[$regId][0]["object"]["id"];
 			
 				//We also only want the ones the lmsID matches!

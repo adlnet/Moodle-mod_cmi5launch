@@ -111,12 +111,20 @@ $lmsAndId = explode(",", $fromView);
 //Retrieve AU ID
 $auID = array_shift($lmsAndId);
 
+//Ok, HERE! We can now go through our au array to get the ids,    then use THOSE to pull the info
+// Array of ids => $auIDs
+$aus_helpers = new Au_Helpers;
+$getAUs = $aus_helpers->getAUsFromDB();
+$au = $getAUs($auID);
+//We now have access to the full AU
+
  // Reload cmi5 instance.
  $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
 //Ok what is record here?
 $regid = $record->registrationid;
 
-///Ok, lets start with a simple test
+//TODO
+//For later to chane student view vs teacher
 //Lets check for the certain capability and display a message if it is found/not found
 //Excellent! The test works, now lets introduce like a flag, and use that to display progress or not
 //Well call it canSEe for now
@@ -131,10 +139,23 @@ if (has_capability('mod/cmi5launch:addinstance', $context)) {
     echo "<br>";
     $canSee = false;
 }
+//////////////////////
 
+//Yeah see this whole thing will change cause if we go by session ids, that is in the AU DB
     //If it is NOT empty there are relevent registrations
-    if (!$lmsAndId[0] == "") {
-        
+//oldcode    if (!$lmsAndId[0] == "") {
+
+echo "<br>";
+echo "Ok, lets start here. what is au sessions? IT SHOULD have something in it";
+var_dump(json_encode($au->sessions) );
+
+echo "<br>";
+//OK! Well it is coming up null, that explains a lot
+
+    //If it is null there have been no previous sessions
+    //So NUT null means there are previous sessions
+    if (!$au->sessions == NULL) {
+
         $getregistrationdatafromlrsstate = cmi5launch_get_global_parameters_and_get_state(
             "http://cmi5api.co.uk/stateapikeys/registrations"
         );
@@ -155,12 +176,9 @@ if (has_capability('mod/cmi5launch:addinstance', $context)) {
         }
             $registrationdatafromlrs = json_decode($getregistrationdatafromlrsstate->content->getContent(), true);
 
-            //Array to hold verbs and be returned
-           // $progress = array();
-
             //Remove dupliicate registration IDs (now it removes dupe object ids)
-            $lmsAndId = array_unique($lmsAndId);
-
+          //old  $lmsAndId = array_unique($lmsAndId);
+        //there should never be dup sessions TODO - makes sessions col 'unique'
             //Array to hold info for table population
             $tableData = array();
 
@@ -175,8 +193,27 @@ if (has_capability('mod/cmi5launch:addinstance', $context)) {
                 get_string('cmi5launchviewlaunchlinkheader', 'cmi5launch'),
             );
 
+            
+            //Now sessions come from table andd should be array
+          $sessionString = $au->sessions;
+         $sessionIDs = array();
+          //except they are not cause of new way to save, so now parse string
+    $sessionIDs= explode(',' , $sessionString);
 
-            foreach ($lmsAndId as $lmsId) {
+            echo "<br>";
+            echo "Did this work? whats the session array";
+			var_dump($sessionIDs);
+			echo "<br>";
+
+            $ses_helpers = new Session_Helpers;
+            $getSession = $ses_helpers->getSessionFromDB();
+			
+            //It IS, but lm
+            //oldforeach ($lmsAndId as $lmsId) {
+                foreach($sessionIDs as $sessionID){
+                    
+                    //Do we call the new session table here?
+                $session = $getSession($sessionID);
 
                 //array to hold data for table
                 $sessionInfo = array();
@@ -194,16 +231,28 @@ if (has_capability('mod/cmi5launch:addinstance', $context)) {
               //MB
               //Lets try to only do this if based on canSee
         if ($canSee == true) {
+
+            $lmsId = $au->lmsid;
             $progress = new progress;
             $getProgress = $progress->getRetrieveStatement();
+            //Actually the lmsid cans till work to shift through results.
+            //What we need now is to save the progress info to sessions table, and it
+            //needs to be able to save and concat not overwrite
+            //We also need some kind of session id or way top keep these sessions separate
+            //and sessionid is primary key. lets look at lrs
+            //Sessionid is sreturned by cmi5player when launch url requested!
 
-    
-
+//Now that we are using session id, progress will have to be updated accordingly to take diff iod. Lets look at this tomorrow
             $sessionInfo[] = ("<pre>" . implode("\n ", $getProgress($regid, $cmi5launch->id, $lmsId)) . "</pre>");
         }
 
+        //So I guess if a session id exists it needs to be passed to launch page through link here?
+        //maybe we loop through session ids, but how does lrrs now these...
+        //maybe it doesn't the table will?
+        
+        //NewSession iss already false (default)
         //Create a string to pass the AU ID and registration to next page (launch.ph)
-        $infoForNextPage = $auID; // . "," . $regId;
+        $infoForNextPage = $sessionID; // . "," . $regId;
         
             $sessionInfo[] =
                     "<a tabindex=\"0\" id='cmi5relaunch_attempt'
@@ -219,25 +268,34 @@ if (has_capability('mod/cmi5launch:addinstance', $context)) {
 
             echo html_writer::table($table);
 
-    //Create a string to pass the auid and reg to next page (launch.php)
-    $infoForNextPage = $auID; // . "," . $regId;
-
+            //Ok, here this is new sooooo
+            //maybe pass the word new throuh?
+            //Wait should this be falsE???
+            $newSession = "false";
+            //Create a string to pass the auid and reg to next page (launch.php)
+            $infoForNextPage = $auID . "," . $newSession;
+            
             //This builds the start new reg button - MB
             // Needs to come after previous attempts so a non-sighted user can hear launch options.
-            if ($cmi5launch->cmi5multipleregs) {
+          //  if ($cmi5launch->cmi5multipleregs) {
                 echo "<p id='cmi5launch_newattempt'><a tabindex=\"0\"
             onkeyup=\"key_test('" . $infoForNextPage . "')\" onclick=\"mod_cmi5launch_launchexperience('"
                     . $infoForNextPage
                     . "')\" style=\"cursor: pointer;\">"
                     . get_string('cmi5launch_attempt', 'cmi5launch')
                     . "</a></p>";
-            }
+            //}
         }
         else {
-            
-            //Create a string to pass the auid and reg to next page (launch.php)
-            $infoForNextPage = $auID;
-
+     //Ok, here this is new sooooo
+            //maybe pass the word new throuh?
+            $newSession = "true";
+    //Create a string to pass the auid and reg to next page (launch.php)
+    $infoForNextPage = $auID . "," . $newSession;
+            //Now the next page needs to know whether it a continuation of old session or an new one
+            echo "<br>";
+echo "what is going over??? ";
+var_dump($infoForNextPage);
             //New attempt
             echo "<p tabindex=\"0\"
             onkeyup=\"key_test('" . $infoForNextPage . "')\"

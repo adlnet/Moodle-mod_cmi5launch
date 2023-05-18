@@ -73,8 +73,34 @@ $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
 
 
 //Retrieve saved AUs
-$auList = json_decode($record->aus, true);
-$aus = $createAUs($auList);
+//$auList = json_decode($record->aus, true);
+
+//Ok, it is poss
+echo "<br>";
+echo "What is AU list?, ideally we just want to what? How best to get records now?";
+//Now these are in a tbale, so we don't NEED to save them from array
+//Instead we need ot make array from table where x and x matchh
+//$aus = $createAUs($auList);
+//Ohhh I don't need to make anymore, just retrieve..
+
+///////Lets try this here. So we dont have to make a new course constantly
+	//Retrieve the courses AUs and save to record
+	//$aus = ($retrieveAus($returnedInfo));
+//Aulist should work right?
+
+    //Maybe better to save AUs here and feed it the array returned by retreieveAUS
+	/*echo"<br>";
+	echo "HEYHEYHYE making progress! but what if we sent au OBJECTS?????";
+	echo "<br>";
+echo "What is record before it goes in?";
+var_dump($record);
+echo "<br>";
+				saveAUs($aus, $record);
+                */
+				//Save the new AUs to DB? 
+                /////////////////////////////////////
+
+
 
 if ($cmi5launch->intro) { 
     // Conditions to show the intro can change to look for own settings or whatever.
@@ -146,6 +172,12 @@ if ($cmi5launch->intro) {
 //to bring in functions from class cmi5Connector
 $connectors = new cmi5Connectors;
 
+//Lets now retrieve our list of AUs from cmi5launch
+$auIDs = json_decode($record->aus);
+echo "Did this work?";
+var_dump($auIDs) ;
+//Yes! But it is bringing in THESE IDs 338, 339 etyc. 
+echo "<br>";
 //Build url to pass as returnUrl
 $returnUrl = $CFG->wwwroot .'/mod/cmi5launch/view.php'. '?id=' .$cm->id;
 
@@ -215,19 +247,29 @@ $table->head = array(
 $getLRS = $progress->getRequestLRSInfo();
 $resultDecoded = $getLRS($registrationdatafromlrs, $cmid);
 
+//Ok, HERE! We can now go through our au array to get the ids,    then use THOSE to pull the info
+// Array of ids => $auIDs
+$aus_helpers = new Au_Helpers;
+$getAUs = $aus_helpers->getAUsFromDB();
     //For each au
-    foreach ($aus as $key => $item) {
+    //old code
+    //foreach ($aus as $key => $item) {
+        //NEW foreach with AU ids
+    foreach($auIDs as $key  => $auID){
         //Retrieve individual AU as array
-        $au = (array) ($aus[$key]);
+        //old $au = (array) ($aus[$key]);
 
-        //Verify object
-        if (!is_array($au)) {
-            $reason = "Excepted array, found " . $au;
+    $au = $getAUs($auID);
+        //We now want an auobject. 
+        //Verify object is an au object
+        if (!is_a($au, 'Au')) {
+            $reason = "Excepted AU, found ";
+        var_dump($au);
             throw new moodle_exception($reason, 'cmi5launch', '', $warnings[$reason]);
         }
 
         //Retrieve AU's lmsID
-        $auId = $au['lmsId'];
+        $auId = $au->lmsid;
 
         //Loop through the statements and match with the LRS statments whose object/id matches the aus lmsID
         //Match on lmsId. This ties the au to the session info from LRS.
@@ -252,7 +294,7 @@ $resultDecoded = $getLRS($registrationdatafromlrs, $cmid);
         }
 
         //Retreive AUs moveon specification
-        $auMoveon = $au['moveOn'];
+        $auMoveon = $au->moveon;
         //If moveon is not applicable, then we don't need to check it's progress, it's just viewed or not
         if ($auMoveon == "NotApplicable") {
             $auStatus = "viewed";
@@ -288,14 +330,19 @@ $resultDecoded = $getLRS($registrationdatafromlrs, $cmid);
         $auInfo = array();
 
         //Assign au name, progress, and index
-        $auInfo[] = $au['title'][0]['text'];
+        $auInfo[] = $au->title;
         $auInfo[] = ($auStatus);
-        $auIndex = $au['auIndex'];
+        $auIndex = $au->auindex;
 
         //ReleventReg and AU index needs to be a string to pass as variable to next page
 	   $regForNextPage = implode(',', $relevantObjId);
-        $infoForNextPage = $auIndex . "," . $regForNextPage;
+       //Do we still need reggggggistration>>>
+      //oldcode  $infoForNextPage = $auIndex . "," . $regForNextPage;
 
+      //Send au id now
+      //This needs to come from AU!!
+      //wait no, let it pass the 338, its the NEXT screens job to get the auindex
+ $infoForNextPage = $auID;
         //Assign au link to auviews
         $auInfo[] = "<a tabindex=\"0\" id='cmi5relaunch_attempt'
     onkeyup=\"key_test('" . $infoForNextPage . "')\" onclick=\"mod_cmi5launch_launchexperience('" . $infoForNextPage . "')\" style='cursor: pointer;'>"

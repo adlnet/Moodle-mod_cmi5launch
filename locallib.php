@@ -174,9 +174,11 @@ function cmi5launch_get_launch_url($registrationuuid, $auID) {
 $connectors = new cmi5Connectors;
 //Get retrieve URL function
 $retrieveUrl = $connectors->getRetrieveUrl();
-$rtnstring = $retrieveUrl($cmi5launch->id, $auID); 
+//See here we are passing the auid. If we have session ids will we pass those instead
+//or is that a whole new func, I think it may be
+//$rtnstring = $retrieveUrl($cmi5launch->id, $auID); 
 
-return $rtnstring;
+//return $rtnstring;
 }
 
 /**

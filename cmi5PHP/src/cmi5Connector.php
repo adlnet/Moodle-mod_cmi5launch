@@ -52,7 +52,7 @@ class cmi5Connectors{
 
         for($i = 0; $i < $length; $i++){
       
-			$au = $resultChunked[$i][0]['auIndex'];
+			$au = $resultChunked[$i][0]['auindex'];
           
             //TODO, do we want to save this to table, why is this here?
 			$record->auid = $au;
@@ -302,7 +302,7 @@ class cmi5Connectors{
     //@param $auID -AU id to pass to cmi5 for url request
     //@return $url - The launch URL returned from cmi5 player
     ////////
-    public function retrieveUrl($id, $auID){
+    public function retrieveUrl($id, $auIndex){
 		//TODO, this needs to be changed to have an if its one old call, if its not, new call
         //MB
         global $DB;
@@ -323,7 +323,7 @@ class cmi5Connectors{
 
         //Build URL for launch URL request
         //Okay it looks like the reurnurk is same level as  
-	    $url = $playerUrl . "/api/v1/course/" . $courseId  ."/launch-url/" . $auID;
+	    $url = $playerUrl . "/api/v1/course/" . $courseId  ."/launch-url/" . $auIndex;
 			//If its NOT one then we have a regid and it should be sent
 			//Ok, here is where we put in the optional param of regid!!
 			//the body of the request must be made as array first
@@ -360,12 +360,16 @@ class cmi5Connectors{
         //sends the stream to the specified URL and stores results (the false is use_include_path, which we dont want in this case, we want to go to the url)
         $launchResponse = file_get_contents( $url, false, $context );
 
+        //NOW, THIS launch response should have the Session code!!!! we can also call
+        //a get session info (will need to be made) to fill out more if need be
         	//Only return the URL
 		$urlDecoded = json_decode($launchResponse, true);
 
-		$url = $urlDecoded['url'];
+        //Now, save the code to au in DB, it should be a 'session id' and saved the the property sessions which is an array
+        //NO! Lets return the whole dang thing and then I will already have access to AU object!
+//		$url = $urlDecoded['url'];
 
-        return $url;
+        return $urlDecoded;
     }
 
 

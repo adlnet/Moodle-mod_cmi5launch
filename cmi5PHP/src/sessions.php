@@ -15,32 +15,18 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- *Class to handle Assignable Units 
+ *Class to handle Sessions. 
+ * TODO The question is, to we want to build this exactly like the session table in cmi5??? 
  *
  * @copyright  2023 Megan Bohland
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-class Au {
+class Session {
   // Properties
-  public $id, $url, $type, $lmsid = [], $title, $moveon, $auindex, $parents, $objectives, $description = [], $activitytype, $launchmethod, $masteryscore;
+  //$id is session id
+  public $id, $tenantname, $lmsid, $firstlaunch, $lastlaunch, $progress = [], $auid, $aulaunchurl, $launchurl, $completed_passed, $grade, $registrationid, $lrscode;
 
-  //Do we needs 'sessions? todo
-
-
-  //Holds launch url, this may be the way to have separate sessions.
-  public $launchurl, $sessionid;
-
-  //Maybe an array will hold info better
-  //I'm thinkig sessionId->launchurl (for that session)
-  public $sessions = array();
-  
-
-  //These may be needed later if AU's become part of a block to keep track of 
-  //being finished.
-  public $progress;
-  
-  public  $noattempt = true|false;
 
   //Why did I ake these arrays? they should just be bools
   public $completed, $passed, $inprogress = true | false;
@@ -55,7 +41,7 @@ class Au {
     return $this->name;
   }
 
-//Constructs AUs. Is fed array and where array key matches property, sets the property.  
+//Constructs sessionss. Is fed array and where array key matches property, sets the property.  
 function __construct($statement){
 
   foreach($statement as $key => $value){

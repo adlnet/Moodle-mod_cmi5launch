@@ -1,5 +1,5 @@
 <?php
-class Au_Helpers
+class Session_Helpers
 {
 
 	public function getRetrieveAUs()
@@ -20,7 +20,7 @@ class Au_Helpers
 		return [$this, 'updateVerbs'];
 	}
 
-	public function getAUsFromDB()
+	public function getSessionFromDB()
 	{
 		return [$this, 'getFromDB'];
 	}
@@ -376,14 +376,14 @@ class Au_Helpers
 		else{
 			$auItem = $DB->get_record('cmi5launch_aus',  array('id' => $auID));
 
-			//echo "we need lms id and sessions???";
-			//var_dump($auItem);
-			//	echo "<br>";
+			echo "we need lms id and sessions???";
+			var_dump($auItem);
+				echo "<br>";
 			//Maybe just combine 45 and 48? TODO
 			$au = new au($auItem);
-			//echo "Did this work? Is it an au???";
-			//var_dump($au);
-			//echo "<br>";
+			echo "Did this work? Is it an au???";
+		var_dump($au);
+			echo "<br>";
 			//It IS, but lmsIIId and sessions are arrays and not coming over correctly
 			///$au->lmsId = //
 
@@ -392,12 +392,47 @@ class Au_Helpers
 		//Return our new list of AU!
 		return $au;
 		}
-	
-		
-	
-
 
 }
 
+function getFromDB($sessionID)
+{
+
+	global $DB;
+
+	//Lets have this take the au id and search records by it
+	//Needs to return our new AU objects
+	$newAus = array();
+	
+	$check = $DB->record_exists( 'cmi5launch_sessions', ['id' => $sessionID], '*', IGNORE_MISSING);
+
+
+	//If check is negative, the record doesnot exist. IT should so throw error
+	if(!$check){
+
+		echo "<p>Error attempting to get AU data from DB. Check AU id.</p>";
+		echo "<pre>";
+	   var_dump($sessionID);
+		echo "</pre>";
+	}
+	else{
+		$auItem = $DB->get_record('cmi5launch_session',  array('id' => $sessionID));
+
+		echo "we need lms id and sessions???";
+		var_dump($auItem);
+			echo "<br>";
+		//Maybe just combine 45 and 48? TODO
+		$au = new au($auItem);
+		echo "Did this work? Is it an au???";
+	var_dump($au);
+		echo "<br>";
+		//It IS, but lmsIIId and sessions are arrays and not coming over correctly
+		///$au->lmsId = //
+
+	}
+
+	//Return our new list of AU!
+	return $au;
+	}
 
 ?>
