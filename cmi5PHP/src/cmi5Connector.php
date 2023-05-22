@@ -5,6 +5,9 @@ class cmi5Connectors{
     public function getCreateTenant(){
         return [$this, 'createTenant'];
     }
+    public function getSessionInfo(){
+        return [$this, 'retrieveSessionInfo'];
+    }
     public function getRetrieveToken(){
         return [$this, 'retrieveToken'];
     }
@@ -441,5 +444,64 @@ class cmi5Connectors{
       	      return $result;
                 }
     }
+
+
+    ///Function to retrieve session info for an AU
+    //@param $id -Actor id to find correct info for url request
+    //@param $auID -AU id to pass to cmi5 for url request
+    //@return $url - The launch URL returned from cmi5 player
+    ////////
+    public function retrieveSessionInfo($sessionId, $id){
+		//TODO, this needs to be changed to have an if its one old call, if its not, new call
+        //MB
+        global $DB;
+
+		//Retrieve actor record, this enables correct actor info for URL storage
+		$record = $DB->get_record("cmi5launch", array('id' => $id));
+
+		$settings = cmi5launch_settings($id);
+		$registrationID = $record->registrationid;
+
+		
+        $homepage = $settings['cmi5launchcustomacchp'];
+        $returnUrl =$record->returnurl;
+		$actor= $settings['cmi5launchtenantname'];
+		$token = $settings['cmi5launchtenanttoken'];
+		$playerUrl = $settings['cmi5launchplayerurl'];
+		$courseId = $record->courseid;
+
+        //Build URL for launch URL request
+        //Okay it looks like the reurnurk is same level as  
+	    $url = $playerUrl . "/api/v1/session/" . $sessionId;
+
+		// use key 'http' even if you send the request to https://...
+        //There can be multiple headers but as an array under the ONE header
+        //content(body) must be JSON encoded here, as that is what CMI5 player accepts
+        //JSON_UNESCAPED_SLASHES used so http addresses are displayed correctly
+     	   $options = array(
+            'http' => array(
+                'method'  => 'GET',
+                'ignore_errors' => true,
+                'header' => array("Authorization: Bearer ". $token,  
+                    "Content-Type: application/json\r\n" .
+                    "Accept: application/json\r\n")
+
+            )	
+        );
+
+        //the options are here placed into a stream to be sent
+        $context  = stream_context_create(($options));
+
+        //sends the stream to the specified URL and stores results (the false is use_include_path, which we dont want in this case, we want to go to the url)
+        $launchResponse = file_get_contents( $url, false, $context );
+
+		$sessionDecoded = json_decode($launchResponse, true);
+
+        return $sessionDecoded;
+    }
+
+
+
 }
-    ?>
+   
+   ?>

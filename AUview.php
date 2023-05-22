@@ -26,7 +26,7 @@ require('header.php');
 
 //For connecting to Progress class - MB
 require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/Progress.php");
-
+require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/sessionHelpers.php");
 global $cmi5launch;
 
 // Trigger module viewed event.
@@ -145,11 +145,6 @@ if (has_capability('mod/cmi5launch:addinstance', $context)) {
     //If it is NOT empty there are relevent registrations
 //oldcode    if (!$lmsAndId[0] == "") {
 
-echo "<br>";
-echo "Ok, lets start here. what is au sessions? IT SHOULD have something in it";
-var_dump(json_encode($au->sessions) );
-
-echo "<br>";
 //OK! Well it is coming up null, that explains a lot
 
     //If it is null there have been no previous sessions
@@ -195,10 +190,11 @@ echo "<br>";
 
             
             //Now sessions come from table andd should be array
-          $sessionString = $au->sessions;
-         $sessionIDs = array();
+          $sessionIDs = json_decode($au->sessions);
+      
+          //$sessionIDs = array();
           //except they are not cause of new way to save, so now parse string
-    $sessionIDs= explode(',' , $sessionString);
+   // $sessionIDs= explode(',' , $sessionString);
 
             echo "<br>";
             echo "Did this work? whats the session array";
@@ -210,10 +206,14 @@ echo "<br>";
 			
             //It IS, but lm
             //oldforeach ($lmsAndId as $lmsId) {
-                foreach($sessionIDs as $sessionID){
+                foreach($sessionIDs as $key => $sessionID){
+
+                    //get int value cause its string
+                    //No, the TABLE is a string, chnage it to int smh
                     
                     //Do we call the new session table here?
-                $session = $getSession($sessionID);
+                    //Pass in id to now call to cmi5player
+                $session = $getSession($sessionID,  $cm->id);
 
                 //array to hold data for table
                 $sessionInfo = array();
@@ -273,7 +273,7 @@ echo "<br>";
             //Wait should this be falsE???
             $newSession = "false";
             //Create a string to pass the auid and reg to next page (launch.php)
-            $infoForNextPage = $auID . "," . $newSession;
+            $infoForNextPage = $sessionID . "," . $newSession;
             
             //This builds the start new reg button - MB
             // Needs to come after previous attempts so a non-sighted user can hear launch options.

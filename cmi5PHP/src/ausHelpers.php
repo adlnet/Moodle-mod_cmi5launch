@@ -358,10 +358,6 @@ class Au_Helpers
 
 		global $DB;
 
-		//Lets have this take the au id and search records by it
-		//Needs to return our new AU objects
-		$newAus = array();
-		
 		$check = $DB->record_exists( 'cmi5launch_aus', ['id' => $auID], '*', IGNORE_MISSING);
 
 	
@@ -375,27 +371,14 @@ class Au_Helpers
 		}
 		else{
 			$auItem = $DB->get_record('cmi5launch_aus',  array('id' => $auID));
-
-			//echo "we need lms id and sessions???";
-			//var_dump($auItem);
-			//	echo "<br>";
-			//Maybe just combine 45 and 48? TODO
+	
 			$au = new au($auItem);
-			//echo "Did this work? Is it an au???";
-			//var_dump($au);
-			//echo "<br>";
-			//It IS, but lmsIIId and sessions are arrays and not coming over correctly
-			///$au->lmsId = //
-
+		
 		}
 
 		//Return our new list of AU!
 		return $au;
-		}
-	
-		
-	
-
+	}
 
 }
 

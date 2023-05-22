@@ -42,7 +42,7 @@ require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/cmi5Connector.php");
 require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/cmi5_table_connectors.php");
 require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/ausHelpers.php");
 require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/aus.php");
-
+require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/sessions.php");
 
 global $cmi5launchsettings;
 $cmi5launchsettings = null;

@@ -2,6 +2,7 @@
 class Session_Helpers
 {
 
+	
 	public function getRetrieveAUs()
 	{
 		return [$this, 'retrieveAUs'];
@@ -10,9 +11,9 @@ class Session_Helpers
 	{
 		return [$this, 'createAUs'];
 	}
-	public function getSaveAUs()
+	public function getSaveSession()
 	{
-		return [$this, 'saveAUs'];
+		return [$this, 'createSession'];
 	}
 
 	public function getUpdateVerb()
@@ -93,346 +94,111 @@ class Session_Helpers
 	 * @param mixed $retUrl - Tenants return url for when course window closes.
 	 * @return mixed
 	 */
-	function saveAUs($auObjectArray, $recordIn)
+	function createSession($sessId, $launchurl, $launchMethod)
 	{
 
-		//Could this be a pointer issue?
-		//Like is it overwriting record and thats casuing the duope?
-		//$record = $recordIn;
 		echo "<br>";
 		echo "Well dang are we even entering this new func";
 		echo "<br>";
 
+		//OMG!!! Lets make a function that call the CMI5 player api (get session info!!!)
+		//And like we can call it twice or make anew func,
+		//but check if like these are filled in and if not, populate from cmi5 player~
+		//Two may be better as this one could soleby be to create session with basics and after cmi5 called it 
+		//will pop the rest. maybe on the return paggge? (which is view.php)
+		//Because that will also tie in to done or not, so lets renme this to createSession
+		//and the other can updateFromCmi5
+
 		global $DB, $CFG, $cmi5launch;
 
-		//$record;
-		$table = "cmi5launch_aus";
+		echo "<br>";
+		echo "wait a dang minute!!! IS the issue the sessId not being here?";
+		echo "<br>";
+		echo "What is sessID?";
+		var_dump($sessId);
+		echo "<br>";
+		echo "<br>";
 
+		//$record;
+		$table = "cmi5launch_sessions";
+		$settings = cmi5launch_settings($cmi5launch->id);
 		//Lets make an array to hold the created ids
-		$auIDs = array();
+		$sessionIDs = array();
 		//Retrieve record id, this will be added to auindex to make unique id
 //		$recordId = $record->id;
 
-		//Ok the foreach is clever, but there are two many nested values for this to work, we will need to do this manually
-		foreach ($auObjectArray as $auObject) {
+//See this is diff, we don't need to do this, just save the id and lauchurl, later
+//we can call a func to retrieve sess info
+$tenantname = $settings['cmi5launchtenantname'];
 
-			echo "<br>";
-			echo"Why are some items null what is the object here??" ;
-			var_dump(($auObject));
-			echo"<br>";
-			
 			//Make a newRecord to save
 			$newRecord = new stdClass();
-						//Because of many nested properties, needs to be done manually
-						$newRecord->auid = $auObject->id;
-						$newRecord->launchmethod = $auObject->launchMethod;
-						//$newRecord->lmsid = $auObject->lmsid;
-						$newRecord->lmsid = json_encode($auObject->lmsId, true);
-
-						$newRecord->url = $auObject->url;
-						$newRecord->type = $auObject->type;
-						$title = json_decode(json_encode($auObject->title), true);
-						$newRecord->title = $title[0]['text'];
-						$newRecord->moveon = $auObject->moveOn;
-						$newRecord->auindex = $auObject->auIndex;
-						$newRecord->parents = json_encode($auObject->parents, true);
-						$newRecord->objectives = $auObject->objectives;
-						$desc = json_decode(json_encode($auObject->description), true);
-						$newRecord->description = $desc[0]['text'];
-						$newRecord->activitytype = $auObject->activityType;
-						$newRecord->masteryscore = $auObject->masteryscore;
-						$newRecord->completed = $auObject->completed;
-						$newRecord->passed = $auObject->passed;
-						$newRecord->inprogress = $auObject->inprogress;
-						$newRecord->noattempt = $auObject->noattempt;
-			echo "<br>";
-			echo"What is our new record item???" ;
-			var_dump(($newRecord));
-			echo"<br>";
-			
-				//The record is ok, I think one of the ARGS in record isn't, some of them are nested arrays! Can I "toString" them?
-			$newId = $DB->insert_record($table, $newRecord, true);
-
-			$auIDs[] = $newId;
-		}
-		//Return record id to it's original value
-		//now return the au id list (Because record is global)
-		//$record->id = $recordId;
-		return $auIDs;
-	}
-
-
-
-
-
-
-
-	/**
-	 * //can we take an AU and just if this matches then this matches and save to table?
-	 * ok if this is called in lib it needs to take an array
-	 * @param mixed $id - base id to make sure record is saved to correct actor
-	 * @param mixed $urlInfo - urlInfo that was returned from cmi5 such as sessionId, launchWindow, URL
-	 * @param mixed $retUrl - Tenants return url for when course window closes.
-	 * @return mixed
-	 */
-	function saveAUsOld($auObjectArray, $recordIn)
-	{
-
-		//Could this be a pointer issue?
-		//Like is it overwriting record and thats casuing the duope?
-		//$record = $recordIn;
-		echo "<br>";
-		echo "Well dang are we even entering this new func";
-		echo "<br>";
-
-		global $DB, $CFG, $cmi5launch;
-
-		$record;
-		$table = "cmi5launch_aus";
-
-		//Lets make an array to hold the created ids
-		$auIDs = array();
-		//Retrieve record id, this will be added to auindex to make unique id
-		$recordId = $record->id;
-
-		//Ok the foreach is clever, but there are two many nested values for this to work, we will need to do this manually
-		foreach ($auObjectArray as $auObject) {
-
 			//Because of many nested properties, needs to be done manually
-			$record->auid = $auObject->id;
-			$record->launchmethod = $auObject->launchMethod;
-			$record->lmsid = $auObject->lmsId;
-			$record->url = $auObject->url;
-			$record->type = $auObject->type;
-			$title = json_decode(json_encode($auObject->title), true);
-			$record->title = $title[0]['text'];
-			$record->moveon = $auObject->moveOn;
-			$record->auindex = $auObject->auIndex;
-			$record->parents = json_encode($auObject->parents, true);
-			$record->objectives = $auObject->objectives;
-			$desc = json_decode(json_encode($auObject->description), true);
-			$record->description = $desc[0]['text'];
-			$record->activitytype = $auObject->activityType;
-			$record->masteryscore = $auObject->masteryScore;
-			$record->completed = $auObject->completed;
-			$record->passed = $auObject->passed;
-			$record->inprogress = $auObject->inProgress;
-			$record->noattempt = $auObject->noAttempt;
+			$newRecord->sessionid = $sessId;
+			$newRecord->launchurl = $launchurl;
+			
+			$newRecord->tenantname = $settings['cmi5launchtenantname'];
+			$newRecord->launchmethod = $launchMethod;
+			
 			echo "<br>";
-			echo "Ok, lets see if everything is right?";
-			echo "<br>";
-			//What if we made id id+au??? could that solve the issue?
-		//	$record->id = ($recordId + $record->auindex);
-			echo "<br>";
-			echo "Ok, break it down, what is recordId ";
-			var_dump($recordId);
-			echo "<br>";
-			echo "<br>";
-			echo "Ok, break it down, what is and auindex in record? ";
-			var_dump($record->auindex);
-			echo "<br>";
-			echo "together they make record->>>id is: ";
-			var_dump($record->id);
-			echo "<br>";
-			echo "record->>>courseid is: ";
-			var_dump($record->courseid);
-			echo "<br>";
-			echo "record->>>tenantname is: ";
-			var_dump($record->tenantname);
-			echo "<br>";
-			echo "record->>>currentgrade is: ";
-			var_dump($record->currentgrade);
-			echo "<br>";
-			echo "record->>>launchmethod is: ";
-			var_dump($record->launchmethod);
-			echo "<br>";
-			echo "record->>>reegistrationid is: ";
-			var_dump($record->registrationid);
-			echo "<br>";
-			echo "record->>>moodleid is: ";
-			var_dump($record->moodleid);
-			echo "<br>";
-			echo "record->>>sessionid is: ";
-			var_dump($record->sessionid); //this will be added to later
-			echo "<br>";
-			echo "record->>>returnurl is: ";
-			var_dump($record->returnurl);
-			echo "<br>";
-			echo "record->>>au id is: ";
-			var_dump($record->lmsid);
-			echo "<br>";
-			echo "<br>";
-			echo "record->>>LMSid is: ";
-			var_dump($record->lmsid);
-			echo "<br>";
-			echo "<br>";
-			echo "record->>> url is: ";
-			var_dump($record->url);
-			echo "<br>";
-			echo "<br>";
-			echo "record->>>  type is: ";
-			var_dump($record->type);
-			echo "<br>";
-			echo "<br>";
-			echo "record->>> title is: ";
-			var_dump($record->title);
-			echo "<br>";
-			echo "<br>";
-			echo "<br>";
-			echo "record->>> moveon is: ";
-			var_dump($record->moveon);
-			echo "<br>";
-			echo "<br>";
-			echo "record->>> AU INDEX is: ";
-			var_dump($record->auindex);
-			echo "<br>";
-			echo "<br>";
-			echo "record->>> parents is: ";
-			var_dump($record->parents);
-			echo "<br>";
-			echo "record->>> description is: ";
-			var_dump($record->description);
-			echo "<br>";
-			echo "record->>> activitytype is: ";
-			var_dump($record->activitytype);
-			echo "<br>";
-			echo "record->>> masteryscore is: ";
-			var_dump($record->masteryscore);
-			echo "<br>";
-			echo "record->>> completed is: ";
-			var_dump($record->completed);
-			echo "<br>";
-			echo "record->>> passed is: ";
-			var_dump($record->passed);
-			echo "<br>";
-			echo "record->>> inprogress is: ";
-			var_dump($record->inprogress);
-			echo "<br>";
-			echo "record->>> noattempt is: ";
-			var_dump($record->noattempt);
+			echo "What is our new record item???";
+			var_dump(($newRecord));
 			echo "<br>";
 
-			//Make sure record doesn't exist before attempting to create
-			//Why is this returning recordds??
-		/*	$check = $DB->record_exists($table, ['id' => $record->id], '*', IGNORE_MISSING);
-			echo "<br>";
-			echo "Ok, what check??????????????";
-			var_dump($check);
-			echo "<br>";
+			//The record is ok, I think one of the ARGS in record isn't, some of them are nested arrays! Can I "toString" them?
+			$DB->insert_record($table, $newRecord, true);
 
-			//If false, record doesn't exist, so create  it
-			if (!$check) {
-*/
-				echo "<br>";
-				echo "No surproise record didnt exist. Record currently BEFORE:: ";
-				var_dump($record);
-				echo "<br>";
-
-				//The record is ok, I think one of the ARGS in record isn't, some of them are nested arrays! Can I "toString" them?
-				$DB->import_record($table, $record, true);
-
-//			}
-			/*else {
-			// If it does exist, update it
-			//Wait, this should NEVER exist
-			echo"<br>";
-			echo "Record currently after:: ";
-			var_dump($record);
-			echo "<br>";
-			//Update record in table with newly retrieved tenant data
-			$DB->update_record($table, $record, true);
-			}*/
-
-			//llllets make an array list of created auid's and have these be retrieved
-			//now add that on
-			$auIDs[] = $record->id;
-		}
 		//Return record id to it's original value
 		//now return the au id list (Because record is global)
 		//$record->id = $recordId;
-		return $auIDs;
+		//return $newId;
 	}
 
-	function getFromDB($auID)
+
+	function getFromDB($sessionID, $cmiId)
 	{
+		global $DB, $CFG;
+		require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/sessionHelpers.php");
+		$cmi5_connectors = new cmi5Connectors;
+		$getSession = $cmi5_connectors->getSessionInfo();
 
-		global $DB;
+		$check = $DB->record_exists('cmi5launch_sessions', ['sessionid' => $sessionID], '*', IGNORE_MISSING);
 
-		//Lets have this take the au id and search records by it
-		//Needs to return our new AU objects
-		$newAus = array();
-		
-		$check = $DB->record_exists( 'cmi5launch_aus', ['id' => $auID], '*', IGNORE_MISSING);
 
-	
 		//If check is negative, the record doesnot exist. IT should so throw error
-		if(!$check){
+		if (!$check) {
 
-			echo "<p>Error attempting to get AU data from DB. Check AU id.</p>";
+			echo "<p>Error attempting to get session data from DB. Check session id.</p>";
 			echo "<pre>";
-		   var_dump($auID);
+			var_dump($sessionID);
 			echo "</pre>";
-		}
-		else{
-			$auItem = $DB->get_record('cmi5launch_aus',  array('id' => $auID));
+		} else {
+			$sessionItem = $DB->get_record('cmi5launch_sessions', array('id' => $sessionID));
 
-			echo "we need lms id and sessions???";
-			var_dump($auItem);
-				echo "<br>";
-			//Maybe just combine 45 and 48? TODO
-			$au = new au($auItem);
-			echo "Did this work? Is it an au???";
-		var_dump($au);
+			//Ok, maybe here is where we query the cmi5 player!
+
+			$infoFromPlayer = $getSession($sessionID, $cmiId);
+
+			echo "Ok, now info from player should be array and we should be able to populate a session object with it?";
+			var_dump($infoFromPlayer);
 			echo "<br>";
-			//It IS, but lmsIIId and sessions are arrays and not coming over correctly
+			//YES! ok, 
+
+			//Maybe the session func should take two objects? and combine to one session?
+			//or it could just take the session id? and get ALL the info from player?
+			//Or heck, the player RETURNS that anyway, so just give what the player returns to construct, 
+			//make sure it is all good, and save back over record (update_record)
+			$session = new session($infoFromPlayer);
+			
+			echo "Did this work? Is it a session???";
+			var_dump($session);
+			echo "<br>";
 			///$au->lmsId = //
 
 		}
 
 		//Return our new list of AU!
-		return $au;
-		}
-
+		return $session;
+	}
 }
-
-function getFromDB($sessionID)
-{
-
-	global $DB;
-
-	//Lets have this take the au id and search records by it
-	//Needs to return our new AU objects
-	$newAus = array();
-	
-	$check = $DB->record_exists( 'cmi5launch_sessions', ['id' => $sessionID], '*', IGNORE_MISSING);
-
-
-	//If check is negative, the record doesnot exist. IT should so throw error
-	if(!$check){
-
-		echo "<p>Error attempting to get AU data from DB. Check AU id.</p>";
-		echo "<pre>";
-	   var_dump($sessionID);
-		echo "</pre>";
-	}
-	else{
-		$auItem = $DB->get_record('cmi5launch_session',  array('id' => $sessionID));
-
-		echo "we need lms id and sessions???";
-		var_dump($auItem);
-			echo "<br>";
-		//Maybe just combine 45 and 48? TODO
-		$au = new au($auItem);
-		echo "Did this work? Is it an au???";
-	var_dump($au);
-		echo "<br>";
-		//It IS, but lmsIIId and sessions are arrays and not coming over correctly
-		///$au->lmsId = //
-
-	}
-
-	//Return our new list of AU!
-	return $au;
-	}
-
 ?>
