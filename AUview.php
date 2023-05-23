@@ -157,6 +157,11 @@ if (has_capability('mod/cmi5launch:addinstance', $context)) {
 
         $lrsrespond = $getregistrationdatafromlrsstate->httpResponse['status'];
 
+        echo "<br>";
+            echo "Whats the LRS res?";
+			var_dump($lrsrespond);
+			echo "<br>";
+
         if ($lrsrespond != 200 && $lrsrespond != 404) {
             // On clicking new attempt, save the registration details to the LRS State and launch a new attempt.
             echo "<div class='alert alert-error'>" . get_string('cmi5launch_notavailable', 'cmi5launch') . "</div>";
@@ -213,11 +218,15 @@ if (has_capability('mod/cmi5launch:addinstance', $context)) {
                     
                     //Do we call the new session table here?
                     //Pass in id to now call to cmi5player
-                $session = $getSession($sessionID,  $cm->id);
+                $session = $getSession($sessionID,  $cmi5launch->id);
 
                 //array to hold data for table
                 $sessionInfo = array();
 
+                echo "<br>";
+                echo "It's having trouble with reggistrationdatafromlrs";
+                var_dump($registrationdatafromlrs);
+                echo "<br>";
                 $sessionInfo[] = date_format(
                     date_create($registrationdatafromlrs[$regid]['created']),
                     'D, d M Y H:i:s'

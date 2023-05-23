@@ -362,6 +362,21 @@ function cmi5launch_get_global_parameters_and_get_state($key) {
     global $cmi5launch;
     $cmi5launchsettings = cmi5launch_settings($cmi5launch->id);
 
+    echo "<br>";
+    echo "Ok, what are the sessting here?";
+    echo "<br>";
+    echo "endpoint:   ";
+    var_dump($cmi5launchsettings['cmi5launchlrsendpoint']);
+    echo "<br>";
+    echo "version:  ";
+    var_dump($cmi5launchsettings['cmi5launchlrsversion']);
+    echo "<br>";
+    echo "login:    ";
+    var_dump($cmi5launchsettings['cmi5launchlrslogin']);
+    echo "<br>";
+    echo "lrs pass :   ";
+    var_dump($cmi5launchsettings['cmi5launchlrspass']);
+    echo "<br>";
     $lrs = new \cmi5\RemoteLRS(
         $cmi5launchsettings['cmi5launchlrsendpoint'],
         $cmi5launchsettings['cmi5launchlrsversion'],

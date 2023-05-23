@@ -456,6 +456,9 @@ class cmi5Connectors{
         //MB
         global $DB;
 
+        echo "The id must not be right?";
+        var_dump($id);
+
 		//Retrieve actor record, this enables correct actor info for URL storage
 		$record = $DB->get_record("cmi5launch", array('id' => $id));
 

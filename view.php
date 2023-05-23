@@ -207,6 +207,11 @@ $getregistrationdatafromlrsstate = cmi5launch_get_global_parameters_and_get_stat
 //Parse for http response
 $lrsrespond = $getregistrationdatafromlrsstate->httpResponse['status'];
 
+echo "<br>";
+echo "Whats the LRS res?";
+var_dump($lrsrespond);
+echo "<br>";
+
 //Array to hold info for table population
 $tableData = array();
 
