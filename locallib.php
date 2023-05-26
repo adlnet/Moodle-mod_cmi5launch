@@ -384,7 +384,16 @@ function cmi5launch_get_global_parameters_and_get_state($key) {
         $cmi5launchsettings['cmi5launchlrspass']
     );
 
-
+    echo "<br>";
+    echo "Before we return it, IS IT THE CMI%ACTIVITY ID??????;";
+    echo "<br>";
+    var_dump($cmi5launch->cmi5activityid);
+    echo "<br>";
+    echo "<br>";
+    echo "Before we return it, OR THE ACTOR!!!!!";
+    echo "<br>";
+    var_dump(cmi5launch_getactor($cmi5launch->id));
+    echo "<br>";
     return $lrs->retrieveState(
         new \cmi5\Activity(array("id" => trim($cmi5launch->cmi5activityid))),
         cmi5launch_getactor($cmi5launch->id),

@@ -174,10 +174,7 @@ $connectors = new cmi5Connectors;
 
 //Lets now retrieve our list of AUs from cmi5launch
 $auIDs = json_decode($record->aus);
-echo "Did this work?";
-var_dump($auIDs) ;
-//Yes! But it is bringing in THESE IDs 338, 339 etyc. 
-echo "<br>";
+
 //Build url to pass as returnUrl
 $returnUrl = $CFG->wwwroot .'/mod/cmi5launch/view.php'. '?id=' .$cm->id;
 
@@ -193,6 +190,11 @@ if ( $record->registrationid == null) {
 	//Get registration id from record (it was made when course was)
 	$registrationID = $record->registrationid; 
 }
+echo "<br>";
+echo "Start at the begindin, what is registraion id here???   ";
+var_dump($registrationID);
+echo "<br>";
+//Ok, thats right
 
     $table = "cmi5launch";
     //Save the returnurl
@@ -208,9 +210,20 @@ $getregistrationdatafromlrsstate = cmi5launch_get_global_parameters_and_get_stat
 $lrsrespond = $getregistrationdatafromlrsstate->httpResponse['status'];
 
 echo "<br>";
-echo "Whats the LRS res?";
+echo "what is lrs respond here?";
 var_dump($lrsrespond);
 echo "<br>";
+
+//What if we query the LRS ourselves? 
+
+$requestStatements = $progress->getRequestLRSInfo();
+
+$trialStatements = $requestStatements($registrationID);
+echo "<br>";
+echo "what are our statments HERE";
+var_dump($trialStatements);
+echo "<br>";
+
 
 //Array to hold info for table population
 $tableData = array();

@@ -25,7 +25,13 @@
 class Session {
   // Properties
   //$id is session id
-  public $id, $tenantname, $lmsid, $firstlaunch, $lastlaunch, $progress = [], $auid, $aulaunchurl, $launchurl, $completed_passed, $grade, $registrationid, $lrscode, $created_at, $updated_at, $registration_course_aus_id, $code, $last_request_time, $launch_mode, $mastery_score, $context_template, $is_launched, $is_initialized, $is_completed, $is_passed, $is_failed, $is_terminated, $is_abandoned, $courseid;
+  public $id, $tenantname, $tenantId, $registrationsCoursesAusId, $lmsid, $firstlaunch, $lastlaunch, 
+  $progress = [], $auid, $aulaunchurl, $launchurl, 
+  $completed_passed, $grade, $registrationid, $lrscode, 
+  $createdAt, $updatedAt, $registrationCourseAusId, 
+  $code, $lastRequestTime, $launchTokenId, $launchMode, $masteryScore, 
+  $contextTemplate, $isLaunched, $isInitialized, $initializedAt, $isCompleted, 
+  $isPassed, $isFailed, $isTerminated, $isAbandoned, $courseid;
 
 
   //Why did I ake these arrays? they should just be bools

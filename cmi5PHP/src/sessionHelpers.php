@@ -16,9 +16,9 @@ class Session_Helpers
 		return [$this, 'createSession'];
 	}
 
-	public function getUpdateVerb()
+	public function getUpdateSession()
 	{
-		return [$this, 'updateVerbs'];
+		return [$this, 'updateSessions'];
 	}
 
 	public function getSessionFromDB()
@@ -26,19 +26,42 @@ class Session_Helpers
 		return [$this, 'getFromDB'];
 	}
 
+	//Lets call session updatefrom cmi5
 
-	function updateVerbs($aus, $verbList)
+	function updateSessions($sessionID, $cmi5Id)
 	{
+		global $CFG, $DB;
+		require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/cmi5Connector.php");
+		$connector = new cmi5Connectors;
+	
+		//Get the session from DB with session id
+		$session = $this->getFromDB($sessionID);
 
-		//This gets the aus separate and then compares to update them
-		//Their verbs and such
-		foreach ($aus as $key) {
+		$getSessionInfo = $connector->getSessions();
 
-			//Retrieve individual AU as array
-			$au = (array) ($aus[$key]);
+		//This is sessioninfo from CMI5 player
+		$sessionInfo =	$getSessionInfo($sessionID, $cmi5Id);
 
+		//Update session
+		foreach($sessionInfo as $key => $value){
+			//We don't want to overwrite id
+			if (property_exists($session, $key ) && $key != 'id' )  {
+				//If it's an array encode it so it can be saved to DB
+				if (is_Array($value)) {
+					$value = json_encode($value);
+				}
+
+					$session->$key = $value;
+			}
 		}
+		
+		//Now update to table
+		$DB->update_record('cmi5launch_sessions', $session);
+
+		return $session;
 	}
+	
+
 	function retrieveAus($returnedInfo)
 	{
 
@@ -155,12 +178,12 @@ $tenantname = $settings['cmi5launchtenantname'];
 	}
 
 
-	function getFromDB($sessionID, $cmiId)
+	function getFromDB($sessionID)
 	{
 		global $DB, $CFG;
-		require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/sessionHelpers.php");
-		$cmi5_connectors = new cmi5Connectors;
-		$getSession = $cmi5_connectors->getSessionInfo();
+		//require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/sessionHelpers.php");
+		//$cmi5_connectors = new cmi5Connectors;
+		//$getSession = $cmi5_connectors->getSessionInfo();
 
 		$check = $DB->record_exists('cmi5launch_sessions', ['sessionid' => $sessionID], '*', IGNORE_MISSING);
 
@@ -173,26 +196,24 @@ $tenantname = $settings['cmi5launchtenantname'];
 			var_dump($sessionID);
 			echo "</pre>";
 		} else {
-			$sessionItem = $DB->get_record('cmi5launch_sessions', array('id' => $sessionID));
+
+			$sessionItem = $DB->get_record('cmi5launch_sessions',  array('sessionid' => $sessionID));
+			//THIS IS ONLY to get fromDB, not update sesion!!
+
+			//$sessionItem = $DB->get_record('cmi5launch_sessions', array('id' => $sessionID));
 
 			//Ok, maybe here is where we query the cmi5 player!
 
-			$infoFromPlayer = $getSession($sessionID, $cmiId);
+			//$infoFromPlayer = $getSession($sessionID, $cmiId);
 
-			echo "Ok, now info from player should be array and we should be able to populate a session object with it?";
-			var_dump($infoFromPlayer);
-			echo "<br>";
 			//YES! ok, 
 
 			//Maybe the session func should take two objects? and combine to one session?
 			//or it could just take the session id? and get ALL the info from player?
 			//Or heck, the player RETURNS that anyway, so just give what the player returns to construct, 
 			//make sure it is all good, and save back over record (update_record)
-			$session = new session($infoFromPlayer);
+			$session = new session($sessionItem);
 			
-			echo "Did this work? Is it a session???";
-			var_dump($session);
-			echo "<br>";
 			///$au->lmsId = //
 
 		}
@@ -201,4 +222,5 @@ $tenantname = $settings['cmi5launchtenantname'];
 		return $session;
 	}
 }
+
 ?>

@@ -51,6 +51,8 @@ $id = array_shift($idAndStatus);
 //REtrieve registration id
  $registrationid = $record->registrationid;
 
+
+
 if (empty($registrationid)) {
     echo "<div class='alert alert-error'>".get_string('cmi5launch_regidempty', 'cmi5launch')."</div>";
 

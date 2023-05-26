@@ -110,14 +110,21 @@ $fromView = required_param('AU_view', PARAM_TEXT);
 $lmsAndId = explode(",", $fromView);
 //Retrieve AU ID
 $auID = array_shift($lmsAndId);
-
+echo "<br>";
+echo "Ok what is the AUID passed in?";
+var_dump($auID);
+echo "<br>";
+ // Reload cmi5
 //Ok, HERE! We can now go through our au array to get the ids,    then use THOSE to pull the info
 // Array of ids => $auIDs
 $aus_helpers = new Au_Helpers;
 $getAUs = $aus_helpers->getAUsFromDB();
 $au = $getAUs($auID);
 //We now have access to the full AU
-
+echo "<br>";
+echo "Ok what is the AU brpought in?";
+var_dump($au);
+echo "<br>";
  // Reload cmi5 instance.
  $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
 //Ok what is record here?
@@ -148,9 +155,11 @@ if (has_capability('mod/cmi5launch:addinstance', $context)) {
 //OK! Well it is coming up null, that explains a lot
 
     //If it is null there have been no previous sessions
-    //So NUT null means there are previous sessions
+    //So NUT null means there ARE previous sessions
     if (!$au->sessions == NULL) {
 
+        //Lets try NOT usingg their old 'state' way
+        /*
         $getregistrationdatafromlrsstate = cmi5launch_get_global_parameters_and_get_state(
             "http://cmi5api.co.uk/stateapikeys/registrations"
         );
@@ -175,7 +184,7 @@ if (has_capability('mod/cmi5launch:addinstance', $context)) {
             die();
         }
             $registrationdatafromlrs = json_decode($getregistrationdatafromlrsstate->content->getContent(), true);
-
+*/
             //Remove dupliicate registration IDs (now it removes dupe object ids)
           //old  $lmsAndId = array_unique($lmsAndId);
         //there should never be dup sessions TODO - makes sessions col 'unique'
@@ -206,40 +215,53 @@ if (has_capability('mod/cmi5launch:addinstance', $context)) {
 			var_dump($sessionIDs);
 			echo "<br>";
 
+            //Once we have session ids, in this case should be 998-1001
             $ses_helpers = new Session_Helpers;
             $getSession = $ses_helpers->getSessionFromDB();
-			
+			/*
+            echo "<br>";
+            echo "Ok what is sessionIDs?";
+            var_dump($sessionIDs);
+            echo "<br>";
+   */
+   
             //It IS, but lm
             //oldforeach ($lmsAndId as $lmsId) {
                 foreach($sessionIDs as $key => $sessionID){
 
-                    //get int value cause its string
-                    //No, the TABLE is a string, chnage it to int smh
-                    
-                    //Do we call the new session table here?
+                 
                     //Pass in id to now call to cmi5player
-                $session = $getSession($sessionID,  $cmi5launch->id);
-
-                //array to hold data for table
+               // $session = $getSession($sessionID,  $cmi5launch->id);
+                //Ok, for each session, lets query the cmi5 player and update our session id
+                    //Ok, now let update our sessions from player with object
+            $updateSession = $ses_helpers->getUpdateSession();
+            
+            $session = $updateSession($sessionID, $cmi5launch->id);    
+          /*      
+            echo"<br>";
+            echo"Ok, let me see session to know what to grab";
+        var_dump($session);
+        echo "<br>";
+        */
+            //array to hold data for table
                 $sessionInfo = array();
 
-                echo "<br>";
-                echo "It's having trouble with reggistrationdatafromlrs";
-                var_dump($registrationdatafromlrs);
-                echo "<br>";
+                    //Now we no longer need to ask the LRS this info as it's oin session
+                    //having retrieved session info from CMI5player
                 $sessionInfo[] = date_format(
-                    date_create($registrationdatafromlrs[$regid]['created']),
-                    'D, d M Y H:i:s'
+                    date_create($session->createdAt),
+                    'D d M Y H:i:s'
                 );
+                //used to grab lastlaunched - now lastRequestTime should do it
                 $sessionInfo[] = date_format(
-                    date_create($registrationdatafromlrs[$regid]['lastlaunched']),
-                    'D, d M Y H:i:s'
+                    date_create($session->lastRequestTime),
+                    'D d M Y H:i:s'
                 );
 
               //Bring in progress class
               //MB
               //Lets try to only do this if based on canSee
-        if ($canSee == true) {
+       // if ($canSee == true) {
 
             $lmsId = $au->lmsid;
             $progress = new progress;
@@ -250,10 +272,16 @@ if (has_capability('mod/cmi5launch:addinstance', $context)) {
             //We also need some kind of session id or way top keep these sessions separate
             //and sessionid is primary key. lets look at lrs
             //Sessionid is sreturned by cmi5player when launch url requested!
+        echo "<br>";
+        echo "hmmmmmm, ok, is it returning anything?";
+        $returned = $getProgress($regid, $cmi5launch->id, $lmsId);
+        var_dump($returned);
+        echo "<br>";
+        //No, its returning a blank array - MB
 
-//Now that we are using session id, progress will have to be updated accordingly to take diff iod. Lets look at this tomorrow
+        //Now that we are using session id, progress will have to be updated accordingly to take diff iod. Lets look at this tomorrow
             $sessionInfo[] = ("<pre>" . implode("\n ", $getProgress($regid, $cmi5launch->id, $lmsId)) . "</pre>");
-        }
+        //}
 
         //So I guess if a session id exists it needs to be passed to launch page through link here?
         //maybe we loop through session ids, but how does lrrs now these...

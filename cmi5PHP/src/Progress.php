@@ -268,7 +268,7 @@ class progress{
 	 * @param mixed $id - 
 	 * @return array
 	 */
-	public function requestLRSinfo($regId, $id){
+	public function requestLRSinfo($regId, /*$id*/){
 
 		//Array to hold result
 		$result = array();
@@ -491,7 +491,7 @@ class progress{
 		//Array to hold verbs and be returned
 		$verbs = array();
 
-		$resultDecoded = $this->requestLRSinfo($regId, $id);
+	$resultDecoded = $this->requestLRSinfo($regId, /*$id*/);
 		$resultChunked = $resultDecoded;
 		
 		foreach($resultDecoded as $singleStatment){
@@ -505,11 +505,27 @@ class progress{
 
 			foreach($resultDecoded as $singleStatment){
 
+				
 			echo "<br>";
 			echo "I need to see a statement again &&&&&&&&&&&&&&&&&&&";
 			var_dump($singleStatment);
 			echo "<br>";
-				$currentLmsId = $singleStatment[$regId][0]["object"]["id"];
+			//Ok, so statements are DEF coming in - something is happening they are not beinf
+			//returned at the end of this func
+
+			echo "<br>";
+			echo "The lms id to match too, and that was passed in is : ?";
+			var_dump($lmsId);
+			echo "<br>";
+			$currentLmsId = $singleStatment[$regId][0]["object"]["id"];
+			echo "<br>";
+			echo "IS it getting the lms id from the statements?";
+			var_dump($currentLmsId);
+			echo "<br>";
+			//Ok, the issue is the lmsID to match too has someweird forward ticks in it.
+			//Where are these coming from? We either need to stop them from being there (preferable)
+			//OR strip them before comparision
+			//MB - MONDAY NOTES above
 			
 				//We also only want the ones the lmsID matches!
 				if ($currentLmsId == $lmsId )     {                                               //&& $regId == $resultDecoded[$i]) {

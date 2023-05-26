@@ -865,6 +865,7 @@ function cmi5launch_getactor($instance) {
         $fields = '*',
         $strictness = IGNORE_MISSING
     );
+   
   
     // If global settings are not used, retrieve activity settings.
     if (!use_global_cmi5_lrs_settings($instance)) {
@@ -885,6 +886,7 @@ function cmi5launch_getactor($instance) {
     $expresult['cmi5launchlrsversion'] = '1.0.0';
 
     $cmi5launchsettings = $expresult;
+  
     return $expresult;
 }
 

@@ -17,7 +17,9 @@ class cmi5Connectors{
     public function getCreateCourse(){
         return [$this, 'createCourse'];
     }
-
+    public function getSessions(){
+        return [$this, 'retrieveSessionInfo'];
+    }
     public function getRegistrationPost(){
         return [$this, 'retrieveRegistrationPost'];
     }
@@ -456,22 +458,10 @@ class cmi5Connectors{
         //MB
         global $DB;
 
-        echo "The id must not be right?";
-        var_dump($id);
-
-		//Retrieve actor record, this enables correct actor info for URL storage
-		$record = $DB->get_record("cmi5launch", array('id' => $id));
-
 		$settings = cmi5launch_settings($id);
-		$registrationID = $record->registrationid;
-
 		
-        $homepage = $settings['cmi5launchcustomacchp'];
-        $returnUrl =$record->returnurl;
-		$actor= $settings['cmi5launchtenantname'];
 		$token = $settings['cmi5launchtenanttoken'];
 		$playerUrl = $settings['cmi5launchplayerurl'];
-		$courseId = $record->courseid;
 
         //Build URL for launch URL request
         //Okay it looks like the reurnurk is same level as  
@@ -488,7 +478,6 @@ class cmi5Connectors{
                 'header' => array("Authorization: Bearer ". $token,  
                     "Content-Type: application/json\r\n" .
                     "Accept: application/json\r\n")
-
             )	
         );
 
