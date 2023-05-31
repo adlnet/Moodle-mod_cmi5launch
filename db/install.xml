@@ -119,7 +119,7 @@
         <FIELD NAME="firstlaunch" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Time activity was first launched, for LRS."/>
         <FIELD NAME="lastlaunch" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Time activity was last launched, for LRS."/>
         <FIELD NAME="completed_passed" TYPE="char" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Whether the AU has been completed or passed"/>
-      </FIELDS>
+      </FIELDS7>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
@@ -153,6 +153,7 @@
         <FIELD NAME="passed" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false" DEFAULT="0" COMMENT="Whether an AU has met passed criteria (0 if false, 1 if true)"/>
         <FIELD NAME="inprogress" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false" DEFAULT="0" COMMENT="Whether an AU is in progress or not (been started) (0 if false, 1 if true)"/>
         <FIELD NAME="noattempt" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false" DEFAULT="0" COMMENT="Whether an AU has attempted TODO (0 if false, 1 if true)"/>
+        <FIELD NAME="satisfied" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false" DEFAULT="0" COMMENT="Whether an AU has been SATISIFED (0 if false, 1 if true)"/>
         <FIELD NAME="sessions" TYPE="text" LENGTH="4000" NOTNULL="false" SEQUENCE="false" COMMENT="The session ids of the AU, saved as array"/>              
 
       </FIELDS>

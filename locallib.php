@@ -362,21 +362,6 @@ function cmi5launch_get_global_parameters_and_get_state($key) {
     global $cmi5launch;
     $cmi5launchsettings = cmi5launch_settings($cmi5launch->id);
 
-    echo "<br>";
-    echo "Ok, what are the sessting here?";
-    echo "<br>";
-    echo "endpoint:   ";
-    var_dump($cmi5launchsettings['cmi5launchlrsendpoint']);
-    echo "<br>";
-    echo "version:  ";
-    var_dump($cmi5launchsettings['cmi5launchlrsversion']);
-    echo "<br>";
-    echo "login:    ";
-    var_dump($cmi5launchsettings['cmi5launchlrslogin']);
-    echo "<br>";
-    echo "lrs pass :   ";
-    var_dump($cmi5launchsettings['cmi5launchlrspass']);
-    echo "<br>";
     $lrs = new \cmi5\RemoteLRS(
         $cmi5launchsettings['cmi5launchlrsendpoint'],
         $cmi5launchsettings['cmi5launchlrsversion'],
@@ -384,16 +369,7 @@ function cmi5launch_get_global_parameters_and_get_state($key) {
         $cmi5launchsettings['cmi5launchlrspass']
     );
 
-    echo "<br>";
-    echo "Before we return it, IS IT THE CMI%ACTIVITY ID??????;";
-    echo "<br>";
-    var_dump($cmi5launch->cmi5activityid);
-    echo "<br>";
-    echo "<br>";
-    echo "Before we return it, OR THE ACTOR!!!!!";
-    echo "<br>";
-    var_dump(cmi5launch_getactor($cmi5launch->id));
-    echo "<br>";
+ 
     return $lrs->retrieveState(
         new \cmi5\Activity(array("id" => trim($cmi5launch->cmi5activityid))),
         cmi5launch_getactor($cmi5launch->id),

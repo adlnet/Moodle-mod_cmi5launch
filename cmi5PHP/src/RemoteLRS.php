@@ -669,8 +669,6 @@ class RemoteLRS implements LRSInterface
         }
         $registration = null;
 
-        echo "what is this stateID>>>??";
-        var_dump( $id);
         $requestCfg = array(
             'params' => array(
                 'activityId' => $activity->getId(),

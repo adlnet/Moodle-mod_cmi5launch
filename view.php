@@ -62,45 +62,13 @@ $PAGE->requires->jquery();
 // Output starts here.
 echo $OUTPUT->header();
 
-
 // Reload cmi5 instance.
 $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
 
-////////////////////////////////////
-
-/////////////////////////////////////////
-
-
-
-//Retrieve saved AUs
-//$auList = json_decode($record->aus, true);
-
-//Ok, it is poss
-echo "<br>";
-echo "What is AU list?, ideally we just want to what? How best to get records now?";
-//Now these are in a tbale, so we don't NEED to save them from array
-//Instead we need ot make array from table where x and x matchh
-//$aus = $createAUs($auList);
-//Ohhh I don't need to make anymore, just retrieve..
-
-///////Lets try this here. So we dont have to make a new course constantly
-	//Retrieve the courses AUs and save to record
-	//$aus = ($retrieveAus($returnedInfo));
-//Aulist should work right?
-
-    //Maybe better to save AUs here and feed it the array returned by retreieveAUS
-	/*echo"<br>";
-	echo "HEYHEYHYE making progress! but what if we sent au OBJECTS?????";
-	echo "<br>";
-echo "What is record before it goes in?";
-var_dump($record);
-echo "<br>";
-				saveAUs($aus, $record);
-                */
-				//Save the new AUs to DB? 
-                /////////////////////////////////////
-
-
+//to bring in functions from class cmi5Connector
+$connectors = new cmi5Connectors;
+$getRegistration = $connectors->getRegistrationGet();
+$registrationInfoFromCMI5 = $getRegistration($record->registrationid, $cmi5launch->id);
 
 if ($cmi5launch->intro) { 
     // Conditions to show the intro can change to look for own settings or whatever.
@@ -163,14 +131,7 @@ if ($cmi5launch->intro) {
         });
     </script>
 <?php
-/////////////////////////////////////////////////////////////////////////////////
 
-
-
-
-/////////////////////////////////////////////////////////////////////////////////
-//to bring in functions from class cmi5Connector
-$connectors = new cmi5Connectors;
 
 //Lets now retrieve our list of AUs from cmi5launch
 $auIDs = json_decode($record->aus);
@@ -190,11 +151,6 @@ if ( $record->registrationid == null) {
 	//Get registration id from record (it was made when course was)
 	$registrationID = $record->registrationid; 
 }
-echo "<br>";
-echo "Start at the begindin, what is registraion id here???   ";
-var_dump($registrationID);
-echo "<br>";
-//Ok, thats right
 
     $table = "cmi5launch";
     //Save the returnurl
@@ -208,22 +164,6 @@ $getregistrationdatafromlrsstate = cmi5launch_get_global_parameters_and_get_stat
 );
 //Parse for http response
 $lrsrespond = $getregistrationdatafromlrsstate->httpResponse['status'];
-
-echo "<br>";
-echo "what is lrs respond here?";
-var_dump($lrsrespond);
-echo "<br>";
-
-//What if we query the LRS ourselves? 
-
-$requestStatements = $progress->getRequestLRSInfo();
-
-$trialStatements = $requestStatements($registrationID);
-echo "<br>";
-echo "what are our statments HERE";
-var_dump($trialStatements);
-echo "<br>";
-
 
 //Array to hold info for table population
 $tableData = array();
@@ -260,11 +200,19 @@ $table->head = array(
 
 );
 
+//Don't think we need this anymore
+/*
 //Get the LRS info (progress)
 //Retrieve LRS session info
 $getLRS = $progress->getRequestLRSInfo();
 $resultDecoded = $getLRS($registrationdatafromlrs, $cmid);
-
+echo"<br>";
+echo "wait a minute, what is this?";
+var_dump($resultDecoded);
+///Why are we asking for all these statements>
+//to get the verbs rihgt? Well this is no longer needed
+echo"<br>";
+*/
 //Ok, HERE! We can now go through our au array to get the ids,    then use THOSE to pull the info
 // Array of ids => $auIDs
 $aus_helpers = new Au_Helpers;
@@ -287,8 +235,11 @@ $getAUs = $aus_helpers->getAUsFromDB();
         }
 
         //Retrieve AU's lmsID
-        $auId = $au->lmsid;
+        $auLmsId = $au->lmsid;
 
+        //Use it to grab the right datafrom this? registrationInfoFromCMI5
+        //But how? Make this smaller?
+        $ausFromCMI5 = array_chunk($registrationInfoFromCMI5["metadata"]["moveOn"]["children"], 1, true);
         //Loop through the statements and match with the LRS statments whose object/id matches the aus lmsID
         //Match on lmsId. This ties the au to the session info from LRS.
         //It matches Object->id from lrs chunked
@@ -296,31 +247,64 @@ $getAUs = $aus_helpers->getAUsFromDB();
         //Array to hold list of relevant registrations
 	   $relevantObjId = array();
 
-        //This is the info back from the lrs
-        foreach ($resultDecoded as $result => $i) {
+       //now we can get the AU's satisifed FROM the CMI5 player
+       //TODO (for that matter couldn't we make it, notattempetd, satisifed, not satisfied??)
 
-            //If the lmsId matches the object id, then this registration is applicable to this au 
-		 if ($auId == $i[$registrationID][0]["object"]["id"]) {
+       //find the AU statement returned from cmi5that matches this current au
+        foreach($ausFromCMI5 as $key => $auInfo){
 
-                //Therefore we want this verb
-                $getVerb = $progress->retrieveVerbs($i, $registrationID);
 
-                $verbs[] = $getVerb;
+            if ($auInfo[$key]["lmsId"] == $auLmsId){
+                //Then this is the au info we want 
+                $auSatisfied = $auInfo[$key]["satisfied"];
 
-            	 $relevantObjId[] = $i[$registrationID][0]["object"]["id"];
             }
         }
+    
 
-        //Retreive AUs moveon specification
-        $auMoveon = $au->moveon;
+
+
+
+        //If the 'sessions' are null we know this hasn't even been attempted
+        if($au->sessions == null ){
+
+            $auStatus = "Not attempted";
+        
+        //And THIS isn't needed at all right? Cause now we just ask the CMI5
+        //player if we've moved on
+        
         //If moveon is not applicable, then we don't need to check it's progress, it's just viewed or not
-        if ($auMoveon == "NotApplicable") {
-            $auStatus = "viewed";
-        } else {
+        }else{
+            //Retreive AUs moveon specification
+            $auMoveon = $au->moveon;
+
+            //If it's been attempted but no moveon value
+            if ($auMoveon == "NotApplicable") {
+                $auStatus = "viewed";
+                
+            }
+            //IF it DOES have a moveon value 
+            else {
+                //If satisifed is returned true,  I
+                //If not, its in progress
+                if ($auSatisfied == "true") {
+                    $auStatus = "Satisfied";
+                } else {
+                    $auStatus = "In Progress";
+                }
+            };
+        };
+            //Ok, how will we do in progress vs not attempted?
+            //If the AU has a session or not!! Of course!!!
+            //If it has a session and is NOT satisfied!
+            //This registrationInfoFromCMI5 is one BIG ole array
+
+
             //If relevant registrations are not null, then it found some session ids. If those exist then this
             //AU has been launched and is therefore 'in progress' or 'completed'
             //If this IS NULL then the AU has not been attempted and we can mark it as such
-	       if (!$relevantObjId == null) {
+	     
+         /*   if (!$relevantObjId == null) {
 
                 $getCompleted = $progress->getCompletion();
 
@@ -340,7 +324,8 @@ $getAUs = $aus_helpers->getAUsFromDB();
             else {
                 $auStatus = "Not attempted";
             }
-        }
+            */
+        
         //List of verbs that may apply toward completion
         $verbs = array();
 
@@ -349,9 +334,17 @@ $getAUs = $aus_helpers->getAUsFromDB();
 
         //Assign au name, progress, and index
         $auInfo[] = $au->title;
+                
+        
+        //Ok, so HERE here lets put in where we get whether its done or not and assign auSTATUS
+
+
         $auInfo[] = ($auStatus);
+        
+        
         $auIndex = $au->auindex;
 
+        //Ok, so HERE here lets put in where we get whether its done or not and assign auSTATUS
         //ReleventReg and AU index needs to be a string to pass as variable to next page
 	   $regForNextPage = implode(',', $relevantObjId);
        //Do we still need reggggggistration>>>

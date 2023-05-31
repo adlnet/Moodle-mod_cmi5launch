@@ -110,10 +110,8 @@ $fromView = required_param('AU_view', PARAM_TEXT);
 $lmsAndId = explode(",", $fromView);
 //Retrieve AU ID
 $auID = array_shift($lmsAndId);
-echo "<br>";
-echo "Ok what is the AUID passed in?";
-var_dump($auID);
-echo "<br>";
+
+
  // Reload cmi5
 //Ok, HERE! We can now go through our au array to get the ids,    then use THOSE to pull the info
 // Array of ids => $auIDs
@@ -121,10 +119,7 @@ $aus_helpers = new Au_Helpers;
 $getAUs = $aus_helpers->getAUsFromDB();
 $au = $getAUs($auID);
 //We now have access to the full AU
-echo "<br>";
-echo "Ok what is the AU brpought in?";
-var_dump($au);
-echo "<br>";
+
  // Reload cmi5 instance.
  $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
 //Ok what is record here?
@@ -263,6 +258,7 @@ if (has_capability('mod/cmi5launch:addinstance', $context)) {
               //Lets try to only do this if based on canSee
        // if ($canSee == true) {
 
+     
             $lmsId = $au->lmsid;
             $progress = new progress;
             $getProgress = $progress->getRetrieveStatement();
@@ -272,11 +268,7 @@ if (has_capability('mod/cmi5launch:addinstance', $context)) {
             //We also need some kind of session id or way top keep these sessions separate
             //and sessionid is primary key. lets look at lrs
             //Sessionid is sreturned by cmi5player when launch url requested!
-        echo "<br>";
-        echo "hmmmmmm, ok, is it returning anything?";
-        $returned = $getProgress($regid, $cmi5launch->id, $lmsId);
-        var_dump($returned);
-        echo "<br>";
+       
         //No, its returning a blank array - MB
 
         //Now that we are using session id, progress will have to be updated accordingly to take diff iod. Lets look at this tomorrow
@@ -286,11 +278,13 @@ if (has_capability('mod/cmi5launch:addinstance', $context)) {
         //So I guess if a session id exists it needs to be passed to launch page through link here?
         //maybe we loop through session ids, but how does lrrs now these...
         //maybe it doesn't the table will?
-        
+        $newSession = "false";
         //NewSession iss already false (default)
         //Create a string to pass the AU ID and registration to next page (launch.ph)
-        $infoForNextPage = $sessionID; // . "," . $regId;
-        
+        //$infoForNextPage = $sessionID; // . "," . $regId;
+        $infoForNextPage = $sessionID . "," . $newSession;
+
+
             $sessionInfo[] =
                     "<a tabindex=\"0\" id='cmi5relaunch_attempt'
                 onkeyup=\"key_test('" . $infoForNextPage . "')\" onclick=\"mod_cmi5launch_launchexperience('" . $infoForNextPage . "')\" style='cursor: pointer;'>"
@@ -304,7 +298,7 @@ if (has_capability('mod/cmi5launch:addinstance', $context)) {
             $table->data = $tableData;
 
             echo html_writer::table($table);
-
+/*
             //Ok, here this is new sooooo
             //maybe pass the word new throuh?
             //Wait should this be falsE???
@@ -321,9 +315,10 @@ if (has_capability('mod/cmi5launch:addinstance', $context)) {
                     . "')\" style=\"cursor: pointer;\">"
                     . get_string('cmi5launch_attempt', 'cmi5launch')
                     . "</a></p>";
-            //}
+          */
+                    //}
         }
-        else {
+       // else {
      //Ok, here this is new sooooo
             //maybe pass the word new throuh?
             $newSession = "true";
@@ -341,7 +336,9 @@ var_dump($infoForNextPage);
             . "')\" style=\"cursor: pointer;\">"
             . get_string('cmi5launch_attempt', 'cmi5launch')
             . "</a></p>";
-        }
+        //}
+
+        //ActuLLY WE ALWAYS want the start new button right?, so lets comment out the else above
 
 // Add a form to be posted based on the attempt selected.
 ?>

@@ -186,12 +186,23 @@ class cmi5Connectors{
                 }
         }
         else{
+            /*REmove
+            echo "<br>";
+            echo"Humor me, what is registration raw by id here?";
+            //to bring in functions from class cmi5Connector
+            echo "<br>";
+            var_dump($result);
+            echo "<br>";
+            */
                $registrationInfo = json_decode($result, true);
     //The returned 'registration info' is a large json 
     //code is the registration id we want   
 			$registration = $registrationInfo["code"];
 			
-			return $registration;
+            //Why would I return the code when the code is needed to fwetch?
+//			return $registration;
+
+            return $registrationInfo; //much better!
         }
     }
 

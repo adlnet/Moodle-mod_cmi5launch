@@ -96,13 +96,6 @@ class Au_Helpers
 	function saveAUs($auObjectArray, $recordIn)
 	{
 
-		//Could this be a pointer issue?
-		//Like is it overwriting record and thats casuing the duope?
-		//$record = $recordIn;
-		echo "<br>";
-		echo "Well dang are we even entering this new func";
-		echo "<br>";
-
 		global $DB, $CFG, $cmi5launch;
 
 		//$record;
@@ -116,18 +109,14 @@ class Au_Helpers
 		//Ok the foreach is clever, but there are two many nested values for this to work, we will need to do this manually
 		foreach ($auObjectArray as $auObject) {
 
-			echo "<br>";
-			echo"Why are some items null what is the object here??" ;
-			var_dump(($auObject));
-			echo"<br>";
-			
+		
 			//Make a newRecord to save
 			$newRecord = new stdClass();
 						//Because of many nested properties, needs to be done manually
 						$newRecord->auid = $auObject->id;
 						$newRecord->launchmethod = $auObject->launchMethod;
 						//$newRecord->lmsid = $auObject->lmsid;
-						$newRecord->lmsid = json_encode($auObject->lmsId, true);
+						$newRecord->lmsid = json_decode(json_encode($auObject->lmsId, true) );
 
 						$newRecord->url = $auObject->url;
 						$newRecord->type = $auObject->type;
@@ -145,10 +134,7 @@ class Au_Helpers
 						$newRecord->passed = $auObject->passed;
 						$newRecord->inprogress = $auObject->inprogress;
 						$newRecord->noattempt = $auObject->noattempt;
-			echo "<br>";
-			echo"What is our new record item???" ;
-			var_dump(($newRecord));
-			echo"<br>";
+		
 			
 				//The record is ok, I think one of the ARGS in record isn't, some of them are nested arrays! Can I "toString" them?
 			$newId = $DB->insert_record($table, $newRecord, true);
@@ -371,9 +357,9 @@ class Au_Helpers
 		}
 		else{
 			$auItem = $DB->get_record('cmi5launch_aus',  array('id' => $auID));
-	
+			
 			$au = new au($auItem);
-		
+			
 		}
 
 		//Return our new list of AU!

@@ -68,6 +68,18 @@ if (empty($registrationid)) {
 //To hold launch url or whether launch url is new!
 $location = "";
 
+echo "<br>";
+echo "What is coming over???";
+echo "<br>";
+echo "the ession id/au id  is ";
+var_dump($id);
+echo "<br>";
+echo"and the leftover/ is new or not is?";
+echo "<br>";
+var_dump($idAndStatus[0]);
+echo "<br>";
+echo "<br>";
+
 if ($idAndStatus[0] == "true") {
    // echo "Are we entering this if";
    echo "<br>";
@@ -125,13 +137,23 @@ $au = $getAUs($id);
 	$saveSession($sessionID, $location, $launchMethod);
 
 } else {
+    // Ok if it is false and this is a new session, we want to get the launch url from the sessions
+    //table using the id passed over, which in this case is the session id
+    
 	//IT was false and this is NOT a new sessions
     echo "Are we in the else where is everyone?!?!?";
  
 
     //Ok, this makes new stuff
     //Does it make sense to call get progres shere? sa well?
+    //actually it may make more sense to just pass the url through, cause otherwise
+    //it has to make the session object again, or does it? it can just read from record object reight?
 
+
+
+    //Honestly, I don't know if we need any of this old code
+    //UNLESS we want to keep the last launched???
+    /*
     // Save a record of this registration to the LRS state API.
     $getregistrationdatafromlrsstate = cmi5launch_get_global_parameters_and_get_state(
         "http://cmi5api.co.uk/stateapikeys/registrations"
@@ -174,8 +196,8 @@ $au = $getAUs($id);
     if (is_null($registrationdata)) {
         // If the error is 404 create a new registration data array.
         /* if ($registrationdata->httpResponse['status'] = 404) {*/
-        $registrationdata = $registrationdataforthisattempt;
-        /* }*/
+        //$registrationdata = $registrationdataforthisattempt;
+        /* }
     } else if (array_key_exists($registrationid, $registrationdata)) {
         // Else if the regsitration exists update the lastlaunched date.
         $registrationdata[$registrationid]["lastlaunched"] = $datenow;
@@ -233,6 +255,7 @@ $au = $getAUs($id);
     player handles the tracking. - MB 1/27/23
     MB - BUT will this help now that we are replacing regid? - 4-17-23
     */
+    /*
     $savelaunchedstatement = cmi5_launched_statement($registrationid);
 
     $lrsrespond = $savelaunchedstatement->httpResponse['status'];
@@ -248,10 +271,10 @@ $au = $getAUs($id);
         die();
     }
 
-//////*/
+//////*
     $completion = new completion_info($course);
     $completion->set_module_viewed($cm);
-
+*/
     //Is it this????
 //I think it may be!!!
 
@@ -261,10 +284,13 @@ $au = $getAUs($id);
     //No, if this isn;t true it should be 
     
     //We WANT to retriev ethe launchurl from sessions
+    
+    $session = $DB->get_record('cmi5launch_sessions',  array('sessionid' => $id));
+
     echo "<br>";
     echo "to the end of this else? if so what is location";
     var_dump($location);
- 
+    $location = $session->launchurl;
 
 } //end else
 
