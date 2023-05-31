@@ -23,7 +23,7 @@
 
 class Au {
   // Properties
-  public $id, $url, $type, $lmsid = [], $title, $moveon, $auindex, $parents, $objectives, $description = [], $activitytype, $launchmethod, $masteryscore;
+  public $id, $url, $type, $lmsid = [], $title, $moveon, $auindex, $parents, $objectives, $description = [], $activitytype, $launchmethod, $masteryscore, $satisfied ;
 
   //Do we needs 'sessions? todo
 

@@ -1037,7 +1037,7 @@ function cmi5_grade_item_update($cmi5launch, $grades=null) {
 
     //BUT it also pulls from PARAM, where are these values set in param?
  //From searching 'gradetype' it seems these may be admin settings (admin>settings>grades.php). Where can we set theeesE?   
-    if ($cmi5launch->grademethod == GRADESCOES) {
+    if ($cmi5launch->grademethod == GRADE_CMI5_AUS) {
         $maxgrade = $DB->count_records_select('scorm_scoes', 'scorm = ? AND '.
                                                 $DB->sql_isnotempty('scorm_scoes', 'launch', false, true), array($scorm->id));
         if ($maxgrade) {

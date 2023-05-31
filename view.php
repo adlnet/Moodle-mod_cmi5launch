@@ -200,169 +200,99 @@ $table->head = array(
 
 );
 
-//Don't think we need this anymore
-/*
-//Get the LRS info (progress)
-//Retrieve LRS session info
-$getLRS = $progress->getRequestLRSInfo();
-$resultDecoded = $getLRS($registrationdatafromlrs, $cmid);
-echo"<br>";
-echo "wait a minute, what is this?";
-var_dump($resultDecoded);
-///Why are we asking for all these statements>
-//to get the verbs rihgt? Well this is no longer needed
-echo"<br>";
-*/
-//Ok, HERE! We can now go through our au array to get the ids,    then use THOSE to pull the info
-// Array of ids => $auIDs
+// Retrieve courses AUs
 $aus_helpers = new Au_Helpers;
 $getAUs = $aus_helpers->getAUsFromDB();
-    //For each au
-    //old code
-    //foreach ($aus as $key => $item) {
-        //NEW foreach with AU ids
-    foreach($auIDs as $key  => $auID){
-        //Retrieve individual AU as array
-        //old $au = (array) ($aus[$key]);
 
-    $au = $getAUs($auID);
-        //We now want an auobject. 
-        //Verify object is an au object
-        if (!is_a($au, 'Au')) {
+	//Cycle through and get each au ID
+    	foreach($auIDs as $key  => $auID){
+       
+    		$au = $getAUs($auID);
+        
+		//We now want an auobject. 
+        	//Verify object is an au object
+        	if (!is_a($au, 'Au')) {
             $reason = "Excepted AU, found ";
-        var_dump($au);
+        	var_dump($au);
             throw new moodle_exception($reason, 'cmi5launch', '', $warnings[$reason]);
-        }
+        	}
 
         //Retrieve AU's lmsID
         $auLmsId = $au->lmsid;
 
-        //Use it to grab the right datafrom this? registrationInfoFromCMI5
-        //But how? Make this smaller?
+        //Take only info about AUs out of registrationInfoFromCMI5
         $ausFromCMI5 = array_chunk($registrationInfoFromCMI5["metadata"]["moveOn"]["children"], 1, true);
-        //Loop through the statements and match with the LRS statments whose object/id matches the aus lmsID
-        //Match on lmsId. This ties the au to the session info from LRS.
-        //It matches Object->id from lrs chunked
-        
-        //Array to hold list of relevant registrations
-	   $relevantObjId = array();
 
-       //now we can get the AU's satisifed FROM the CMI5 player
+       //TODO now we can get the AU's satisifed FROM the CMI5 player
        //TODO (for that matter couldn't we make it, notattempetd, satisifed, not satisfied??)
 
-       //find the AU statement returned from cmi5that matches this current au
-        foreach($ausFromCMI5 as $key => $auInfo){
+     	//find the AU statement returned from cmi5 that matches this current au (match on lmsId)
+     	foreach($ausFromCMI5 as $key => $auInfo){
 
+          	if ($auInfo[$key]["lmsId"] == $auLmsId){
+               	//Then this is the au info we want 
+				//Grab it's 'satisfied' info
+               	$auSatisfied = $auInfo[$key]["satisfied"];
+	          }
+        	}
 
-            if ($auInfo[$key]["lmsId"] == $auLmsId){
-                //Then this is the au info we want 
-                $auSatisfied = $auInfo[$key]["satisfied"];
+        	//If the 'sessions' in this AU are null we know this hasn't even been attempted
+        	if($au->sessions == null ){
 
-            }
-        }
-    
-
-
-
-
-        //If the 'sessions' are null we know this hasn't even been attempted
-        if($au->sessions == null ){
-
-            $auStatus = "Not attempted";
-        
-        //And THIS isn't needed at all right? Cause now we just ask the CMI5
-        //player if we've moved on
-        
-        //If moveon is not applicable, then we don't need to check it's progress, it's just viewed or not
-        }else{
-            //Retreive AUs moveon specification
-            $auMoveon = $au->moveon;
-
-            //If it's been attempted but no moveon value
-            if ($auMoveon == "NotApplicable") {
-                $auStatus = "viewed";
-                
-            }
-            //IF it DOES have a moveon value 
-            else {
-                //If satisifed is returned true,  I
-                //If not, its in progress
-                if ($auSatisfied == "true") {
-                    $auStatus = "Satisfied";
-                } else {
-                    $auStatus = "In Progress";
-                }
-            };
-        };
-            //Ok, how will we do in progress vs not attempted?
-            //If the AU has a session or not!! Of course!!!
-            //If it has a session and is NOT satisfied!
-            //This registrationInfoFromCMI5 is one BIG ole array
-
-
-            //If relevant registrations are not null, then it found some session ids. If those exist then this
-            //AU has been launched and is therefore 'in progress' or 'completed'
-            //If this IS NULL then the AU has not been attempted and we can mark it as such
+	          $auStatus = "Not attempted";
 	     
-         /*   if (!$relevantObjId == null) {
+     	}else{
+            
+			//Retreive AUs moveon specification
+			$auMoveon = $au->moveon;
+            
+            	//If it's been attempted but no moveon value
+          	if ($auMoveon == "NotApplicable") {
+               	$auStatus = "viewed";
+	          }
+            	//IF it DOES have a moveon value 
+            	else {
+               
+				//If satisifed is returned true,  I
+                	if ($auSatisfied == "true") {
+                    	$auStatus = "Satisfied";
+					
+					//Also update AU
+					$au->satisfied = "true";
+                	}else {
+					//If not, its in progress
+					$auStatus = "In Progress";
+					
+					//Also update AU
+					$au->satisfied = "false";
+	               }
+            	};
+        	};
 
-                $getCompleted = $progress->getCompletion();
+		//Create array of info to place in table
+		$auInfo = array();
 
-                $completed = $getCompleted($auMoveon, $verbs);
+		//Assign au name, progress, and index
+		$auInfo[] = $au->title;
+		$auInfo[] = ($auStatus);
+		$auIndex = $au->auindex;
 
-                //If completed is returned true we move on. If not, its in progress
-                if ($completed == true) {
-
-                    $auStatus = "Completed";
-                } else {
-
-                    $auStatus = "In Progress";
-                }
-
-            }
-            //If relevenat reg is null than this is not attmepted
-            else {
-                $auStatus = "Not attempted";
-            }
-            */
+      	//Send au id now
+		 $infoForNextPage = $auID;
         
-        //List of verbs that may apply toward completion
-        $verbs = array();
-
-        //Create array of info to place in table
-        $auInfo = array();
-
-        //Assign au name, progress, and index
-        $auInfo[] = $au->title;
-                
+		//Assign au link to auviews
+        	$auInfo[] = "<a tabindex=\"0\" id='cmi5relaunch_attempt'
+    			onkeyup=\"key_test('" . $infoForNextPage . "')\" onclick=\"mod_cmi5launch_launchexperience('" . $infoForNextPage . "')\" style='cursor: pointer;'>"
+            	. get_string('cmi5launchviewlaunchlink', 'cmi5launch') . "</a>";
         
-        //Ok, so HERE here lets put in where we get whether its done or not and assign auSTATUS
+		//add to be fed to table
+        	$tableData[] = $auInfo;
 
-
-        $auInfo[] = ($auStatus);
-        
-        
-        $auIndex = $au->auindex;
-
-        //Ok, so HERE here lets put in where we get whether its done or not and assign auSTATUS
-        //ReleventReg and AU index needs to be a string to pass as variable to next page
-	   $regForNextPage = implode(',', $relevantObjId);
-       //Do we still need reggggggistration>>>
-      //oldcode  $infoForNextPage = $auIndex . "," . $regForNextPage;
-
-      //Send au id now
-      //This needs to come from AU!!
-      //wait no, let it pass the 338, its the NEXT screens job to get the auindex
- $infoForNextPage = $auID;
-        //Assign au link to auviews
-        $auInfo[] = "<a tabindex=\"0\" id='cmi5relaunch_attempt'
-    onkeyup=\"key_test('" . $infoForNextPage . "')\" onclick=\"mod_cmi5launch_launchexperience('" . $infoForNextPage . "')\" style='cursor: pointer;'>"
-            . get_string('cmi5launchviewlaunchlink', 'cmi5launch') . "</a>"
-        ;
-        //add to be fed to table
-        $tableData[] = $auInfo;
-
-    }
+		//And lastly, update the au in DB
+		$DB->update_record("cmi5launch_aus", $au);
+		
+	}
+	
 //This feeds the table, note registrationdatafromlrs is an OBJECT
 $table->data = $tableData;
 

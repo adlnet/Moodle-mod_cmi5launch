@@ -166,9 +166,7 @@ class cmi5Tables
 	    global $DB;
         //Id to create/update record
         $id = $record->id;
-        echo"<br>";
-        echo "$$$$$$$$$$$$$$$$$$$$$ id in populate table is" . $id;
-        echo"<br>";
+        
         //Make sure record doesn't exist before attempting to create
        // $check = $DB->get_record($table, ['id' => $id,], '*', IGNORE_MISSING);
 		$check = $DB->record_exists($table, ['id' => $id], '*', IGNORE_MISSING);

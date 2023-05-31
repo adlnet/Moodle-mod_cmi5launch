@@ -99,6 +99,14 @@ $string['cmi5launchtenanttoken_default'] = '';
 
 //Grading info - MB
 
+//Headers
+$string['defaultgradesettings'] = 'Default values for CMI5 Launch Link activity grades';
+$string['defaultothersettings'] = 'Default values for CMI5 Launch Link activity attempts and completion';
+
+//other
+$string['maximumgradedesc'] = 'The maximum grade for a CMI5 Launch Link activity';
+
+
 //-MB - Not sure if we need ALL of these
 //* No - If a previous attempt is completed, passed or failed, the student will be provided with the option to enter in review mode or start a new attempt.
 //* When previous attempt completed, passed or failed - This relies on the SCORM package setting the status of \'completed\', \'passed\' or \'failed\'.
@@ -116,10 +124,11 @@ $string['fromleft'] = 'From left';
 $string['fromtop'] = 'From top';
 $string['fullscreen'] = 'Fill the whole screen';*/
 $string['general'] = 'General data';
-$string['gradeaverage'] = 'Average grade';
+$string['GRADE_AVERAGE_CMI5'] = 'Average grade';
 $string['gradeforattempt'] = 'Grade for attempt';
-$string['gradehighest'] = 'Highest grade';
+$string['GRADE_HIGHEST_CMI5'] = 'Highest grade';
 $string['grademethod'] = 'Grading method';
+//TODO - Is this accurate? Does it define for only ONE attempt?  
 $string['grademethod_help'] = 'The grading method defines how the grade for a single attempt of the activity is determined.
 
 There are 4 grading methods:
@@ -131,8 +140,8 @@ There are 4 grading methods:
 $string['grademethoddesc'] = 'The grading method defines how the grade for a single attempt of the activity is determined.';
 $string['gradereported'] = 'Grade reported';
 $string['gradesettings'] = 'Grade settings';
-$string['gradescoes'] = 'Learning objects';
-$string['gradesum'] = 'Sum grade';
+$string['GRADE_CMI5_AUS'] = 'Learning objects';
+$string['GRADE_SUM_CMI5'] = 'Sum grade';
 
 
 // Start Activity Settings.

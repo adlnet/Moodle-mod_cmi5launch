@@ -107,7 +107,7 @@ if ($ADMIN->fulltree) {
         $settings->add(new admin_setting_heading('cmi5launch/gradesettings', get_string('defaultgradesettings', 'cmi5launch'), ''));
         $settings->add(new admin_setting_configselect('cmi5launch/grademethod',
             get_string('grademethod', 'cmi5launch'), get_string('grademethoddesc', 'cmi5launch'),
-            GRADEHIGHEST, cmi5_get_grade_method_array()));
+            GRADE_HIGHEST_CMI5, cmi5_get_grade_method_array()));
     
         for ($i = 0; $i <= 100; $i++) {
             $grades[$i] = "$i";
@@ -123,7 +123,7 @@ if ($ADMIN->fulltree) {
             get_string('maximumattempts', 'cmi5launch'), '', '0', cmi5_get_attempts_array()));
     
         $settings->add(new admin_setting_configselect('cmi5launch/whatgrade',
-            get_string('whatgrade', 'cmi5launch'), get_string('whatgradedesc', 'cmi5launch'), HIGHESTATTEMPT, cmi5_get_what_grade_array()));
+            get_string('whatgrade', 'cmi5launch'), get_string('whatgradedesc', 'cmi5launch'), HIGHEST_ATTEMPT_CMI5, cmi5_get_what_grade_array()));
     
         $settings->add(new admin_setting_configselect('cmi5launch/forcecompleted',
             get_string('forcecompleted', 'cmi5launch'), get_string('forcecompleteddesc', 'cmi5launch'), 0, $yesno));
@@ -138,8 +138,8 @@ if ($ADMIN->fulltree) {
         $settings->add(new admin_setting_configselect('cmi5launch/masteryoverride',
             get_string('masteryoverride', 'cmi5launch'), get_string('masteryoverridedesc', 'cmi5launch'), 1, $yesno));
     
-        $settings->add(new admin_setting_configselect('cmi5launch/lastattemptlock',
-            get_string('lastattemptlock', 'cmi5launch'), get_string('lastattemptlockdesc', 'cmi5launch'), 0, $yesno));
+        $settings->add(new admin_setting_configselect('cmi5launch/last_attempt_cmi5lock',
+            get_string('last_attempt_cmi5lock', 'cmi5launch'), get_string('last_attempt_cmi5lockdesc', 'cmi5launch'), 0, $yesno));
     
         $settings->add(new admin_setting_configselect('cmi5launch/auto',
             get_string('autocontinue', 'cmi5launch'), get_string('autocontinuedesc', 'cmi5launch'), 0, $yesno));

@@ -153,7 +153,7 @@
         <FIELD NAME="passed" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false" DEFAULT="0" COMMENT="Whether an AU has met passed criteria (0 if false, 1 if true)"/>
         <FIELD NAME="inprogress" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false" DEFAULT="0" COMMENT="Whether an AU is in progress or not (been started) (0 if false, 1 if true)"/>
         <FIELD NAME="noattempt" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false" DEFAULT="0" COMMENT="Whether an AU has attempted TODO (0 if false, 1 if true)"/>
-        <FIELD NAME="satisfied" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false" DEFAULT="0" COMMENT="Whether an AU has been SATISIFED (0 if false, 1 if true)"/>
+        <FIELD NAME="satisfied" TYPE="char" LENGTH="5" NOTNULL="false" SEQUENCE="false" DEFAULT="0" COMMENT="Whether an AU has been SATISIFED (0 if false, 1 if true)"/>
         <FIELD NAME="sessions" TYPE="text" LENGTH="4000" NOTNULL="false" SEQUENCE="false" COMMENT="The session ids of the AU, saved as array"/>              
 
       </FIELDS>

@@ -516,15 +516,15 @@ function cmi5launch_send_api_request($auth, $method, $url) {
 //Grade stuff from SCORM
 
 //Move these to top where they belong if they are what we need
-define('GRADESCOES', '0');
-define('GRADEHIGHEST', '1');
-define('GRADEAVERAGE', '2');
-define('GRADESUM', '3');
+define('GRADE_AUS_CMI5', '0');
+define('GRADE_HIGHEST_CMI5', '1');
+define('GRADE_AVERAGE_CMI5', '2');
+define('GRADE_SUM_CMI5', '3');
 
-define('HIGHESTATTEMPT', '0');
-define('AVERAGEATTEMPT', '1');
-define('FIRSTATTEMPT', '2');
-define('LASTATTEMPT', '3');
+define('HIGHEST_ATTEMPT_CMI5', '0');
+define('AVERAGE_ATTEMPT_CMI5', '1');
+define('FIRST_ATTEMPT_CMI5', '2');
+define('LAST_ATTEMPT_CMI5', '3');
 
 define('CMI5_FORCEATTEMPT_NO', 0);
 define('CMI5_FORCEATTEMPT_ONCOMPLETE', 1);
@@ -551,10 +551,10 @@ function cmi5_get_updatefreq_array() {
  * @return array an array of what grade options
  */
 function cmi5_get_grade_method_array() {
-    return array (GRADESCOES => get_string('gradescoes', 'cmi5launch'),
-                  GRADEHIGHEST => get_string('gradehighest', 'cmi5launch'),
-                  GRADEAVERAGE => get_string('gradeaverage', 'cmi5launch'),
-                  GRADESUM => get_string('gradesum', 'cmi5launch'));
+    return array (GRADE_AUS_CMI5 => get_string('GRADE_CMI5_AUS', 'cmi5launch'),
+                  GRADE_HIGHEST_CMI5 => get_string('GRADE_HIGHEST_CMI5', 'cmi5launch'),
+                  GRADE_AVERAGE_CMI5 => get_string('GRADE_AVERAGE_CMI5', 'cmi5launch'),
+                  GRADE_SUM_CMI5 => get_string('GRADE_SUM_CMI5', 'cmi5launch'));
 }
 
 
@@ -581,10 +581,10 @@ function cmi5_get_attempts_array() {
  * @return array an array of what grade options
  */
 function cmi5_get_what_grade_array() {
-    return array (HIGHESTATTEMPT => get_string('highestattempt', 'cmi5launch'),
-                  AVERAGEATTEMPT => get_string('averageattempt', 'cmi5launch'),
-                  FIRSTATTEMPT => get_string('firstattempt', 'cmi5launch'),
-                  LASTATTEMPT => get_string('lastattempt', 'cmi5launch'));
+    return array (HIGHEST_ATTEMPT_CMI5 => get_string('HIGHEST_ATTEMPT_CMI5', 'cmi5launch'),
+                  AVERAGE_ATTEMPT_CMI5 => get_string('AVERAGE_ATTEMPT_CMI5', 'cmi5launch'),
+                  FIRST_ATTEMPT_CMI5 => get_string('FIRST_ATTEMPT_CMI5', 'cmi5launch'),
+                  LAST_ATTEMPT_CMI5 => get_string('last_attempt_cmi5', 'cmi5launch'));
 }
 
 /**

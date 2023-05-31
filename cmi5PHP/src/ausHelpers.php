@@ -134,7 +134,7 @@ class Au_Helpers
 						$newRecord->passed = $auObject->passed;
 						$newRecord->inprogress = $auObject->inprogress;
 						$newRecord->noattempt = $auObject->noattempt;
-		
+						$newRecord->satisfied = $auObject->satisfied;
 			
 				//The record is ok, I think one of the ARGS in record isn't, some of them are nested arrays! Can I "toString" them?
 			$newId = $DB->insert_record($table, $newRecord, true);
