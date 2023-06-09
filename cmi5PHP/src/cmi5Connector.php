@@ -5,9 +5,6 @@ class cmi5Connectors{
     public function getCreateTenant(){
         return [$this, 'createTenant'];
     }
-    public function getSessionInfo(){
-        return [$this, 'retrieveSessionInfo'];
-    }
     public function getRetrieveToken(){
         return [$this, 'retrieveToken'];
     }
@@ -26,45 +23,6 @@ class cmi5Connectors{
     public function getRegistrationGet(){
         return [$this, 'retrieveRegistrationGet'];
     }
-    public function getRetrieveAus(){
-	return [$this, 'retrieveAus'];
- }
-    public function retrieveAUs($returnedInfo, $record){
-     
-        $returnedInfo = json_decode($returnedInfo, true);
-	
-      
-        //The results come back as nested array under more then statments. We only want statements, and we want them separated into unique statments
-        $resultChunked = array_chunk($returnedInfo["metadata"]["aus"], 1);
-
-
-        //TODO, any benefit in saving some info to DB here?
-	   /*
-       $tables = new cmi5Tables;
-	        //bring in functions from class cmi5_table_connectors
-    	    $populateTable = $tables->getPopulateTable();
-        */
-
-	    //These values wqonts changge based on au so do here
-		//In FACT, if we are goin to make this where tables stored
-		//Maybe store it then aus, but look at that later TODO
-
-
-	    $record->courseid = $returnedInfo["id"];
-
-		$length = count($resultChunked);
-		$courseAus = array( );
-
-        for($i = 0; $i < $length; $i++){
-      
-			$au = $resultChunked[$i][0]['auindex'];
-          
-            //TODO, do we want to save this to table, why is this here?
-			$record->auid = $au;
-			$courseAus[] = $au;
-        }
-    }
-
 
     //Function to create a course
     // @param $id - tenant id in Moodle
@@ -186,14 +144,7 @@ class cmi5Connectors{
                 }
         }
         else{
-            /*REmove
-            echo "<br>";
-            echo"Humor me, what is registration raw by id here?";
-            //to bring in functions from class cmi5Connector
-            echo "<br>";
-            var_dump($result);
-            echo "<br>";
-            */
+  
                $registrationInfo = json_decode($result, true);
     //The returned 'registration info' is a large json 
     //code is the registration id we want   
@@ -338,23 +289,20 @@ class cmi5Connectors{
 		$courseId = $record->courseid;
 
         //Build URL for launch URL request
-        //Okay it looks like the reurnurk is same level as  
 	    $url = $playerUrl . "/api/v1/course/" . $courseId  ."/launch-url/" . $auIndex;
-			//If its NOT one then we have a regid and it should be sent
-			//Ok, here is where we put in the optional param of regid!!
-			//the body of the request must be made as array first
-			$data = array(
-				'actor' => array(
-					'account' => array(
-						"homePage" => $homepage,
-						"name" => $actor,
-					),
-				),
-				'returnUrl' => $returnUrl,
-				'reg' => $registrationID
-			);
 
-			        // use key 'http' even if you send the request to https://...
+        $data = array(
+            'actor' => array(
+                'account' => array(
+                    "homePage" => $homepage,
+                    "name" => $actor,
+                ),
+            ),
+            'returnUrl' => $returnUrl,
+            'reg' => $registrationID
+        );
+
+		// use key 'http' even if you send the request to https://...
         //There can be multiple headers but as an array under the ONE header
         //content(body) must be JSON encoded here, as that is what CMI5 player accepts
         //JSON_UNESCAPED_SLASHES used so http addresses are displayed correctly
@@ -376,14 +324,8 @@ class cmi5Connectors{
         //sends the stream to the specified URL and stores results (the false is use_include_path, which we dont want in this case, we want to go to the url)
         $launchResponse = file_get_contents( $url, false, $context );
 
-        //NOW, THIS launch response should have the Session code!!!! we can also call
-        //a get session info (will need to be made) to fill out more if need be
-        	//Only return the URL
+        //Only return the URL
 		$urlDecoded = json_decode($launchResponse, true);
-
-        //Now, save the code to au in DB, it should be a 'session id' and saved the the property sessions which is an array
-        //NO! Lets return the whole dang thing and then I will already have access to AU object!
-//		$url = $urlDecoded['url'];
 
         return $urlDecoded;
     }
@@ -459,14 +401,14 @@ class cmi5Connectors{
     }
 
 
-    ///Function to retrieve session info for an AU
-    //@param $id -Actor id to find correct info for url request
-    //@param $auID -AU id to pass to cmi5 for url request
-    //@return $url - The launch URL returned from cmi5 player
-    ////////
+    /**
+    *Retrieve session info from cmi5player
+    * @param mixed $sessionId - the session id to retrieve
+     * @param mixed $id - cmi5 id
+     * @return mixed
+     */
     public function retrieveSessionInfo($sessionId, $id){
-		//TODO, this needs to be changed to have an if its one old call, if its not, new call
-        //MB
+
         global $DB;
 
 		$settings = cmi5launch_settings($id);
@@ -475,7 +417,6 @@ class cmi5Connectors{
 		$playerUrl = $settings['cmi5launchplayerurl'];
 
         //Build URL for launch URL request
-        //Okay it looks like the reurnurk is same level as  
 	    $url = $playerUrl . "/api/v1/session/" . $sessionId;
 
 		// use key 'http' even if you send the request to https://...
@@ -502,8 +443,6 @@ class cmi5Connectors{
 
         return $sessionDecoded;
     }
-
-
 
 }
    
