@@ -63,13 +63,12 @@ if (empty($registrationid)) {
 //To hold launch url or whether launch url is new!
 $location = "";
 
-//Then this is a NEW launch
+//If tture, this is a NEW launch
 if ($idAndStatus[0] == "true") {
         
-	//Retrieve AU helper functions        
+	//Retrieve AUs         
 	$aus_helpers = new Au_Helpers;
 	$getAUs = $aus_helpers->getAUsFromDB();
-
 	$au = $getAUs($id);
 		
 	//to bring in functions from class cmi5Connector
@@ -86,12 +85,12 @@ if ($idAndStatus[0] == "true") {
 	
 	//Check if there are previous sessions
     	if(!$au->sessions == NULL){
-		//We don't want to overwrite so retreive the sessions
+		//We don't want to overwrite so retrieve the sessions
 		$sessionList = json_decode($au->sessions);
 		//now add the new session number
 		$sessionList[] = $sessionID;
 
-   	}else{//Itis null so just start fresh
+   	}else{//It is null so just start fresh
 
 		$sessionList = array();
 		$sessionList[] = $sessionID;
@@ -100,11 +99,11 @@ if ($idAndStatus[0] == "true") {
 	//Save sessions   
 	$au->sessions =json_encode($sessionList );
 
-    	//The record needs to updated in db
+    //The record needs to updated in db
    	$updated =  $DB->update_record('cmi5launch_aus', $au, true);
 
-     //Url is the location we want to go
-     $location = $urlDecoded['url'];
+    //Url is the location we want to go
+    $location = $urlDecoded['url'];
 	$launchMethod = $urlDecoded['launchMethod'];
 
 	$ses_helpers = new Session_Helpers;

@@ -13,14 +13,7 @@ class progress{
 		return [$this, 'requestCompletedInfo'];
 	}
 
-	public function getCompletion()
-	{
-	    return [$this, 'evaluateCompleted'];
-	}
-	public function getRetrieveProgress()
-	{
-	    return [$this, 'retrieveProgress'];
-	}
+
 	public function getRetrieveVerb()
 	{
 	    return [$this, 'retrieveVerbs'];
@@ -31,289 +24,36 @@ class progress{
 	    return [$this, 'requestLRSinfo'];
 	}
 
-	public function evaluateCompleted($auMoveon, $verbs){
-
-		//Return this bool to let cqaller know if it is moveon worthy
-		$moveOn = true | false;
-
-
-		//These will keep track of completed and passed being found
-		$completedFound = true | false;
-		$passedFound = true | false;
-
-		$completedFound = array_search("completed", $verbs);
-		$passedFound = array_search("passed", $verbs);
-
-		//These bools track what verb has been sent. This helps because we may need more than one verb
-		//maybe these should be in outerloop, or see what verbs come here
-		//in outer loop then use a array of verbs HERE and finally pass out completed.
-		//
-		switch ($auMoveon) {
-			case ("Passed"):
-			    
-				//Only moves on if verb is 'passed'
-				
-				if($passedFound == true){
-					$moveOn = true;
-					return $moveOn;
-				}
-				else{
-					$moveOn = false;
-					return $moveOn;
-				}
-			    
-			case ("Completed"):
-				//Only moves on if verb is 'completed'
-
-				if($completedFound == true){
-					$moveOn = true;
-					return $moveOn;
-				}
-				else{
-					$moveOn = false;
-					return $moveOn;
-				}	
-			case ("CompletedAndPassed"):
-				//Only moves on if verb(s) is/are 'completed AND PASSED'
-				
-				if($passedFound == true && $completedFound == true){
-					$moveOn = true;
-					return $moveOn;
-				}
-				else{
-					$moveOn = false;
-					return $moveOn;
-				}
-
-
-				case ("CompletedOrPassed"):
-				//Only moves on if verb(s) is/are 'completed' OR 'passes'
-				if($passedFound == true || $completedFound == true){
-					$moveOn = true;
-					return $moveOn;
-				}
-				else{
-					$moveOn = false;
-					return $moveOn;
-				}
-		 }
-	}
-
-
-	public function retrieveProgress($registrationdatafromlrs, $id)
-	{
-		//We can return this to calling page
-		//or even save in a DB, there IS a completed.pass in cmi5_urls table
-		$progressList = array();
-		
-		//Retrieve list of registration ids
-		$registrationIds = $this->sortRegistration($registrationdatafromlrs);
-
-		//use the registration ids to request progress updates from
-		//LRS
-		foreach ($registrationIds as $regid) {
-
-			/*
-			$statement = $this->retrieveStatement($regid, $id);
-			$verb= $this->retrieveVerbs($regid, $id);
-			
-			//<May not need this? Perhaps regid is enouvh
-			$auId = $this->retrieveObject($regid, $id);
-			*/
-
-			//Ok so this retrieves statment
-			$progressList[] = $this->retrieveStatement($regid, $id);
-			
-			//$progressList[] = "$auId => $verb";
-		}
-
-		return $progressList;
-		//So if verb is completed, then auID is completed
-		//if verb is anything else in proresS?
-		//and of course if no verb then
-	}
-
-
-	//This will take the LRS info and retrieve the regisid, later we may want dates?
-	public function sortRegistration($lrsInfo){
-
-		//To hold regID
-		$regIds = array();
-		foreach ($lrsInfo as $regId =>$info) {
-			$regIds[] = $regId;
-		}
-		return $regIds;
-	}
-	
-
-	public function checkCompleted($aus, $regId){
-		
-		$foundStatement = array();
-		
-		foreach($regId as $id){
-			
-
-			foreach ($aus as $key => $item) {
-
-			
-
-				//Retrieve individual AU as array
-				$au = (array) ($aus[$key]);
-				$auId = $au['id'];
-				$auMoveon = $au['moveOn'];
-	
-				//ToDO - this is the version of completed the LRS seems to use, but there can be more than
-				//one version fo a verb. Needs to be investigated?
-				$completedVerb = "http://adlnet.gov/expapi/verbs/completed";
-				//When searching by reg id, which is the option available to Moodle, many results are returned, so iterating through them is necessary
-				//Lets try to ask for 'completed' verb
-				$data = array(
-					'registration' => $id,
-					'verb' => $completedVerb
-					/*'activity'=>$auId*/
-				);
-				$result = $this->sendRequestToLRS($data, $id);
-			
-				
-				if (!$result['more']){
-					echo"true, its NOT empty";
-				}
-				else{
-					echo "false, its empty";
-				}
-				//echo"What is " . $result['statements'][0];
-				echo "<br>";
-
-					//If break is used you can use it to get out of mopre than one loop!
-				if ($result['more']="" && empty($result['statements']) ){
-					//It found something!
-					$foundStatement[] = $result;
-				}
-			}
-		}
-		/*
-		echo "<br>";
-				echo "HEY WHAT IS THIS";
-				echo var_dump($foundStatement);
-				echo "<br>";
-			*/
-			//IF empty there was nothing! Boo! return no passed found or false
-			if(count($foundStatement)==0){
-			return false;
-			}
-			else{
-				//Something was found! Woot!
-			return true;
-			}
-	}
-	/**
-	 * Summary of checkPassed
-	 * @param mixed $aus
-	 * @param mixed $regId
-	 * @return bool
-	 */
-	public function checkPassed($aus, $regId){
-
-		$foundStatement = array();
-
-		foreach($regId as $id){
-			foreach ($aus as $key => $item) {
-				//Retrieve individual AU as array
-				$au = (array) ($aus[$key]);
-				$auId = $au['id'];
-				$auMoveon = $au['moveOn'];
-	
-				//ToDO - this is the version of completed the LRS seems to use, but there can be more than
-				//one version fo a verb. Needs to be investigated?
-				$passedVerb = "http://adlnet.gov/expapi/verbs/passed`";
-				//When searching by reg id, which is the option available to Moodle, many results are returned, so iterating through them is necessary
-				//Lets try to ask for 'completed' verb
-				$data = array(
-					'registration' => $id,
-					'verb' => $passedVerb,
-					'activity'=>$auId
-				);
-				$result = $this->sendRequestToLRS($data, $id);
-				
-					//If break is used you can use it to get out of mopre than one loop!
-				if (!$result['more']="" && !$result['statements']="" ){
-					//It found something!
-					$foundStatement[] = $result;
-				}
-			}
-		}
-			//If empty there was nothing! 
-			if(empty($foundStatement)){
-			return false;
-			}
-			else{
-				//Something was found
-			return true;
-			}
-	}
-
-	public function requestCompletedInfo($aus, $registrationIds, $id){
-
-		$regId = $this->sortRegistration($registrationIds);
-
-		$completedFound = $this->checkCompleted($aus, $regId);
-		
-		$passedFound = $this->checkPassed($aus, $regId);
-
-	}
 	/**
 	 * Send request to LRS
 	 * @param mixed $regId - registration id
-	 * @param mixed $id - 
+	 * @param mixed $session - a session object 
 	 * @return array
 	 */
-	public function requestLRSinfo($regId, /*$id*/){
+	public function requestLRSinfo($regId, $session /*$id*/){
 
 		//Array to hold result
 		$result = array();
 
-		//Somes times when this is called, for instance from AUview.php
-		//It's a single reg id not an array. Below needs an array, so check and create array if need be
-		if (!is_array($regId)) {
-			//When searching by reg id, which is the option available to Moodle, many results are returned, so iterating through them is necessary
-			$data = array(
-				'registration' => $regId
-			);
+		//When searching by reg id, which is the option available to Moodle, many results are returned, so iterating through them is necessary
+		$data = array(
+			'registration' => $regId,
+			'since' => $session->createdAt
+		);
 
-			$statements = $this->sendRequestToLRS($data, $regId);
-			//The results come back as nested array under more then statments. We only want statements, and we want them separated into unique statments
-			$statement = array_chunk($statements["statements"], 1);
+		$statements = $this->sendRequestToLRS($data, $regId);
+		//The results come back as nested array under more then statements. We only want statements, and we want them unique
+		$statement = array_chunk($statements["statements"], 1);
 
-			$length = count($statement);
+		$length = count($statement);
 
-			for ($i = 0; $i < $length; $i++){
-			
-			//This separates the larger statement into the separate sessions and verbs
-				$current = ($statement[$i]);
-			array_push($result, array ($regId => $current) );
-			}
-		}else{
-			foreach ($regId as $id => $info) {
-				//When searching by reg id, which is the option available to Moodle, many results are returned, so iterating through them is necessary
-				$data = array(
-					'registration' => $id
-				);
-
-				$statements = $this->sendRequestToLRS($data, $id);
-				//The results come back as nested array under more then statments. We only want statements, and we want them separated into unique statments
-
-				$statement = array_chunk($statements["statements"], 1);
-
-				$length = count($statement);
-
-				for ($i = 0; $i < $length; $i++) {
-
-					//This separates the larger statment into the separete sessions and verbs
-					$current = ($statement[$i]);
-					array_push($result, array($id => $current));
-				}
-			}
-	}
+		for ($i = 0; $i < $length; $i++){
+		
+		//This separates the larger statement into the separate sessions and verbs
+			$current = ($statement[$i]);
+		array_push($result, array ($regId => $current) );
+		}
+	
 		return $result;
 	}
 
@@ -326,39 +66,38 @@ class progress{
 	 */
 	public function sendRequestToLRS($data, $id)
 	{
-	//Now were do we get ID, will view.php have it?
-	$settings = cmi5launch_settings($id);
+		$settings = cmi5launch_settings($id);
 
-	//Url to request statements fr
-	$url = $settings['cmi5launchlrsendpoint'] . "statements";
-	//Build query with data above
-	$url = $url . '?' . http_build_query($data,"", '&',  PHP_QUERY_RFC1738);
+		//Url to request statements from
+		$url = $settings['cmi5launchlrsendpoint'] . "statements";
+		//Build query with data above
+		$url = $url . '?' . http_build_query($data,"", '&',  PHP_QUERY_RFC1738);
 
-	//LRS username and password
-	$user = $settings['cmi5launchlrslogin'];
-	$pass = $settings['cmi5launchlrspass'];
+		//LRS username and password
+		$user = $settings['cmi5launchlrslogin'];
+		$pass = $settings['cmi5launchlrspass'];
 
-	// use key 'http' even if you send the request to https://...
-	//There can be multiple headers but as an array under the ONE header
-	//content(body) must be JSON encoded here, as that is what CMI5 player accepts
-	$options = array(
-		'http' => array(
-			'method'  => 'GET',
-			'header' => array('Authorization: Basic '. base64_encode("$user:$pass"),  
-			"Content-Type: application/json\r\n" .
-			"X-Experience-API-Version:1.0.3",
+		// use key 'http' even if you send the request to https://...
+		//There can be multiple headers but as an array under the ONE header
+		//content(body) must be JSON encoded here, as that is what CMI5 player accepts
+		$options = array(
+			'http' => array(
+				'method'  => 'GET',
+				'header' => array('Authorization: Basic '. base64_encode("$user:$pass"),  
+				"Content-Type: application/json\r\n" .
+				"X-Experience-API-Version:1.0.3",
+				)
 			)
-		)
-	);
-	//the options are here placed into a stream to be sent
-	$context  = stream_context_create($options);
+		);
+		//the options are here placed into a stream to be sent
+		$context  = stream_context_create($options);
 
-	//sends the stream to the specified URL and stores results (the false is use_include_path, which we dont want in this case, we want to go to the url)
-	$result = file_get_contents( $url, false, $context );
+		//sends the stream to the specified URL and stores results (the false is use_include_path, which we dont want in this case, we want to go to the url)
+		$result = file_get_contents( $url, false, $context );
 
-	$resultDecoded = json_decode($result, true);
-	
-	return $resultDecoded;
+		$resultDecoded = json_decode($result, true);
+		
+		return $resultDecoded;
 	}
 	
 	/**
@@ -456,6 +195,53 @@ class progress{
 		}
 		return $object;
 	}
+	/**
+	 * TODO MB - This is able to get all results for later grading
+	 * Result params when returned with statements can have 5 fields (not including extensions)
+	 * Success - a true/false to provide for a pass/fail of Activity
+	 * Completion - a true/false to provide for completion of Activity
+	 * Score - takes a Score object
+	 * Response - a string value that can contain anything, such as an answer to a question
+	 * Duration - length of time taken for experience
+	 * 
+	 * We are concerned with  the top three for Moodle reporting purposes
+	 * 
+	 * Summary of retrieveResult
+	 * @param mixed $resultChunked - data retrieved from LRS, usually an array
+	 * @param mixed $i - the registration id
+	 * @return mixed
+	 */
+	public function retrieveResult($resultChunked, $i){
+
+		//Verify this statement has a 'result' param
+		if (array_key_exists("result", $resultChunked ) )
+		{
+			//If it exists, grab it
+			$resultInfo = $resultChunked[$i][0]["result"];
+		
+			//Check which keys exist in 'result'
+			$success = array_key_exists("success", $resultInfo);
+			$completion = array_key_exists("completion", $resultInfo);
+			$score = array_key_exists("score", $resultInfo);
+			//Andy seeemed interested in durations?
+			$duration = array_key_exists("score", $resultInfo);
+			$response = array_key_exists("response", $resultInfo);
+	
+		}
+		
+		//How should we save and return these infos? A key value array maybe?
+			//If it is null then the item in question doesn't exist in this statement
+			if($success){
+				//no need to make new variable, save over
+				$success = $resultChunked[$i][0]["result"]["success"];
+				
+				//now that we have success, save to db. This means we need an object right? Can we update afield?
+				//even if we could we need id to find it...
+			}else{
+			}
+
+			//Maybe it would be better to just have a 'retrieveScore' for now
+	}
 
 	/**
 	 * Returns a timestamp retrieved from collected LRS data based on registration id
@@ -475,6 +261,47 @@ class progress{
 	}
 
 	/**
+	 * 
+	 * Summary of retrieveScore
+	 * @param mixed $resultChunked - data retrieved from LRS, usually an array
+	 * @param mixed $registrationid - the registration id
+	 * @return mixed
+	 */
+	//Ok, if we change so session id goes through, can we update DB in this func	
+	public function retrieveScore($resultChunked, $registrationid){
+
+		//Verify this statement has a 'result' param
+		if ($resultChunked[$registrationid][0]["result"] )
+		{
+			//If it exists, grab it
+			$resultInfo = $resultChunked[$registrationid][0]["result"];
+		
+			$score = array_key_exists("score", $resultInfo);
+
+		}
+		
+			//If it is null then the item in question doesn't exist in this statement
+		if ($score) {
+
+			$score = $resultChunked[$registrationid][0]["result"]["score"];
+
+			//Raw score preferred to scaled
+			if($score["raw"]){
+		
+				$returnScore = $score["raw"];
+				return $returnScore;
+			}
+			elseif($score["scaled"]){
+		
+				$returnScore = round($score["scaled"], 2) ;
+				return $returnScore;
+			}
+			
+		}
+	
+	}
+	
+	/**
 	 * Summary of retrieveStatement
 	 * //Retrieves statements from LRS
 	 * @param mixed $regId
@@ -482,55 +309,59 @@ class progress{
 	 * @param mixed $lmsId
 	 * @return array<string>
 	 */
-	public function retrieveStatement($regId, $id, $lmsId)
+
+	public function retrieveStatement($regId, $id, $session)
 	{
 		//Array to hold verbs and be returned
 		$progressUpdate = array();
+		//Array to hold score and be returned
+		$returnScore = 0;
 
-		//Array to hold verbs and be returned
-		$verbs = array();
+		$resultDecoded = $this->requestLRSinfo($regId, $session);
 
-	$resultDecoded = $this->requestLRSinfo($regId, /*$id*/);
-		$resultChunked = $resultDecoded;
-		
+			//We need to sort the statements by finding their session id
+			//parse through array 'ext' to find the one holding session id, 
+			//grab id and go with it
+
 		foreach($resultDecoded as $singleStatment){
 
-			$currentLmsId = $singleStatment[$regId][0]["object"]["id"];
-		}
-		//The results come back as nested array under more then statments. We only want statements, and we want them separated into unique statments
-		
-			//Ok, so then this should be resultDecoded, not chunked? Uh lets just change it to chunked on 522 and save changingg
-			$length = count($resultDecoded);
+			//We need to sort the statements by finding their session id
+			//parse through array 'ext' to find the one holding session id, 
+			//grab id and go and compare to saved session 'code'
+			$code = $session->code;
+			$currentSessID = "";
+			$ext = $singleStatment[$regId][0]["context"]["extensions"];
+				foreach ($ext as $key => $value) {
+				
+					//if key contains "sessionid" in string
+					if(str_contains($key, "sessionid")){
+						$currentSessID= $value;
+					}
+				}
 
-			foreach($resultDecoded as $singleStatment){
-
-			//Ok, so statements are DEF coming in - something is happening they are not beinf
-			//returned at the end of this func
-
-		
-			$currentLmsId = $singleStatment[$regId][0]["object"]["id"];
+			//Now if code equals currentSessID, this is a statement pertaining to this session
+			if($code == $currentSessID){
 			
-			//Ok, the issue is the lmsID to match too has someweird forward ticks in it.
-			//Where are these coming from? We either need to stop them from being there (preferable)
-			//OR strip them before comparision
-			//MB - MONDAY NOTES above
-
-				//We also only want the ones the lmsID matches!
-				if ($currentLmsId == $lmsId )     {                                               //&& $regId == $resultDecoded[$i]) {
-
-					//Now to parse the diff verbs, maybe array chunk on 'id'?
 				$actor = $this->retrieveActor($singleStatment, $regId);
 				$verb = $this->retrieveVerbs($singleStatment, $regId);
 				$object = $this->retrieveObject($singleStatment, $regId);
 				$date = $this->retrieveTimestamp($singleStatment, $regId);
-
-				//OR object=> actor, verb, date. Then we can sort it by au!
-				$progressUpdate[] = "$actor $verb $object on $date";
-				//}
+				$score = $this->retrieveScore($singleStatment, $regId);
+				
+				//If a session has more than one score, we only want the highest
+				if(!$score == null && $score > $returnScore){
+					$returnScore = $score;
 				}
+				//Update to return
+				$progressUpdate[] = "$actor $verb $object on $date";
+			
 			}
-
-			return $progressUpdate;
+				
+		}
+			$session->progress = json_encode($progressUpdate);
+			$session->score = $returnScore;
+		
+			return $session;
 	}
 
 	/**

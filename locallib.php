@@ -30,7 +30,6 @@ require_once("$CFG->dirroot/mod/cmi5launch/lib.php");
 
 //Classes for connecting to CMI5 player
 require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/cmi5Connector.php");
-require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/cmi5_table_connectors.php");
 
 
 /**

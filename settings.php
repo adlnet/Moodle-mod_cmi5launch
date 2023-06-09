@@ -120,33 +120,20 @@ if ($ADMIN->fulltree) {
     
         // Default attempts settings.
         $settings->add(new admin_setting_configselect('cmi5launch/maxattempt',
-            get_string('maximumattempts', 'cmi5launch'), '', '0', cmi5_get_attempts_array()));
+            get_string('maximumattempts', 'cmi5launch'), '', '0', cmi5_get_attempts_array()), get_string('whatmaxdesc', 'cmi5launch'),);
     
         $settings->add(new admin_setting_configselect('cmi5launch/whatgrade',
             get_string('whatgrade', 'cmi5launch'), get_string('whatgradedesc', 'cmi5launch'), HIGHEST_ATTEMPT_CMI5, cmi5_get_what_grade_array()));
-    
-        $settings->add(new admin_setting_configselect('cmi5launch/forcecompleted',
-            get_string('forcecompleted', 'cmi5launch'), get_string('forcecompleteddesc', 'cmi5launch'), 0, $yesno));
-    
-        $forceattempts = cmi5_get_forceattempt_array();
-        $settings->add(new admin_setting_configselect('cmi5launch/forcenewattempt',
-            get_string('forcenewattempts', 'cmi5launch'), get_string('forcenewattempts_help', 'cmi5launch'), 0, $forceattempts));
-    
-        $settings->add(new admin_setting_configselect('cmi5launch/autocommit',
-        get_string('autocommit', 'cmi5launch'), get_string('autocommitdesc', 'cmi5launch'), 0, $yesno));
-    
+
+        //Not sure if we wan to implement mastery override? -MB
+        /*
         $settings->add(new admin_setting_configselect('cmi5launch/masteryoverride',
             get_string('masteryoverride', 'cmi5launch'), get_string('masteryoverridedesc', 'cmi5launch'), 1, $yesno));
-    
+            */
+        
         $settings->add(new admin_setting_configselect('cmi5launch/last_attempt_cmi5lock',
-            get_string('last_attempt_cmi5lock', 'cmi5launch'), get_string('last_attempt_cmi5lockdesc', 'cmi5launch'), 0, $yesno));
-    
-        $settings->add(new admin_setting_configselect('cmi5launch/auto',
-            get_string('autocontinue', 'cmi5launch'), get_string('autocontinuedesc', 'cmi5launch'), 0, $yesno));
-    
-        $settings->add(new admin_setting_configselect('cmi5launch/updatefreq',
-            get_string('updatefreq', 'cmi5launch'), get_string('updatefreqdesc', 'cmi5launch'), 0, cmi5_get_updatefreq_array()));
-    
+            get_string('last_attempt_cmi5_lock', 'cmi5launch'), get_string('last_attempt_cmi5_lockdesc', 'cmi5launch'), 0, $yesno));
+
 
 
 }

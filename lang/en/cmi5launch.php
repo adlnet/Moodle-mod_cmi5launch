@@ -106,6 +106,27 @@ $string['defaultothersettings'] = 'Default values for CMI5 Launch Link activity 
 //other
 $string['maximumgradedesc'] = 'The maximum grade for a CMI5 Launch Link activity';
 
+$string['maximumattempts'] = 'Maxium Attempt Amount';
+$string['whatmaxdesc'] = 'The maximum amount of allowed attempts';
+
+$string['maximumattempts'] = 'Maxium Attempt Amount';
+$string['whatmaxdesc'] = 'The maximum amount of allowed attempts';
+
+$string['nolimit'] = 'No limit';
+$string['attempt1'] = '1 attempt';
+$string['attemptsx'] = '{$a} attempts';
+
+$string['whatgrade'] = 'Attempts grading';
+$string['whatgradedesc'] = 'If multiple attempts are allowed, this setting specifies whether the highest, average (mean), first or last completed attempt is recorded in the gradebook. The last completed attempt option does not include attempts with a \'failed\' status.';
+$string['HIGHEST_ATTEMPT_CMI5'] = 'Highest attempt';
+$string['AVERAGE_ATTEMPT_CMI5'] = 'Average of attempts';
+$string['FIRST_ATTEMPT_CMI5'] = 'First attempt';
+$string['last_attempt_cmi5'] = 'Last attempt';
+
+$string['lastattempt'] = 'Last completed attempt';
+$string['last_attempt_cmi5_lock'] = 'Lock after final attempt';
+$string['lastattemptlock_help'] = 'If enabled, a student is prevented from launching the CMI5 player after using up all their allocated attempts.';
+$string['last_attempt_cmi5_lockdesc'] = 'If enabled, a student is prevented from launching the CMI5 player after using up all their allocated attempts.';
 
 //-MB - Not sure if we need ALL of these
 //* No - If a previous attempt is completed, passed or failed, the student will be provided with the option to enter in review mode or start a new attempt.
@@ -123,6 +144,13 @@ $string['framewidth'] = 'The width of the stage frame or window.';
 $string['fromleft'] = 'From left';
 $string['fromtop'] = 'From top';
 $string['fullscreen'] = 'Fill the whole screen';*/
+
+//Not sure if we want to implement these?
+/*$string['masteryoverride'] = 'Mastery score overrides status';
+$string['masteryoverride_help'] = 'If enabled and a mastery score is provided, when LMSFinish is called and a raw score has been set, status will be recalculated using the raw score and mastery score and any status provided by the SCORM (including "incomplete") will be overridden.';
+$string['masteryoverridedesc'] = 'This preference sets the default for the mastery score override setting';
+*/
+
 $string['general'] = 'General data';
 $string['GRADE_AVERAGE_CMI5'] = 'Average grade';
 $string['gradeforattempt'] = 'Grade for attempt';
@@ -199,11 +227,13 @@ $string['cmi5launchviewlastlaunched'] = 'Last launched';
 $string['cmi5launchviewlaunchlinkheader'] = 'Launch link';
 $string['cmi5launchviewlaunchlink'] = 'launch';
 $string['cmi5launchviewprogress'] = 'Progress';
+$string['cmi5launchviewgradeheader'] = 'Grade';
 
 // View settings.
 $string['cmi5launchviewAUname'] = 'Name';
 $string['cmi5launchviewstatus'] = 'Status';
 $string['cmi5launchviewregistrationheader'] = 'Registrations';
+$string['cmi5launchviewgradeheader'] = 'Grade';
 $string['cmi5launchviewlaunchlink'] = 'view';
 $string['AUtableheader'] = 'Assignable Units';
 

@@ -111,13 +111,13 @@ $lmsAndId = explode(",", $fromView);
 //Retrieve AU ID
 $auID = array_shift($lmsAndId);
 
-
-// Reload cmi5
-// Array of ids => $auIDs
 $aus_helpers = new Au_Helpers;
 $getAUs = $aus_helpers->getAUsFromDB();
 //Retrieve appropriate AU from DB
 $au = $getAUs($auID);
+
+//Array to hold session scores for the au
+$sessionScores = array();
 
 // Reload cmi5 instance.
 $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
@@ -145,7 +145,6 @@ if (has_capability('mod/cmi5launch:addinstance', $context)) {
 
 
 //If it is null there have been no previous sessions
-//NOT null means there ARE previous sessions
 if (!$au->sessions == NULL) {
 
 	//Array to hold info for table population
@@ -159,6 +158,7 @@ if (!$au->sessions == NULL) {
 		get_string('cmi5launchviewfirstlaunched', 'cmi5launch'),
 		get_string('cmi5launchviewlastlaunched', 'cmi5launch'),
 		get_string('cmi5launchviewprogress', 'cmi5launch'),
+        get_string('cmi5launchviewgradeheader', 'cmi5launch'),
 		get_string('cmi5launchviewlaunchlinkheader', 'cmi5launch'),
 	);
 
@@ -169,35 +169,48 @@ if (!$au->sessions == NULL) {
 	//Iterate through each session by id
 	foreach($sessionIDs as $key => $sessionID){
 
-		//Retrieve new info (if any) from CMI5 player on session	
+        //Retrieve new info (if any) from CMI5 player on session	
 		$updateSession = $ses_helpers->getUpdateSession();
 		$session = $updateSession($sessionID, $cmi5launch->id);    
+        
+        //array to hold data for table
+        $sessionInfo = array();
 
-          //array to hold data for table
-          $sessionInfo = array();
+        //Retrieve createdAt and format        
+		$date = new DateTime($session->createdAt, new DateTimeZone('US/Eastern'));
+		$date->setTimezone(new DateTimeZone('America/New_York'));
+        $sessionInfo[] = $date->format('D d M Y H:i:s');
 
-		$sessionInfo[] = date_format( date_create($session->createdAt), 'D d M Y H:i:s');
-		
+        ///Retrieve lastRequestTime and format
+        $date = new DateTime($session->lastRequestTime, new DateTimeZone('US/Eastern'));
+		$date->setTimezone(new DateTimeZone('America/New_York'));
 		//used to grab lastlaunched - now lastRequestTime should do it
-		$sessionInfo[] = date_format(date_create($session->lastRequestTime), 'D d M Y H:i:s');
+        $sessionInfo[] = $date->format('D d M Y H:i:s');
 
 		//Retrieve lmsid 
-          $lmsId = $au->lmsid;
+        //$lmsId = $au->lmsid;
           
-		//Bring in getProgress class
+		//Get progress from LRS
 		$progress = new progress;
-          $getProgress = $progress->getRetrieveStatement();
+        $getProgress = $progress->getRetrieveStatement();
+		$session = $getProgress($regid, $cmi5launch->id, $session);
+		$sessionInfo[] = ("<pre>" . implode("\n ", json_decode($session->progress) ) . "</pre>");
+		
+        //add score to table
+        $sessionInfo[] = $session->score;
+        //Add score to array for AU
+        $sessionScores[] = $session->score;
 
-		//Get session info progress printout
-          $sessionInfo[] = ("<pre>" . implode("\n ", $getProgress($regid, $cmi5launch->id, $lmsId)) . "</pre>");
-	     
-		//Build launch link to continue session
+		//Update session in table with new info
+		$DB->update_record('cmi5launch_sessions', $session);
+		
+        //Build launch link to continue session
 		$newSession = "false";
-	     $infoForNextPage = $sessionID . "," . $newSession;
+	    $infoForNextPage = $sessionID . "," . $newSession;
 
-          $sessionInfo[] = "<a tabindex=\"0\" id='cmi5relaunch_attempt'
+        $sessionInfo[] = "<a tabindex=\"0\" id='cmi5relaunch_attempt'
 			onkeyup=\"key_test('" . $infoForNextPage . "')\" onclick=\"mod_cmi5launch_launchexperience('" . $infoForNextPage . "')\" style='cursor: pointer;'>"
-               . get_string('cmi5launchviewlaunchlink', 'cmi5launch') . "</a>";
+            . get_string('cmi5launchviewlaunchlink', 'cmi5launch') . "</a>";
 
           //add to be fed to table
           $tableData[] = $sessionInfo;
@@ -205,8 +218,14 @@ if (!$au->sessions == NULL) {
      
 	//Write table
 	$table->data = $tableData;
-     echo html_writer::table($table);
+    echo html_writer::table($table);
 
+     //Save the session scores to AU, it is ok to overwrite
+    $au->scores = json_encode($sessionScores);
+
+    //Update AU in table with new info
+	$DB->update_record('cmi5launch_aus', $au);
+		
 }
 
 //Build the new session link

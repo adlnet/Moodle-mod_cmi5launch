@@ -24,7 +24,7 @@
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="courseinfo" TYPE="text" LENGTH="4000" NOTNULL="false" SEQUENCE="false" COMMENT="The full string of course info"/>              
         <FIELD NAME="aus" TYPE="text" LENGTH="4000" NOTNULL="false" SEQUENCE="false" COMMENT="The AUs of the course, saved as array"/>              
-
+        <FIELD NAME="grade" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="The overall grade for the course, the average of all it's aus"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
@@ -100,10 +100,13 @@
          <FIELD NAME="lastRequestTime" TYPE="char" LENGTH="30" NOTNULL="false" SEQUENCE="false" COMMENT="Time a session was last requested?? (string as that is what is returned from player)"/>
          <FIELD NAME="launchMode" TYPE="char" LENGTH="25" NOTNULL="false" SEQUENCE="false" COMMENT="Launch mode, separate from launchmethod. It can be 'Normal', 'Browse', or 'Review"/>
         <FIELD NAME="masteryScore" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="The amount toward mastery score."/>
+        <FIELD NAME="score" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="The score of session (returned from 'result' param)."/>
+        <FIELD NAME="response" TYPE="text" LENGTH="1000" NOTNULL="false" SEQUENCE="false" COMMENT="The response returned from statement 'result' paramater"/>              
         <FIELD NAME="contextTemplate" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="The context??"/>
         <FIELD NAME="isLaunched" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Has session been launched?."/>
         <FIELD NAME="isInitialized" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Has session been intialized?."/>
          <FIELD NAME="initializedAt" TYPE="char" LENGTH="30" NOTNULL="false" SEQUENCE="false" COMMENT="Time a session was initialized (string as that is what is returned from player)"/>
+        <FIELD NAME="duration" TYPE="char" LENGTH="30" NOTNULL="false" SEQUENCE="false" COMMENT="Time a session took (from 'result' param)"/>
         <FIELD NAME="isCompleted" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Has session been completed?"/>
         <FIELD NAME="isPassed" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Has session been passed?"/>
         <FIELD NAME="isFailed" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Has session been failed?."/>
@@ -155,7 +158,8 @@
         <FIELD NAME="noattempt" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false" DEFAULT="0" COMMENT="Whether an AU has attempted TODO (0 if false, 1 if true)"/>
         <FIELD NAME="satisfied" TYPE="char" LENGTH="5" NOTNULL="false" SEQUENCE="false" DEFAULT="0" COMMENT="Whether an AU has been SATISIFED (0 if false, 1 if true)"/>
         <FIELD NAME="sessions" TYPE="text" LENGTH="4000" NOTNULL="false" SEQUENCE="false" COMMENT="The session ids of the AU, saved as array"/>              
-
+        <FIELD NAME="scores" TYPE="text" LENGTH="4000" NOTNULL="false" SEQUENCE="false" COMMENT="The sessions scores, saved as array"/>              
+        <FIELD NAME="grade" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" DEFAULT="0" COMMENT="The overall grade (average of session scores)"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="id" TYPE="primary" FIELDS="id"/>
