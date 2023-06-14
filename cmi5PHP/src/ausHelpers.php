@@ -73,7 +73,8 @@ class Au_Helpers
 	 */
 	function saveAUs($auObjectArray)
 	{
-		global $DB;
+		//Add userid to the record
+		global $DB, $USER;
 		//$record;
 		$table = "cmi5launch_aus";
 
@@ -84,7 +85,7 @@ class Au_Helpers
 		foreach ($auObjectArray as $auObject) {
 			//Make a newRecord to save
 			$newRecord = new stdClass();
-
+			$newRecord->userid = $USER->id;
 			$newRecord->auid = $auObject->id;
 			$newRecord->launchmethod = $auObject->launchMethod;
 			$newRecord->lmsid = json_decode(json_encode($auObject->lmsId, true) );

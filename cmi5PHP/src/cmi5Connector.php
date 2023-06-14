@@ -165,10 +165,14 @@ class cmi5Connectors{
     //@param $courseID
     // @param $id 
     function retrieveRegistrationPost($courseId, $id){
- 
+
+        global $USER;
+
 		$settings = cmi5launch_settings($id);
 
-        $actor = $settings['cmi5launchtenantname'];
+        //Switch this out for user not tenant
+//        $actor = $settings['cmi5launchtenantname'];
+        $actor = $USER->username;
         $token = $settings['cmi5launchtenanttoken'];
         $playerUrl = $settings['cmi5launchplayerurl'];
         $homepage = $settings['cmi5launchcustomacchp'];
@@ -272,21 +276,27 @@ class cmi5Connectors{
     public function retrieveUrl($id, $auIndex){
 		//TODO, this needs to be changed to have an if its one old call, if its not, new call
         //MB
-        global $DB;
+        global $DB, $USER;
 
 		//Retrieve actor record, this enables correct actor info for URL storage
 		$record = $DB->get_record("cmi5launch", array('id' => $id));
 
+        //Here's the trouble, still getting reggistration id from master RECORD
 		$settings = cmi5launch_settings($id);
-		$registrationID = $record->registrationid;
+     
+        $usersCourse = $DB->get_record('cmi5launch_course', ['courseid'  => $record->courseid, 'userid'  => $USER->id]);
 
+		$registrationID = $usersCourse->registrationid;
 		
         $homepage = $settings['cmi5launchcustomacchp'];
-        $returnUrl =$record->returnurl;
-		$actor= $settings['cmi5launchtenantname'];
+        $returnUrl =$usersCourse->returnurl;
+		//MB
+        //We need to change this to actor name, not tenant
+        $actor= $USER->username;
+        //$actor= $settings['cmi5launchtenantname'];
 		$token = $settings['cmi5launchtenanttoken'];
 		$playerUrl = $settings['cmi5launchplayerurl'];
-		$courseId = $record->courseid;
+		$courseId = $usersCourse->courseid;
 
         //Build URL for launch URL request
 	    $url = $playerUrl . "/api/v1/course/" . $courseId  ."/launch-url/" . $auIndex;
@@ -324,6 +334,11 @@ class cmi5Connectors{
         //sends the stream to the specified URL and stores results (the false is use_include_path, which we dont want in this case, we want to go to the url)
         $launchResponse = file_get_contents( $url, false, $context );
 
+        //here may be the problem, what is being sent back?
+        echo"<br>";
+        echo" This is swhat is bein sent back>:";
+        var_dump($launchResponse);
+        ECHO"<br>";
         //Only return the URL
 		$urlDecoded = json_decode($launchResponse, true);
 

@@ -29,6 +29,8 @@ class Session_Helpers
 		require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/cmi5Connector.php");
 		$connector = new cmi5Connectors;
 	
+		//find the session id and echo it
+		echo "This is sess id" . $sessionID;
 		//Get the session from DB with session id
 		$session = $this->getFromDB($sessionID);
 
@@ -65,7 +67,7 @@ class Session_Helpers
 	 */
 	function createSession($sessId, $launchurl, $launchMethod)
 	{
-		global $DB, $CFG, $cmi5launch;
+		global $DB, $CFG, $cmi5launch, $USER;
 	
 		//$record;
 		$table = "cmi5launch_sessions";
@@ -81,7 +83,10 @@ class Session_Helpers
 		//Because of many nested properties, needs to be done manually
 		$newRecord->sessionid = $sessId;
 		$newRecord->launchurl = $launchurl;
-		$newRecord->tenantname = $settings['cmi5launchtenantname'];
+		//MB
+		//Change this to use user name
+		//$newRecord->tenantname = $settings['cmi5launchtenantname'];
+		$newRecord->tenantname = $USER->username;
 		$newRecord->launchmethod = $launchMethod;
 
 		//Save

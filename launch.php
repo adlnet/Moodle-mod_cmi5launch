@@ -47,8 +47,25 @@ $id = array_shift($idAndStatus);
 
 // Reload cmi5 instance.
 $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
+
+//Nope now we need OUR thing
+
+$exists = $DB->get_record('cmi5launch_course', ['courseid'  => $record->courseid, 'userid'  => $USER->id]);
+
+if($exists == false){
+
+    //Record should exist, throw error message
+    echo"<br>";
+    echo "Error: User does not exist in this course";
+    echo"<br>";
+
+}else{
+
+    $usersCourse = $DB->get_record('cmi5launch_course', ['courseid'  => $record->courseid, 'userid'  => $USER->id]);
+}
+
 //Retrieve registration id
-$registrationid = $record->registrationid;
+$registrationid = $usersCourse->registrationid;
 
 if (empty($registrationid)) {
     echo "<div class='alert alert-error'>".get_string('cmi5launch_regidempty', 'cmi5launch')."</div>";
@@ -80,7 +97,11 @@ if ($idAndStatus[0] == "true") {
 
 	//Now pass in the au index so we can retrieve a launchurl and session id
 	$urlDecoded = $retrieveUrl($cmi5launch->id, $auIndex);
-   
+	echo"<br>";
+	echo"What url is it retrieving?";
+	var_dump($urlDecoded);
+	echo"<br>";
+
 	$sessionID = intval($urlDecoded['id']);
 	
 	//Check if there are previous sessions
@@ -118,7 +139,14 @@ if ($idAndStatus[0] == "true") {
     
     //We want to retrieve the launchurl from sessions
     $session = $DB->get_record('cmi5launch_sessions',  array('sessionid' => $id));
-    $location = $session->launchurl;
+    /*
+	echo"<br>";
+	echo "waht is session? is problem here?";
+	var_dump($session);
+	echo"<br>";
+	*/
+	
+	$location = $session->launchurl;
 
 } 
 

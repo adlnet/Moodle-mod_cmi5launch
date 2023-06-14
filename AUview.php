@@ -27,7 +27,8 @@ require('header.php');
 //For connecting to Progress class - MB
 require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/Progress.php");
 require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/sessionHelpers.php");
-global $cmi5launch;
+
+global $cmi5launch, $USER;
 
 // Trigger module viewed event.
 $event = \mod_cmi5launch\event\course_module_viewed::create(array(
@@ -119,10 +120,30 @@ $au = $getAUs($auID);
 //Array to hold session scores for the au
 $sessionScores = array();
 
+//Ok, so here is where it takes the record - we need to swap out for the new user specific record
 // Reload cmi5 instance.
 $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
+//$course = new course($record);
+//We need to make a try catch to make sure there is no error
+
+$exists = $DB->get_record('cmi5launch_course', ['courseid'  => $record->courseid, 'userid'  => $USER->id]);
+
+if($exists == false){
+
+    //Record should exist, throw error message
+    echo"<br>";
+    echo "Error: User does not exist in this course";
+    echo"<br>";
+
+}else{
+
+    $usersCourse = $DB->get_record('cmi5launch_course', ['courseid'  => $record->courseid, 'userid'  => $USER->id]);
+}
+
+//Now that we have the correct record, we need to make sure we update IT and not master record
+
 //Retrieve the registration id
-$regid = $record->registrationid;
+$regid = $usersCourse->registrationid;
 
 //TODO
 //For later to change student view vs teacher
@@ -166,6 +187,8 @@ if (!$au->sessions == NULL) {
 	$sessionIDs = json_decode($au->sessions);
 	$ses_helpers = new Session_Helpers;
 
+    echo"<br>";
+    echo" au id is $au->id";
 	//Iterate through each session by id
 	foreach($sessionIDs as $key => $sessionID){
 

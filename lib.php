@@ -564,7 +564,6 @@ function cmi5launch_process_new_package($cmi5launch) {
 
 	//bring in functions from class cmi5_table_connectors and AU helpers
 	$createCourse = $connectors->getCreateCourse();
-    $getRegistration = $connectors->getRegistrationPost();
     $retrieveAus = $aus_helpers-> getRetrieveAus();
     $saveAUs = $aus_helpers->getSaveAUs();
     $createAUs = $aus_helpers->getCreateAUs();
@@ -615,15 +614,18 @@ function cmi5launch_process_new_package($cmi5launch) {
 
     $record->courseid = $returnedInfo["id"];
     
+    //MB
+    //Here, does the course need registration at all? 
 	//retrieve reg
-	$registration = $getRegistration($returnedInfo["id"], $cmi5launch->id);
-    $record->registrationid = $registration;
+	//$registration = $getRegistration($returnedInfo["id"], $cmi5launch->id);
+    //$record->registrationid = $registration;
 
     
 	//create url for sending to when requesting launch url for course 
     $playerUrl = $settings['cmi5launchplayerurl'];
     
     //TODO - another ref to tenant name! Maybe here is a good place to change user?
+    //MB - no, this needs to be tenant name cause this is course creation
     $tenantname = $settings['cmi5launchtenantname'];
     
     //Build and save launchurl
@@ -631,10 +633,14 @@ function cmi5launch_process_new_package($cmi5launch) {
 	$record->launchurl = $url;
     
 	//Retrieve the courses AUs and save to record
-	$aus = ($retrieveAus($returnedInfo));
+	//Here it is saving to MASTER record, we need each student to have their own
+
+    //Maybe in view.php it does this same thing, saving to the student record instead.
+    //so these stay as a 'master' record and the students tweak their own
+    $aus = ($retrieveAus($returnedInfo));
     //Maybe better to save AUs here and feed it the array returned by retreieveAUS
-	$auIDs = $saveAUs($createAUs($aus));
-    $record->aus = (json_encode($auIDs));
+	//$auIDs = $saveAUs($createAUs($aus));
+    $record->aus = (json_encode($aus));
 
 
 	//Populate player table with new course info
@@ -1037,10 +1043,12 @@ function cmi5_update_grades($cmi5launch, $userid=0, $nullifnone=true) {
  * @param mixed $grades optional array/object of grade(s); 'reset' means reset grades in gradebook
  * @return object grade_item
  */
-
+//TODO MB
+//Return to this for grades
+ /*
  //Whereever 'scorm' is replace with 'cmi5launch'
 function cmi5_grade_item_update($record, $grades=null) {
-    global $CFG, $DB;
+    global $CFG, $DB, $cmi5launch;
     //Note the SCORM version called it's locallib, we may need to get funcs from there as well and place into 
     //OUR locallib
     //May be where those constants were kept
@@ -1100,7 +1108,7 @@ function cmi5_grade_item_update($record, $grades=null) {
         $params['reset'] = true;
         $grades = null;
     }
-*/
+
 
     $grades = $record->grade;
     //This is calling grade_update from lib>gradelib.php
@@ -1126,10 +1134,10 @@ function cmi5_grade_item_update($record, $grades=null) {
  * @param mixed  $itemdetails Object or array describing the grading item, NULL if no change
  * @param bool   $isbulkupdate If bulk grade update is happening.
  * @return int Returns GRADE_UPDATE_OK, GRADE_UPDATE_FAILED, GRADE_UPDATE_MULTIPLE or GRADE_UPDATE_ITEM_LOCKED
-    */ 
+     
     return grade_update('mod/cmi5launch', $cmi5launch->courseid, 'mod', 'cmi5', $cmi5launch->id, 0, $grades, $params);
 }
-
+*/
 
 /**
  * Delete grade item for given scorm
