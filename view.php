@@ -59,7 +59,12 @@ $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
 echo"br";
 echo "<p> User is: " . $USER->username . "</p>";
 echo"<br>";
-
+echo"br";
+echo "<p> User id: " . $USER->id . "</p>";
+echo"<br>";
+echo"br";
+echo "<p> course id is: " . $record->courseid . "</p>";
+echo"<br>";
 
 if ($cmi5launch->intro) { 
     // Conditions to show the intro can change to look for own settings or whatever.
@@ -126,6 +131,19 @@ if ($cmi5launch->intro) {
 //Check if a course record exists for this user yet
 $exists = $DB->record_exists('cmi5launch_course', ['courseid'  => $record->courseid, 'userid'  => $USER->id]);
 
+
+$saveAUs = $aus_helpers->getSaveAUs();
+$createAUs = $aus_helpers->getCreateAUs();
+$getAUs = $aus_helpers->getAUsFromDB();
+
+//Whats happening is it is making new AUs EVERYtime.
+//This page can be gotten to as both a new user and a returning user
+//If a new user, we need to create AUs and save them to DB
+//If a returning user, we need to retrieve AUs from DB
+//We need to check if the user has AUs already, if not, create them
+//This is creating if they don't have any
+
+
 //If it does not exist, create it
 if($exists == false){
 
@@ -142,7 +160,10 @@ if($exists == false){
     $registrationID = $getRegistration($record->courseid, $cmi5launch->id);
     //Save the registration to the users course object
     $usersCourse->registrationid = $registrationID;
-
+    $aus = json_decode($record->aus);
+    //SaveAus will need to take user id into account now, tweak it
+    $auIDs = $saveAUs($createAUs($aus));
+    $usersCourse->aus = (json_encode($auIDs));
     //Save new record to DB
     $DB->insert_record('cmi5launch_course', $usersCourse);
 
@@ -152,6 +173,9 @@ if($exists == false){
     $usersCourse = $DB->get_record('cmi5launch_course', ['courseid'  => $record->courseid, 'userid'  => $USER->id]);
     //Retrieve registration id
     $registrationID = $usersCourse->registrationid; 
+
+    //This is retrieving if they do have some
+    $auIDs = (json_decode($usersCourse->aus) );
 }
 
 
@@ -179,14 +203,7 @@ $table->head = array(
 //TODO MB
 //Return to for grades
 //cmi5_update_grades($cmi5launch, 0);
-$saveAUs = $aus_helpers->getSaveAUs();
-$createAUs = $aus_helpers->getCreateAUs();
-$getAUs = $aus_helpers->getAUsFromDB();
 
-$aus = json_decode($record->aus);
-//SaveAus will need to take user id into account now, tweak it
-$auIDs = $saveAUs($createAUs($aus));
-$usersCourse->aus = (json_encode($auIDs));
 
 //Lets now retrieve our list of AUs
 //Cycle through and get each au ID

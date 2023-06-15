@@ -45,6 +45,8 @@ $idAndStatus = explode(",", $fromAUview);
 //Retrieve AU OR session id
 $id = array_shift($idAndStatus);
 
+//Ai are you there?
+echo"<br>";
 // Reload cmi5 instance.
 $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
 

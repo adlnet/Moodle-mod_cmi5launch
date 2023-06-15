@@ -599,9 +599,10 @@ function cmi5launch_process_new_package($cmi5launch) {
     //Retrieve user settings to apply to newly created record
     $settings = cmi5launch_settings($cmi5launch->id);
     $token = $settings['cmi5launchtenanttoken'];
-
     //Create the course and retrieve info for saving to DB
-	$courseResults =  $createCourse($context->id, $token, $packagefile );
+    
+    //Lets wrap this in a try catch statement
+    $courseResults =  $createCourse($context->id, $token, $packagefile );
 
 	//Take the results of created course and save new course id to table
     $record->courseinfo = $courseResults;
@@ -634,6 +635,7 @@ function cmi5launch_process_new_package($cmi5launch) {
     
 	//Retrieve the courses AUs and save to record
 	//Here it is saving to MASTER record, we need each student to have their own
+
 
     //Maybe in view.php it does this same thing, saving to the student record instead.
     //so these stay as a 'master' record and the students tweak their own
