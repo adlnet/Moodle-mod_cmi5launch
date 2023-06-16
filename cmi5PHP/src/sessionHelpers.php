@@ -28,13 +28,10 @@ class Session_Helpers
 		global $CFG, $DB;
 		require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/cmi5Connector.php");
 		$connector = new cmi5Connectors;
-	
-		//find the session id and echo it
-		echo "This is sess id" . $sessionID;
+		$getSessionInfo = $connector->getSessions();
+
 		//Get the session from DB with session id
 		$session = $this->getFromDB($sessionID);
-
-		$getSessionInfo = $connector->getSessions();
 
 		//This is sessioninfo from CMI5 player
 		$sessionInfo =	$getSessionInfo($sessionID, $cmi5Id);
@@ -71,27 +68,17 @@ class Session_Helpers
 	
 		//$record;
 		$table = "cmi5launch_sessions";
-		$settings = cmi5launch_settings($cmi5launch->id);
-
-		//TODO MB Maybe here check for user not tenant?
-		//See this is diff, we don't need to do this, just save the id and lauchurl, later
-		//we can call a func to retrieve sess info
-		//$tenantname = $settings['cmi5launchtenantname'];
 
 		//Make a newRecord to save
 		$newRecord = new stdClass();
 		//Because of many nested properties, needs to be done manually
 		$newRecord->sessionid = $sessId;
 		$newRecord->launchurl = $launchurl;
-		//MB
-		//Change this to use user name
-		//$newRecord->tenantname = $settings['cmi5launchtenantname'];
 		$newRecord->tenantname = $USER->username;
 		$newRecord->launchmethod = $launchMethod;
 
 		//Save
 		$DB->insert_record($table, $newRecord, true);
-
 	}
 
 	/**

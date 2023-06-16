@@ -30,6 +30,14 @@ require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/sessionHelpers.php");
 
 global $cmi5launch, $USER;
 
+//Classes and functions 
+$aus_helpers = new Au_Helpers;
+$ses_helpers = new Session_Helpers;
+$progress = new progress;
+$getProgress = $progress->getRetrieveStatement();
+$updateSession = $ses_helpers->getUpdateSession();
+$getAUs = $aus_helpers->getAUsFromDB();
+
 // Trigger module viewed event.
 $event = \mod_cmi5launch\event\course_module_viewed::create(array(
     'objectid' => $cmi5launch->id,
@@ -105,42 +113,24 @@ if ($cmi5launch->intro) { // Conditions to show the intro can change to look for
 <?php
 
 
-//Retrieve the registration AND au ID from view.php
+//Retrieve the registration and AU ID from view.php
 $fromView = required_param('AU_view', PARAM_TEXT);
 //Break it into array (AU is first index)
 $lmsAndId = explode(",", $fromView);
 //Retrieve AU ID
 $auID = array_shift($lmsAndId);
 
-$aus_helpers = new Au_Helpers;
-$getAUs = $aus_helpers->getAUsFromDB();
 //Retrieve appropriate AU from DB
 $au = $getAUs($auID);
 
 //Array to hold session scores for the au
 $sessionScores = array();
 
-//Ok, so here is where it takes the record - we need to swap out for the new user specific record
 // Reload cmi5 instance.
 $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
-//$course = new course($record);
-//We need to make a try catch to make sure there is no error
 
-$exists = $DB->get_record('cmi5launch_course', ['courseid'  => $record->courseid, 'userid'  => $USER->id]);
-
-if($exists == false){
-
-    //Record should exist, throw error message
-    echo"<br>";
-    echo "Error: User does not exist in this course";
-    echo"<br>";
-
-}else{
-
-    $usersCourse = $DB->get_record('cmi5launch_course', ['courseid'  => $record->courseid, 'userid'  => $USER->id]);
-}
-
-//Now that we have the correct record, we need to make sure we update IT and not master record
+//Reload user course instance
+$usersCourse = $DB->get_record('cmi5launch_course', ['courseid'  => $record->courseid, 'userid'  => $USER->id]);
 
 //Retrieve the registration id
 $regid = $usersCourse->registrationid;
@@ -164,7 +154,6 @@ if (has_capability('mod/cmi5launch:addinstance', $context)) {
 }
 */
 
-
 //If it is null there have been no previous sessions
 if (!$au->sessions == NULL) {
 
@@ -179,59 +168,49 @@ if (!$au->sessions == NULL) {
 		get_string('cmi5launchviewfirstlaunched', 'cmi5launch'),
 		get_string('cmi5launchviewlastlaunched', 'cmi5launch'),
 		get_string('cmi5launchviewprogress', 'cmi5launch'),
-        get_string('cmi5launchviewgradeheader', 'cmi5launch'),
+     	get_string('cmi5launchviewgradeheader', 'cmi5launch'),
 		get_string('cmi5launchviewlaunchlinkheader', 'cmi5launch'),
 	);
 
 	//Retrieve session ids
 	$sessionIDs = json_decode($au->sessions);
-	$ses_helpers = new Session_Helpers;
 
-    echo"<br>";
-    echo" au id is $au->id";
 	//Iterate through each session by id
 	foreach($sessionIDs as $key => $sessionID){
 
-        //Retrieve new info (if any) from CMI5 player on session	
-		$updateSession = $ses_helpers->getUpdateSession();
+	     //Retrieve new info (if any) from CMI5 player on session	
 		$session = $updateSession($sessionID, $cmi5launch->id);    
         
-        //array to hold data for table
-        $sessionInfo = array();
+        	//array to hold data for table
+        	$sessionInfo = array();
 
-        //Retrieve createdAt and format        
+        	//Retrieve createdAt and format        
 		$date = new DateTime($session->createdAt, new DateTimeZone('US/Eastern'));
 		$date->setTimezone(new DateTimeZone('America/New_York'));
-        $sessionInfo[] = $date->format('D d M Y H:i:s');
+        	$sessionInfo[] = $date->format('D d M Y H:i:s');
 
-        ///Retrieve lastRequestTime and format
-        $date = new DateTime($session->lastRequestTime, new DateTimeZone('US/Eastern'));
+        	///Retrieve lastRequestTime and format
+        	$date = new DateTime($session->lastRequestTime, new DateTimeZone('US/Eastern'));
 		$date->setTimezone(new DateTimeZone('America/New_York'));
-		//used to grab lastlaunched - now lastRequestTime should do it
-        $sessionInfo[] = $date->format('D d M Y H:i:s');
+        	$sessionInfo[] = $date->format('D d M Y H:i:s');
 
-		//Retrieve lmsid 
-        //$lmsId = $au->lmsid;
-          
 		//Get progress from LRS
-		$progress = new progress;
-        $getProgress = $progress->getRetrieveStatement();
 		$session = $getProgress($regid, $cmi5launch->id, $session);
 		$sessionInfo[] = ("<pre>" . implode("\n ", json_decode($session->progress) ) . "</pre>");
 		
-        //add score to table
-        $sessionInfo[] = $session->score;
-        //Add score to array for AU
-        $sessionScores[] = $session->score;
+		//add score to table
+		$sessionInfo[] = $session->score;
+		//Add score to array for AU
+		$sessionScores[] = $session->score;
 
-		//Update session in table with new info
+		//Update session in DB
 		$DB->update_record('cmi5launch_sessions', $session);
 		
-        //Build launch link to continue session
+        	//Build launch link to continue session
 		$newSession = "false";
-	    $infoForNextPage = $sessionID . "," . $newSession;
+	    	$infoForNextPage = $sessionID . "," . $newSession;
 
-        $sessionInfo[] = "<a tabindex=\"0\" id='cmi5relaunch_attempt'
+        	$sessionInfo[] = "<a tabindex=\"0\" id='cmi5relaunch_attempt'
 			onkeyup=\"key_test('" . $infoForNextPage . "')\" onclick=\"mod_cmi5launch_launchexperience('" . $infoForNextPage . "')\" style='cursor: pointer;'>"
             . get_string('cmi5launchviewlaunchlink', 'cmi5launch') . "</a>";
 
@@ -241,14 +220,13 @@ if (!$au->sessions == NULL) {
      
 	//Write table
 	$table->data = $tableData;
-    echo html_writer::table($table);
+    	echo html_writer::table($table);
 
      //Save the session scores to AU, it is ok to overwrite
-    $au->scores = json_encode($sessionScores);
+    	$au->scores = json_encode($sessionScores);
 
     //Update AU in table with new info
 	$DB->update_record('cmi5launch_aus', $au);
-		
 }
 
 //Build the new session link

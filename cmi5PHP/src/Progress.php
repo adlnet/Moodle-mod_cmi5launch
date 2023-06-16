@@ -270,8 +270,11 @@ class progress{
 	//Ok, if we change so session id goes through, can we update DB in this func	
 	public function retrieveScore($resultChunked, $registrationid){
 
+		//variable to hold score
+		$score = null;
+
 		//Verify this statement has a 'result' param
-		if ($resultChunked[$registrationid][0]["result"] )
+		if (array_key_exists("result", $resultChunked[$registrationid][0] ) )
 		{
 			//If it exists, grab it
 			$resultInfo = $resultChunked[$registrationid][0]["result"];
@@ -357,7 +360,6 @@ class progress{
 			
 			}
 				
-		}
 			$session->progress = json_encode($progressUpdate);
 			$session->score = $returnScore;
 		

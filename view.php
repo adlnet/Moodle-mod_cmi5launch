@@ -25,11 +25,22 @@ require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/Progress.php");
 require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/course.php");
 require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/cmi5Connector.php");
 require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/ausHelpers.php");
+require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/sessionHelpers.php");
 
 //bring in functions from class Progress and AU helpers, Connectors
 $progress = new progress;
 $aus_helpers = new Au_Helpers;
 $connectors = new cmi5Connectors;
+$ses_helpers = new Session_Helpers;
+
+//Functions from other classes
+$saveAUs = $aus_helpers->getSaveAUs();
+$createAUs = $aus_helpers->getCreateAUs();
+$getAUs = $aus_helpers->getAUsFromDB();
+$getRegistration = $connectors->getRegistrationPost();
+$getRegistrationInfo = $connectors->getRegistrationGet();
+$getProgress = $progress->getRetrieveStatement();
+$updateSession = $ses_helpers->getUpdateSession();
 
 global $cmi5launch, $USER, $mod;
 
@@ -55,16 +66,6 @@ echo $OUTPUT->header();
 
 // Reload cmi5 course instance.
 $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
-
-echo"br";
-echo "<p> User is: " . $USER->username . "</p>";
-echo"<br>";
-echo"br";
-echo "<p> User id: " . $USER->id . "</p>";
-echo"<br>";
-echo"br";
-echo "<p> course id is: " . $record->courseid . "</p>";
-echo"<br>";
 
 if ($cmi5launch->intro) { 
     // Conditions to show the intro can change to look for own settings or whatever.
@@ -128,21 +129,9 @@ if ($cmi5launch->intro) {
     </script>
 <?php
 
+
 //Check if a course record exists for this user yet
 $exists = $DB->record_exists('cmi5launch_course', ['courseid'  => $record->courseid, 'userid'  => $USER->id]);
-
-
-$saveAUs = $aus_helpers->getSaveAUs();
-$createAUs = $aus_helpers->getCreateAUs();
-$getAUs = $aus_helpers->getAUsFromDB();
-
-//Whats happening is it is making new AUs EVERYtime.
-//This page can be gotten to as both a new user and a returning user
-//If a new user, we need to create AUs and save them to DB
-//If a returning user, we need to retrieve AUs from DB
-//We need to check if the user has AUs already, if not, create them
-//This is creating if they don't have any
-
 
 //If it does not exist, create it
 if($exists == false){
@@ -150,18 +139,17 @@ if($exists == false){
     $usersCourse = new course($record);
 
     $usersCourse->userid = $USER->id;
+    
     //Build url to pass as returnUrl
     $returnUrl = $CFG->wwwroot .'/mod/cmi5launch/view.php'. '?id=' .$cm->id;
-    //Save the returnurl
     $usersCourse->returnurl = $returnUrl;
 
-    //Assign new record an registration id
-    $getRegistration = $connectors->getRegistrationPost();
+    //Assign new record a registration id
     $registrationID = $getRegistration($record->courseid, $cmi5launch->id);
-    //Save the registration to the users course object
     $usersCourse->registrationid = $registrationID;
+
+    //Retrieve AU ids for this user/course 
     $aus = json_decode($record->aus);
-    //SaveAus will need to take user id into account now, tweak it
     $auIDs = $saveAUs($createAUs($aus));
     $usersCourse->aus = (json_encode($auIDs));
     //Save new record to DB
@@ -171,17 +159,13 @@ if($exists == false){
 
     //Then we have a record, so we need to retrieve it
     $usersCourse = $DB->get_record('cmi5launch_course', ['courseid'  => $record->courseid, 'userid'  => $USER->id]);
+    
     //Retrieve registration id
     $registrationID = $usersCourse->registrationid; 
 
-    //This is retrieving if they do have some
+    //Retrieve AU ids
     $auIDs = (json_decode($usersCourse->aus) );
 }
-
-
-
-//Get info from cmi5 for Progress updates
-//$registrationInfoFromCMI5 = $getRegistration($registrationID, $cmi5launch->id);
 
 //Array to hold info for table population
 $tableData = array();
@@ -196,7 +180,7 @@ $table->caption = get_string('AUtableheader', 'cmi5launch');
 $table->head = array(
 	get_string('cmi5launchviewAUname', 'cmi5launch'),
 	get_string('cmi5launchviewstatus', 'cmi5launch'),
-    get_string('cmi5launchviewgradeheader', 'cmi5launch'),
+    	get_string('cmi5launchviewgradeheader', 'cmi5launch'),
 	get_string('cmi5launchviewregistrationheader', 'cmi5launch'),
 
 );
@@ -204,13 +188,10 @@ $table->head = array(
 //Return to for grades
 //cmi5_update_grades($cmi5launch, 0);
 
-
-//Lets now retrieve our list of AUs
-//Cycle through and get each au ID
+//Cycle through AU IDs
 foreach($auIDs as $key  => $auID){
-    
-    //We may need to tweak this to, the aus id may be same?? no they shouldn't its sequential!!
-    $au = $getAUs($auID);
+
+	$au = $getAUs($auID);
 
     //Verify object is an au object
     if (!is_a($au, 'Au')) {
@@ -223,8 +204,7 @@ foreach($auIDs as $key  => $auID){
     //Retrieve AU's lmsID
     $auLmsId = $au->lmsid;
 
-    //we need to make $registrion date, is this the one that uses post?
-    $getRegistrationInfo = $connectors->getRegistrationGet();
+    //Query CMI5 player for updated registration info
     $registrationInfoFromCMI5 = $getRegistrationInfo($registrationID, $cmi5launch->id);
     //Take only info about AUs out of registrationInfoFromCMI5
     $ausFromCMI5 = array_chunk($registrationInfoFromCMI5["metadata"]["moveOn"]["children"], 1, true);
@@ -272,9 +252,34 @@ foreach($auIDs as $key  => $auID){
                 $au->satisfied = "false";
             }
         };
+        //Ensure sessions are up to date
+        //Retrieve session ids
+	    $sessionIDs = json_decode($au->sessions);
+
+        //Array to hold scores for AU
+        $sessionScores = array();
+	    //Iterate through each session by id
+        foreach ($sessionIDs as $key => $sessionID) {
+
+
+            //Retrieve new info (if any) from CMI5 player on session	
+            $session = $updateSession($sessionID, $cmi5launch->id);
+
+            //Get progress from LRS
+            $session = $getProgress($registrationID, $cmi5launch->id, $session);
+
+            //Add score to array for AU
+            $sessionScores[] = $session->score;
+
+            //Update session in DB
+            $DB->update_record('cmi5launch_sessions', $session);
+        }
+
+         //Save the session scores to AU, it is ok to overwrite
+         $au->scores = json_encode($sessionScores);
     };
 
-		//Create array of info to place in table
+        //Create array of info to place in table
 		$auInfo = array();
 
 		//Assign au name, progress, and index
@@ -283,23 +288,21 @@ foreach($auIDs as $key  => $auID){
        
         //Ok, now we need to retreive the sessions and find the average score
         $grade = 0;
-        if($au->scores != null){
-
-            $sessionScores = json_decode($au->scores); 
-    
-            //TODO MB
-            //Are we sure we want average here?
-            $grade = array_sum($sessionScores) / count($sessionScores);
-        }
+        
+        //TODO MB
+        //Currently it takes the highest grade out of sessions for grade. Later this can be changed by linking it to plugin options
+        //However, since CMI5 player does not count any sessions after the first for scoring, by averaging we are adding unnessary 
+        //0', and artificailly lowering the grade.
+        $grade = max($sessionScores);
     
         $au->grade = $grade;
         $auInfo[] = ($grade);
        
         $auIndex = $au->auindex;
 
-      	//Send au id now
-		 $infoForNextPage = $auID;
-        
+		//AU id for next page (to be loaded)
+		$infoForNextPage = $auID;
+		
 		//Assign au link to auviews
         $auInfo[] = "<a tabindex=\"0\" id='cmi5relaunch_attempt'
             onkeyup=\"key_test('" . $infoForNextPage . "')\" onclick=\"mod_cmi5launch_launchexperience('" . $infoForNextPage . "')\" style='cursor: pointer;'>"
@@ -307,22 +310,8 @@ foreach($auIDs as $key  => $auID){
     
 		//add to be fed to table
         $tableData[] = $auInfo;
-            
-        //Maybe in view.php it does this same thing, saving to the student record instead.
-    //so these stay as a 'master' record and the students tweak their own
-   // $aus = ($retrieveAus($returnedInfo));
-    //Maybe better to save AUs here and feed it the array returned by retreieveAUS
-    //So maybe record just holds 'aus' and then the velow lines parses that, returnes ids to saves, and save saves to DB FOR students!!
 
-	/////$auIDs = $saveAUs($createAUs($aus));
-    ////$record->aus = (json_encode($auIDs));
-    //See above is from lib.php and saves to AU table, but we can save to student record
-    //and insert new ones here?
-        
-		//And lastly, update the au in DB
-        //What makes this AU unique? So other students can't update it?
-        //Well, their is a 'tenantname' if we change to a 'userid' they will be specific to the user
-        //we will need to custom make the AU's for each user
+		//update the au in DB
 		$DB->update_record("cmi5launch_aus", $au);
 	}
 
