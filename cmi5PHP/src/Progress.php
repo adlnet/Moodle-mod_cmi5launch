@@ -360,6 +360,7 @@ class progress{
 			
 			}
 				
+		}
 			$session->progress = json_encode($progressUpdate);
 			$session->score = $returnScore;
 		
