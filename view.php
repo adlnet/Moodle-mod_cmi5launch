@@ -19,6 +19,11 @@
  * @copyright  2023 Megan Bohland
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+// namespace cmi5;
+ //For some reason using the namespace cmi5; here breaks the code.
+//It cannot find html_table class.
+
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require('header.php');
 require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/Progress.php");
@@ -26,6 +31,7 @@ require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/course.php");
 require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/cmi5Connector.php");
 require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/ausHelpers.php");
 require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/sessionHelpers.php");
+require_once("$CFG->dirroot/lib/outputcomponents.php");
 
 //bring in functions from class Progress and AU helpers, Connectors
 $progress = new progress;
@@ -180,7 +186,7 @@ $table->caption = get_string('AUtableheader', 'cmi5launch');
 $table->head = array(
 	get_string('cmi5launchviewAUname', 'cmi5launch'),
 	get_string('cmi5launchviewstatus', 'cmi5launch'),
-    	get_string('cmi5launchviewgradeheader', 'cmi5launch'),
+    get_string('cmi5launchviewgradeheader', 'cmi5launch'),
 	get_string('cmi5launchviewregistrationheader', 'cmi5launch'),
 
 );
@@ -213,6 +219,9 @@ foreach($auIDs as $key  => $auID){
     //TODO (for that matter couldn't we make it, notattempetd, satisifed, not satisfied??)
 
     foreach($ausFromCMI5 as $key => $auInfo){
+
+        //Array to hold scores for AU
+        $sessionScores = array();
 
         if ($auInfo[$key]["lmsId"] == $auLmsId){
             //Grab it's 'satisfied' info
@@ -256,8 +265,7 @@ foreach($auIDs as $key  => $auID){
         //Retrieve session ids
 	    $sessionIDs = json_decode($au->sessions);
 
-        //Array to hold scores for AU
-        $sessionScores = array();
+        
 	    //Iterate through each session by id
         foreach ($sessionIDs as $key => $sessionID) {
 
@@ -286,6 +294,7 @@ foreach($auIDs as $key  => $auID){
 		$auInfo[] = $au->title;
 		$auInfo[] = ($auStatus);
        
+     
         //Ok, now we need to retreive the sessions and find the average score
         $grade = 0;
         
@@ -293,10 +302,16 @@ foreach($auIDs as $key  => $auID){
         //Currently it takes the highest grade out of sessions for grade. Later this can be changed by linking it to plugin options
         //However, since CMI5 player does not count any sessions after the first for scoring, by averaging we are adding unnessary 
         //0', and artificailly lowering the grade.
+        if(!$sessionScores == null){
+                 //if the grade is empty, we need to pass a null or NA
         $grade = max($sessionScores);
-    
         $au->grade = $grade;
         $auInfo[] = ($grade);
+
+        }
+        else{
+            $auInfo[] = ("Not attempted");
+        }
        
         $auIndex = $au->auindex;
 

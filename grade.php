@@ -63,7 +63,8 @@ if (has_capability('mod/scorm:viewreport', context_module::instance($cm->id))) {
 //We are currently using this capability, but we should make one for grading
 if (has_capability('mod/cmi5launch:addinstance', $context)) {
 	//This is teacher/manger/non editing teacher;
-
+    redirect('report.php?id='.$cm->id);
 }else{
     //This is student or other non-teacher role
+    redirect('view.php?id='.$cm->id);
 }   

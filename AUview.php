@@ -20,6 +20,10 @@
  * @copyright  2023 Megan Bohland
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+//namespace cmi5;
+//For some reason using the namespace cmi5; here breaks the code.
+//It cannot find html_table class.
+
 
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require('header.php');
@@ -27,6 +31,7 @@ require('header.php');
 //For connecting to Progress class - MB
 require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/Progress.php");
 require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/sessionHelpers.php");
+require_once("$CFG->dirroot/lib/outputcomponents.php");
 
 global $cmi5launch, $USER;
 

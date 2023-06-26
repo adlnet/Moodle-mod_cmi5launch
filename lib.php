@@ -68,17 +68,21 @@ function cmi5launch_supports($feature) {
         case FEATURE_BACKUP_MOODLE2:
             return true;
             /////////////////
-            case FEATURE_GROUPS:                  return true;
-                case FEATURE_GROUPINGS:               return true;
-                case FEATURE_GRADE_HAS_GRADE:         return true;
-                case FEATURE_GRADE_OUTCOMES:          return true;
-                case FEATURE_SHOW_DESCRIPTION:        return true;
-                case FEATURE_MOD_PURPOSE:             return MOD_PURPOSE_CONTENT;
+        case FEATURE_GROUPS:                  
+            return true;
+        case FEATURE_GROUPINGS:              
+            return true;
+        case FEATURE_GRADE_HAS_GRADE:         
+            return true;
+        case FEATURE_GRADE_OUTCOMES:          
+            return true;
+        case FEATURE_SHOW_DESCRIPTION:        
+            return true;
+        case FEATURE_MOD_PURPOSE:             
+            return MOD_PURPOSE_CONTENT;
         //////////////////////
         default:
             return null;
-
-          
     }
 }
 
@@ -639,7 +643,17 @@ function cmi5launch_process_new_package($cmi5launch) {
 
     //Maybe in view.php it does this same thing, saving to the student record instead.
     //so these stay as a 'master' record and the students tweak their own
+
+    //Temp print returnedinfo so I can tests it!
+    echo "<br>";
+    var_dump($returnedInfo);
+    echo "<br>";
     $aus = ($retrieveAus($returnedInfo));
+    
+    //What do thes elook like?
+    echo "<br>";
+    var_dump($aus);
+    echo "<br>";
     //Maybe better to save AUs here and feed it the array returned by retreieveAUS
 	//$auIDs = $saveAUs($createAUs($aus));
     $record->aus = (json_encode($aus));
@@ -1047,8 +1061,8 @@ function cmi5_update_grades($cmi5launch, $userid=0, $nullifnone=true) {
  */
 //TODO MB
 //Return to this for grades
- /*
- //Whereever 'scorm' is replace with 'cmi5launch'
+/*
+//Whereever 'scorm' is replace with 'cmi5launch'
 function cmi5_grade_item_update($record, $grades=null) {
     global $CFG, $DB, $cmi5launch;
     //Note the SCORM version called it's locallib, we may need to get funcs from there as well and place into 
@@ -1074,8 +1088,6 @@ function cmi5_grade_item_update($record, $grades=null) {
     }
 
     //HEre scorm is getting the grading method.
-    //This is something we will need to add, I don't think cmi5 objects
-    //have this yet. I KNOW we don't have the DBS and will need those!
     //Scorm originally pulled from scorm_scoes - SCO being a Sharable Object Model
  
     //Here the grading method is checking if it is a SCO, and then pulls from table

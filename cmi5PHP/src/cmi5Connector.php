@@ -1,5 +1,7 @@
 <?php
 //Class to hold ways to communicate with CMI5 player through its API's -MB
+//namespace cmi5;
+
 class cmi5Connectors{
 
     public function getCreateTenant(){

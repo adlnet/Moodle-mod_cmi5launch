@@ -1,6 +1,6 @@
 <?php
 //Class to hold methods for tracking and displaying student progress
-
+//namespace cmi5;
 class progress{
 
 	public function getRetrieveStatement()

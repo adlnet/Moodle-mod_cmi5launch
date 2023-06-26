@@ -13,57 +13,26 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-
 /**
  *Class to handle Assignable Units 
- *
- * @copyright  2023 Megan Bohland
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
+*
+* @copyright  2023 Megan Bohland
+* @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+*/
 
 class Au {
-  // Properties
-  public $id, $url, $type, $lmsid, $grade, $scores, $title, $moveon, $auindex, $parents, $objectives, $description = [], $activitytype, $launchmethod, $masteryscore, $satisfied ;
+// Properties
 
-  //Do we needs 'sessions? todo
+	public $id, $url, $type, $lmsid, $grade, $scores, $title, $moveon, $auindex, $parents, $objectives, $description, $activitytype, $launchmethod, $masteryscore, $satisfied, $launchurl, $sessionid, $sessions, $progress, $noattempt, $completed, $passed, $inprogress;
 
+	// Methods
+	//Constructs AUs. Is fed array and where array key matches property, sets the property.  
+	function __construct($statement){
 
-  //Holds launch url, this may be the way to have separate sessions.
-  public $launchurl, $sessionid;
+		foreach($statement as $key => $value){
 
-  //Maybe an array will hold info better
-  //I'm thinkig sessionId->launchurl (for that session)
-  public $sessions = array();
-  
-
-  //These may be needed later if AU's become part of a block to keep track of 
-  //being finished.
-  public $progress;
-  
-  public  $noattempt = true|false;
-
-  //Why did I ake these arrays? they should just be bools
-  public $completed, $passed, $inprogress = true | false;
-  //public $passed = array('finished'=> true|false, 'info' =>"");
-  //public $inProgress = array('finished'=> true|false, 'info' =>"");
-
-  // Methods
-  function set_name($name) {
-    $this->name = $name;
-  }
-  function get_name() {
-    return $this->name;
-  }
-
-//Constructs AUs. Is fed array and where array key matches property, sets the property.  
-function __construct($statement){
-
-  foreach($statement as $key => $value){
-    
-    $this->$key = ($value);
-	}	
-
-}
-
+		$this->$key = ($value);
+		}	
+	}
 }
 ?>

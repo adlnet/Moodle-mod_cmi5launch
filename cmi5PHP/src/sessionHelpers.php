@@ -1,4 +1,6 @@
 <?php
+
+//namespace cmi5;
 class Session_Helpers
 {
 
