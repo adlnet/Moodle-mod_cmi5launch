@@ -182,6 +182,8 @@ class RemoteLRS implements LRSInterface
             //
             // Content-Type won't be set in the case of a 204 (and potentially others)
             //
+  
+  
             if (isset($response['headers']['contentType']) && $response['headers']['contentType'] === "multipart/mixed") {
                 $content = $this->_parseMultipart($response['headers']['contentTypeBoundary'], $content);
             }
@@ -194,6 +196,7 @@ class RemoteLRS implements LRSInterface
             }
         }
 
+        
         return new LRSResponse($success, $content, $response);
     }
 
@@ -360,6 +363,15 @@ class RemoteLRS implements LRSInterface
             $statement = new Statement($statement);
         }
 
+        //Ok, trial- MB
+       //Triaal for what megan? smh
+        // global $DB;
+
+       // $DB->set_field("trial", "statement", $statement, null);
+
+        ///////
+
+
         $requestCfg = array(
             'headers' => array(
                 'Content-Type' => 'application/json'
@@ -378,7 +390,7 @@ class RemoteLRS implements LRSInterface
         }
 
         $response = $this->sendRequest($method, 'statements', $requestCfg);
-
+        
         if ($response->success) {
             if (! $statement->hasId()) {
                 $parsed_content = json_decode($response->content, true);
@@ -399,7 +411,9 @@ class RemoteLRS implements LRSInterface
         return $response;
     }
 
+    //MB Lets see if we can save statements here
     public function saveStatements($statements) {
+
         $versioned_statements = array();
         $attachments_map = array();
         foreach ($statements as $i => $st) {
@@ -439,9 +453,13 @@ class RemoteLRS implements LRSInterface
             $response->content = $statements;
         }
 
+
         return $response;
     }
 
+    //TODO INVEST
+    //
+    //Is this a freaking retreiveStatment, like I made for progress?
     public function retrieveStatement($id, $options = array()) {
         if (! isset($options['voided'])) {
             $options['voided'] = false;
@@ -679,6 +697,8 @@ class RemoteLRS implements LRSInterface
                     'agent'    => $agent,
                 )
             );
+
+
             if (isset($registration)) {
                 $doc->setRegistration($registration);
             }
@@ -1201,3 +1221,5 @@ class RemoteLRS implements LRSInterface
     }
     public function getHeaders() { return $this->headers; }
 }
+
+

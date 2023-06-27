@@ -15,7 +15,7 @@
         <FIELD NAME="cmi5activityid" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="The LMS id"/>
         <FIELD NAME="registrationid" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" COMMENT="Course registration ID returned by CMI5 player. We want to use this for LRS instead"/>
         <FIELD NAME="returnurl" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Tenants return url, where it will go after closing course from launch url"/>
-        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="This is the course id returned by cmi5"/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="This is the course id returned by cmi5"/>
         <FIELD NAME="cmi5verbid" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Launch URL"/>
         <FIELD NAME="cmi5expiry" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="365" SEQUENCE="false" COMMENT="Number of days to expire completion after"/>
         <FIELD NAME="overridedefaults" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false" COMMENT="Determines if the activity is inheriting the global defaults or has overriden them at the activity level."/>
@@ -23,15 +23,35 @@
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="courseinfo" TYPE="text" LENGTH="4000" NOTNULL="false" SEQUENCE="false" COMMENT="The full string of course info"/>              
-
+        <FIELD NAME="aus" TYPE="text" LENGTH="4000" NOTNULL="false" SEQUENCE="false" COMMENT="The AUs of the course, saved as array"/>              
+        <FIELD NAME="grade" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="The overall grade for the course, the average of all it's aus"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
       <INDEXES>
         <INDEX NAME="course" UNIQUE="false" FIELDS="course"/>
-      </INDEXES>
+      </INDEXES>  
     </TABLE>
+      <TABLE NAME="cmi5launch_course" COMMENT="A users course information such as progress, etc">
+        <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Course id, assigned by cmi5 player"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="User id, combined with coursed can be used to retrieve unique records"/>
+        <FIELD NAME="cmi5launchurl" TYPE="char" LENGTH="1333" NOTNULL="true" SEQUENCE="false" COMMENT="Launch URL"/>
+        <FIELD NAME="cmi5activityid" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="The LMS id"/>
+        <FIELD NAME="registrationid" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" COMMENT="Course registration ID returned by CMI5 player. We want to use this for LRS instead"/>
+        <FIELD NAME="returnurl" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Tenants return url, where it will go after closing course from launch url"/>
+        <FIELD NAME="aus" TYPE="text" LENGTH="4000" NOTNULL="false" SEQUENCE="false" COMMENT="The AUs of the course, saved as array"/>              
+        <FIELD NAME="grade" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="The overall grade for the course, the average of all it's aus"/>
+     </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="courseid" UNIQUE="false" FIELDS="courseid"/>
+      </INDEXES>
+      </TABLE>
     <TABLE NAME="cmi5launch_lrs" COMMENT="Store LRS settings">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
@@ -58,14 +78,14 @@
     </TABLE>
     <TABLE NAME="cmi5launch_player" COMMENT="Store variables for API communication with CMI5 player.">
       <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The id of returned course IN MOODLE (this id matches with field id in cmi5launch table. Moodle assigns id'ssequentially. CMI5 ALSO will assign course ids. These are separate. "/>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The id of returned course IN MOODLE (this id matches with field id in cmi5launch table. Moodle assigns id'ssequentially. CMI5 ALSO will assign course ids. These are separate. "/>
         <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Name field for course name IN MOODLE, may be different than course name in it's own xml file"/>
         <FIELD NAME="tenantid" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="The id of returned course"/>
         <FIELD NAME="tenantname" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="The name of the user for the cmi5 player (this is found in table cmi5launch_lrs, investiagte ways to get-MB)"/>
         <FIELD NAME="tenanttoken" TYPE="char" LENGTH="350" NOTNULL="false" SEQUENCE="false" COMMENT="This is a bearer token for tenant used to retreive and post courses(this is found in table cmi5launch_lrs, investiagte ways to get-MB)"/>
         <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="The id of the returned course generated BY CMI5 player"/>
         <FIELD NAME="launchmethod" TYPE="char" LENGTH="10" NOTNULL="false" DEFAULT="AnyWindow" SEQUENCE="false" COMMENT="Whether the course's retrieved URL opens in it's own window or new one"/>
-        <FIELD NAME="returnurl" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Tenants return url, where it will go after closing course from launch url"/>
+        <FIELD NAME="returnurl" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Tenants return url, where it will go after closing course from launch url"/>
         <FIELD NAME="homepage" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Tenants homepage(URL)"/>
         <FIELD NAME="registrationid" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" COMMENT="Course registration ID returned by CMI5 player. We want to use this for LRS instead"/>
         <FIELD NAME="sessionid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Id created when an AU launch URL is requested"/>
@@ -81,6 +101,91 @@
       </KEYS>
       <INDEXES>
         <INDEX NAME="name" UNIQUE="false" FIELDS="name"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="cmi5launch_sessions" COMMENT="A tenants AU progress">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="true"  COMMENT="The session id. This is created by cmi5 player and returned with URL request "/>
+        <FIELD NAME="sessionid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"  COMMENT="The session id. This is created by cmi5 player and returned with URL request "/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="User id, combined with coursed can be used to retrieve unique records"/>
+        <FIELD NAME="registrationscoursesausid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="???."/>
+         <FIELD NAME="tenantname" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="The tenant name"/> 
+        <FIELD NAME="lmsid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="The lmsid  of AU to match wit hobject id from LRS for puullinng progress info."/>
+         <FIELD NAME="createdat" TYPE="char" LENGTH="30" NOTNULL="false" SEQUENCE="false" COMMENT="Time a session started (string as that is returned by cmi5)"/>
+         <FIELD NAME="updatedat" TYPE="char" LENGTH="30" NOTNULL="false" SEQUENCE="false" COMMENT="Time a session was updated (string as that is returned by cmi5)"/>
+        <FIELD NAME="registrationcourseausid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="???."/>
+        <FIELD NAME="code" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Session code???"/>
+        <FIELD NAME="launchtokenid" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="???"/>
+         <FIELD NAME="lastrequesttime" TYPE="char" LENGTH="30" NOTNULL="false" SEQUENCE="false" COMMENT="Time a session was last requested?? (string as that is what is returned from player)"/>
+         <FIELD NAME="launchmode" TYPE="char" LENGTH="25" NOTNULL="false" SEQUENCE="false" COMMENT="Launch mode, separate from launchmethod. It can be 'Normal', 'Browse', or 'Review"/>
+        <FIELD NAME="masteryscore" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="The amount toward mastery score."/>
+        <FIELD NAME="score" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="The score of session (returned from 'result' param)."/>
+        <FIELD NAME="response" TYPE="text" LENGTH="1000" NOTNULL="false" SEQUENCE="false" COMMENT="The response returned from statement 'result' paramater"/>              
+        <FIELD NAME="contexttemplate" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="The context??"/>
+        <FIELD NAME="islaunched" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Has session been launched?."/>
+        <FIELD NAME="isinitialized" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Has session been intialized?."/>
+         <FIELD NAME="initializedat" TYPE="char" LENGTH="30" NOTNULL="false" SEQUENCE="false" COMMENT="Time a session was initialized (string as that is what is returned from player)"/>
+        <FIELD NAME="duration" TYPE="char" LENGTH="30" NOTNULL="false" SEQUENCE="false" COMMENT="Time a session took (from 'result' param)"/>
+        <FIELD NAME="iscompleted" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Has session been completed?"/>
+        <FIELD NAME="ispassed" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Has session been passed?"/>
+        <FIELD NAME="isfailed" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Has session been failed?."/>
+        <FIELD NAME="isterminated" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Has session been terminated?."/>
+        <FIELD NAME="isabandoned" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Has session been abandoned?."/>
+        <FIELD NAME="progress" TYPE="text" LENGTH="4000" NOTNULL="false" SEQUENCE="false" COMMENT="The full string of session progress reported from LRS"/>              
+        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="The id of the returned course generated BY CMI5 player"/>
+        <FIELD NAME="launchmethod" TYPE="char" LENGTH="10" NOTNULL="false" DEFAULT="AnyWindow" SEQUENCE="false" COMMENT="Whether the course's retrieved URL opens in it's own window or new one"/>
+        <FIELD NAME="registrationid" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" COMMENT="Course registration ID returned by CMI5 player. We want to use this for LRS instead"/>
+        <FIELD NAME="lrscode" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" COMMENT="Code session is given by LRS for tracking"/>
+        <FIELD NAME="auid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="AU id from course package, used to retreive separate AU URLs"/>
+        <FIELD NAME="launchurl" TYPE="char" LENGTH="750" NOTNULL="false" SEQUENCE="false" COMMENT="Returned launch url from cmi5 player"/>
+        <FIELD NAME="firstlaunch" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Time activity was first launched, for LRS."/>
+        <FIELD NAME="lastlaunch" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Time activity was last launched, for LRS."/>
+        <FIELD NAME="completed_passed" TYPE="char" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Whether the AU has been completed or passed"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="lmsid" UNIQUE="false" FIELDS="lmsid"/>
+      </INDEXES>
+    </TABLE>
+        <TABLE NAME="cmi5launch_aus" COMMENT="Stores a courses AUs">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="true" COMMENT="The id of the AU (assigned by Moodle). "/>
+        <FIELD NAME="auid" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="CMI5 compliant ID"/>        
+        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The course id this AU belongs to"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="The user id"/>
+        <FIELD NAME="tenantname" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="The tenant name"/> 
+        <FIELD NAME="currentgrade" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="The current aggregate grade"/>  
+        <FIELD NAME="launchmethod" TYPE="char" LENGTH="10" NOTNULL="false" DEFAULT="AnyWindow" SEQUENCE="false" COMMENT="Whether the course's retrieved URL opens in it's own window or new one"/>
+        <FIELD NAME="registrationid" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" COMMENT="Course registration ID returned by CMI5 player."/>
+        <FIELD NAME="sessionid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Id created when an AU launch URL is requested"/>
+        <FIELD NAME="returnurl" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="The url to return to when au window closes"/>      
+        <FIELD NAME="lmsid" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="The au is from the course packet. The singular cmi5 compliant id"/>
+        <FIELD NAME="url" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="The ending to be added to url that   takes you to specific au"/>
+        <FIELD NAME="type" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" COMMENT="The AU activity type."/>
+        <FIELD NAME="title" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="The au title (from course package)."/>
+        <FIELD NAME="moveon" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" COMMENT="The requirement for AU to be marked as done."/>
+        <FIELD NAME="auindex" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="The AU index"/>
+        <FIELD NAME="parents" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" COMMENT="AU's parent activities."/>
+        <FIELD NAME="objectives" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" COMMENT="AUs objectives."/>
+        <FIELD NAME="description" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="AUs description."/>
+        <FIELD NAME="activitytype" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Activity type of AU."/>
+        <FIELD NAME="masteryscore" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="The amount it counts toward mastery score."/>
+        <FIELD NAME="completed" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false" DEFAULT="0" COMMENT="Whether an AU has met completed criteria (0 if false, 1 if true)"/>
+        <FIELD NAME="passed" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false" DEFAULT="0" COMMENT="Whether an AU has met passed criteria (0 if false, 1 if true)"/>
+        <FIELD NAME="inprogress" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false" DEFAULT="0" COMMENT="Whether an AU is in progress or not (been started) (0 if false, 1 if true)"/>
+        <FIELD NAME="noattempt" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false" DEFAULT="0" COMMENT="Whether an AU has attempted TODO (0 if false, 1 if true)"/>
+        <FIELD NAME="satisfied" TYPE="char" LENGTH="5" NOTNULL="false" SEQUENCE="false" DEFAULT="0" COMMENT="Whether an AU has been SATISIFED (0 if false, 1 if true)"/>
+        <FIELD NAME="sessions" TYPE="text" LENGTH="4000" NOTNULL="false" SEQUENCE="false" COMMENT="The session ids of the AU, saved as array"/>              
+        <FIELD NAME="scores" TYPE="text" LENGTH="4000" NOTNULL="false" SEQUENCE="false" COMMENT="The sessions scores, saved as array"/>              
+        <FIELD NAME="grade" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" DEFAULT="0" COMMENT="The overall grade (average of session scores)"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="id" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="courseid" UNIQUE="false" FIELDS="courseid"/>
       </INDEXES>
     </TABLE>
   </TABLES>
