@@ -54,8 +54,8 @@ class cmi5Connectors{
             if ($CFG->debugdeveloper) {
                 echo "Something went wrong sending the request";
                 echo "<br>";
-                echo "Dumping session to troubleshoot.";
-                var_dump($_SESSION);
+                echo "Response from CMI5 player: ";
+                var_dump($result);
                 echo "<br>";
             }
 	     } else {
