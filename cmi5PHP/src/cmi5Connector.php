@@ -43,6 +43,11 @@ class cmi5Connectors{
         //Build URL to import course to
         $url= $settings['cmi5launchplayerurl'] . "/api/v1/course" ;
        
+        echo "Something went wrong? What is url?";
+        echo "<br>";
+        var_dump($url);        
+        echo "<br>";
+
         //the body of the request must be made as array first
         $data = $file;
   

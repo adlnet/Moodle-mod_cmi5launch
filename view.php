@@ -297,22 +297,44 @@ foreach($auIDs as $key  => $auID){
      
         //Ok, now we need to retreive the sessions and find the average score
         $grade = 0;
-        
-        //TODO MB
+         //what is au moveon is not set?
+   // var_dump($au->moveon);
+   // echo "<br>";
+    if ($au->moveon == "CompletedOrPassed" || "Passed") {
+       // echo"are we in here?";
+        //what is au moveon is not set?
+        //TODO M
         //Currently it takes the highest grade out of sessions for grade. Later this can be changed by linking it to plugin options
         //However, since CMI5 player does not count any sessions after the first for scoring, by averaging we are adding unnessary 
         //0', and artificailly lowering the grade.
-        if(!$sessionScores == null){
-                 //if the grade is empty, we need to pass a null or NA
-        $grade = max($sessionScores);
-        $au->grade = $grade;
-        $auInfo[] = ($grade);
+        //Also, should we query for 'passed' or 'completed'? statements here?
+        //Or can we have the cmi5player update our AU's moveon to 'passed' or 'completed'?
+        
+        if (!$sessionScores == null) {
+            //if the grade is empty, we need to pass a null or NA
+            $grade = max($sessionScores);
+            $au->grade = $grade;
+            if ($grade == 0) {
+                $auInfo[] = ("Passed");
+            } else {
+                $auInfo[] = ($grade);;
+            }
 
+        } else {
+            $auInfo[] = ("Not Applicable");
         }
-        else{
-            $auInfo[] = ("Not attempted");
+    } else {
+       // echo"why not here?";
+        if (!$sessionScores == null) {
+            //if the grade is empty, we need to pass a null or NA
+            $grade = max($sessionScores);
+            $au->grade = $grade;
+            $auInfo[] = ($grade);
+
+        } else {
+            $auInfo[] = ("Not Attempted");
         }
-       
+    }
         $auIndex = $au->auindex;
 
 		//AU id for next page (to be loaded)

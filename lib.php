@@ -643,17 +643,8 @@ function cmi5launch_process_new_package($cmi5launch) {
 
     //Maybe in view.php it does this same thing, saving to the student record instead.
     //so these stay as a 'master' record and the students tweak their own
-
-    //Temp print returnedinfo so I can tests it!
-    echo "<br>";
-    var_dump($returnedInfo);
-    echo "<br>";
     $aus = ($retrieveAus($returnedInfo));
     
-    //What do thes elook like?
-    echo "<br>";
-    var_dump($aus);
-    echo "<br>";
     //Maybe better to save AUs here and feed it the array returned by retreieveAUS
 	//$auIDs = $saveAUs($createAUs($aus));
     $record->aus = (json_encode($aus));
