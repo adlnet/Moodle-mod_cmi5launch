@@ -232,7 +232,7 @@ $string['cmi5launchviewgradeheader'] = 'Grade';
 // View settings.
 $string['cmi5launchviewAUname'] = 'Name';
 $string['cmi5launchviewstatus'] = 'Status';
-$string['cmi5launchviewregistrationheader'] = 'Registrations';
+$string['cmi5launchviewregistrationheader'] = 'Sessions';
 $string['cmi5launchviewgradeheader'] = 'Grade';
 $string['cmi5launchviewlaunchlink'] = 'view';
 $string['AUtableheader'] = 'Assignable Units';
@@ -240,7 +240,7 @@ $string['AUtableheader'] = 'Assignable Units';
 
 $string['cmi5launch_completed'] = 'Experience complete!';
 $string['cmi5launch_progress'] = 'Attempt in progress.';
-$string['cmi5launch_attempt'] = 'Start New Registration';
+$string['cmi5launch_attempt'] = 'Start New Session';
 $string['cmi5launch_notavailable'] = 'The Learning Record Store is not available. Please contact a system administrator.
 
 If you are the system administrator, go to Site admin / Development / Debugging and set Debug messages to DEVELOPER. Set it back to NONE or MINIMAL once the error details have been recorded.';
