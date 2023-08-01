@@ -15,9 +15,48 @@ To use this plugin you will need the following:
 * A running instance of the cmi5 player (https://github.com/adlnet/CATAPULT/tree/main/player)
 * A copy of this plugin
 
-## Notes
+## Installation Instructions
 
-When installing from github, wrap this entire repository in a zip file named cmi5launch.zip
+Once the plugin is downloaded, be sure it is entirely in a file named 'cmi5launch.' Then compress that file into zip. The zip file _must_ be named 'cmi5_moodle.zip' to be uploaded to Moodle.
+
+### Install plugin in Moodle
+
+To install the CMI5 plugin into Moodle - 
+- Go to _Site Administration_
+- Go to _Plugins_
+- Click on _Install Plugins_
+  - Currently the only way to install plugin is via zip file
+- Under _Install plugin from ZIP file_ upload the plugin. It must be in a zip file named 'cmi5_moodle.zip'.
+  - Follow the Moodle instructions to upload plugin to the site
+
+Once Moodle has finished uploading the plugin it will brin up the _cmi5 Launch Link_ settings page. This will enable you to set the information to connect to your LRS and instance of your running CMI5 player. These are the fields:
+- Endpoint
+  - The LRS endpoint, to enable the plugin to communicate with your LRS. Ex: https://lrsendpoint.com/data/xAPI/. Must include trailing forward slash.
+- LRS integration 
+  - This is an optional dropdown for addtional LRS's. Defaults to 'None.'
+- LRS: Basic Username
+  - The basic username for connecting to your LRS.
+- LRS: Basic Password
+  - Your password for connecting to your LRS. 
+- Duration
+   - Used with 'LRS integrated basic authentication'. Requests the LRS to keep credentials valid for this number of minutes. Default is set to 9000.
+- Custom account homepage
+  - If entered, Moodle will use this homePage in conjunction with the ID number user profile field to identify the learner. Defaults to https://moodle.com.
+- Identify by email
+  - If selected, learners will be identified by their email address if they have one recorded in Moodle.
+- cmi5 Player URL 
+  -The URL to communicate with the CMI5 player, can include port number(e.g. http://player.example.com or http://localhost:63398). Must NOT include a trailing forward slash.
+- cmi5 Player: Basic Username
+  - This is the tenant username for the CMI5 player
+- cmi5 Player: Basic Password
+  - This is the basic password to login to player. (IS this needed? check code - MB)
+- cmi5 Player: Bearer Token
+  - The cmi5 tenant bearer token (should be a long string). 
+
+There are two sections "Default ccalues foor CMI5 LAunch Link activity grades" and "Default values for CMI5 Launch Link activity attempts and completion." These can be ignored for now as they are works in progress for future features. 
+
+The plugin is now accessible as a resource to be added to a Moodle course! Under your Moodle courses in edit mode select _Add activity or resource_ and you will see _cmi5 Launch Link_ as an available option. Currently the Launch link can take a folder or XML compliant with cmi5 specification.
+
 
 # Flowchart
 
@@ -96,12 +135,5 @@ sequenceDiagram
 
 ## User progress
 
-The cmi5 player tracks user progress, however the Moodle application will also want to track progress. Moodle will present the progress details to the user to let them know whether the lesson was completed, or how far along the user is in the lesson. This is not implemented yet.
+The cmi5 player tracks user progress by tracking whether an AU is satisfied or not. The LRS is a better way to track a users progress in any detail. Currently the Moodle plugin queries the LRS for progress. This in shows AUs as complete, in-progress, or not attempted. It also breaks down sessions into detail, ex; " The actor watched video at  certain time".
 
-### Introduce a webhook
-
-Moodle and cmi5 Player do not currently share a user's progress. One option is for the cmi5 player to ping Moodle via a webhook whenever progress and/or completion has been made.
-
-Webhooks are "user-defined HTTP callbacks". They are usually triggered by some event, such as pushing code to a repository or a comment being posted to a blog. When that event occurs, the source site makes an HTTP request to the URL configured for the webhook. Users can configure them to cause events on one site to invoke behavior on another.
-
-One consideration is that the cmi5 Player will also need private credentials to request a progress update and/or completion.

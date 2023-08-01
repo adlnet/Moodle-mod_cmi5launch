@@ -28,6 +28,10 @@
 defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->dirroot/mod/cmi5launch/lib.php");
 
+//Classes for connecting to CMI5 player
+require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/cmi5Connector.php");
+
+
 /**
  * Send a statement that the activity was launched.
  * This is useful for debugging - if the 'launched' statement is present in the LRS, you know the activity was at least launched.
@@ -124,7 +128,7 @@ function cmi5_launched_statement($registrationid) {
  * @param string/UUID $registrationid The cmi5 Registration UUID associated with the launch.
  * @return string launch link including querystring.
  */
-function cmi5launch_get_launch_url($registrationuuid) {
+function cmi5launch_get_launch_url($registrationuuid, $auID) {
     global $cmi5launch, $CFG, $DB;
     $cmi5launchsettings = cmi5launch_settings($cmi5launch->id);
     $expiry = new DateTime('NOW');
@@ -165,12 +169,15 @@ function cmi5launch_get_launch_url($registrationuuid) {
             $basicauth = base64_encode($basiclogin.":".$basicpass);
             break;
     }
+//to bring in functions from class cmi5Connector
+$connectors = new cmi5Connectors;
+//Get retrieve URL function
+$retrieveUrl = $connectors->getRetrieveUrl();
+//See here we are passing the auid. If we have session ids will we pass those instead
+//or is that a whole new func, I think it may be
+//$rtnstring = $retrieveUrl($cmi5launch->id, $auID); 
 
-	//Retrieve launch url
-	$record = $DB->get_record("cmi5launch_player", array('registrationid' => $registrationuuid));
-	$rtnstring = $record->launchurl;
-
-	return $rtnstring;
+//return $rtnstring;
 }
 
 /**
@@ -361,7 +368,7 @@ function cmi5launch_get_global_parameters_and_get_state($key) {
         $cmi5launchsettings['cmi5launchlrspass']
     );
 
-
+ 
     return $lrs->retrieveState(
         new \cmi5\Activity(array("id" => trim($cmi5launch->cmi5activityid))),
         cmi5launch_getactor($cmi5launch->id),
@@ -504,3 +511,89 @@ function cmi5launch_send_api_request($auth, $method, $url) {
         "status" => $responsecode
     );
 }
+
+//Grade stuff from SCORM
+
+//Move these to top where they belong if they are what we need
+define('GRADE_AUS_CMI5', '0');
+define('GRADE_HIGHEST_CMI5', '1');
+define('GRADE_AVERAGE_CMI5', '2');
+define('GRADE_SUM_CMI5', '3');
+
+define('HIGHEST_ATTEMPT_CMI5', '0');
+define('AVERAGE_ATTEMPT_CMI5', '1');
+define('FIRST_ATTEMPT_CMI5', '2');
+define('LAST_ATTEMPT_CMI5', '3');
+
+define('CMI5_FORCEATTEMPT_NO', 0);
+define('CMI5_FORCEATTEMPT_ONCOMPLETE', 1);
+define('CMI5_FORCEATTEMPT_ALWAYS', 2);
+
+define('CMI5_UPDATE_NEVER', '0');
+define('CMI5_UPDATE_EVERYDAY', '2');
+define('CMI5_UPDATE_EVERYTIME', '3');
+
+/**
+ * Returns an array of the array of update frequency options
+ *
+ * @return array an array of update frequency options
+ */
+function cmi5_get_updatefreq_array() {
+    return array(CMI5_UPDATE_NEVER => get_string('never'),
+    CMI5_UPDATE_EVERYDAY => get_string('everyday', 'cmi5launch'),
+    CMI5_UPDATE_EVERYTIME => get_string('everytime', 'cmi5launch'));
+}
+
+/**
+ * Returns an array of the array of what grade options
+ *
+ * @return array an array of what grade options
+ */
+function cmi5_get_grade_method_array() {
+    return array (GRADE_AUS_CMI5 => get_string('GRADE_CMI5_AUS', 'cmi5launch'),
+                  GRADE_HIGHEST_CMI5 => get_string('GRADE_HIGHEST_CMI5', 'cmi5launch'),
+                  GRADE_AVERAGE_CMI5 => get_string('GRADE_AVERAGE_CMI5', 'cmi5launch'),
+                  GRADE_SUM_CMI5 => get_string('GRADE_SUM_CMI5', 'cmi5launch'));
+}
+
+
+
+/**
+ * Returns an array of the array of attempt options
+ *
+ * @return array an array of attempt options
+ */
+function cmi5_get_attempts_array() {
+    $attempts = array(0 => get_string('nolimit', 'cmi5launch'),
+                      1 => get_string('attempt1', 'cmi5launch'));
+
+    for ($i = 2; $i <= 6; $i++) {
+        $attempts[$i] = get_string('attemptsx', 'cmi5launch', $i);
+    }
+
+    return $attempts;
+}
+
+/**
+ * Returns an array of the array of what grade options
+ *
+ * @return array an array of what grade options
+ */
+function cmi5_get_what_grade_array() {
+    return array (HIGHEST_ATTEMPT_CMI5 => get_string('HIGHEST_ATTEMPT_CMI5', 'cmi5launch'),
+                  AVERAGE_ATTEMPT_CMI5 => get_string('AVERAGE_ATTEMPT_CMI5', 'cmi5launch'),
+                  FIRST_ATTEMPT_CMI5 => get_string('FIRST_ATTEMPT_CMI5', 'cmi5launch'),
+                  LAST_ATTEMPT_CMI5 => get_string('last_attempt_cmi5', 'cmi5launch'));
+}
+
+/**
+ * Returns an array of the force attempt options
+ *
+ * @return array an array of attempt options
+ */
+function cmi5_get_forceattempt_array() {
+    return array(CMI5_FORCEATTEMPT_NO => get_string('no'),
+                 CMI5_FORCEATTEMPT_ONCOMPLETE => get_string('forceattemptoncomplete', 'cmi5launch'),
+                 CMI5_FORCEATTEMPT_ALWAYS => get_string('forceattemptalways', 'cmi5launch'));
+}
+

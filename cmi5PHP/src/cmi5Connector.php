@@ -1,5 +1,7 @@
 <?php
 //Class to hold ways to communicate with CMI5 player through its API's -MB
+//namespace cmi5;
+
 class cmi5Connectors{
 
     public function getCreateTenant(){
@@ -13,6 +15,15 @@ class cmi5Connectors{
     }
     public function getCreateCourse(){
         return [$this, 'createCourse'];
+    }
+    public function getSessions(){
+        return [$this, 'retrieveSessionInfo'];
+    }
+    public function getRegistrationPost(){
+        return [$this, 'retrieveRegistrationPost'];
+    }
+    public function getRegistrationGet(){
+        return [$this, 'retrieveRegistrationGet'];
     }
 
     //Function to create a course
@@ -32,6 +43,11 @@ class cmi5Connectors{
         //Build URL to import course to
         $url= $settings['cmi5launchplayerurl'] . "/api/v1/course" ;
        
+        echo "Something went wrong? What is url?";
+        echo "<br>";
+        var_dump($url);        
+        echo "<br>";
+
         //the body of the request must be made as array first
         $data = $file;
   
@@ -43,8 +59,8 @@ class cmi5Connectors{
             if ($CFG->debugdeveloper) {
                 echo "Something went wrong sending the request";
                 echo "<br>";
-                echo "Dumping session to troubleshoot.";
-                var_dump($_SESSION);
+                echo "Response from CMI5 player: ";
+                var_dump($result);
                 echo "<br>";
             }
 	     } else {
@@ -91,8 +107,136 @@ class cmi5Connectors{
         //Return an array with tenant name and info
         return $returnedInfo;
     }
-    
-    
+
+
+    //Function to retreive registration from cmi5 player. This way uses
+    //the registration id
+    //Registration  is "code" in returned json body
+    //@param $registration - registration UUID
+    // @param $id - launch id
+    function retrieveRegistrationGet($registration, $id) {
+
+		$settings = cmi5launch_settings($id);
+
+		$token = $settings['cmi5launchtenanttoken'];
+		$playerUrl = $settings['cmi5launchplayerurl'];
+
+		global $CFG;
+
+        //Build URL for launch URL request
+        //Okay it looks like the reurnurk is same level as  
+	    $url = $playerUrl . "/api/v1/registration/" . $registration ;
+
+	   ///////////
+	   $options = array(
+		'http' => array(
+		    'method'  => 'GET',
+		    'header' => array('Authorization: Bearer ' . $token,  
+			   "Content-Type: application/json\r\n" .
+			   "Accept: application/json\r\n")
+		)
+	 );
+		//the options are here placed into a stream to be sent
+		$context  = stream_context_create($options);
+		
+		//sends the stream to the specified URL and stores results (the false is use_include_path, which we dont want in this case, we want to go to the url)
+		$result = file_get_contents( $url, false, $context );
+	 
+        if ($result === FALSE){
+
+            if ($CFG->debugdeveloper)  {
+                echo "Something went wrong!";
+                echo "<br>";
+                var_dump($_SESSION);
+                }
+        }
+        else{
+  
+               $registrationInfo = json_decode($result, true);
+    //The returned 'registration info' is a large json 
+    //code is the registration id we want   
+			$registration = $registrationInfo["code"];
+			
+            //Why would I return the code when the code is needed to fwetch?
+//			return $registration;
+
+            return $registrationInfo; //much better!
+        }
+    }
+
+
+    //Function to retreive registration from cmi5 player. This way uses
+    //the course id and actor name
+    //As this is a POST request it returns a new code everytime it is called
+    //Registration  is "code" in returned json body
+    //@param $courseID
+    // @param $id 
+    function retrieveRegistrationPost($courseId, $id){
+
+        global $USER;
+
+		$settings = cmi5launch_settings($id);
+
+        //Switch this out for user not tenant
+//        $actor = $settings['cmi5launchtenantname'];
+        $actor = $USER->username;
+        $token = $settings['cmi5launchtenanttoken'];
+        $playerUrl = $settings['cmi5launchplayerurl'];
+        $homepage = $settings['cmi5launchcustomacchp'];
+        global $CFG;
+      
+        //Build URL for launch URL request
+        //Okay it looks like the return url is same level as  
+	    $url = $playerUrl . "/api/v1/registration" ;
+
+        //the body of the request must be made as array first
+        $data = array(
+            'courseId' => $courseId,
+            'actor' => array(
+                'account' => array(
+                    "homePage" => $homepage,
+                    "name" => $actor
+                )
+            )
+        );
+        
+	   $options = array(
+		'http' => array(
+		    'method'  => 'POST',
+		    'header' => array('Authorization: Bearer ' . $token,  
+			   "Content-Type: application/json\r\n" .
+			   "Accept: application/json\r\n"),
+		    'content' => json_encode($data)
+		)
+	 );
+
+		//the options are here placed into a stream to be sent
+		$context  = stream_context_create($options);
+		
+		//sends the stream to the specified URL and stores results (the false is use_include_path, which we dont want in this case, we want to go to the url)
+		$result = file_get_contents( $url, false, $context );
+		
+
+        if ($result === FALSE){
+
+            if ($CFG->debugdeveloper)  {
+                echo "Something went wrong!";
+                echo "<br>";
+                var_dump($_SESSION);
+                }
+        }
+        else{
+
+               $registrationInfo = json_decode($result, true);
+          
+               //The returned 'registration info' is a large json 
+		    //code is the registration id we want   
+			$registration = $registrationInfo["code"];
+			
+			return $registration;
+        }
+    }
+
      //@param $urlToSend - URL to send request to
     // @param $user - username
     // @param $pass - password
@@ -129,48 +273,57 @@ class cmi5Connectors{
             return $token;
         }
 
-}
+    }
 
-    ///Function to retrieve a launch URL for course
+    ///Function to retrieve a launch URL for an AU
     //@param $id -Actor id to find correct info for url request
-    //@param $retUrl - returnUrl to pass to cmi5 in request
-    //@param $id -Actor id to find correct info for url request
+    //@param $auID -AU id to pass to cmi5 for url request
     //@return $url - The launch URL returned from cmi5 player
     ////////
-    //Trying somehting new, maybe just pass in id instead of above params?
-    public function retrieveUrl($id, $retUrl){
-		global $DB;
+    public function retrieveUrl($id, $auIndex){
+		//TODO, this needs to be changed to have an if its one old call, if its not, new call
+        //MB
+        global $DB, $USER;
 
 		//Retrieve actor record, this enables correct actor info for URL storage
 		$record = $DB->get_record("cmi5launch", array('id' => $id));
 
+        //Here's the trouble, still getting reggistration id from master RECORD
 		$settings = cmi5launch_settings($id);
+     
+        $usersCourse = $DB->get_record('cmi5launch_course', ['courseid'  => $record->courseid, 'userid'  => $USER->id]);
 
+		$registrationID = $usersCourse->registrationid;
+		
         $homepage = $settings['cmi5launchcustomacchp'];
-        $returnUrl= $retUrl;
-		$actor= $settings['cmi5launchtenantname'];
+        $returnUrl =$usersCourse->returnurl;
+		//MB
+        //We need to change this to actor name, not tenant
+        $actor= $USER->username;
+        //$actor= $settings['cmi5launchtenantname'];
 		$token = $settings['cmi5launchtenanttoken'];
 		$playerUrl = $settings['cmi5launchplayerurl'];
-		$courseId = $record->courseid;
+		$courseId = $usersCourse->courseid;
 
-	    $url = $playerUrl . "/api/v1/course/" . $courseId  ."/launch-url/0";
+        //Build URL for launch URL request
+	    $url = $playerUrl . "/api/v1/course/" . $courseId  ."/launch-url/" . $auIndex;
 
-        //the body of the request must be made as array first
         $data = array(
-            'actor' => array (
+            'actor' => array(
                 'account' => array(
                     "homePage" => $homepage,
                     "name" => $actor,
-                )
+                ),
             ),
-            'returnUrl' => $returnUrl
+            'returnUrl' => $returnUrl,
+            'reg' => $registrationID
         );
-    
-        // use key 'http' even if you send the request to https://...
+
+		// use key 'http' even if you send the request to https://...
         //There can be multiple headers but as an array under the ONE header
         //content(body) must be JSON encoded here, as that is what CMI5 player accepts
         //JSON_UNESCAPED_SLASHES used so http addresses are displayed correctly
-        $options = array(
+     	   $options = array(
             'http' => array(
                 'method'  => 'POST',
                 'ignore_errors' => true,
@@ -179,7 +332,7 @@ class cmi5Connectors{
                     "Accept: application/json\r\n"),
                 'content' => json_encode($data, JSON_UNESCAPED_SLASHES)
 
-            )
+            )	
         );
 
         //the options are here placed into a stream to be sent
@@ -188,19 +341,15 @@ class cmi5Connectors{
         //sends the stream to the specified URL and stores results (the false is use_include_path, which we dont want in this case, we want to go to the url)
         $launchResponse = file_get_contents( $url, false, $context );
 
-	   //to bring in functions from class cmi5Connector
-		$connectors = new cmi5Tables;
-		$saveUrl = $connectors->getSaveURL();
-
-        //Save the returned info to the correct table
-		$saveUrl($id, $launchResponse, $returnUrl, $homepage);
-		
-		//Only return the URL
+        //here may be the problem, what is being sent back?
+        echo"<br>";
+        echo" This is swhat is bein sent back>:";
+        var_dump($launchResponse);
+        ECHO"<br>";
+        //Only return the URL
 		$urlDecoded = json_decode($launchResponse, true);
-		$url = $urlDecoded['url'];
 
-        //return response
-        return $url;
+        return $urlDecoded;
     }
 
 
@@ -272,6 +421,51 @@ class cmi5Connectors{
       	      return $result;
                 }
     }
-}
 
-    ?>
+
+    /**
+    *Retrieve session info from cmi5player
+    * @param mixed $sessionId - the session id to retrieve
+     * @param mixed $id - cmi5 id
+     * @return mixed
+     */
+    public function retrieveSessionInfo($sessionId, $id){
+
+        global $DB;
+
+		$settings = cmi5launch_settings($id);
+		
+		$token = $settings['cmi5launchtenanttoken'];
+		$playerUrl = $settings['cmi5launchplayerurl'];
+
+        //Build URL for launch URL request
+	    $url = $playerUrl . "/api/v1/session/" . $sessionId;
+
+		// use key 'http' even if you send the request to https://...
+        //There can be multiple headers but as an array under the ONE header
+        //content(body) must be JSON encoded here, as that is what CMI5 player accepts
+        //JSON_UNESCAPED_SLASHES used so http addresses are displayed correctly
+     	   $options = array(
+            'http' => array(
+                'method'  => 'GET',
+                'ignore_errors' => true,
+                'header' => array("Authorization: Bearer ". $token,  
+                    "Content-Type: application/json\r\n" .
+                    "Accept: application/json\r\n")
+            )	
+        );
+
+        //the options are here placed into a stream to be sent
+        $context  = stream_context_create(($options));
+
+        //sends the stream to the specified URL and stores results (the false is use_include_path, which we dont want in this case, we want to go to the url)
+        $launchResponse = file_get_contents( $url, false, $context );
+
+		$sessionDecoded = json_decode($launchResponse, true);
+
+        return $sessionDecoded;
+    }
+
+}
+   
+   ?>

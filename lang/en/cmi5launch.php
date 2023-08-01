@@ -71,6 +71,14 @@ If the ID number is not entered for a learner, they will instead be identified b
 Note: If a learner\'s id changes, they will lose access to registrations associated with former ids and completion data may be reset. Reports in your LRS may also be affected.';
 $string['cmi5launchcustomacchp_default'] = 'https://moodle.com';
 
+//Cmi5 grades admin
+// Start Default LRS Admin Settings.
+$string['cmi5launchgradesettings'] = 'Default values for cmi5 Launch Link activity settings';
+$string['cmi5launchgradesettings_help'] = 'These are site-wide, default values used when creating a new activity. Each activity has the ability to override and provide alternative values.';
+
+///
+$string['othersettings'] = 'Additional settings';
+
 //cmi5 player root location
 $string['cmi5launchplayerurl'] = 'cmi5 Player URL';
 $string['cmi5launchplayerurl_help'] = 'The url to communicate with CMI5 player, can include port number(e.g. http://player.example.com or http://localhost:63398). Must NOT include a trailing forward slash.';
@@ -88,6 +96,81 @@ $string['cmi5launchtenantpass_default'] = '';
 $string['cmi5launchtenanttoken'] = 'cmi5 Player: Bearer Token';
 $string['cmi5launchtenanttoken_help'] = 'The cmi5 tenant bearer token (should be a long string).';
 $string['cmi5launchtenanttoken_default'] = '';
+
+//Grading info - MB
+
+//Headers
+$string['defaultgradesettings'] = 'Default values for CMI5 Launch Link activity grades';
+$string['defaultothersettings'] = 'Default values for CMI5 Launch Link activity attempts and completion';
+
+//other
+$string['maximumgradedesc'] = 'The maximum grade for a CMI5 Launch Link activity';
+
+$string['maximumattempts'] = 'Maxium Attempt Amount';
+$string['whatmaxdesc'] = 'The maximum amount of allowed attempts';
+
+$string['maximumattempts'] = 'Maxium Attempt Amount';
+$string['whatmaxdesc'] = 'The maximum amount of allowed attempts';
+
+$string['nolimit'] = 'No limit';
+$string['attempt1'] = '1 attempt';
+$string['attemptsx'] = '{$a} attempts';
+
+$string['whatgrade'] = 'Attempts grading';
+$string['whatgradedesc'] = 'If multiple attempts are allowed, this setting specifies whether the highest, average (mean), first or last completed attempt is recorded in the gradebook. The last completed attempt option does not include attempts with a \'failed\' status.';
+$string['HIGHEST_ATTEMPT_CMI5'] = 'Highest attempt';
+$string['AVERAGE_ATTEMPT_CMI5'] = 'Average of attempts';
+$string['FIRST_ATTEMPT_CMI5'] = 'First attempt';
+$string['last_attempt_cmi5'] = 'Last attempt';
+
+$string['lastattempt'] = 'Last completed attempt';
+$string['last_attempt_cmi5_lock'] = 'Lock after final attempt';
+$string['lastattemptlock_help'] = 'If enabled, a student is prevented from launching the CMI5 player after using up all their allocated attempts.';
+$string['last_attempt_cmi5_lockdesc'] = 'If enabled, a student is prevented from launching the CMI5 player after using up all their allocated attempts.';
+
+//-MB - Not sure if we need ALL of these
+//* No - If a previous attempt is completed, passed or failed, the student will be provided with the option to enter in review mode or start a new attempt.
+//* When previous attempt completed, passed or failed - This relies on the SCORM package setting the status of \'completed\', \'passed\' or \'failed\'.
+//* Always - Each re-entry to the SCORM activity will generate a new attempt and the student will not be returned to the same point they reached in their previous attempt.';
+/*
+$string['forceattemptalways'] = 'Always';
+$string['forceattemptoncomplete'] = 'When previous attempt completed, passed or failed';
+$string['forcejavascript'] = 'Force users to enable JavaScript';
+$string['forcejavascript_desc'] = 'If enabled (recommended) this prevents access to SCORM objects when JavaScript is not supported/enabled in a users browser. If disabled the user may view the SCORM but API communication will fail and no grade information will be saved.';
+$string['forcejavascriptmessage'] = 'JavaScript is required to view this object, please enable JavaScript in your browser and try again.';
+$string['found'] = 'Manifest found';
+$string['frameheight'] = 'The height of the stage frame or window.';
+$string['framewidth'] = 'The width of the stage frame or window.';
+$string['fromleft'] = 'From left';
+$string['fromtop'] = 'From top';
+$string['fullscreen'] = 'Fill the whole screen';*/
+
+//Not sure if we want to implement these?
+/*$string['masteryoverride'] = 'Mastery score overrides status';
+$string['masteryoverride_help'] = 'If enabled and a mastery score is provided, when LMSFinish is called and a raw score has been set, status will be recalculated using the raw score and mastery score and any status provided by the SCORM (including "incomplete") will be overridden.';
+$string['masteryoverridedesc'] = 'This preference sets the default for the mastery score override setting';
+*/
+
+$string['general'] = 'General data';
+$string['GRADE_AVERAGE_CMI5'] = 'Average grade';
+$string['gradeforattempt'] = 'Grade for attempt';
+$string['GRADE_HIGHEST_CMI5'] = 'Highest grade';
+$string['grademethod'] = 'Grading method';
+//TODO - Is this accurate? Does it define for only ONE attempt?  
+$string['grademethod_help'] = 'The grading method defines how the grade for a single attempt of the activity is determined.
+
+There are 4 grading methods:
+
+* Learning objects - The number of completed/passed learning objects
+* Highest grade - The highest score obtained in all passed learning objects
+* Average grade - The mean of all the scores
+* Sum grade - The sum of all the scores';
+$string['grademethoddesc'] = 'The grading method defines how the grade for a single attempt of the activity is determined.';
+$string['gradereported'] = 'Grade reported';
+$string['gradesettings'] = 'Grade settings';
+$string['GRADE_CMI5_AUS'] = 'Learning objects';
+$string['GRADE_SUM_CMI5'] = 'Sum grade';
+
 
 // Start Activity Settings.
 $string['cmi5launchname'] = 'Launch link name';
@@ -138,15 +221,26 @@ $string['completionexpiry'] = 'Expiry';
 $string['completionexpirygroup'] = 'Completion Expires After (days)';
 $string['completionexpirygroup_help'] = 'If checked, when looking for completion Moodle will only look at data stored in the LRS in the previous X days. It will unset completion for learners who had previously completed but whose completion has now expired.';
 
-// View settings.
+// AU View settings.
 $string['cmi5launchviewfirstlaunched'] = 'First launched';
 $string['cmi5launchviewlastlaunched'] = 'Last launched';
 $string['cmi5launchviewlaunchlinkheader'] = 'Launch link';
 $string['cmi5launchviewlaunchlink'] = 'launch';
+$string['cmi5launchviewprogress'] = 'Progress';
+$string['cmi5launchviewgradeheader'] = 'Grade';
+
+// View settings.
+$string['cmi5launchviewAUname'] = 'Name';
+$string['cmi5launchviewstatus'] = 'Status';
+$string['cmi5launchviewregistrationheader'] = 'Sessions';
+$string['cmi5launchviewgradeheader'] = 'Grade';
+$string['cmi5launchviewlaunchlink'] = 'view';
+$string['AUtableheader'] = 'Assignable Units';
+
 
 $string['cmi5launch_completed'] = 'Experience complete!';
 $string['cmi5launch_progress'] = 'Attempt in progress.';
-$string['cmi5launch_attempt'] = 'Start New Registration';
+$string['cmi5launch_attempt'] = 'Start New Session';
 $string['cmi5launch_notavailable'] = 'The Learning Record Store is not available. Please contact a system administrator.
 
 If you are the system administrator, go to Site admin / Development / Debugging and set Debug messages to DEVELOPER. Set it back to NONE or MINIMAL once the error details have been recorded.';
