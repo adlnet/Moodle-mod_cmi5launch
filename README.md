@@ -10,8 +10,8 @@ To use this plugin you will need the following:
 * Moodle 4.0+
 * Login details for the admin account 
 * A Moodle course setup where you would like to add the activity
-* A cmi5 package in compliance with the cmi5 Specification
-* A Learning Record Store (LRS) as defined in the xAPI specification
+* A cmi5 package in compliance with the cmi5 Specification (https://github.com/AICC/CMI-5_Spec_Current/blob/quartz/cmi5_spec.md)
+* A Learning Record Store (LRS) as defined in the xAPI specification (https://opensource.ieee.org/xapi/xapi-base-standard-documentation)
 * A running instance of the cmi5 prototype player (https://github.com/adlnet/CATAPULT/tree/main/player)
 * A copy of this plugin
 
