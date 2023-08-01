@@ -10,9 +10,9 @@ To use this plugin you will need the following:
 * Moodle 4.0+
 * Login details for the admin account 
 * A Moodle course setup where you would like to add the activity
-* A piece of cmi5 compliant e-learning that also implements the launch mechanism, for example e-learning produced using Articulate Storyline or Adobe Captivate and packaged as a .zip file
-* A cmi5 compliant LRS
-* A running instance of the cmi5 player (https://github.com/adlnet/CATAPULT/tree/main/player)
+* A cmi5 package in compliance with the cmi5 Specification
+* A Learning Record Store (LRS) as defined in the xAPI specification
+* A running instance of the cmi5 prototype player (https://github.com/adlnet/CATAPULT/tree/main/player)
 * A copy of this plugin
 
 ## Installation Instructions
