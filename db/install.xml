@@ -167,8 +167,8 @@
         <FIELD NAME="title" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="The au title (from course package)."/>
         <FIELD NAME="moveon" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" COMMENT="The requirement for AU to be marked as done."/>
         <FIELD NAME="auindex" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="The AU index"/>
-        <FIELD NAME="parents" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" COMMENT="AU's parent activities."/>
-        <FIELD NAME="objectives" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" COMMENT="AUs objectives."/>
+        <FIELD NAME="parents" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="AU's parent activities."/>
+        <FIELD NAME="objectives" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="AUs objectives."/>
         <FIELD NAME="description" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="AUs description."/>
         <FIELD NAME="activitytype" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Activity type of AU."/>
         <FIELD NAME="masteryscore" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="The amount it counts toward mastery score."/>
