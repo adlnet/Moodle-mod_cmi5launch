@@ -1,6 +1,4 @@
 <?php
-//namespace cmi5;
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -37,11 +35,9 @@ require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/autoload.php");
 
 // SCORM library from the SCORM module. Required for its xml2Array class by cmi5launch_process_new_package.
 require_once("$CFG->dirroot/mod/scorm/datamodels/scormlib.php");
-//Classes for connecting to CMI5 player
-require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/cmi5Connector.php");
-require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/ausHelpers.php");
-require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/aus.php");
-require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/sessions.php");
+
+use mod_cmi5launch\local\cmi5_connectors;
+use mod_cmi5launch\local\au_helpers;
 
 global $cmi5launchsettings;
 $cmi5launchsettings = null;
@@ -109,6 +105,8 @@ function cmi5launch_add_instance(stdClass $cmi5launch, mod_cmi5launch_mod_form $
 
     $cmi5launchlrs = cmi5launch_build_lrs_settings($cmi5launch);
 
+    //We removed this part pof lrs box -MB
+    /*
     // Determine if override defaults checkbox is checked or we need to save watershed creds.
     if ($cmi5launch->overridedefaults == '1' || $cmi5launchlrs->lrsauthentication == '2') {
         $cmi5launchlrs->cmi5launchid = $cmi5launch->id;
@@ -118,6 +116,7 @@ function cmi5launch_add_instance(stdClass $cmi5launch, mod_cmi5launch_mod_form $
             return false;
         }
     }
+*/
 
     // Process uploaded file.
     if (!empty($cmi5launch->packagefile)) {
@@ -146,6 +145,8 @@ function cmi5launch_update_instance(stdClass $cmi5launch, mod_cmi5launch_mod_for
 
     $cmi5launchlrs = cmi5launch_build_lrs_settings($cmi5launch);
 
+    //We removed this part of lrs box -MB
+    /*
     // Determine if override defaults checkbox is checked.
     if ($cmi5launch->overridedefaults == '1') {
         // Check to see if there is a record of this instance in the table.
@@ -168,6 +169,7 @@ function cmi5launch_update_instance(stdClass $cmi5launch, mod_cmi5launch_mod_for
             }
         }
     }
+*/
 
     if (!$DB->update_record('cmi5launch', $cmi5launch)) {
         return false;
@@ -563,14 +565,12 @@ function cmi5launch_process_new_package($cmi5launch) {
     $context = context_module::instance($cmid);
     
 	//bring in functions from classes cmi5Connector/
-	$connectors = new cmi5Connectors;
-    $aus_helpers = new Au_Helpers;
+	$connectors = new cmi5_connectors;
+    $aus_helpers = new au_helpers;
 
 	//bring in functions from class cmi5_table_connectors and AU helpers
-	$createCourse = $connectors->getCreateCourse();
-    $retrieveAus = $aus_helpers-> getRetrieveAus();
-    $saveAUs = $aus_helpers->getSaveAUs();
-    $createAUs = $aus_helpers->getCreateAUs();
+	$cmi5launch_create_course = $connectors->cmi5launch_get_create_course();
+    $cmi5launch_retrieve_aus = $aus_helpers-> get_cmi5launch_retrieve_aus();
     
     // Reload cmi5 instance.
     $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
@@ -606,7 +606,7 @@ function cmi5launch_process_new_package($cmi5launch) {
     //Create the course and retrieve info for saving to DB
     
     //Lets wrap this in a try catch statement
-    $courseResults =  $createCourse($context->id, $token, $packagefile );
+    $courseResults =  $cmi5launch_create_course($context->id, $token, $packagefile );
 
 	//Take the results of created course and save new course id to table
     $record->courseinfo = $courseResults;
@@ -643,10 +643,10 @@ function cmi5launch_process_new_package($cmi5launch) {
 
     //Maybe in view.php it does this same thing, saving to the student record instead.
     //so these stay as a 'master' record and the students tweak their own
-    $aus = ($retrieveAus($returnedInfo));
+    $aus = ($cmi5launch_retrieve_aus($returnedInfo));
     
     //Maybe better to save AUs here and feed it the array returned by retreieveAUS
-	//$auIDs = $saveAUs($createAUs($aus));
+	//$auIDs = $cmi5launch_save_aus($cmi5launch_create_aus($aus));
     $record->aus = (json_encode($aus));
 
 
@@ -896,9 +896,12 @@ function use_global_cmi5_lrs_settings($instance) {
     global $DB;
     // Determine if there is a row in cmi5launch_lrs matching the current activity id.
     $activitysettings = $DB->get_record('cmi5launch', array('id' => $instance));
+   
+    /* Removed override defaults from db
     if ($activitysettings->overridedefaults == 1) {
         return false;
     }
+    */
     return true;
 }
 

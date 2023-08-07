@@ -460,7 +460,7 @@ class RemoteLRS implements LRSInterface
     //TODO INVEST
     //
     //Is this a freaking retreiveStatment, like I made for progress?
-    public function retrieveStatement($id, $options = array()) {
+    public function cmi5launch_retrieve_statements($id, $options = array()) {
         if (! isset($options['voided'])) {
             $options['voided'] = false;
         }
@@ -512,7 +512,7 @@ class RemoteLRS implements LRSInterface
 
     public function retrieveVoidedStatement($id, $options = array()) {
         $options['voided'] = true;
-        return $this->retrieveStatement($id, $options);
+        return $this->cmi5launch_retrieve_statements($id, $options);
     }
 
     private function _queryStatementsRequestParams($query) {

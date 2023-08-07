@@ -1,27 +1,43 @@
 <?php
-//Class to hold methods for tracking and displaying student progress
-//namespace cmi5;
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * //Class to retrieve progress statements from LRS
+ * //Holds methods for tracking and displaying student progress
+ *
+ * @copyright  2023 Megan Bohland
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+namespace mod_cmi5launch\local;
+
 class progress{
 
-	public function getRetrieveStatement()
+	public function get_cmi5launch_retrieve_statements()
 	{
-	    return [$this, 'retrieveStatement'];
+	    return [$this, 'cmi5launch_retrieve_statements'];
 	}
 
-	public function getRequestCompleted()
+	public function get_cmi5launch_request_completion_info()
 	{
-		return [$this, 'requestCompletedInfo'];
+		return [$this, 'cmi5launch_request_completion_info'];
 	}
 
-
-	public function getRetrieveVerb()
+	public function get_cmi5launch_request_statements_from_lrs()
 	{
-	    return [$this, 'retrieveVerbs'];
-	}
-
-	public function getRequestLRSInfo()
-	{
-	    return [$this, 'requestLRSinfo'];
+	    return [$this, 'cmi5launch_request_statements_from_lrs'];
 	}
 
 	/**
@@ -30,18 +46,18 @@ class progress{
 	 * @param mixed $session - a session object 
 	 * @return array
 	 */
-	public function requestLRSinfo($regId, $session /*$id*/){
+	public function cmi5launch_request_statements_from_lrs($registrationid, $session /*$id*/){
 
 		//Array to hold result
 		$result = array();
 
 		//When searching by reg id, which is the option available to Moodle, many results are returned, so iterating through them is necessary
 		$data = array(
-			'registration' => $regId,
+			'registration' => $registrationid,
 			'since' => $session->createdAt
 		);
 
-		$statements = $this->sendRequestToLRS($data, $regId);
+		$statements = $this->cmi5launch_send_request_to_lrs($data, $registrationid);
 		//The results come back as nested array under more then statements. We only want statements, and we want them unique
 		$statement = array_chunk($statements["statements"], 1);
 
@@ -51,7 +67,7 @@ class progress{
 		
 		//This separates the larger statement into the separate sessions and verbs
 			$current = ($statement[$i]);
-		array_push($result, array ($regId => $current) );
+		array_push($result, array ($registrationid => $current) );
 		}
 	
 		return $result;
@@ -64,7 +80,7 @@ class progress{
 	 * @param mixed $id
 	 * @return mixed
 	 */
-	public function sendRequestToLRS($data, $id)
+	public function cmi5launch_send_request_to_lrs($data, $id)
 	{
 		$settings = cmi5launch_settings($id);
 
@@ -106,28 +122,28 @@ class progress{
 	 * @param mixed $i - the registration id
 	 * @return mixed - actor
 	 */
-	public function retrieveActor($info, $regid){
+	public function cmi5launch_retrieve_actor($info, $registrationid){
 
-		$actor = $info[$regid][0]["actor"]["account"]["name"];
+		$actor = $info[$registrationid][0]["actor"]["account"]["name"];
 		return $actor;
 	}
 
-	/**
+		/**
 	 * Returns a verb retrieved from collected LRS data based on registration id
-	 * @param mixed $resultChunked - data retrieved from LRS, usually an array
+	 * @param mixed $resultarray - data retrieved from LRS, usually an array
 	 * @param mixed $i - the registration id
 	 * @return mixed - verb
 	 */
-	public function retrieveVerbsOrig($resultChunked, $i){
+	public function cmi5launch_retrieve_verbs($resultarray, $i){
 
 		//Some verbs do not have an easy to display 'language' option, we need to check if 'display' is present			
-		$verbInfo = $resultChunked[0][0][$i]["statements"][0]["verb"];
+		$verbInfo = $resultarray[$i][0]["verb"];
 		$display = array_key_exists("display", $verbInfo);
 
 			//If it is null then there is no display, so go by verb id
 			if(!$display ){
 				//retrieve id
-				$verbId = $resultChunked[$i][0]["verb"]["id"];
+				$verbId = $resultarray[$i][0]["verb"]["id"];
 
 				//SPLITS id in two on 'verbs/', we want the end which is the actual verb
 				$split = explode('verbs/', $verbId);
@@ -135,33 +151,7 @@ class progress{
 
 			}else{
 				//IF it is not null then there is a language easy to read version of verb display, such as 'en' or 'en-us'
-				$verbLang =  $resultChunked[$i][0]["verb"]["display"];
-				//Retreive the language
-				$lang = array_key_first($verbLang);
-				//use it to retreive verb
-				$verb = [$verbLang][0][$lang];
-			}
-			return $verb;
-	}
-
-	public function retrieveVerbs($resultChunked, $i){
-
-		//Some verbs do not have an easy to display 'language' option, we need to check if 'display' is present			
-		$verbInfo = $resultChunked[$i][0]["verb"];
-		$display = array_key_exists("display", $verbInfo);
-
-			//If it is null then there is no display, so go by verb id
-			if(!$display ){
-				//retrieve id
-				$verbId = $resultChunked[$i][0]["verb"]["id"];
-
-				//SPLITS id in two on 'verbs/', we want the end which is the actual verb
-				$split = explode('verbs/', $verbId);
-				$verb = $split[1];
-
-			}else{
-				//IF it is not null then there is a language easy to read version of verb display, such as 'en' or 'en-us'
-				$verbLang =  $resultChunked[$i][0]["verb"]["display"];
+				$verbLang =  $resultarray[$i][0]["verb"]["display"];
 				//Retreive the language
 				$lang = array_key_first($verbLang);
 				//use it to retreive verb
@@ -171,23 +161,23 @@ class progress{
 	}
 
 	/**
-	 * Returns an object (au title?) retrieved from collected LRS data based on registration id
-	 * @param mixed $resultChunked - data retrieved from LRS, usually an array
-	 * @param mixed $i - the registration id
+	 * Returns a name (the au title) retrieved from collected LRS data based on registration id
+	 * @param mixed $resultarray - data retrieved from LRS, usually an array
+	 * @param mixed $registrationid - the registration id
 	 * @return mixed - object name
 	 */
-	public function retrieveObject($resultChunked, $i){
+	public function cmi5launch_retrieve_name($resultarray, $registrationid){
 		//THIS is the SECOND chunk, this is the problem
-		$objectInfo = $resultChunked[$i][0]["object"];
+		$objectInfo = $resultarray[$registrationid][0]["object"];
 		$definition = array_key_exists("definition", $objectInfo);
 		//If it is null then there is no "definition", so go by object id
 		if(!$definition ){
 			//retrieve id
-			$object = $resultChunked[$i][0]["object"]["id"];
+			$object = $resultarray[$registrationid][0]["object"]["id"];
 			//I have noticed that in the LRS when it can't find a name it references the WHOLE id as in "actor did WHOLEID", so I will do the same here
 		}else{
 			//IF it is not null then there is a language easy to read version of object definition, such as 'en' or 'en-us'
-			$objectLang =  $resultChunked[$i][0]["object"]["definition"]["name"];
+			$objectLang =  $resultarray[$registrationid][0]["object"]["definition"]["name"];
 			//Retreive the language
 			$lang = array_key_first($objectLang);
 			//use it to retreive verb
@@ -206,18 +196,18 @@ class progress{
 	 * 
 	 * We are concerned with  the top three for Moodle reporting purposes
 	 * 
-	 * Summary of retrieveResult
-	 * @param mixed $resultChunked - data retrieved from LRS, usually an array
-	 * @param mixed $i - the registration id
+	 * Summary of cmi5launch_retrieve_result
+	 * @param mixed $resultarray - data retrieved from LRS, usually an array
+	 * @param mixed $registrationid - the registration id
 	 * @return mixed
 	 */
-	public function retrieveResult($resultChunked, $i){
+	public function cmi5launch_retrieve_result($resultarray, $registrationid){
 
 		//Verify this statement has a 'result' param
-		if (array_key_exists("result", $resultChunked ) )
+		if (array_key_exists("result", $resultarray ) )
 		{
 			//If it exists, grab it
-			$resultInfo = $resultChunked[$i][0]["result"];
+			$resultInfo = $resultarray[$registrationid][0]["result"];
 		
 			//Check which keys exist in 'result'
 			$success = array_key_exists("success", $resultInfo);
@@ -233,27 +223,28 @@ class progress{
 			//If it is null then the item in question doesn't exist in this statement
 			if($success){
 				//no need to make new variable, save over
-				$success = $resultChunked[$i][0]["result"]["success"];
+				$success = $resultarray[$registrationid][0]["result"]["success"];
 				
 				//now that we have success, save to db. This means we need an object right? Can we update afield?
 				//even if we could we need id to find it...
 			}else{
 			}
 
-			//Maybe it would be better to just have a 'retrieveScore' for now
+			//Maybe it would be better to just have a 'cmi5launch_retrieve_score' for now
 	}
 
 	/**
 	 * Returns a timestamp retrieved from collected LRS data based on registration id
-	 * @param mixed $resultChunked - data retrieved from LRS, usually an array
-	 * @param mixed $i - the registration id
+	 * @param mixed $resultarray - data retrieved from LRS, usually an array
+	 * @param mixed $registrationid - the registration id
 	 * @return string - date/time
 	 */
-	public function retrieveTimestamp($resultChunked, $i){
+	public function cmi5launch_retrieve_timestamp($resultarray, $registrationid){
 		
-		$date = new DateTime($resultChunked[$i][0]["timestamp"], new DateTimeZone('US/Eastern'));
 		
-		$date->setTimezone(new DateTimeZone('America/New_York'));
+		$date = new \DateTime($resultarray[$registrationid][0]["timestamp"], new \DateTimeZone('US/Eastern'));
+		
+		$date->setTimezone(new \DateTimeZone('America/New_York'));
 
 		$date = $date->format('d-m-Y' . " ".  'h:i a');
 
@@ -262,22 +253,22 @@ class progress{
 
 	/**
 	 * 
-	 * Summary of retrieveScore
-	 * @param mixed $resultChunked - data retrieved from LRS, usually an array
+	 * Summary of cmi5launch_retrieve_score
+	 * @param mixed $resultarray - data retrieved from LRS, usually an array
 	 * @param mixed $registrationid - the registration id
 	 * @return mixed
 	 */
 	//Ok, if we change so session id goes through, can we update DB in this func	
-	public function retrieveScore($resultChunked, $registrationid){
+	public function cmi5launch_retrieve_score($resultarray, $registrationid){
 
 		//variable to hold score
 		$score = null;
 
 		//Verify this statement has a 'result' param
-		if (array_key_exists("result", $resultChunked[$registrationid][0] ) )
+		if (array_key_exists("result", $resultarray[$registrationid][0] ) )
 		{
 			//If it exists, grab it
-			$resultInfo = $resultChunked[$registrationid][0]["result"];
+			$resultInfo = $resultarray[$registrationid][0]["result"];
 		
 			$score = array_key_exists("score", $resultInfo);
 
@@ -286,7 +277,7 @@ class progress{
 			//If it is null then the item in question doesn't exist in this statement
 		if ($score) {
 
-			$score = $resultChunked[$registrationid][0]["result"]["score"];
+			$score = $resultarray[$registrationid][0]["result"]["score"];
 
 			//Raw score preferred to scaled
 			if($score["raw"]){
@@ -305,22 +296,22 @@ class progress{
 	}
 	
 	/**
-	 * Summary of retrieveStatement
+	 * Summary of cmi5launch_retrieve_statements
 	 * //Retrieves statements from LRS
-	 * @param mixed $regId
+	 * @param mixed $registrationid
 	 * @param mixed $id
 	 * @param mixed $lmsId
 	 * @return array<string>
 	 */
 
-	public function retrieveStatement($regId, $id, $session)
+	public function cmi5launch_retrieve_statements($registrationid, $id, $session)
 	{
 		//Array to hold verbs and be returned
 		$progressUpdate = array();
 		//Array to hold score and be returned
 		$returnScore = 0;
 
-		$resultDecoded = $this->requestLRSinfo($regId, $session);
+		$resultDecoded = $this->cmi5launch_request_statements_from_lrs($registrationid, $session);
 
 			//We need to sort the statements by finding their session id
 			//parse through array 'ext' to find the one holding session id, 
@@ -333,7 +324,7 @@ class progress{
 			//grab id and go and compare to saved session 'code'
 			$code = $session->code;
 			$currentSessID = "";
-			$ext = $singleStatment[$regId][0]["context"]["extensions"];
+			$ext = $singleStatment[$registrationid][0]["context"]["extensions"];
 				foreach ($ext as $key => $value) {
 				
 					//if key contains "sessionid" in string
@@ -345,11 +336,11 @@ class progress{
 			//Now if code equals currentSessID, this is a statement pertaining to this session
 			if($code == $currentSessID){
 			
-				$actor = $this->retrieveActor($singleStatment, $regId);
-				$verb = $this->retrieveVerbs($singleStatment, $regId);
-				$object = $this->retrieveObject($singleStatment, $regId);
-				$date = $this->retrieveTimestamp($singleStatment, $regId);
-				$score = $this->retrieveScore($singleStatment, $regId);
+				$actor = $this->cmi5launch_retrieve_actor($singleStatment, $registrationid);
+				$verb = $this->cmi5launch_retrieve_verbs($singleStatment, $registrationid);
+				$object = $this->cmi5launch_retrieve_name($singleStatment, $registrationid);
+				$date = $this->cmi5launch_retrieve_timestamp($singleStatment, $registrationid);
+				$score = $this->cmi5launch_retrieve_score($singleStatment, $registrationid);
 				
 				//If a session has more than one score, we only want the highest
 				if(!$score == null && $score > $returnScore){
@@ -367,35 +358,5 @@ class progress{
 			return $session;
 	}
 
-	/**
-	 * Summary of prettyProgress
-	 * I dont know if we need this anymore -TODO
-	 * @param mixed $arrayOfStatements
-	 * @return array<string>
-	 */
-	public function prettyProgress($arrayOfStatements){
-		$length = count($arrayOfStatements);
-		
-		//Why is iteration unreachable? It's reachable in the other test file
-		for($i = 0; $i < $length; $i++){
-
-			$actor = $this->retrieveActor($arrayOfStatements, $i);
-			$verb = $this->retrieveVerbs($arrayOfStatements, $i);
-			$object = $this->retrieveObject($arrayOfStatements, $i);
-			$date = $this->retrieveTimestamp($arrayOfStatements, $i);
-
-			//Maybe make this an overloaded func that can print this and /or just verbs
-			//Like if you pass in verbs it gives only verbs
-			//Wait....this is the above smh
-			//BUT, this is the only one with the resultChunked info, so lets pass back shtuff
-			//and let it have the string stuff added later, then easy to parse
-			//Could even pas as actor=>actor
-			//OR object=> actor, verb, date. Then we can sort it by au!
-			$progressUpdate[] = "$actor $verb $object on $date";
-	
-		}		
-	
-		return $progressUpdate;
-	}
 }
 ?>

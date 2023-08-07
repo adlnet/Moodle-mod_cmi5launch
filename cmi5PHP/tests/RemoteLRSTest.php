@@ -212,7 +212,7 @@ class RemoteLRSTest extends \PHPUnit_Framework_TestCase {
         }
     }
 
-    public function testRetrieveStatement() {
+    public function testcmi5launch_retrieve_statements() {
         $lrs = new RemoteLRS(self::$endpoint, self::$version, self::$username, self::$password);
 
         $saveResponse = $lrs->saveStatement(
@@ -232,14 +232,14 @@ class RemoteLRSTest extends \PHPUnit_Framework_TestCase {
             $this->fail("save statement setup failed: " . $saveResponse->content);
         }
 
-        $response = $lrs->retrieveStatement($saveResponse->content->getId());
+        $response = $lrs->cmi5launch_retrieve_statements($saveResponse->content->getId());
 
         $this->assertInstanceOf('cmi5\LRSResponse', $response);
         $this->assertTrue($response->success);
         $this->assertInstanceOf('cmi5\Statement', $response->content);
     }
 
-    public function testRetrieveStatementWithAttachments() {
+    public function testcmi5launch_retrieve_statementsWithAttachments() {
         $lrs = new RemoteLRS(self::$endpoint, self::$version, self::$username, self::$password);
         $content = json_encode(['foo' => 'bar']);
 
@@ -269,7 +269,7 @@ class RemoteLRSTest extends \PHPUnit_Framework_TestCase {
             $this->fail("save statement setup failed: " . $saveResponse->content);
         }
 
-        $response = $lrs->retrieveStatement($saveResponse->content->getId(), [ 'attachments' => true ]);
+        $response = $lrs->cmi5launch_retrieve_statements($saveResponse->content->getId(), [ 'attachments' => true ]);
 
         $this->assertInstanceOf('cmi5\LRSResponse', $response);
         $this->assertTrue($response->success);

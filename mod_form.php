@@ -105,7 +105,7 @@ class mod_cmi5launch_mod_form extends moodleform_mod {
 
         // Start advanced settings.
         $mform->addElement('header', 'lrsheading', get_string('lrsheading', 'cmi5launch'));
-        
+                                       
         // Actor account homePage.
         $mform->addElement(
             'text',

@@ -20,28 +20,25 @@
  * @copyright  2023 Megan Bohland
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-//namespace cmi5;
-//For some reason using the namespace cmi5; here breaks the code.
-//It cannot find html_table class.
 
+use mod_cmi5launch\local\progress;
+use mod_cmi5launch\local\session_helpers;
+use mod_cmi5launch\local\au_helpers;
 
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require('header.php');
 
-//For connecting to Progress class - MB
-require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/Progress.php");
-require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/sessionHelpers.php");
 require_once("$CFG->dirroot/lib/outputcomponents.php");
 
 global $cmi5launch, $USER;
 
 //Classes and functions 
-$aus_helpers = new Au_Helpers;
-$ses_helpers = new Session_Helpers;
+$aus_helpers = new au_helpers;
+$ses_helpers = new session_helpers;
 $progress = new progress;
-$getProgress = $progress->getRetrieveStatement();
+$getProgress = $progress->get_cmi5launch_retrieve_statements();
 $updateSession = $ses_helpers->getUpdateSession();
-$getAUs = $aus_helpers->getAUsFromDB();
+$getAUs = $aus_helpers->get_cmi5launch_retrieve_aus_from_db();
 
 // Trigger module viewed event.
 $event = \mod_cmi5launch\event\course_module_viewed::create(array(

@@ -20,32 +20,30 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-// namespace cmi5;
- //For some reason using the namespace cmi5; here breaks the code.
-//It cannot find html_table class.
 
+use mod_cmi5launch\local\progress;
+use mod_cmi5launch\local\course;
+use mod_cmi5launch\local\cmi5_connectors;
+use mod_cmi5launch\local\au_helpers;
+use mod_cmi5launch\local\session_helpers;
+
+require_once("../../config.php");
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require('header.php');
-require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/Progress.php");
-require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/course.php");
-require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/cmi5Connector.php");
-require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/ausHelpers.php");
-require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/sessionHelpers.php");
-require_once("$CFG->dirroot/lib/outputcomponents.php");
 
 //bring in functions from class Progress and AU helpers, Connectors
 $progress = new progress;
-$aus_helpers = new Au_Helpers;
-$connectors = new cmi5Connectors;
-$ses_helpers = new Session_Helpers;
+$aus_helpers = new au_helpers;
+$connectors = new cmi5_connectors;
+$ses_helpers = new session_helpers;
 
 //Functions from other classes
-$saveAUs = $aus_helpers->getSaveAUs();
-$createAUs = $aus_helpers->getCreateAUs();
-$getAUs = $aus_helpers->getAUsFromDB();
+$cmi5launch_save_aus = $aus_helpers->get_cmi5launch_save_aus();
+$cmi5launch_create_aus = $aus_helpers->get_cmi5launch_create_aus();
+$getAUs = $aus_helpers->get_cmi5launch_retrieve_aus_from_db();
 $getRegistration = $connectors->getRegistrationPost();
 $getRegistrationInfo = $connectors->getRegistrationGet();
-$getProgress = $progress->getRetrieveStatement();
+$getProgress = $progress->get_cmi5launch_retrieve_statements();
 $updateSession = $ses_helpers->getUpdateSession();
 
 global $cmi5launch, $USER, $mod;
@@ -156,7 +154,7 @@ if($exists == false){
 
     //Retrieve AU ids for this user/course 
     $aus = json_decode($record->aus);
-    $auIDs = $saveAUs($createAUs($aus));
+    $auIDs = $cmi5launch_save_aus($cmi5launch_create_aus($aus));
     $usersCourse->aus = (json_encode($auIDs));
     //Save new record to DB
     $DB->insert_record('cmi5launch_course', $usersCourse);
@@ -200,7 +198,7 @@ foreach($auIDs as $key  => $auID){
 	$au = $getAUs($auID);
 
     //Verify object is an au object
-    if (!is_a($au, 'Au')) {
+    if (!is_a($au, 'mod_cmi5launch\local\au', false)) {
     
         $reason = "Excepted AU, found ";
         var_dump($au);

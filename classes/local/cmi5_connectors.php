@@ -1,20 +1,43 @@
 <?php
-//Class to hold ways to communicate with CMI5 player through its API's -MB
-//namespace cmi5;
 
-class cmi5Connectors{
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-    public function getCreateTenant(){
-        return [$this, 'createTenant'];
+/**
+ * //Class to hold ways to communicate with CMI5 player through its API's -MB
+ *
+ * @copyright  2023 Megan Bohland
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+
+ namespace mod_cmi5launch\local;
+ 
+class cmi5_connectors{
+
+    public function cmi5launch_get_create_tenant(){
+        return [$this, 'cmi5launch_create_tenant'];
     }
-    public function getRetrieveToken(){
-        return [$this, 'retrieveToken'];
+    public function cmi5launch_get_retrieve_token(){
+        return [$this, 'cmi5launch_retrieve_token'];
     }
-    public function getRetrieveUrl(){
-        return [$this, 'retrieveUrl'];
+    public function cmi5launch_get_retrieve_url(){
+        return [$this, 'cmi5launch_retrieve_url'];
     }
-    public function getCreateCourse(){
-        return [$this, 'createCourse'];
+    public function cmi5launch_get_create_course(){
+        return [$this, 'cmi5launch_create_course'];
     }
     public function getSessions(){
         return [$this, 'retrieveSessionInfo'];
@@ -31,7 +54,7 @@ class cmi5Connectors{
     // @param $token - tenant bearer token
     // @param $fileName - The filename of the course to be imported, to be added to url POST request 
     // @return  $result - Response from cmi5 player
-    public function createCourse($id, $tenantToken, $fileName){
+    public function cmi5launch_create_course($id, $tenantToken, $fileName){
 
         global $DB, $CFG;
         $settings = cmi5launch_settings($id);
@@ -77,7 +100,7 @@ class cmi5Connectors{
     // @param $pass - password 
     // @param $newTenantName - the name the new tenant will be, retreived from Tenant Name textbox
     /////
-    public function createTenant($urlToSend, $user, $pass, $newTenantName){
+    public function cmi5launch_create_tenant($urlToSend, $user, $pass, $newTenantName){
 
         global $CFG;
         //retrieve and assign params
@@ -242,7 +265,7 @@ class cmi5Connectors{
     // @param $pass - password
     // @param $audience - the name the of the audience using the token,
     // @param #tenantId - the id of the tenant
-     function retrieveToken($urlToSend, $user, $pass, $audience, $tenantId){
+     function cmi5launch_retrieve_token($urlToSend, $user, $pass, $audience, $tenantId){
 
         global $CFG;
         //retrieve and assign params
@@ -280,7 +303,7 @@ class cmi5Connectors{
     //@param $auID -AU id to pass to cmi5 for url request
     //@return $url - The launch URL returned from cmi5 player
     ////////
-    public function retrieveUrl($id, $auIndex){
+    public function cmi5launch_retrieve_url($id, $auIndex){
 		//TODO, this needs to be changed to have an if its one old call, if its not, new call
         //MB
         global $DB, $USER;

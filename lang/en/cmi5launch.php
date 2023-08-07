@@ -191,8 +191,8 @@ $string['cmi5packagetext'] = 'You can populate the Launch URL and Activity ID se
 $string['lrsheading'] = 'LRS settings';
 $string['lrsdefaults'] = 'LRS Default Settings';
 $string['lrssettingdescription'] = 'By default, this activity uses the global LRS settings found in Site administration > Plugins > Activity modules > cmi5 Launch Link. To change the settings for this specific activity, select Unlock Defaults.';
-$string['overridedefaults'] = 'Unlock Defaults';
-$string['overridedefaults_help'] = 'Allows activity to have different LRS settings than the site-wide, default LRS settings.';
+//$string['overridedefaults'] = 'Unlock Defaults';
+//$string['overridedefaults_help'] = 'Allows activity to have different LRS settings than the site-wide, default LRS settings.';
 
 $string['behaviorheading'] = 'Module behavior';
 

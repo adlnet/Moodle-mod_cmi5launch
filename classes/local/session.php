@@ -15,39 +15,25 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- *Class to handle invidual courses
- *experimental 
+ *Class to handle Sessions. 
  *
  * @copyright  2023 Megan Bohland
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-class course {
+namespace mod_cmi5launch\local;
+
+class session {
   // Properties
-  public $id, $url, $type, $lmsid, $grade, $scores, $title, $moveon, $auindex, $parents, $objectives, $description = [], $activitytype, $launchmethod, $masteryscore, $satisfied ;
-public $courseid; //The id assigned by cmi5
-public $userid; //The user id who is taking the course
-  public $returnurl; //the users returnurl? needed?
-  public $registrationid; //the registration id assigned by the CMI5 player
-  public $aus = array(); //array of AUs in the course
+  //$id is session id
+  public $id, $tenantname, $tenantId, $registrationsCoursesAusId, $lmsid, $firstlaunch, $lastlaunch, 
+  $progress = [], $auid, $aulaunchurl, $launchurl, 
+  $completed_passed, $grade, $registrationid, $lrscode, 
+  $createdAt, $updatedAt, $registrationCourseAusId, 
+  $code, $lastRequestTime, $launchTokenId, $launchMode, $masteryScore, 
+  $contextTemplate, $isLaunched, $isInitialized, $initializedAt, $isCompleted, 
+  $isPassed, $isFailed, $isTerminated, $isAbandoned, $courseid;
 
-
-  //Do we needs 'sessions? todo
-
-
-  //Holds launch url, this may be the way to have separate sessions.
-  public $launchurl, $sessionid;
-
-  //Maybe an array will hold info better
-  //I'm thinkig sessionId->launchurl (for that session)
-  public $sessions = array(); //Sessions still needed?
-  
-
-  //These may be needed later if AU's become part of a block to keep track of 
-  //being finished.
-  public $progress;
-  
-  public  $noattempt = true|false;
 
   //Why did I ake these arrays? they should just be bools
   public $completed, $passed, $inprogress = true | false;
@@ -62,16 +48,12 @@ public $userid; //The user id who is taking the course
     return $this->name;
   }
 
-//Constructs courses. Is fed array and where array key matches property, sets the property.  
+//Constructs sessionss. Is fed array and where array key matches property, sets the property.  
 function __construct($statement){
 
   foreach($statement as $key => $value){
     
-    //If the key exists as a property, set it.
-    if(property_exists($this, $key) ){
-      
-      $this->$key = ($value);
-    }
+    $this->$key = ($value);
 	}	
 
 }
