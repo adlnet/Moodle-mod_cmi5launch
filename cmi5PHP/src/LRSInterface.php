@@ -23,7 +23,7 @@ interface LRSInterface
 
     public function saveStatement($statement);
     public function saveStatements($statements);
-    public function retrieveStatement($id);
+    public function cmi5launch_retrieve_statements($id);
     public function retrieveVoidedStatement($id);
     public function queryStatements($query);
     public function moreStatements($moreUrl);

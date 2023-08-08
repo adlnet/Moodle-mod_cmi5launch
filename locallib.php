@@ -29,7 +29,13 @@ defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->dirroot/mod/cmi5launch/lib.php");
 
 //Classes for connecting to CMI5 player
-require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/cmi5Connector.php");
+use mod_cmi5launch\au;
+use mod_cmi5launch\local\progress;
+use mod_cmi5launch\local\course;
+use mod_cmi5launch\local\cmi5_connectors;
+use mod_cmi5launch\local\au_helpers;
+use mod_cmi5launch\local\session_helpers;
+
 
 
 /**
@@ -170,12 +176,12 @@ function cmi5launch_get_launch_url($registrationuuid, $auID) {
             break;
     }
 //to bring in functions from class cmi5Connector
-$connectors = new cmi5Connectors;
+$connectors = new cmi5_connectors;
 //Get retrieve URL function
-$retrieveUrl = $connectors->getRetrieveUrl();
+$cmi5launch_retrieve_url = $connectors->cmi5launch_get_retrieve_url();
 //See here we are passing the auid. If we have session ids will we pass those instead
 //or is that a whole new func, I think it may be
-//$rtnstring = $retrieveUrl($cmi5launch->id, $auID); 
+//$rtnstring = $cmi5launch_retrieve_url($cmi5launch->id, $auID); 
 
 //return $rtnstring;
 }

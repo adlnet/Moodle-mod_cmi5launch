@@ -21,10 +21,15 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+ use mod_cmi5launch\au;
+ use mod_cmi5launch\local\progress;
+ use mod_cmi5launch\local\course;
+ use mod_cmi5launch\local\cmi5_connectors;
+ use mod_cmi5launch\local\au_helpers;
+ use mod_cmi5launch\local\session_helpers;
 
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once('header.php');
-require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/src/sessionHelpers.php");
 
 global $CFG, $cmi5launch, $USER, $DB;
 
@@ -38,13 +43,13 @@ $event->add_record_snapshot('cmi5launch', $cmi5launch);
 $event->trigger();
 
 //External class and funcs to use
-$aus_helpers = new Au_Helpers;
-$connectors = new cmi5Connectors;
-$ses_helpers = new Session_Helpers;
+$aus_helpers = new au_helpers;
+$connectors = new cmi5_connectors;
+$ses_helpers = new session_helpers;
 
 $saveSession = $ses_helpers->getSaveSession();
-$retrieveUrl = $connectors->getRetrieveUrl();
-$getAUs = $aus_helpers->getAUsFromDB();
+$cmi5launch_retrieve_url = $connectors->cmi5launch_get_retrieve_url();
+$getAUs = $aus_helpers->get_cmi5launch_retrieve_aus_from_db();
 
 //Retrieve registration id and au index (from AUview.php)
 $fromAUview = required_param('launchform_registration', PARAM_TEXT);
@@ -89,7 +94,7 @@ if ($idAndStatus[0] == "true") {
 	$auIndex = $au->auindex;
 
 	//Pass in the au index to retrieve a launchurl and session id
-	$urlDecoded = $retrieveUrl($cmi5launch->id, $auIndex);
+	$urlDecoded = $cmi5launch_retrieve_url($cmi5launch->id, $auIndex);
 
 	//Retrieve and store session id in the aus table
 	$sessionID = intval($urlDecoded['id']);

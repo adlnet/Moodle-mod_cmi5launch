@@ -191,8 +191,8 @@ $string['cmi5packagetext'] = 'You can populate the Launch URL and Activity ID se
 $string['lrsheading'] = 'LRS settings';
 $string['lrsdefaults'] = 'LRS Default Settings';
 $string['lrssettingdescription'] = 'By default, this activity uses the global LRS settings found in Site administration > Plugins > Activity modules > cmi5 Launch Link. To change the settings for this specific activity, select Unlock Defaults.';
-$string['overridedefaults'] = 'Unlock Defaults';
-$string['overridedefaults_help'] = 'Allows activity to have different LRS settings than the site-wide, default LRS settings.';
+//$string['overridedefaults'] = 'Unlock Defaults';
+//$string['overridedefaults_help'] = 'Allows activity to have different LRS settings than the site-wide, default LRS settings.';
 
 $string['behaviorheading'] = 'Module behavior';
 
@@ -232,7 +232,7 @@ $string['cmi5launchviewgradeheader'] = 'Grade';
 // View settings.
 $string['cmi5launchviewAUname'] = 'Name';
 $string['cmi5launchviewstatus'] = 'Status';
-$string['cmi5launchviewregistrationheader'] = 'Registrations';
+$string['cmi5launchviewregistrationheader'] = 'Sessions';
 $string['cmi5launchviewgradeheader'] = 'Grade';
 $string['cmi5launchviewlaunchlink'] = 'view';
 $string['AUtableheader'] = 'Assignable Units';
@@ -240,7 +240,7 @@ $string['AUtableheader'] = 'Assignable Units';
 
 $string['cmi5launch_completed'] = 'Experience complete!';
 $string['cmi5launch_progress'] = 'Attempt in progress.';
-$string['cmi5launch_attempt'] = 'Start New Registration';
+$string['cmi5launch_attempt'] = 'Start New Session';
 $string['cmi5launch_notavailable'] = 'The Learning Record Store is not available. Please contact a system administrator.
 
 If you are the system administrator, go to Site admin / Development / Debugging and set Debug messages to DEVELOPER. Set it back to NONE or MINIMAL once the error details have been recorded.';

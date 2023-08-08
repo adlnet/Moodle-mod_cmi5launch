@@ -2,8 +2,8 @@
 namespace cmi5Test;
 
 use PHPUnit\Framework\TestCase;
-use Au;
-use Au_Helpers;
+use au;
+use au_helpers;
 
 /**
  * Tests for AuHelpers class.
@@ -87,7 +87,7 @@ class AusHelpersTest extends TestCase
     //Retrieve Aus parses and returns AUs from large statements from the CMI5 player
     //So to test, maybe make a statement and ensure the test value is returned? 
     //Arbitrarily pick a word and put in right place? See if it is returned?
-    public function testRetrieveAus()
+    public function testcmi5launch_retrieve_aus()
     {
     //It's not just returning it, it's splitting it into chuncks~!
 
@@ -197,9 +197,9 @@ class AusHelpersTest extends TestCase
         
         );
 
-       $helper = new Au_Helpers();
+       $helper = new au_helpers();
         //So now with this fake 'statement', lets ensure it pulls the correct value which is "correct Retrieval"
-        $retrieved = $helper->retrieveAus($mockStatement);
+        $retrieved = $helper->cmi5launch_retrieve_aus($mockStatement);
 
    
         //It should retrieve the mock aus
@@ -218,7 +218,7 @@ class AusHelpersTest extends TestCase
     }
 
     //Test function that is fed an array of statments and returns an array of aus
-    public function testCreateAus()
+    public function testcmi5launch_create_aus()
     {
         //Should be enough to pass the mock statement values here, make an array of them first
         $testStatements = array();
@@ -228,15 +228,15 @@ class AusHelpersTest extends TestCase
             $testStatements[$i][] = $this->mockStatementValues;
         }
     
-        $helper = new Au_Helpers();
+        $helper = new au_helpers();
         //So now with this fake 'statement', lets ensure it pulls the correct value which is "correct Retrieval"
-        $auList = $helper->createAus($testStatements);
+        $auList = $helper->cmi5launch_create_aus($testStatements);
         
         //There should be a total of 4 Aus in this array
         $this->assertCount(4, $auList, "Expected retrieved statement to have four aus");
         //And they should all be au objects
         foreach ($auList as $au) {
-            $this->assertInstanceOf(Au::class, $au, "Expected retrieved statement to be an array of aus");
+            $this->assertInstanceOf(au::class, $au, "Expected retrieved statement to be an array of aus");
         }
     }
 
@@ -246,7 +246,7 @@ class AusHelpersTest extends TestCase
     //We just need tothat it saves the correct values and CALLS insert_record
     //Technically this function returns ids, so we can make a stub which just returns ids
     //This will test it is called without messing with the DB
-    public function testSaveAus()
+    public function testcmi5launch_save_aus()
     {
 
     }   

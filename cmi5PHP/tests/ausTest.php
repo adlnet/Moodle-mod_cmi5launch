@@ -2,7 +2,7 @@
 namespace cmi5Test;
 
 use PHPUnit\Framework\TestCase;
-use Au;
+use au;
 
 /**
  * Class AuTest.
@@ -10,7 +10,7 @@ use Au;
  * @copyright 2023 Megan Bohland
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
- * @covers \Au
+ * @covers \au
  */
 class AusTest extends TestCase
 {
@@ -84,10 +84,10 @@ class AusTest extends TestCase
 
     public function testInstantiationWithEmpty()
     {
-        $obj = new Au($this->emptyStatement);
+        $obj = new au($this->emptyStatement);
 
         //Is an AU object
-        $this->assertInstanceOf('Au', $obj);
+        $this->assertInstanceOf('au', $obj);
         //It is saying AU is not transversable
         //Implementing traversable in AU is breaking the code,
         //Make sure the AU object does not have any 'extra' properties, only the amount passed in
@@ -107,10 +107,10 @@ class AusTest extends TestCase
 
     public function testInstantiationWithValues()
     {
-        $obj = new Au($this->mockStatementValues);
+        $obj = new au($this->mockStatementValues);
 
         //Is an AU object
-        $this->assertInstanceOf('Au', $obj);
+        $this->assertInstanceOf('au', $obj);
         //It is saying AU is not transversable
         //Implementing traversable in AU is breaking the code,
         //Make sure the AU object does not have any 'extra' properties, only the amount passed in
