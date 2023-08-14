@@ -47,7 +47,7 @@ $aus_helpers = new au_helpers;
 $connectors = new cmi5_connectors;
 $ses_helpers = new session_helpers;
 
-$saveSession = $ses_helpers->getSaveSession();
+$saveSession = $ses_helpers->cmi5launch_get_create_session();
 $cmi5launch_retrieve_url = $connectors->cmi5launch_get_retrieve_url();
 $getAUs = $aus_helpers->get_cmi5launch_retrieve_aus_from_db();
 

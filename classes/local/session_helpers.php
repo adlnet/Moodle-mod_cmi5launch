@@ -29,28 +29,28 @@ use mod_cmi5launch\local\session;
 class session_helpers
 {
 
-	public function getSaveSession()
+	public function cmi5launch_get_create_session()
 	{
-		return [$this, 'createSession'];
+		return [$this, 'cmi5launch_create_session'];
 	}
 
-	public function getUpdateSession()
+	public function cmi5launch_get_update_session()
 	{
-		return [$this, 'updateSessions'];
+		return [$this, 'cmi5launch_update_sessions'];
 	}
 
-	public function getSessionFromDB()
+	public function cmi5launch_get_retrieve_sessions_from_db()
 	{
-		return [$this, 'cmi5launch_retrieve_aus_from_db'];
+		return [$this, 'cmi5launch_retrieve_sessions_from_db'];
 	}
 
 	/**
 	 * Gets updated session information from CMI5 player
-	 * @param mixed $sessionID - the session id
-	 * @param mixed $cmi5Id - cmi5 instance id
+	 * @param mixed $sessionid - the session id
+	 * @param mixed $cmi5id - cmi5 instance id
 	 * @return session
 	 */
-	function updateSessions($sessionID, $cmi5Id)
+	function cmi5launch_update_sessions($sessionid, $cmi5id)
 	{
 		global $CFG, $DB;
 
@@ -58,10 +58,10 @@ class session_helpers
 		$getSessionInfo = $connector->getSessions();
 
 		//Get the session from DB with session id
-		$session = $this->cmi5launch_retrieve_aus_from_db($sessionID);
+		$session = $this->cmi5launch_retrieve_sessions_from_db($sessionid);
 
 		//This is sessioninfo from CMI5 player
-		$sessionInfo =	$getSessionInfo($sessionID, $cmi5Id);
+		$sessionInfo =	$getSessionInfo($sessionid, $cmi5id);
 
 		//Update session
 		foreach($sessionInfo as $key => $value){
@@ -84,12 +84,12 @@ class session_helpers
 
 	/**
 	 * Creates a session record in DB
-	 * @param mixed $sessId - the session id
+	 * @param mixed $sessionid - the session id
 	 * @param mixed $launchurl - the launch url
-	 * @param mixed $launchMethod - the launch method
+	 * @param mixed $launchmethod - the launch method
 	 * @return void
 	 */
-	function createSession($sessId, $launchurl, $launchMethod)
+	function cmi5launch_create_session($sessionid, $launchurl, $launchmethod)
 	{
 		global $DB, $CFG, $cmi5launch, $USER;
 	
@@ -99,10 +99,10 @@ class session_helpers
 		//Make a newRecord to save
 		$newRecord = new \stdClass();
 		//Because of many nested properties, needs to be done manually
-		$newRecord->sessionid = $sessId;
+		$newRecord->sessionid = $sessionid;
 		$newRecord->launchurl = $launchurl;
 		$newRecord->tenantname = $USER->username;
-		$newRecord->launchmethod = $launchMethod;
+		$newRecord->launchmethod = $launchmethod;
 
 		//Save
 		$DB->insert_record($table, $newRecord, true);
@@ -110,26 +110,26 @@ class session_helpers
 
 	/**
 	 * Retrieves session from DB
-	 * @param mixed $sessionID - the session id
+	 * @param mixed $sessionid - the session id
 	 * @return session
 	 */
-	function cmi5launch_retrieve_aus_from_db($sessionID)
+	function cmi5launch_retrieve_sessions_from_db($sessionid)
 	{
 		global $DB, $CFG;
 
-		$check = $DB->record_exists('cmi5launch_sessions', ['sessionid' => $sessionID], '*', IGNORE_MISSING);
+		$check = $DB->record_exists('cmi5launch_sessions', ['sessionid' => $sessionid], '*', IGNORE_MISSING);
 
 		//If check is negative, the record does not exist. Throw error
 		if (!$check) {
 
 			echo "<p>Error attempting to get session data from DB. Check session id.</p>";
 			echo "<pre>";
-			var_dump($sessionID);
+			var_dump($sessionid);
 			echo "</pre>";
 		
 		} else {
 
-			$sessionItem = $DB->get_record('cmi5launch_sessions',  array('sessionid' => $sessionID));
+			$sessionItem = $DB->get_record('cmi5launch_sessions',  array('sessionid' => $sessionid));
 
 			$session = new session($sessionItem);
 			

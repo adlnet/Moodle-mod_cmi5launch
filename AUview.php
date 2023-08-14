@@ -36,8 +36,8 @@ global $cmi5launch, $USER;
 $aus_helpers = new au_helpers;
 $ses_helpers = new session_helpers;
 $progress = new progress;
-$getProgress = $progress->get_cmi5launch_retrieve_statements();
-$updateSession = $ses_helpers->getUpdateSession();
+$getProgress = $progress->cmi5launch_get_retrieve_statements();
+$updateSession = $ses_helpers->cmi5launch_get_update_session();
 $getAUs = $aus_helpers->get_cmi5launch_retrieve_aus_from_db();
 
 // Trigger module viewed event.

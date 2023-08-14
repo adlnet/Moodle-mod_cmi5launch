@@ -54,13 +54,13 @@ class cmi5_connectors{
     // @param $token - tenant bearer token
     // @param $fileName - The filename of the course to be imported, to be added to url POST request 
     // @return  $result - Response from cmi5 player
-    public function cmi5launch_create_course($id, $tenantToken, $fileName){
+    public function cmi5launch_create_course($id, $tenanttoken, $fileName){
 
         global $DB, $CFG;
         $settings = cmi5launch_settings($id);
 
         //retrieve and assign params
-        $token = $tenantToken;
+        $token = $tenanttoken;
         $file = $fileName;
 
         //Build URL to import course to
@@ -100,14 +100,14 @@ class cmi5_connectors{
     // @param $pass - password 
     // @param $newTenantName - the name the new tenant will be, retreived from Tenant Name textbox
     /////
-    public function cmi5launch_create_tenant($urlToSend, $user, $pass, $newTenantName){
+    public function cmi5launch_create_tenant($urltosend, $user, $pass, $newtenantname){
 
         global $CFG;
         //retrieve and assign params
-        $url = $urlToSend;
+        $url = $urltosend;
         $username = $user;
         $password = $pass;
-        $tenant = $newTenantName;
+        $tenant = $newtenantname;
     
         //the body of the request must be made as array first
         $data = array(
@@ -194,7 +194,7 @@ class cmi5_connectors{
     //Registration  is "code" in returned json body
     //@param $courseID
     // @param $id 
-    function retrieveRegistrationPost($courseId, $id){
+    function retrieveRegistrationPost($courseid, $id){
 
         global $USER;
 
@@ -214,7 +214,7 @@ class cmi5_connectors{
 
         //the body of the request must be made as array first
         $data = array(
-            'courseId' => $courseId,
+            'courseId' => $courseid,
             'actor' => array(
                 'account' => array(
                     "homePage" => $homepage,
@@ -265,15 +265,15 @@ class cmi5_connectors{
     // @param $pass - password
     // @param $audience - the name the of the audience using the token,
     // @param #tenantId - the id of the tenant
-     function cmi5launch_retrieve_token($urlToSend, $user, $pass, $audience, $tenantId){
+     function cmi5launch_retrieve_token($urltosend, $user, $pass, $audience, $tenantid){
 
         global $CFG;
         //retrieve and assign params
-        $url = $urlToSend;
+        $url = $urltosend;
         $username = $user;
         $password = $pass;
         $tokenUser = $audience;
-        $id = $tenantId;
+        $id = $tenantid;
     
         //the body of the request must be made as array first
         $data = array(
@@ -303,7 +303,7 @@ class cmi5_connectors{
     //@param $auID -AU id to pass to cmi5 for url request
     //@return $url - The launch URL returned from cmi5 player
     ////////
-    public function cmi5launch_retrieve_url($id, $auIndex){
+    public function cmi5launch_retrieve_url($id, $auindex){
 		//TODO, this needs to be changed to have an if its one old call, if its not, new call
         //MB
         global $DB, $USER;
@@ -329,7 +329,7 @@ class cmi5_connectors{
 		$courseId = $usersCourse->courseid;
 
         //Build URL for launch URL request
-	    $url = $playerUrl . "/api/v1/course/" . $courseId  ."/launch-url/" . $auIndex;
+	    $url = $playerUrl . "/api/v1/course/" . $courseId  ."/launch-url/" . $auindex;
 
         $data = array(
             'actor' => array(
@@ -382,10 +382,10 @@ class cmi5_connectors{
         //@param ...$tenantInfo is a variable length param. If one is passed, it is $token, if two it is $username and $password
         ///@return - $result is the response from cmi5 player
         /////
-        public function sendRequest($dataBody, $urlDest, ...$tenantInfo) {
-            $data = $dataBody;
-            $url = $urlDest;
-            $tenantInformation = $tenantInfo;
+        public function sendRequest($databody, $urldest, ...$tenantinfo) {
+            $data = $databody;
+            $url = $urldest;
+            $tenantInformation = $tenantinfo;
     
                 //If number of args is greater than one it is for retrieving tenant info and args are username and password
                 if(count($tenantInformation) > 1 ){
@@ -448,11 +448,11 @@ class cmi5_connectors{
 
     /**
     *Retrieve session info from cmi5player
-    * @param mixed $sessionId - the session id to retrieve
+    * @param mixed $sessionid - the session id to retrieve
      * @param mixed $id - cmi5 id
      * @return mixed
      */
-    public function retrieveSessionInfo($sessionId, $id){
+    public function retrieveSessionInfo($sessionid, $id){
 
         global $DB;
 
@@ -462,7 +462,7 @@ class cmi5_connectors{
 		$playerUrl = $settings['cmi5launchplayerurl'];
 
         //Build URL for launch URL request
-	    $url = $playerUrl . "/api/v1/session/" . $sessionId;
+	    $url = $playerUrl . "/api/v1/session/" . $sessionid;
 
 		// use key 'http' even if you send the request to https://...
         //There can be multiple headers but as an array under the ONE header

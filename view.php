@@ -43,8 +43,8 @@ $cmi5launch_create_aus = $aus_helpers->get_cmi5launch_create_aus();
 $getAUs = $aus_helpers->get_cmi5launch_retrieve_aus_from_db();
 $getRegistration = $connectors->getRegistrationPost();
 $getRegistrationInfo = $connectors->getRegistrationGet();
-$getProgress = $progress->get_cmi5launch_retrieve_statements();
-$updateSession = $ses_helpers->getUpdateSession();
+$getProgress = $progress->cmi5launch_get_retrieve_statements();
+$updateSession = $ses_helpers->cmi5launch_get_update_session();
 
 global $cmi5launch, $USER, $mod;
 

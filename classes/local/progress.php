@@ -25,17 +25,17 @@ namespace mod_cmi5launch\local;
 
 class progress{
 
-	public function get_cmi5launch_retrieve_statements()
+	public function cmi5launch_get_retrieve_statements()
 	{
 	    return [$this, 'cmi5launch_retrieve_statements'];
 	}
 
-	public function get_cmi5launch_request_completion_info()
+	public function cmi5launch_get_request_completion_info()
 	{
 		return [$this, 'cmi5launch_request_completion_info'];
 	}
 
-	public function get_cmi5launch_request_statements_from_lrs()
+	public function cmi5launch_get_request_statements_from_lrs()
 	{
 	    return [$this, 'cmi5launch_request_statements_from_lrs'];
 	}
@@ -57,7 +57,26 @@ class progress{
 			'since' => $session->createdAt
 		);
 
+		//Testing-MB
+		//Ok, is there a problem with the session? or registrationp? Why would that change from one program to another
+		echo"<br>";
+		echo("What is our registrationid?");
+		var_dump($registrationid);
+		echo"<br>";
+		echo("What is our session->createdAt?");
+		var_dump($session->createdAt);
+		echo"<br>";
+		
 		$statements = $this->cmi5launch_send_request_to_lrs($data, $registrationid);
+
+		//Testing-MB
+		//It would seem they are NOT coming back, what are statements here??
+		echo"<br>";
+		echo("Are statements coming back?");
+		var_dump($statements);
+		echo"<br>";
+
+
 		//The results come back as nested array under more then statements. We only want statements, and we want them unique
 		$statement = array_chunk($statements["statements"], 1);
 
@@ -69,6 +88,14 @@ class progress{
 			$current = ($statement[$i]);
 		array_push($result, array ($registrationid => $current) );
 		}
+
+		//Testing-MB
+		//IS anything being returned?
+		echo"<br>";
+		echo("Are results coming back?");
+		var_dump($result);
+		echo"<br>";
+
 	
 		return $result;
 	}
@@ -89,9 +116,27 @@ class progress{
 		//Build query with data above
 		$url = $url . '?' . http_build_query($data,"", '&',  PHP_QUERY_RFC1738);
 
+		//Testing-MB
+		//I wonder if the url has something to do with it?
+		echo"<br>";
+		echo("What is our url at this point?");
+		echo"<br>";
+		var_dump($url);
+		echo"<br>";
+		
 		//LRS username and password
 		$user = $settings['cmi5launchlrslogin'];
 		$pass = $settings['cmi5launchlrspass'];
+
+		//Testing-MB
+		//I woulllllllllllllllllllllllllllllllllllllllld bet money this is it! the suer settings are wrong?
+		echo"<br>";
+		var_dump($user);
+		echo"<br>";
+		//See we have it set to be TENANT name, but it's not! The tenant name should be sent to player, not lrs?
+		//wait, no this SHOULD be right, what is pass as well
+		var_dump($pass);
+		echo"<br>";
 
 		// use key 'http' even if you send the request to https://...
 		//There can be multiple headers but as an array under the ONE header
@@ -111,39 +156,53 @@ class progress{
 		//sends the stream to the specified URL and stores results (the false is use_include_path, which we dont want in this case, we want to go to the url)
 		$result = file_get_contents( $url, false, $context );
 
+		//Testing-MB
+		//So the issue must stem from talking to lrs, what is our result here? what is it sending  back?
+		echo"<br>";
+		echo("What is our result?");
+		var_dump($result);
+		echo"<br>";
+
 		$resultDecoded = json_decode($result, true);
+
+		//Testing-MB
+		//And if result is ok, is the problem resultDecoded?
+		echo"<br>";
+		echo("What is our resultDecoded?");
+		var_dump($resultDecoded);
+		echo"<br>";
 		
 		return $resultDecoded;
 	}
 	
 	/**
 	 * Returns an actor (name) retrieved from collected LRS data based on registration id
-	 * @param mixed $resultChunked - data retrieved from LRS, usually an array
+	 * @param mixed $resultarray - data retrieved from LRS, usually an array
 	 * @param mixed $i - the registration id
 	 * @return mixed - actor
 	 */
-	public function cmi5launch_retrieve_actor($info, $registrationid){
+	public function cmi5launch_retrieve_actor($resultarray, $registrationid){
 
-		$actor = $info[$registrationid][0]["actor"]["account"]["name"];
+		$actor = $resultarray[$registrationid][0]["actor"]["account"]["name"];
 		return $actor;
 	}
 
 		/**
 	 * Returns a verb retrieved from collected LRS data based on registration id
 	 * @param mixed $resultarray - data retrieved from LRS, usually an array
-	 * @param mixed $i - the registration id
+	 * @param mixed $registrationid - the registration id
 	 * @return mixed - verb
 	 */
-	public function cmi5launch_retrieve_verbs($resultarray, $i){
+	public function cmi5launch_retrieve_verbs($resultarray, $registrationid){
 
 		//Some verbs do not have an easy to display 'language' option, we need to check if 'display' is present			
-		$verbInfo = $resultarray[$i][0]["verb"];
+		$verbInfo = $resultarray[$registrationid][0]["verb"];
 		$display = array_key_exists("display", $verbInfo);
 
 			//If it is null then there is no display, so go by verb id
 			if(!$display ){
 				//retrieve id
-				$verbId = $resultarray[$i][0]["verb"]["id"];
+				$verbId = $resultarray[$registrationid][0]["verb"]["id"];
 
 				//SPLITS id in two on 'verbs/', we want the end which is the actual verb
 				$split = explode('verbs/', $verbId);
@@ -151,7 +210,7 @@ class progress{
 
 			}else{
 				//IF it is not null then there is a language easy to read version of verb display, such as 'en' or 'en-us'
-				$verbLang =  $resultarray[$i][0]["verb"]["display"];
+				$verbLang =  $resultarray[$registrationid][0]["verb"]["display"];
 				//Retreive the language
 				$lang = array_key_first($verbLang);
 				//use it to retreive verb
@@ -313,6 +372,11 @@ class progress{
 
 		$resultDecoded = $this->cmi5launch_request_statements_from_lrs($registrationid, $session);
 
+		//Testing-MB
+		echo"<br>";
+		echo("Since it's annoying lets also test here, are statements being returnes?");
+		var_dump($resultDecoded);
+		echo"<br>";
 			//We need to sort the statements by finding their session id
 			//parse through array 'ext' to find the one holding session id, 
 			//grab id and go with it
@@ -335,7 +399,11 @@ class progress{
 
 			//Now if code equals currentSessID, this is a statement pertaining to this session
 			if($code == $currentSessID){
-			
+
+				//Testing-MB
+				echo"<br>";
+				echo("AH! what about here? does code equal currensesid? Are we in here?");
+				echo"<br>";
 				$actor = $this->cmi5launch_retrieve_actor($singleStatment, $registrationid);
 				$verb = $this->cmi5launch_retrieve_verbs($singleStatment, $registrationid);
 				$object = $this->cmi5launch_retrieve_name($singleStatment, $registrationid);
