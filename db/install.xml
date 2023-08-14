@@ -18,7 +18,6 @@
         <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="This is the course id returned by cmi5"/>
         <FIELD NAME="cmi5verbid" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Launch URL"/>
         <FIELD NAME="cmi5expiry" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="365" SEQUENCE="false" COMMENT="Number of days to expire completion after"/>
-        <FIELD NAME="overridedefaults" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false" COMMENT="Determines if the activity is inheriting the global defaults or has overriden them at the activity level."/>
         <FIELD NAME="cmi5multipleregs" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
