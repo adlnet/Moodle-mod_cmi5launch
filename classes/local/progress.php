@@ -57,15 +57,6 @@ class progress{
 			'since' => $session->createdAt
 		);
 
-		//Testing-MB
-		//Ok, is there a problem with the session? or registrationp? Why would that change from one program to another
-		echo"<br>";
-		echo("What is our registrationid?");
-		var_dump($registrationid);
-		echo"<br>";
-		echo("What is our session->createdAt?");
-		var_dump($session->createdAt);
-		echo"<br>";
 		
 		$statements = $this->cmi5launch_send_request_to_lrs($data, $registrationid);
 

@@ -40,7 +40,7 @@ class cmi5_connectors{
         return [$this, 'cmi5launch_create_course'];
     }
     public function getSessions(){
-        return [$this, 'retrieveSessionInfo'];
+        return [$this, 'cmi5launch_retrieve_session_info_from_player'];
     }
     public function getRegistrationPost(){
         return [$this, 'retrieveRegistrationPost'];
@@ -54,36 +54,35 @@ class cmi5_connectors{
     // @param $token - tenant bearer token
     // @param $fileName - The filename of the course to be imported, to be added to url POST request 
     // @return  $result - Response from cmi5 player
-    public function cmi5launch_create_course($id, $tenanttoken, $fileName){
+    public function cmi5launch_create_course($id, $tenanttoken, $filename){
 
         global $DB, $CFG;
         $settings = cmi5launch_settings($id);
 
         //retrieve and assign params
         $token = $tenanttoken;
-        $file = $fileName;
+        $file = $filename;
 
         //Build URL to import course to
         $url= $settings['cmi5launchplayerurl'] . "/api/v1/course" ;
-       
-        echo "Something went wrong? What is url?";
-        echo "<br>";
-        var_dump($url);        
-        echo "<br>";
 
         //the body of the request must be made as array first
         $data = $file;
   
         //sends the stream to the specified URL 
-        $result = $this->sendRequest($data, $url, $token);
+        $result = $this->cmi5launch_send_request_to_player($data, $url, $token);
 
         if ($result === FALSE) {
 
             if ($CFG->debugdeveloper) {
-                echo "Something went wrong sending the request";
+                echo "Something went wrong creating the course ";
                 echo "<br>";
                 echo "Response from CMI5 player: ";
                 var_dump($result);
+                echo "Sending file: ";
+                var_dump($file);
+                echo "to url: ";
+                var_dump($url);
                 echo "<br>";
             }
 	     } else {
@@ -114,13 +113,18 @@ class cmi5_connectors{
             'code' => $tenant);
     
         //sends the stream to the specified URL 
-        $result = $this->sendRequest($data, $url, $username, $password);
+        $result = $this->cmi5launch_send_request_to_player($data, $url, $username, $password);
 
         if ($result === FALSE){
             if ($CFG->debugdeveloper)  {
-                    echo "Something went wrong!";
-                    echo "<br>";
-                    var_dump($_SESSION);
+                echo "Something went wrong with creating a tenant ";
+                echo "<br>";
+                echo"Response from CMI5 player: ";
+                var_dump($result);
+                echo"Sending code is (tenant name to be created): ";
+                var_dump($tenant);
+                echo"to url: ";
+                var_dump($url);
                 }
         }
         
@@ -168,9 +172,14 @@ class cmi5_connectors{
         if ($result === FALSE){
 
             if ($CFG->debugdeveloper)  {
-                echo "Something went wrong!";
+                echo "Something went wrong retrieving registration info!";
                 echo "<br>";
-                var_dump($_SESSION);
+                echo"Response from CMI5 player: ";
+                var_dump($result);
+                echo"Sending registration: ";
+                var_dump($registration);
+                echo"to url: ";
+                var_dump($url);
                 }
         }
         else{
@@ -243,9 +252,18 @@ class cmi5_connectors{
         if ($result === FALSE){
 
             if ($CFG->debugdeveloper)  {
-                echo "Something went wrong!";
+                echo "Something went wrong creating registration id";
                 echo "<br>";
-                var_dump($_SESSION);
+                echo"Response from CMI5 player: ";
+                var_dump($result);
+                echo"Sending course id: ";
+                var_dump($courseid);
+                echo"Sending actor: ";
+                var_dump($actor);
+                echo"Sending homepage: ";    
+                var_dump($homepage);
+                echo"to url: ";
+                var_dump($url);
                 }
         }
         else{
@@ -282,14 +300,21 @@ class cmi5_connectors{
         );
     
         //sends the stream to the specified URL 
-        $token = $this->sendRequest($data, $url, $username, $password);
+        $token = $this->cmi5launch_send_request_to_player($data, $url, $username, $password);
 
         if ($token === FALSE){
 
             if ($CFG->debugdeveloper)  {
-                echo "Something went wrong!";
+                echo "Something went wrong with retrieving a token ";
                 echo "<br>";
-                var_dump($_SESSION);
+                echo"Response from CMI5 player: ";
+                var_dump($token);
+                echo"Sending course id: ";
+                var_dump($id);
+                echo"Sending audience: ";
+                var_dump($tokenUser);
+                echo"to url: ";
+                var_dump($url);
                 }
         }
         else{
@@ -320,10 +345,7 @@ class cmi5_connectors{
 		
         $homepage = $settings['cmi5launchcustomacchp'];
         $returnUrl =$usersCourse->returnurl;
-		//MB
-        //We need to change this to actor name, not tenant
         $actor= $USER->username;
-        //$actor= $settings['cmi5launchtenantname'];
 		$token = $settings['cmi5launchtenanttoken'];
 		$playerUrl = $settings['cmi5launchplayerurl'];
 		$courseId = $usersCourse->courseid;
@@ -341,7 +363,11 @@ class cmi5_connectors{
             'returnUrl' => $returnUrl,
             'reg' => $registrationID
         );
+      
+        //sends the stream to the specified URL 
+         $launchResponse = $this->cmi5launch_send_request_to_player($data, $url, $token);
 
+   /*
 		// use key 'http' even if you send the request to https://...
         //There can be multiple headers but as an array under the ONE header
         //content(body) must be JSON encoded here, as that is what CMI5 player accepts
@@ -363,12 +389,34 @@ class cmi5_connectors{
 
         //sends the stream to the specified URL and stores results (the false is use_include_path, which we dont want in this case, we want to go to the url)
         $launchResponse = file_get_contents( $url, false, $context );
-
-        //here may be the problem, what is being sent back?
-        echo"<br>";
-        echo" This is swhat is bein sent back>:";
-        var_dump($launchResponse);
-        ECHO"<br>";
+*/
+        if($launchResponse === FALSE){
+            echo "Something went wrong with retrieving launch URL";
+            echo "<br>";
+            echo"Response from CMI5 player: ";
+            var_dump($launchResponse);
+            echo"Sending actor: ";
+            var_dump($actor);
+            echo"Sending homepage: ";    
+            var_dump($homepage);
+            echo"Sending return url: ";    
+            var_dump($returnUrl);
+            echo"Sending registration id: ";    
+            var_dump($registrationID);
+            echo"Sending course id: ";    
+            var_dump($courseId);
+            echo"Sending au index: ";    
+            var_dump($auindex);
+            echo"to url: ";
+            var_dump($url);
+        }
+        else{
+            //decode returned response into array
+            $returnedInfo = json_decode($launchResponse, true);
+            
+            //Return an array with tenant name and info
+            return $returnedInfo;
+        }
         //Only return the URL
 		$urlDecoded = json_decode($launchResponse, true);
 
@@ -382,7 +430,7 @@ class cmi5_connectors{
         //@param ...$tenantInfo is a variable length param. If one is passed, it is $token, if two it is $username and $password
         ///@return - $result is the response from cmi5 player
         /////
-        public function sendRequest($databody, $urldest, ...$tenantinfo) {
+        public function cmi5launch_send_request_to_player($databody, $urldest, ...$tenantinfo) {
             $data = $databody;
             $url = $urldest;
             $tenantInformation = $tenantinfo;
@@ -414,7 +462,7 @@ class cmi5_connectors{
                     //return response
                     return $result;
                 }
-            //Else the args are what we need for posting a course
+            //Else the args are what we need for posting a course, or retrieving a launch url
           	  else{
 
 				//First arg will be token
@@ -452,7 +500,7 @@ class cmi5_connectors{
      * @param mixed $id - cmi5 id
      * @return mixed
      */
-    public function retrieveSessionInfo($sessionid, $id){
+    public function cmi5launch_retrieve_session_info_from_player($sessionid, $id){
 
         global $DB;
 
