@@ -339,16 +339,16 @@ class cmi5_connectors{
         //Here's the trouble, still getting reggistration id from master RECORD
 		$settings = cmi5launch_settings($id);
      
-        $usersCourse = $DB->get_record('cmi5launch_course', ['courseid'  => $record->courseid, 'userid'  => $USER->id]);
+        $userscourse = $DB->get_record('cmi5launch_course', ['courseid'  => $record->courseid, 'userid'  => $USER->id]);
 
-		$registrationID = $usersCourse->registrationid;
+		$registrationID = $userscourse->registrationid;
 		
         $homepage = $settings['cmi5launchcustomacchp'];
-        $returnUrl =$usersCourse->returnurl;
+        $returnUrl =$userscourse->returnurl;
         $actor= $USER->username;
 		$token = $settings['cmi5launchtenanttoken'];
 		$playerUrl = $settings['cmi5launchplayerurl'];
-		$courseId = $usersCourse->courseid;
+		$courseId = $userscourse->courseid;
 
         //Build URL for launch URL request
 	    $url = $playerUrl . "/api/v1/course/" . $courseId  ."/launch-url/" . $auindex;
@@ -364,10 +364,6 @@ class cmi5_connectors{
             'reg' => $registrationID
         );
       
-        //sends the stream to the specified URL 
-         $launchResponse = $this->cmi5launch_send_request_to_player($data, $url, $token);
-
-   /*
 		// use key 'http' even if you send the request to https://...
         //There can be multiple headers but as an array under the ONE header
         //content(body) must be JSON encoded here, as that is what CMI5 player accepts
@@ -389,7 +385,7 @@ class cmi5_connectors{
 
         //sends the stream to the specified URL and stores results (the false is use_include_path, which we dont want in this case, we want to go to the url)
         $launchResponse = file_get_contents( $url, false, $context );
-*/
+
         if($launchResponse === FALSE){
             echo "Something went wrong with retrieving launch URL";
             echo "<br>";
@@ -431,6 +427,7 @@ class cmi5_connectors{
         ///@return - $result is the response from cmi5 player
         /////
         public function cmi5launch_send_request_to_player($databody, $urldest, ...$tenantinfo) {
+            
             $data = $databody;
             $url = $urldest;
             $tenantInformation = $tenantinfo;
@@ -462,7 +459,7 @@ class cmi5_connectors{
                     //return response
                     return $result;
                 }
-            //Else the args are what we need for posting a course, or retrieving a launch url
+            //Else the args are what we need for posting a course
           	  else{
 
 				//First arg will be token

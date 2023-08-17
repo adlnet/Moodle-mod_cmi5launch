@@ -43,13 +43,13 @@ $event->add_record_snapshot('cmi5launch', $cmi5launch);
 $event->trigger();
 
 //External class and funcs to use
-$aus_helpers = new au_helpers;
+$auhelper = new au_helpers;
 $connectors = new cmi5_connectors;
-$ses_helpers = new session_helpers;
+$sessionhelper = new session_helpers;
 
-$saveSession = $ses_helpers->cmi5launch_get_create_session();
+$saveSession = $sessionhelper->cmi5launch_get_create_session();
 $cmi5launch_retrieve_url = $connectors->cmi5launch_get_retrieve_url();
-$getAUs = $aus_helpers->get_cmi5launch_retrieve_aus_from_db();
+$retrieveaus = $auhelper->get_cmi5launch_retrieve_aus_from_db();
 
 //Retrieve registration id and au index (from AUview.php)
 $fromAUview = required_param('launchform_registration', PARAM_TEXT);
@@ -64,11 +64,11 @@ $id = array_shift($idAndStatus);
 $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
 
 //Retrieve user's course record
-$usersCourse = $DB->get_record('cmi5launch_course', ['courseid'  => $record->courseid, 'userid'  => $USER->id]);
+$userscourse = $DB->get_record('cmi5launch_course', ['courseid'  => $record->courseid, 'userid'  => $USER->id]);
 
 
 //Retrieve registration id
-$registrationid = $usersCourse->registrationid;
+$registrationid = $userscourse->registrationid;
 
 if (empty($registrationid)) {
 	echo "<div class='alert alert-error'>" . get_string('cmi5launch_regidempty', 'cmi5launch') . "</div>";
@@ -88,7 +88,7 @@ $location = "";
 if ($idAndStatus[0] == "true") {
         
 	//Retrieve AUs         
-	$au = $getAUs($id);
+	$au = $retrieveaus($id);
 
 	//Retrieve AU index
 	$auIndex = $au->auindex;

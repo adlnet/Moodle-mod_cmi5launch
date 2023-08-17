@@ -30,21 +30,22 @@ use mod_cmi5launch\local\session_helpers;
 require_once("../../config.php");
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require('header.php');
+require_login($course, false, $cm);
 
 //bring in functions from class Progress and AU helpers, Connectors
 $progress = new progress;
-$aus_helpers = new au_helpers;
+$auhelper = new au_helpers;
 $connectors = new cmi5_connectors;
-$ses_helpers = new session_helpers;
+$sessionhelper = new session_helpers;
 
 //Functions from other classes
-$cmi5launch_save_aus = $aus_helpers->get_cmi5launch_save_aus();
-$cmi5launch_create_aus = $aus_helpers->get_cmi5launch_create_aus();
-$getAUs = $aus_helpers->get_cmi5launch_retrieve_aus_from_db();
+$cmi5launch_save_aus = $auhelper->get_cmi5launch_save_aus();
+$cmi5launch_create_aus = $auhelper->get_cmi5launch_create_aus();
+$retrieveaus = $auhelper->get_cmi5launch_retrieve_aus_from_db();
 $getRegistration = $connectors->getRegistrationPost();
 $getRegistrationInfo = $connectors->getRegistrationGet();
-$getProgress = $progress->cmi5launch_get_retrieve_statements();
-$updateSession = $ses_helpers->cmi5launch_get_update_session();
+$getprogress = $progress->cmi5launch_get_retrieve_statements();
+$updatesession = $sessionhelper->cmi5launch_get_update_session();
 
 global $cmi5launch, $USER, $mod;
 
@@ -140,35 +141,35 @@ $exists = $DB->record_exists('cmi5launch_course', ['courseid'  => $record->cours
 //If it does not exist, create it
 if($exists == false){
 
-    $usersCourse = new course($record);
+    $userscourse = new course($record);
 
-    $usersCourse->userid = $USER->id;
+    $userscourse->userid = $USER->id;
     
     //Build url to pass as returnUrl
     $returnUrl = $CFG->wwwroot .'/mod/cmi5launch/view.php'. '?id=' .$cm->id;
-    $usersCourse->returnurl = $returnUrl;
+    $userscourse->returnurl = $returnUrl;
 
     //Assign new record a registration id
     $registrationID = $getRegistration($record->courseid, $cmi5launch->id);
-    $usersCourse->registrationid = $registrationID;
+    $userscourse->registrationid = $registrationID;
 
     //Retrieve AU ids for this user/course 
     $aus = json_decode($record->aus);
     $auIDs = $cmi5launch_save_aus($cmi5launch_create_aus($aus));
-    $usersCourse->aus = (json_encode($auIDs));
+    $userscourse->aus = (json_encode($auIDs));
     //Save new record to DB
-    $DB->insert_record('cmi5launch_course', $usersCourse);
+    $DB->insert_record('cmi5launch_course', $userscourse);
 
 }else{
 
     //Then we have a record, so we need to retrieve it
-    $usersCourse = $DB->get_record('cmi5launch_course', ['courseid'  => $record->courseid, 'userid'  => $USER->id]);
+    $userscourse = $DB->get_record('cmi5launch_course', ['courseid'  => $record->courseid, 'userid'  => $USER->id]);
     
     //Retrieve registration id
-    $registrationID = $usersCourse->registrationid; 
+    $registrationID = $userscourse->registrationid; 
 
     //Retrieve AU ids
-    $auIDs = (json_decode($usersCourse->aus) );
+    $auIDs = (json_decode($userscourse->aus) );
 }
 
 //Array to hold info for table population
@@ -195,7 +196,7 @@ $table->head = array(
 //Cycle through AU IDs
 foreach($auIDs as $key  => $auID){
 
-	$au = $getAUs($auID);
+	$au = $retrieveaus($auID);
 
     //Verify object is an au object
     if (!is_a($au, 'mod_cmi5launch\local\au', false)) {
@@ -269,10 +270,10 @@ foreach($auIDs as $key  => $auID){
 
 
             //Retrieve new info (if any) from CMI5 player on session	
-            $session = $updateSession($sessionID, $cmi5launch->id);
+            $session = $updatesession($sessionID, $cmi5launch->id);
 
             //Get progress from LRS
-            $session = $getProgress($registrationID, $cmi5launch->id, $session);
+            $session = $getprogress($registrationID, $cmi5launch->id, $session);
 
             //Add score to array for AU
             $sessionScores[] = $session->score;
@@ -351,7 +352,7 @@ foreach($auIDs as $key  => $auID){
 	}
 
 //Lastly, update our course table
-$updated = $DB->update_record("cmi5launch_course", $usersCourse);
+$updated = $DB->update_record("cmi5launch_course", $userscourse);
 
 //This feeds the table
 $table->data = $tableData;

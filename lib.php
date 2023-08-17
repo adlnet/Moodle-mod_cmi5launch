@@ -566,11 +566,11 @@ function cmi5launch_process_new_package($cmi5launch) {
     
 	//bring in functions from classes cmi5Connector/
 	$connectors = new cmi5_connectors;
-    $aus_helpers = new au_helpers;
+    $auhelper = new au_helpers;
 
 	//bring in functions from class cmi5_table_connectors and AU helpers
 	$cmi5launch_create_course = $connectors->cmi5launch_get_create_course();
-    $cmi5launch_retrieve_aus = $aus_helpers-> get_cmi5launch_retrieve_aus();
+    $cmi5launch_retrieve_aus = $auhelper-> get_cmi5launch_retrieve_aus();
     
     // Reload cmi5 instance.
     $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
