@@ -40,6 +40,74 @@ class progress{
 	    return [$this, 'cmi5launch_request_statements_from_lrs'];
 	}
 
+	//Changing this func as a test
+	/**
+	 * Send request to LRS
+	 * @param mixed $regId - registration id
+	 * @param mixed $session - a session object 
+	 * @return array
+	 */
+	public function cmi5launch_request_statements_from_lrs2($registrationid, $session /*$id*/){
+
+		//Array to hold result
+		$result = array();
+
+		//When searching by reg id, which is the option available to Moodle, many results are returned, so iterating through them is necessary
+		$data = array(
+			'registration' => $registrationid,
+			'since' => $session->createdAt
+		);
+
+		
+		$statements = $this->cmi5launch_send_request_to_lrs($data, $registrationid);
+
+		echo "what does this object look like?";
+		var_dump($statements);
+		echo "<br>";
+		echo "<br>";
+		echo "How about array_search?";
+		
+		//so apparently the key to nested arrays is foreach and is_array
+		foreach($statements as $key => $value){
+			if(is_array($value)){
+				echo"found array";
+				echo "<br>";
+				if(array_search("object", $value)){
+					echo "found it";
+				}
+				if(is_array($value)){
+					foreach($value as $key => $value){
+						if(is_array($value)){
+							if(array_search("object", $value)){
+								echo "found it";
+							}
+						}
+					}
+				}
+			}
+		}
+		var_dump(array_search("object", $statements));
+		echo "<br>";
+
+		echo "What about array_keys";
+		var_dump(array_keys($statements, "object"));
+		echo "End";
+	/*
+		//The results come back as nested array under more then statements. We only want statements, and we want them unique
+		$statement = array_chunk($statements["statements"], 1);
+
+		$length = count($statement);
+
+		for ($i = 0; $i < $length; $i++){
+		
+		//This separates the larger statement into the separate sessions and verbs
+			$current = ($statement[$i]);
+		array_push($result, array ($registrationid => $current) );
+		}
+	
+		return $result; */
+	}
+	
 	/**
 	 * Send request to LRS
 	 * @param mixed $regId - registration id
@@ -60,10 +128,31 @@ class progress{
 		
 		$statements = $this->cmi5launch_send_request_to_lrs($data, $registrationid);
 
-	
+		//Ok, here, what are statements here?
+		/*echo`<br>`;
+		echo "what does this object look like?";
+		var_dump($statements);
+		echo "<br>";
+		echo "<br>";
+		echo "and how does it look as plain json?";
+		echo json_encode($statements);
+		echo "<br>";
+		echo "<br>";
+	*/
 		//The results come back as nested array under more then statements. We only want statements, and we want them unique
-		$statement = array_chunk($statements["statements"], 1);
+		$statement = array_chunk($statements["statements"], 1) ;////!?//
 
+		//Ok, here, what are statements here?
+		/*echo`<br>`;
+		echo "what does this object look like AFTER CHUNKING?";
+		var_dump($statement);
+		echo "<br>";
+		echo "<br>";
+		echo "and how does it look as plain json AFTER HCUNKING?";
+		echo json_encode($statement);
+		echo "<br>";
+		echo "<br>";
+		*/
 		$length = count($statement);
 
 		for ($i = 0; $i < $length; $i++){
@@ -73,6 +162,18 @@ class progress{
 		array_push($result, array ($registrationid => $current) );
 		}
 	
+			//Ok, here, what are statements here?
+		/*	echo`<br>`;
+			echo "what does this object look like as a result?";
+			var_dump($result);
+			echo "<br>";
+			echo "<br>";
+			echo "and how does it look like as a result plain json";
+			echo json_encode($result);
+			echo "<br>";
+			echo "<br>";
+			*/
+
 		return $result;
 	}
 
@@ -130,8 +231,42 @@ class progress{
 	 */
 	public function cmi5launch_retrieve_actor($resultarray, $registrationid){
 
-		$actor = $resultarray[$registrationid][0]["actor"]["account"]["name"];
+
+		if (array_key_exists("actor", $resultarray[$registrationid][0])) 
+		{ //Print that it exists and it's value
+			if(array_key_exists("name", $resultarray[$registrationid][0]["actor"]))
+			{	
+				//So if it DOES exist, we want to parse it for it's name
+				$actor = $resultarray[$registrationid][0]["actor"]["name"];}
+			else{
+
+				$this->cmi5launch_statement_retrieval_error("Actor name");
+			}
+		}
+		else { //Print that it doesn't exist
+			
+			$this->cmi5launch_statement_retrieval_error("Actor object");
+
+		//$actor = $resultarray[$registrationid][0]["actor"]["account"]["name"];
 		return $actor;
+	}
+
+	//What if this class had it's own error function? That just inserts a variable that's missing? that would be easier 
+	//then 600 if statements. Then it can be if debug, call my werror function
+	//should it be if debug call this? OR just call this and have if debug in it? I think the second option is best
+	public function cmi5launch_statement_retrieval_error($missingvariable)
+	{
+		Global $CFG;
+		//If admin debugging is enabled
+		if($CFG->debugdeveloper){
+			//If the variable is missing
+			if(!$missingvariable){
+				//Print that it is missing
+				echo"<br>";
+				echo "Error: " . $missingvariable . " missing from statement";
+				echo "<br>";
+			}
+		}
 	}
 
 		/**
@@ -173,15 +308,72 @@ class progress{
 	 * @return mixed - object name
 	 */
 	public function cmi5launch_retrieve_name($resultarray, $registrationid){
-		//THIS is the SECOND chunk, this is the problem
+
+        
+
+
+		echo "<br>";
+		echo "resultarray in retrieve name is: ";
+		var_dump($resultarray);
+		echo "<br>";
+		echo"And as regular json it is:";
+		echo json_encode($resultarray);
+		echo "<br>";
+
+		//First find the object, it should always be second level of statement (so third level array).
+		if (array_key_exists("actor", $resultarray[$registrationid][0])) 
+		{ //Print that it exists and it's value
+			if(array_key_exists("name", $resultarray[$registrationid][0]["actor"]))
+			{	
+				//So if it DOES exist, we want to parse it for it's name
+				$actor = $resultarray[$registrationid][0]["actor"]["name"];}
+			else{
+
+				$this->cmi5launch_statement_retrieval_error("Actor name");
+			}
+		}
+		else { //Print that it doesn't exist
+			
+			$this->cmi5launch_statement_retrieval_error("Actor object");
 		$objectInfo = $resultarray[$registrationid][0]["object"];
+		
+	
+
 		$definition = array_key_exists("definition", $objectInfo);
 		//If it is null then there is no "definition", so go by object id
 		if(!$definition ){
+
+			//Is the issue it is not checking for whether or not defiiotn is null?
+			echo"<br>";
+			echo" are we in the first if loop?";
+			echo "What is definition here?";
+			var_dump($definition);
+			echo"<br>";
 			//retrieve id
 			$object = $resultarray[$registrationid][0]["object"]["id"];
+			//What is object here?
+			echo"<br>";
+			echo" What is object here?";
+			var_dump($object);
+			echo"<br>";
+
 			//I have noticed that in the LRS when it can't find a name it references the WHOLE id as in "actor did WHOLEID", so I will do the same here
 		}else{
+			echo"<br>";
+			echo"Or did we go to else? ";
+			echo"<br>";
+
+				echo "What is definition here?";
+			var_dump($definition);
+			echo"<br>";
+			//retrieve id
+			$object = $resultarray[$registrationid][0];
+			//What is object here?
+			echo"<br>";
+			echo" What is object it starting at here, at 0??";
+			var_dump($object);
+			echo"<br>";
+
 			//IF it is not null then there is a language easy to read version of object definition, such as 'en' or 'en-us'
 			$objectLang =  $resultarray[$registrationid][0]["object"]["definition"]["name"];
 			//Retreive the language
@@ -339,11 +531,22 @@ class progress{
 					}
 				}
 
+				//Ok, so HERE is where we have statments only pertaining to THIS sess and THIS regid
+				//So these are the statements we can look at the 2nd level for 'object' and 'verb', etc
+				//with array_search, or array_key_exists
+
 			//Now if code equals currentSessID, this is a statement pertaining to this session
 			if($code == $currentSessID){
 
 				$actor = $this->cmi5launch_retrieve_actor($singleStatment, $registrationid);
 				$verb = $this->cmi5launch_retrieve_verbs($singleStatment, $registrationid);
+				
+					//This is so hard to parse, can we make it json?
+		echo"start json";
+		echo"<br>";
+		echo json_encode($singleStatment);
+		echo"<br>";
+		echo"end json";
 				$object = $this->cmi5launch_retrieve_name($singleStatment, $registrationid);
 				$date = $this->cmi5launch_retrieve_timestamp($singleStatment, $registrationid);
 				$score = $this->cmi5launch_retrieve_score($singleStatment, $registrationid);
