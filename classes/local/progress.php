@@ -231,24 +231,37 @@ class progress{
 	 */
 	public function cmi5launch_retrieve_actor($resultarray, $registrationid){
 
+		// variable to hold actor.
+		$actor = "";
 
-		if (array_key_exists("actor", $resultarray[$registrationid][0])) 
-		{ //Print that it exists and it's value
-			if(array_key_exists("name", $resultarray[$registrationid][0]["actor"]))
-			{	
-				//So if it DOES exist, we want to parse it for it's name
-				$actor = $resultarray[$registrationid][0]["actor"]["name"];}
-			else{
+		if (array_key_exists("actor", $resultarray[$registrationid][0])) { //Print that it exists and it's value
+			
 
-				$this->cmi5launch_statement_retrieval_error("Actor name");
+			if (array_key_exists("account", $resultarray[$registrationid][0]["actor"])) {
+
+				if (array_key_exists("name", $resultarray[$registrationid][0]["actor"]["account"])) {
+
+					$actor = $resultarray[$registrationid][0]["actor"]["account"]["name"];
+
+				} else {
+
+					$this->cmi5launch_statement_retrieval_error("Actor name");
+
+				}
+			} else {
+				$this->cmi5launch_statement_retrieval_error("Actor account");
 			}
 		}
-		else { //Print that it doesn't exist
-			
-			$this->cmi5launch_statement_retrieval_error("Actor object");
+			else { //Print that it doesn't exist
+				
+				$this->cmi5launch_statement_retrieval_error("Actor object");
+	
 
-		//$actor = $resultarray[$registrationid][0]["actor"]["account"]["name"];
-		return $actor;
+		
+		
+	}
+
+	return $actor;
 	}
 
 	//What if this class had it's own error function? That just inserts a variable that's missing? that would be easier 
@@ -260,7 +273,7 @@ class progress{
 		//If admin debugging is enabled
 		if($CFG->debugdeveloper){
 			//If the variable is missing
-			if(!$missingvariable){
+			if($missingvariable){
 				//Print that it is missing
 				echo"<br>";
 				echo "Error: " . $missingvariable . " missing from statement";
@@ -277,28 +290,50 @@ class progress{
 	 */
 	public function cmi5launch_retrieve_verbs($resultarray, $registrationid){
 
+		global $CFG;
+		$verb = "";
 		//Some verbs do not have an easy to display 'language' option, we need to check if 'display' is present			
-		$verbInfo = $resultarray[$registrationid][0]["verb"];
-		$display = array_key_exists("display", $verbInfo);
+		//$verbInfo = $resultarray[$registrationid][0]["verb"];
+		//$display = array_key_exists("display", $verbInfo);
 
-			//If it is null then there is no display, so go by verb id
-			if(!$display ){
+		if (array_key_exists("verb", $resultarray[$registrationid][0])) { //Print that it exists and it's value
+
+			if(array_key_exists("display", $resultarray[$registrationid][0]["verb"])){
+				
+			// Retrieve the name of the verb,
+				//However, there may be more than one languages string to choose from. First we want to 
+				//select the language that matches the language of the course, then if not available, the first key.
+				$verbArray = $resultarray[$registrationid][0]["verb"]["display"];
+
+				// System language setting
+				$language = $CFG->lang;
+				if (array_key_exists($language, $verbArray)) {
+					$verb = $verbArray[$language];
+				} else {
+					$defaultLanguage = array_key_first($verbArray);
+					$verb = $verbArray[$defaultLanguage];
+				}
+				return $verb;
+				
+			} elseif(array_key_exists("id", $resultarray[$registrationid][0]["verb"])) {
+			//If it is null then there is no display section, default to verb id
+			
 				//retrieve id
 				$verbId = $resultarray[$registrationid][0]["verb"]["id"];
 
 				//SPLITS id in two on 'verbs/', we want the end which is the actual verb
 				$split = explode('verbs/', $verbId);
 				$verb = $split[1];
-
-			}else{
-				//IF it is not null then there is a language easy to read version of verb display, such as 'en' or 'en-us'
-				$verbLang =  $resultarray[$registrationid][0]["verb"]["display"];
-				//Retreive the language
-				$lang = array_key_first($verbLang);
-				//use it to retreive verb
-				$verb = [$verbLang][0][$lang];
+				return $verb;
 			}
-			return $verb;
+			else{
+				$this->cmi5launch_statement_retrieval_error("Verb id and display missing ");
+			}
+		
+		}
+		else {
+			$this->cmi5launch_statement_retrieval_error("Verb object ");
+		}
 	}
 
 	/**
@@ -307,82 +342,54 @@ class progress{
 	 * @param mixed $registrationid - the registration id
 	 * @return mixed - object name
 	 */
-	public function cmi5launch_retrieve_name($resultarray, $registrationid){
+	public function cmi5launch_retrieve_object_name($resultarray, $registrationid)
+	{
 
-        
-
-
-		echo "<br>";
-		echo "resultarray in retrieve name is: ";
-		var_dump($resultarray);
-		echo "<br>";
-		echo"And as regular json it is:";
-		echo json_encode($resultarray);
-		echo "<br>";
-
+		Global $CFG;
 		//First find the object, it should always be second level of statement (so third level array).
-		if (array_key_exists("actor", $resultarray[$registrationid][0])) 
-		{ //Print that it exists and it's value
-			if(array_key_exists("name", $resultarray[$registrationid][0]["actor"]))
-			{	
-				//So if it DOES exist, we want to parse it for it's name
-				$actor = $resultarray[$registrationid][0]["actor"]["name"];}
-			else{
-
-				$this->cmi5launch_statement_retrieval_error("Actor name");
-			}
-		}
-		else { //Print that it doesn't exist
+		if (array_key_exists("object", $resultarray[$registrationid][0])) { //Print that it exists and it's value
 			
-			$this->cmi5launch_statement_retrieval_error("Actor object");
-		$objectInfo = $resultarray[$registrationid][0]["object"];
-		
+			if (array_key_exists("definition", $resultarray[$registrationid][0]["object"])) {
+				
+				//if 'definition' exists, check if 'name' does
+				if (array_key_exists("name", $resultarray[$registrationid][0]["object"]["definition"])) {
+					
+					//retrieve the name
+					//However, there may be more than one languages string to choose from. First we want to 
+					//select the language that matches the language of the course, then if not available, the first key.
+					$objectArray = $resultarray[$registrationid][0]["object"]["definition"]["name"];
+
+					// System language setting
+					$language = $CFG->lang;
+					if (array_key_exists($language, $objectArray)) {
+						$object = $objectArray[$language];
+					} else {
+						$defaultLanguage = array_key_first($objectArray);
+						$object = $objectArray[$defaultLanguage];
+					}
+					return $object;
+				}
+					
+					//If name is missing check for id
+				}elseif(array_key_exists("id", $resultarray[$registrationid][0]["object"])){
+					
+						//retrieve id
+						$object = $resultarray[$registrationid][0]["object"]["id"];	
+						return $object;			
+				}else
+					//if both name and id are missing throw error
+					$this->cmi5launch_statement_retrieval_error("Object name and id ");
+			
 	
+		} else { //Print that it doesn't exist
 
-		$definition = array_key_exists("definition", $objectInfo);
-		//If it is null then there is no "definition", so go by object id
-		if(!$definition ){
-
-			//Is the issue it is not checking for whether or not defiiotn is null?
-			echo"<br>";
-			echo" are we in the first if loop?";
-			echo "What is definition here?";
-			var_dump($definition);
-			echo"<br>";
-			//retrieve id
-			$object = $resultarray[$registrationid][0]["object"]["id"];
-			//What is object here?
-			echo"<br>";
-			echo" What is object here?";
-			var_dump($object);
-			echo"<br>";
-
-			//I have noticed that in the LRS when it can't find a name it references the WHOLE id as in "actor did WHOLEID", so I will do the same here
-		}else{
-			echo"<br>";
-			echo"Or did we go to else? ";
-			echo"<br>";
-
-				echo "What is definition here?";
-			var_dump($definition);
-			echo"<br>";
-			//retrieve id
-			$object = $resultarray[$registrationid][0];
-			//What is object here?
-			echo"<br>";
-			echo" What is object it starting at here, at 0??";
-			var_dump($object);
-			echo"<br>";
-
-			//IF it is not null then there is a language easy to read version of object definition, such as 'en' or 'en-us'
-			$objectLang =  $resultarray[$registrationid][0]["object"]["definition"]["name"];
-			//Retreive the language
-			$lang = array_key_first($objectLang);
-			//use it to retreive verb
-			$object = [$objectLang][0][$lang];
+			$this->cmi5launch_statement_retrieval_error("Object ");
+			//$objectInfo = $resultarray[$registrationid][0]["object"];
 		}
-		return $object;
+
+		
 	}
+
 	/**
 	 * TODO MB - This is able to get all results for later grading
 	 * Result params when returned with statements can have 5 fields (not including extensions)
@@ -439,14 +446,20 @@ class progress{
 	 */
 	public function cmi5launch_retrieve_timestamp($resultarray, $registrationid){
 		
+		if (array_key_exists("timestamp", $resultarray[$registrationid][0])) { //Print that it exists and it's value
+			
+			$date = new \DateTime($resultarray[$registrationid][0]["timestamp"], new \DateTimeZone('US/Eastern'));
 		
-		$date = new \DateTime($resultarray[$registrationid][0]["timestamp"], new \DateTimeZone('US/Eastern'));
-		
-		$date->setTimezone(new \DateTimeZone('America/New_York'));
+			$date->setTimezone(new \DateTimeZone('America/New_York'));
 
-		$date = $date->format('d-m-Y' . " ".  'h:i a');
+			$date = $date->format('d-m-Y' . " ".  'h:i a');
 
 		return $date;
+		
+		} else { //Print that it doesn't exist
+			$this->cmi5launch_statement_retrieval_error("Timestamp ");
+		}
+		
 	}
 
 	/**
@@ -463,35 +476,41 @@ class progress{
 		$score = null;
 
 		//Verify this statement has a 'result' param
-		if (array_key_exists("result", $resultarray[$registrationid][0] ) )
-		{
-			//If it exists, grab it
-			$resultInfo = $resultarray[$registrationid][0]["result"];
-		
-			$score = array_key_exists("score", $resultInfo);
+		// Note there is no catch error here. There may not be a score and that's ok.
+		if (array_key_exists("result", $resultarray[$registrationid][0])) {
+
+
+			if (array_key_exists("score", $resultarray[$registrationid][0]["result"])) {
+
+				$score = $resultarray[$registrationid][0]["result"]["score"];
+
+				//Raw score preferred to scaled
+				if ($score["raw"]) {
+
+					$returnScore = $score["raw"];
+					return $returnScore;
+				} elseif ($score["scaled"]) {
+
+					$returnScore = round($score["scaled"], 2);
+					return $returnScore;
+				}
+
+			}
 
 		}
-		
-			//If it is null then the item in question doesn't exist in this statement
-		if ($score) {
+		else{
+			Global $CFG;
+			//If admin debugging is enabled
+			if($CFG->debugdeveloper){
 
-			$score = $resultarray[$registrationid][0]["result"]["score"];
-
-			//Raw score preferred to scaled
-			if($score["raw"]){
-		
-				$returnScore = $score["raw"];
-				return $returnScore;
+					//Print that it is missing
+					echo"<br>";
+					echo "No score in this statement.";
+					echo "<br>";
+				}
 			}
-			elseif($score["scaled"]){
-		
-				$returnScore = round($score["scaled"], 2) ;
-				return $returnScore;
-			}
-			
-		}
-	
 	}
+	
 	
 	/**
 	 * Summary of cmi5launch_retrieve_statements
@@ -515,14 +534,14 @@ class progress{
 			//parse through array 'ext' to find the one holding session id, 
 			//grab id and go with it
 
-		foreach($resultDecoded as $singleStatment){
+		foreach($resultDecoded as $singleStatement){
 
 			//We need to sort the statements by finding their session id
 			//parse through array 'ext' to find the one holding session id, 
 			//grab id and go and compare to saved session 'code'
 			$code = $session->code;
 			$currentSessID = "";
-			$ext = $singleStatment[$registrationid][0]["context"]["extensions"];
+			$ext = $singleStatement[$registrationid][0]["context"]["extensions"];
 				foreach ($ext as $key => $value) {
 				
 					//if key contains "sessionid" in string
@@ -538,18 +557,19 @@ class progress{
 			//Now if code equals currentSessID, this is a statement pertaining to this session
 			if($code == $currentSessID){
 
-				$actor = $this->cmi5launch_retrieve_actor($singleStatment, $registrationid);
-				$verb = $this->cmi5launch_retrieve_verbs($singleStatment, $registrationid);
+				$actor = $this->cmi5launch_retrieve_actor($singleStatement, $registrationid);
+				$verb = $this->cmi5launch_retrieve_verbs($singleStatement, $registrationid);
 				
 					//This is so hard to parse, can we make it json?
-		echo"start json";
+		/*echo"start json";
 		echo"<br>";
-		echo json_encode($singleStatment);
+		echo json_encode($singleStatement);
 		echo"<br>";
 		echo"end json";
-				$object = $this->cmi5launch_retrieve_name($singleStatment, $registrationid);
-				$date = $this->cmi5launch_retrieve_timestamp($singleStatment, $registrationid);
-				$score = $this->cmi5launch_retrieve_score($singleStatment, $registrationid);
+		*/
+				$object = $this->cmi5launch_retrieve_object_name($singleStatement, $registrationid);
+				$date = $this->cmi5launch_retrieve_timestamp($singleStatement, $registrationid);
+				$score = $this->cmi5launch_retrieve_score($singleStatement, $registrationid);
 				
 				//If a session has more than one score, we only want the highest
 				if(!$score == null && $score > $returnScore){
