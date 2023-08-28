@@ -30,7 +30,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-// cmi5PHP - required for interacting with the LRS in cmi5launch_get_statements.
+// Cmi5PHP - required for interacting with the LRS in cmi5launch_get_statements.
 require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/autoload.php");
 
 // SCORM library from the SCORM module. Required for its xml2Array class by cmi5launch_process_new_package.
@@ -44,8 +44,8 @@ $cmi5launchsettings = null;
 
 // Moodle Core API.
 
-//TODO- this is where we add  functions for grades we want  suchs as FEATURE_GRADE_HAS_GRADE
-//For now I added those SCORM had, we can whittle this down
+// TODO- this is where we add  functions for grades we want suchs as FEATURE_GRADE_HAS_GRADE.
+// For now I added those SCORM had, we can whittle this down. -MB.
 /**
  * Returns the information on whether the module supports a feature
  *
@@ -63,20 +63,18 @@ function cmi5launch_supports($feature) {
             return true;
         case FEATURE_BACKUP_MOODLE2:
             return true;
-            /////////////////
-        case FEATURE_GROUPS:                  
+        case FEATURE_GROUPS:
             return true;
-        case FEATURE_GROUPINGS:              
+        case FEATURE_GROUPINGS:
             return true;
-        case FEATURE_GRADE_HAS_GRADE:         
+        case FEATURE_GRADE_HAS_GRADE:
             return true;
-        case FEATURE_GRADE_OUTCOMES:          
+        case FEATURE_GRADE_OUTCOMES:
             return true;
-        case FEATURE_SHOW_DESCRIPTION:        
+        case FEATURE_SHOW_DESCRIPTION:
             return true;
-        case FEATURE_MOD_PURPOSE:             
+        case FEATURE_MOD_PURPOSE:
             return MOD_PURPOSE_CONTENT;
-        //////////////////////
         default:
             return null;
     }
@@ -96,6 +94,7 @@ function cmi5launch_supports($feature) {
  */
 
 function cmi5launch_add_instance(stdClass $cmi5launch, mod_cmi5launch_mod_form $mform = null) {
+
     global $DB, $CFG;
 
     $cmi5launch->timecreated = time();
@@ -105,7 +104,7 @@ function cmi5launch_add_instance(stdClass $cmi5launch, mod_cmi5launch_mod_form $
 
     $cmi5launchlrs = cmi5launch_build_lrs_settings($cmi5launch);
 
-    //We removed this part pof lrs box -MB
+    // We removed this part of lrs box -MB.
     /*
     // Determine if override defaults checkbox is checked or we need to save watershed creds.
     if ($cmi5launch->overridedefaults == '1' || $cmi5launchlrs->lrsauthentication == '2') {
@@ -116,10 +115,11 @@ function cmi5launch_add_instance(stdClass $cmi5launch, mod_cmi5launch_mod_form $
             return false;
         }
     }
-*/
+    */
 
     // Process uploaded file.
     if (!empty($cmi5launch->packagefile)) {
+
         cmi5launch_process_new_package($cmi5launch);
     }
 
@@ -145,7 +145,7 @@ function cmi5launch_update_instance(stdClass $cmi5launch, mod_cmi5launch_mod_for
 
     $cmi5launchlrs = cmi5launch_build_lrs_settings($cmi5launch);
 
-    //We removed this part of lrs box -MB
+    // We removed this part of lrs box -MB
     /*
     // Determine if override defaults checkbox is checked.
     if ($cmi5launch->overridedefaults == '1') {
@@ -169,7 +169,7 @@ function cmi5launch_update_instance(stdClass $cmi5launch, mod_cmi5launch_mod_for
             }
         }
     }
-*/
+    */
 
     if (!$DB->update_record('cmi5launch', $cmi5launch)) {
         return false;
@@ -369,7 +369,7 @@ function cmi5launch_get_file_info($browser, $areas, $course, $cm, $context, $fil
 
         $urlbase = $CFG->wwwroot.'/pluginfile.php';
         if (!$storedfile = $fs->get_file($context->id, 'mod_cmi5launch', 'package', 0, $filepath, $filename)) {
-            if ($filepath === '/' and $filename === '.') {
+            if ($filepath === '/' && $filename === '.') {
                 $storedfile = new virtual_root_file($context->id, 'mod_cmi5launch', 'package', 0);
             } else {
                 // Not found.
@@ -419,8 +419,8 @@ function cmi5launch_pluginfile($course, $cm, $context, $filearea, $args, $forced
     $fs = get_file_storage();
 
     if (
-        !$file = $fs->get_file($context->id, 'mod_cmi5launch', $filearea, 0, '/'.$filepath.'/', $filename)
-        or $file->is_directory()
+        (!$file = $fs->get_file($context->id, 'mod_cmi5launch', $filearea, 0, '/'.$filepath.'/', $filename)) 
+        || ($file->is_directory())
     ) {
         if ($filearea === 'content') { // Return file not found straight away to improve performance.
             send_header_404();
@@ -539,8 +539,7 @@ function cmi5launch_get_completion_state($course, $cm, $userid, $type) {
     return $result;
 }
 
-// cmi5Launch specific functions.
-
+// Cmi5Launch specific functions.
 /*
 The functions below should really be in locallib, however they are required for one
 or more of the functions above so need to be here.
@@ -560,17 +559,18 @@ It looks like the standard Quiz module does that same thing, so I don't feel so 
  */
 
 function cmi5launch_process_new_package($cmi5launch) {
+
     global $DB, $CFG;
     $cmid = $cmi5launch->coursemodule;
     $context = context_module::instance($cmid);
-    
-	//bring in functions from classes cmi5Connector/
-	$connectors = new cmi5_connectors;
-    $aus_helpers = new au_helpers;
 
-	//bring in functions from class cmi5_table_connectors and AU helpers
-	$cmi5launch_create_course = $connectors->cmi5launch_get_create_course();
-    $cmi5launch_retrieve_aus = $aus_helpers-> get_cmi5launch_retrieve_aus();
+    // Bring in functions from classes cmi5Connector and AU helpers.
+    $connectors = new cmi5_connectors;
+    $auhelper = new au_helpers;
+
+    // Bring in functions from class cmi5_table_connectors and AU helpers.
+    $createcourse = $connectors->cmi5launch_get_create_course();
+    $retrieveaus = $auhelper-> get_cmi5launch_retrieve_aus();
     
     // Reload cmi5 instance.
     $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
@@ -592,7 +592,7 @@ function cmi5launch_process_new_package($cmi5launch) {
     if (count($files) < 1) {
         return false;
     }
-    
+
     $zipfile = reset($files);
     $zipfilename = $zipfile->get_filename();
 
@@ -600,57 +600,36 @@ function cmi5launch_process_new_package($cmi5launch) {
 
     $packagefile = $fs->get_file($context->id, 'mod_cmi5launch', 'package', 0, '/', $zipfilename);
  
-    //Retrieve user settings to apply to newly created record
+    // Retrieve user settings to apply to newly created record.
     $settings = cmi5launch_settings($cmi5launch->id);
     $token = $settings['cmi5launchtenanttoken'];
-    //Create the course and retrieve info for saving to DB
-    
-    //Lets wrap this in a try catch statement
-    $courseResults =  $cmi5launch_create_course($context->id, $token, $packagefile );
 
-	//Take the results of created course and save new course id to table
-    $record->courseinfo = $courseResults;
-    
-    $returnedInfo = json_decode($courseResults, true);
+    // Create the course and retrieve info for saving to DB.
+    $courseresults = $createcourse($context->id, $token, $packagefile);
 
-    //Retrieve the lmsId of course
-    $lmsId = $returnedInfo["lmsId"];
-    $record->cmi5activityid = $lmsId;
+	// Take the results of created course and save new course id to table.
+    $record->courseinfo = $courseresults;
 
-    $record->courseid = $returnedInfo["id"];
-    
-    //MB
-    //Here, does the course need registration at all? 
-	//retrieve reg
-	//$registration = $getRegistration($returnedInfo["id"], $cmi5launch->id);
-    //$record->registrationid = $registration;
+    $returnedinfo = json_decode($courseresults, true);
 
-    
-	//create url for sending to when requesting launch url for course 
-    $playerUrl = $settings['cmi5launchplayerurl'];
-    
-    //TODO - another ref to tenant name! Maybe here is a good place to change user?
-    //MB - no, this needs to be tenant name cause this is course creation
-    $tenantname = $settings['cmi5launchtenantname'];
-    
-    //Build and save launchurl
-    $url = $playerUrl . "/api/v1/". $record->courseid. "/launch-url/";
-	$record->launchurl = $url;
-    
-	//Retrieve the courses AUs and save to record
-	//Here it is saving to MASTER record, we need each student to have their own
+    // Retrieve the lmsId of course.
+    $lmsid = $returnedinfo["lmsId"];
+    $record->cmi5activityid = $lmsid;
 
+    $record->courseid = $returnedinfo["id"];
 
-    //Maybe in view.php it does this same thing, saving to the student record instead.
-    //so these stay as a 'master' record and the students tweak their own
-    $aus = ($cmi5launch_retrieve_aus($returnedInfo));
-    
-    //Maybe better to save AUs here and feed it the array returned by retreieveAUS
-	//$auIDs = $cmi5launch_save_aus($cmi5launch_create_aus($aus));
+    // Create url for sending to when requesting launch url for course.
+    $playerurl = $settings['cmi5launchplayerurl'];
+
+    // Build and save launchurl.
+    $url = $playerurl . "/api/v1/". $record->courseid. "/launch-url/";
+    $record->launchurl = $url;
+
+    $aus = ($retrieveaus($returnedinfo));
+
     $record->aus = (json_encode($aus));
 
-
-	//Populate player table with new course info
+	// Populate player table with new course info.
     $DB->update_record('cmi5launch', $record, true);
 
     $fs->delete_area_files($context->id, 'mod_cmi5launch', 'content');
@@ -673,7 +652,7 @@ function cmi5launch_process_new_package($cmi5launch) {
         $objxml = new xml2Array();
         $manifest = $objxml->parse($xmltext);
 
-	   // Update activity id from the first activity in cmi5.xml, if it is found.
+	    // Update activity id from the first activity in cmi5.xml, if it is found.
         // Skip without error if not. (The Moodle admin will need to enter the id manually).
         if (isset($manifest[0]["children"][0]["children"][0]["attrs"]["ID"])) {
             $record->cmi5activityid = $manifest[0]["children"][0]["children"][0]["attrs"]["ID"];
@@ -689,7 +668,7 @@ function cmi5launch_process_new_package($cmi5launch) {
         }
     }
     // Save reference.
-   ///turn off to trigger echo 
+    // Turn off to trigger echo.
    return $DB->update_record('cmi5launch', $record);
 }
 
@@ -833,7 +812,6 @@ function cmi5launch_getactor($instance) {
 }
 
 
-
 /**
  * Returns the LRS settings relating to a cmi5 Launch module instance
  *
@@ -842,10 +820,9 @@ function cmi5launch_getactor($instance) {
  * @param string $instance The Moodle id for the cmi5 module instance.
  * @return array LRS settings to use
  */
-
  function cmi5launch_settings($instance) {
     global $DB, $CFG, $cmi5launchsettings;
-    
+
     if (!is_null($cmi5launchsettings)) {
         return $cmi5launchsettings;
     }
@@ -857,7 +834,6 @@ function cmi5launch_getactor($instance) {
         $fields = '*',
         $strictness = IGNORE_MISSING
     );
-   
   
     // If global settings are not used, retrieve activity settings.
     if (!use_global_cmi5_lrs_settings($instance)) {
@@ -878,7 +854,7 @@ function cmi5launch_getactor($instance) {
     $expresult['cmi5launchlrsversion'] = '1.0.0';
 
     $cmi5launchsettings = $expresult;
-  
+
     return $expresult;
 }
 
@@ -891,7 +867,6 @@ function cmi5launch_getactor($instance) {
  * @param string $instance The Moodle id for the cmi5 module instance.
  * @return bool
  */
-
 function use_global_cmi5_lrs_settings($instance) {
     global $DB;
     // Determine if there is a row in cmi5launch_lrs matching the current activity id.
@@ -907,9 +882,9 @@ function use_global_cmi5_lrs_settings($instance) {
 
 /*
 
-//Grade functions
-//TODO - this is a copy of how scorm handles grades. I got these from SCORM's lib.php
-//We will need to tweak
+// Grade functions
+// TODO - this is a copy of how scorm handles grades. I got these from SCORM's lib.php
+// We will need to tweak
 /**
  * Return grade for given user or all users.
  *
@@ -922,28 +897,25 @@ function use_global_cmi5_lrs_settings($instance) {
 
 function cmi5_get_user_grades($cmi5launch, $userid=0) {
     global $CFG, $DB;
-    //What aer they pulling rom locallib?
-    //Do we need ot pul it as well?
-   // require_once($CFG->dirroot.'/mod/scorm/locallib.php');
 
     $grades = array();
 
-    //They are pulling mutliple beacue this may be ALL grades! Like x student had this and y student had that
-   //Because if the userid is empty they want all as opposed to a particulr student
+    // They are pulling mutliple beacue this may be ALL grades! Like x student had this and y student had that.
+    // Because if the userid is empty they want all as opposed to a particulr student.
     if (empty($userid)) {
         
-		//We are going to need to make CMI5_tables
-        //They retrieve the list of users
-        $au_users = $DB->get_records_select('scorm_scoes_track', "cmi5id=? GROUP BY userid",
+		// We are going to need to make CMI5_tables.
+        // They retrieve the list of users.
+        $users = $DB->get_records_select('scorm_scoes_track', "cmi5id=? GROUP BY userid",
                                             array($cmi5launch->id), "", "userid,null");
 
-        //if there is a list of users then they iterate through it and make user objects with the individual users                                    
-        if ($au_users) {
-            foreach ($au_users as $au_user) {
-                $grades[$au_user->userid] = new stdClass();
-                $grades[$au_user->userid]->id         = $au_user->userid;
-                $grades[$au_user->userid]->userid     = $au_user->userid;
-                $grades[$au_user->userid]->rawgrade = scorm_grade_user($cmi5launch, $au_user->userid);
+        // If there is a list of users then they iterate through it and make user objects with the individual users.
+        if ($users) {
+            foreach ($users as $user) {
+                $grades[$user->userid] = new stdClass();
+                $grades[$user->userid]->id         = $user->userid;
+                $grades[$user->userid]->userid     = $user->userid;
+                $grades[$user->userid]->rawgrade = scorm_grade_user($cmi5launch, $user->userid);
             }
         } else {
             return false;
@@ -967,31 +939,30 @@ function cmi5_get_user_grades($cmi5launch, $userid=0) {
 
 /**
  * For example, this callback for the assignment module is assignment_update_grades().
-*This callback should update the grade(s) for the supplied user. 
-* This may be as simple as retrieving the grades for the user from the activity module's own tables 
-* then calling {$modname}_grade_item_update().
-
-*Its parameters are:
-
-*stdClass $modinstance the activity module settings.
-*int $userid A user ID or 0 for all users.
-*bool $nullifnone If a single user is specified, $nullifnone is true and the user has no grade then a grade item with a null rawgrade should be inserted
- * Update grades in central gradebook
+ * This callback should update the grade(s) for the supplied user.
+ * This may be as simple as retrieving the grades for the user from the activity module's own tables.
+ * then calling {$modname}_grade_item_update().
+ * Its parameters are:
+ * stdClass $modinstance the activity module settings.
+ * int $userid A user ID or 0 for all users.
+ * bool $nullifnone If a single user is specified, $nullifnone is true and the user has no grade then a grade item with a null rawgrade should be inserted.
+ * Update grades in central gradebook.
  *
  * @category grade
  * @param object $cmi5launch
  * @param int $userid specific user only, 0 mean all
  * @param bool $nullifnone
  */
-//This can call grade_item_update which helps interact with Moodle gradebook
-//it can pull from DB and then call grade_item_update
-//We could also later use this to change how the array is massaged
-//in case they want highest or lowest
-//TODO MB
+// This can call grade_item_update which helps interact with Moodle gradebook.
+// it can pull from DB and then call grade_item_update.
+// We could also later use this to change how the array is massaged.
+// in case they want highest or lowest.
+// TODO MB
 function cmi5_update_grades($cmi5launch, $userid=0, $nullifnone=true) {
     global $CFG, $DB;
-    //can our mod see these?
-    //I can make my own gradelib! to figuree stuff and things
+    
+    // can our mod see these?
+    // I can make my own gradelib! to figuree stuff and things
 
     require_once($CFG->libdir.'/gradelib.php');
     require_once($CFG->libdir.'/completionlib.php');

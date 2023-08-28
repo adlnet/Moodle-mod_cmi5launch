@@ -22,122 +22,116 @@
  */
 
 namespace mod_cmi5launch\local;
+defined('MOODLE_INTERNAL') || die();
 
 use mod_cmi5launch\local\cmi5_connectors;
 use mod_cmi5launch\local\session;
 
-class session_helpers
-{
+class session_helpers {
 
-	public function getSaveSession()
-	{
-		return [$this, 'createSession'];
-	}
+    public function cmi5launch_get_create_session() {
+        return [$this, 'cmi5launch_create_session'];
+    }
 
-	public function getUpdateSession()
-	{
-		return [$this, 'updateSessions'];
-	}
+    public function cmi5launch_get_update_session() {
+        return [$this, 'cmi5launch_update_sessions'];
+    }
 
-	public function getSessionFromDB()
-	{
-		return [$this, 'cmi5launch_retrieve_aus_from_db'];
-	}
+    public function cmi5launch_get_retrieve_sessions_from_db() {
+        return [$this, 'cmi5launch_retrieve_sessions_from_db'];
+    }
 
-	/**
-	 * Gets updated session information from CMI5 player
-	 * @param mixed $sessionID - the session id
-	 * @param mixed $cmi5Id - cmi5 instance id
-	 * @return session
-	 */
-	function updateSessions($sessionID, $cmi5Id)
-	{
-		global $CFG, $DB;
+    /**
+     * Gets updated session information from CMI5 player
+     * @param mixed $sessionid - the session id
+     * @param mixed $cmi5id - cmi5 instance id
+     * @return session
+     */
+    public function cmi5launch_update_sessions($sessionid, $cmi5id) {
 
-		$connector = new cmi5_connectors;
-		$getSessionInfo = $connector->getSessions();
+        global $CFG, $DB;
 
-		//Get the session from DB with session id
-		$session = $this->cmi5launch_retrieve_aus_from_db($sessionID);
+        $connector = new cmi5_connectors;
+        $getsessioninfo = $connector->cmi5launch_get_session_from_player();
 
-		//This is sessioninfo from CMI5 player
-		$sessionInfo =	$getSessionInfo($sessionID, $cmi5Id);
+        // Get the session from DB with session id.
+        $session = $this->cmi5launch_retrieve_sessions_from_db($sessionid);
 
-		//Update session
-		foreach($sessionInfo as $key => $value){
-			//We don't want to overwrite id
-			if (property_exists($session, $key ) && $key != 'id' )  {
-				//If it's an array encode it so it can be saved to DB
-				if (is_Array($value)) {
-					$value = json_encode($value);
-				}
-					$session->$key = $value;
-			}
-		}
-	
-		//Now update to table
-		$DB->update_record('cmi5launch_sessions', $session);
+        // This is sessioninfo from CMI5 player.
+        $sessioninfo = $getsessioninfo($sessionid, $cmi5id);
 
-		return $session;
-	}
-	
+        // Update session.
+        foreach ($sessioninfo as $key => $value) {
+            // We don't want to overwrite id.
+            if (property_exists($session, $key ) && $key != 'id' ) {
+                // If it's an array, encode it so it can be saved to DB.
+                if (is_array($value)) {
+                    $value = json_encode($value);
+                }
+                    $session->$key = $value;
+            }
+        }
 
-	/**
-	 * Creates a session record in DB
-	 * @param mixed $sessId - the session id
-	 * @param mixed $launchurl - the launch url
-	 * @param mixed $launchMethod - the launch method
-	 * @return void
-	 */
-	function createSession($sessId, $launchurl, $launchMethod)
-	{
-		global $DB, $CFG, $cmi5launch, $USER;
-	
-		//$record;
-		$table = "cmi5launch_sessions";
+        // Now update to table.
+        $DB->update_record('cmi5launch_sessions', $session);
 
-		//Make a newRecord to save
-		$newRecord = new \stdClass();
-		//Because of many nested properties, needs to be done manually
-		$newRecord->sessionid = $sessId;
-		$newRecord->launchurl = $launchurl;
-		$newRecord->tenantname = $USER->username;
-		$newRecord->launchmethod = $launchMethod;
+        return $session;
+    }
 
-		//Save
-		$DB->insert_record($table, $newRecord, true);
-	}
 
-	/**
-	 * Retrieves session from DB
-	 * @param mixed $sessionID - the session id
-	 * @return session
-	 */
-	function cmi5launch_retrieve_aus_from_db($sessionID)
-	{
-		global $DB, $CFG;
+    /**
+     * Creates a session record in DB
+     * @param mixed $sessionid - the session id
+     * @param mixed $launchurl - the launch url
+     * @param mixed $launchmethod - the launch method
+     * @return void
+     */
+    public function cmi5launch_create_session($sessionid, $launchurl, $launchmethod) {
 
-		$check = $DB->record_exists('cmi5launch_sessions', ['sessionid' => $sessionID], '*', IGNORE_MISSING);
+        global $DB, $CFG, $cmi5launch, $USER;
 
-		//If check is negative, the record does not exist. Throw error
-		if (!$check) {
+        $table = "cmi5launch_sessions";
 
-			echo "<p>Error attempting to get session data from DB. Check session id.</p>";
-			echo "<pre>";
-			var_dump($sessionID);
-			echo "</pre>";
-		
-		} else {
+        // Make a new record to save.
+        $newrecord = new \stdClass();
+        // Because of many nested properties, needs to be done manually.
+        $newrecord->sessionid = $sessionid;
+        $newrecord->launchurl = $launchurl;
+        $newrecord->tenantname = $USER->username;
+        $newrecord->launchmethod = $launchmethod;
 
-			$sessionItem = $DB->get_record('cmi5launch_sessions',  array('sessionid' => $sessionID));
+        // Save record to table.
+        $DB->insert_record($table, $newrecord, true);
+    }
 
-			$session = new session($sessionItem);
-			
-		}
+    /**
+     * Retrieves session from DB
+     * @param mixed $sessionid - the session id
+     * @return session
+     */
+    public function cmi5launch_retrieve_sessions_from_db($sessionid) {
 
-		//Return new session object!
-		return $session;
-	}
+        global $DB, $CFG;
+
+        $check = $DB->record_exists('cmi5launch_sessions', ['sessionid' => $sessionid], '*', IGNORE_MISSING);
+
+        // If check is negative, the record does not exist. Throw error.
+        if (!$check) {
+
+            echo "<p>Error attempting to get session data from DB. Check session id.</p>";
+            echo "<pre>";
+            var_dump($sessionid);
+            echo "</pre>";
+
+        } else {
+
+            $sessionitem = $DB->get_record('cmi5launch_sessions',  array('sessionid' => $sessionid));
+
+            $session = new session($sessionitem);
+
+        }
+
+        // Return new session object.
+        return $session;
+    }
 }
-
-?>
