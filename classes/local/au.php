@@ -14,26 +14,24 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 /**
- *Class to handle Assignable Units 
-*
-* @copyright  2023 Megan Bohland
-* @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
-*/
+ * Class to handle Assignable Units.
+ *
+ * @copyright  2023 Megan Bohland
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 namespace mod_cmi5launch\local;
 
 class au {
-// Properties
 
-	public $id, $url, $type, $lmsid, $grade, $scores, $title, $moveon, $auindex, $parents, $objectives, $description, $activitytype, $launchmethod, $masteryscore, $satisfied, $launchurl, $sessionid, $sessions, $progress, $noattempt, $completed, $passed, $inprogress;
+    public $id, $url, $type, $lmsid, $grade, $scores, $title, $moveon, $auindex, $parents, $objectives, $description, $activitytype,
+    $launchmethod, $masteryscore, $satisfied, $launchurl, $sessionid, $sessions, $progress, $noattempt, $completed, $passed, $inprogress;
 
-	// Methods
-	//Constructs AUs. Is fed array and where array key matches property, sets the property.  
-	function __construct($statement){
+    // Constructs AUs. Is fed array and where array key matches property, sets the property.
+    public function __construct($statement) {
 
-		foreach($statement as $key => $value){
+        foreach ($statement as $key => $value) {
 
-		$this->$key = ($value);
-		}	
-	}
+            $this->$key = ($value);
+        }
+    }
 }
-?>

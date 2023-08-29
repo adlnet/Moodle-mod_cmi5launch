@@ -17,13 +17,12 @@
 /**
  * //Class to retrieve progress statements from LRS
  * //Holds methods for tracking and displaying student progress
- *
  * @copyright  2023 Megan Bohland
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace mod_cmi5launch\local;
 
-class progress{
+class progress  {
 
 	public function get_cmi5launch_retrieve_statements()
 	{
@@ -260,20 +259,23 @@ class progress{
             // Maybe it would be better to just have a 'cmi5launch_retrieve_score' for now.
     }
 
-	/**
-	 * Returns a timestamp retrieved from collected LRS data based on registration id
-	 * @param mixed $resultarray - data retrieved from LRS, usually an array
-	 * @param mixed $registrationid - the registration id
-	 * @return string - date/time
-	 */
-	public function cmi5launch_retrieve_timestamp($resultarray, $registrationid){
-		
-		
-		$date = new \DateTime($resultarray[$registrationid][0]["timestamp"], new \DateTimeZone('US/Eastern'));
-		
-		$date->setTimezone(new \DateTimeZone('America/New_York'));
+    /**
+     * Returns a timestamp retrieved from collected LRS data based on registration id
+     * @param mixed $resultarray - data retrieved from LRS, usually an array
+     * @param mixed $registrationid - the registration id
+     * @return string - date/time
+     */
+    public function cmi5launch_retrieve_timestamp($resultarray, $registrationid){
+        
+        
+        //Verify this statement has a 'timestamp' param
+        if (array_key_exists("timestamp", $resultarray[$registrationid][0] ) ) {
 
-		$date = $date->format('d-m-Y' . " ".  'h:i a');
+            $date = new \DateTime($resultarray[$registrationid][0]["timestamp"], new \DateTimeZone('US/Eastern'));
+            
+            $date->setTimezone(new \DateTimeZone('America/New_York'));
+
+            $date = $date->format('d-m-Y' . " ".  'h:i a');
 
             return $date;
 
@@ -298,20 +300,18 @@ class progress{
         // Variable to hold score.
         $score = null;
 
-		//Verify this statement has a 'result' param
-		if (array_key_exists("result", $resultarray[$registrationid][0] ) )
-		{
-			//If it exists, grab it
-			$resultInfo = $resultarray[$registrationid][0]["result"];
-		
-			$score = array_key_exists("score", $resultInfo);
+        //Verify this statement has a 'result' param
+        if (array_key_exists("result", $resultarray[$registrationid][0] ) )
+        {
+            //If it exists, grab it
+            $resultInfo = $resultarray[$registrationid][0]["result"];
+        
+            $score = array_key_exists("score", $resultInfo);
+        
+            //If it is null then the item in question doesn't exist in this statement
+        if ($score) {
 
-		}
-		
-			//If it is null then the item in question doesn't exist in this statement
-		if ($score) {
-
-			$score = $resultarray[$registrationid][0]["result"]["score"];
+            $score = $resultarray[$registrationid][0]["result"]["score"];
 
                 // Raw score preferred to scaled.
                 if ($score["raw"]) {
@@ -355,11 +355,12 @@ class progress{
         // Array to hold score and be returned.
         $returnscore = 0;
 
+        $resultDecoded = $this->cmi5launch_request_statements_from_lrs($registrationid, $session);
 			//We need to sort the statements by finding their session id
 			//parse through array 'ext' to find the one holding session id, 
 			//grab id and go with it
 
-		foreach($resultDecoded as $singleStatment){
+		foreach($resultDecoded as $singlestatement){
 
             // We need to sort the statements by finding their session id.
             // Parse through array 'ext' to find the one holding session id.

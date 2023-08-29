@@ -15,8 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Prints an AUs session information annd allows retreival of session or start of new one. 
- *
+ * Prints an AUs session information annd allows retrieval of session or start of new one.
  * @copyright  2023 Megan Bohland
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -29,16 +28,17 @@ require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require('header.php');
 
 require_once("$CFG->dirroot/lib/outputcomponents.php");
+require_login($course, false, $cm);
 
 global $cmi5launch, $USER;
 
-//Classes and functions 
-$aus_helpers = new au_helpers;
-$ses_helpers = new session_helpers;
+// Classes and functions.
+$auhelper = new au_helpers;
+$sessionhelper = new session_helpers;
 $progress = new progress;
-$getProgress = $progress->get_cmi5launch_retrieve_statements();
-$updateSession = $ses_helpers->getUpdateSession();
-$getAUs = $aus_helpers->get_cmi5launch_retrieve_aus_from_db();
+$getprogress = $progress->cmi5launch_get_retrieve_statements();
+$updatesession = $sessionhelper->cmi5launch_get_update_session();
+$retrieveaus = $auhelper->get_cmi5launch_retrieve_aus_from_db();
 
 // Trigger module viewed event.
 $event = \mod_cmi5launch\event\course_module_viewed::create(array(
@@ -72,21 +72,21 @@ if ($cmi5launch->intro) { // Conditions to show the intro can change to look for
 ?>
 
     <script>
-      
+
         function key_test(registration) {
-        
+
             if (event.keyCode === 13 || event.keyCode === 32) {
                 mod_cmi5launch_launchexperience(registration);
             }
         }
-        
+
         // Function to run when the experience is launched.
         function mod_cmi5launch_launchexperience(registration) {
             // Set the form paramters.
             $('#launchform_registration').val(registration);
             // Post it.
             $('#launchform').submit();
-            
+
             //Add some new content.
             if (!$('#cmi5launch_status').length) {
                 var message = "<?php echo get_string('cmi5launch_progress', 'cmi5launch'); ?>";
@@ -115,131 +115,113 @@ if ($cmi5launch->intro) { // Conditions to show the intro can change to look for
 <?php
 
 
-//Retrieve the registration and AU ID from view.php
-$fromView = required_param('AU_view', PARAM_TEXT);
-//Break it into array (AU is first index)
-$lmsAndId = explode(",", $fromView);
-//Retrieve AU ID
-$auID = array_shift($lmsAndId);
+// Retrieve the registration and AU ID from view.php.
+$fromview = required_param('AU_view', PARAM_TEXT);
+// Break it into array (AU is first index).
+$fromview = explode(",", $fromview);
+// Retrieve AU ID.
+$auid = array_shift($fromview);
 
-//Retrieve appropriate AU from DB
-$au = $getAUs($auID);
+// Retrieve appropriate AU from DB.
+$au = $retrieveaus($auid);
 
-//Array to hold session scores for the au
-$sessionScores = array();
+// Array to hold session scores for the au.
+$sessionscores = array();
 
 // Reload cmi5 instance.
 $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
 
-//Reload user course instance
-$usersCourse = $DB->get_record('cmi5launch_course', ['courseid'  => $record->courseid, 'userid'  => $USER->id]);
+// Reload user course instance.
+$userscourse = $DB->get_record('cmi5launch_course', ['courseid'  => $record->courseid, 'userid'  => $USER->id]);
 
-//Retrieve the registration id
-$regid = $usersCourse->registrationid;
+// Retrieve the registration id.
+$regid = $userscourse->registrationid;
 
-//TODO
-//For later to change student view vs teacher
-//Lets check for the certain capability and display a message if it is found/not found
-//Excellent! The test works, now lets introduce like a flag, and use that to display progress or not
-//Well call it canSee for now
-/*
-$canSee = true | false;
-//now change it based on capability
-$context = context_module::instance($cm->id);
-if (has_capability('mod/cmi5launch:addinstance', $context)) {
-    //This is someone we want to let see grades/progress!!!";
-    $canSee = true;
-}else{
-    //This is not someone to see grades!";
-    echo "<br>";
-    $canSee = false;
-}
-*/
+// If it is null there have been no previous sessions.
+if (!$au->sessions == null) {
 
-//If it is null there have been no previous sessions
-if (!$au->sessions == NULL) {
+    // Array to hold info for table population.
+    $tabledata = array();
 
-	//Array to hold info for table population
-	$tableData = array();
+    // Build table.
+    $table = new html_table();
+    $table->id = 'cmi5launch_auSessionTable';
+    $table->caption = get_string('modulenameplural', 'cmi5launch');
+    $table->head = array(
+    get_string('cmi5launchviewfirstlaunched', 'cmi5launch'),
+    get_string('cmi5launchviewlastlaunched', 'cmi5launch'),
+    get_string('cmi5launchviewprogress', 'cmi5launch'),
+    get_string('cmi5launchviewgradeheader', 'cmi5launch'),
+    get_string('cmi5launchviewlaunchlinkheader', 'cmi5launch'),
+    );
 
-	//Build table
-	$table = new html_table();
-	$table->id = 'cmi5launch_auSessionTable';
-	$table->caption = get_string('modulenameplural', 'cmi5launch');
-	$table->head = array(
-		get_string('cmi5launchviewfirstlaunched', 'cmi5launch'),
-		get_string('cmi5launchviewlastlaunched', 'cmi5launch'),
-		get_string('cmi5launchviewprogress', 'cmi5launch'),
-     	get_string('cmi5launchviewgradeheader', 'cmi5launch'),
-		get_string('cmi5launchviewlaunchlinkheader', 'cmi5launch'),
-	);
+    // Retrieve session ids.
+    $sessionids = json_decode($au->sessions);
 
-	//Retrieve session ids
-	$sessionIDs = json_decode($au->sessions);
+    // Iterate through each session by id.
+    foreach ($sessionids as $key => $sessionid) {
 
-	//Iterate through each session by id
-	foreach($sessionIDs as $key => $sessionID){
+        // Retrieve new info (if any) from CMI5 player on session.
+        $session = $updatesession($sessionid, $cmi5launch->id);
 
-	     //Retrieve new info (if any) from CMI5 player on session	
-		$session = $updateSession($sessionID, $cmi5launch->id);    
-        
-        	//array to hold data for table
-        	$sessionInfo = array();
+        // Array to hold data for table.
+        $sessioninfo = array();
 
-        	//Retrieve createdAt and format        
-		$date = new DateTime($session->createdAt, new DateTimeZone('US/Eastern'));
-		$date->setTimezone(new DateTimeZone('America/New_York'));
-        	$sessionInfo[] = $date->format('D d M Y H:i:s');
+        // Retrieve createdAt and format.
+        $date = new DateTime($session->createdAt, new DateTimeZone('US/Eastern'));
+        $date->setTimezone(new DateTimeZone('America/New_York'));
+        $sessioninfo[] = $date->format('D d M Y H:i:s');
 
-        	///Retrieve lastRequestTime and format
-        	$date = new DateTime($session->lastRequestTime, new DateTimeZone('US/Eastern'));
-		$date->setTimezone(new DateTimeZone('America/New_York'));
-        	$sessionInfo[] = $date->format('D d M Y H:i:s');
+        // Retrieve lastRequestTime and format.
+        $date = new DateTime($session->lastRequestTime, new DateTimeZone('US/Eastern'));
+        $date->setTimezone(new DateTimeZone('America/New_York'));
+        $sessioninfo[] = $date->format('D d M Y H:i:s');
 
-		//Get progress from LRS
-		$session = $getProgress($regid, $cmi5launch->id, $session);
-		$sessionInfo[] = ("<pre>" . implode("\n ", json_decode($session->progress) ) . "</pre>");
-		
-		//add score to table
-		$sessionInfo[] = $session->score;
-		//Add score to array for AU
-		$sessionScores[] = $session->score;
+        // Get progress from LRS.
+        $session = $getprogress($regid, $cmi5launch->id, $session);
+        $sessioninfo[] = ("<pre>" . implode("\n ", json_decode($session->progress) ) . "</pre>");
 
-		//Update session in DB
-		$DB->update_record('cmi5launch_sessions', $session);
-		
-        	//Build launch link to continue session
-		$newSession = "false";
-	    	$infoForNextPage = $sessionID . "," . $newSession;
+        // Add score to table.
+        $sessioninfo[] = $session->score;
+        // Add score to array for AU.
+        $sessionscores[] = $session->score;
 
-        	$sessionInfo[] = "<a tabindex=\"0\" id='cmi5relaunch_attempt'
-			onkeyup=\"key_test('" . $infoForNextPage . "')\" onclick=\"mod_cmi5launch_launchexperience('" . $infoForNextPage . "')\" style='cursor: pointer;'>"
-            . get_string('cmi5launchviewlaunchlink', 'cmi5launch') . "</a>";
+        // Update session in DB.
+        $DB->update_record('cmi5launch_sessions', $session);
 
-          //add to be fed to table
-          $tableData[] = $sessionInfo;
-     }
-     
-	//Write table
-	$table->data = $tableData;
-    	echo html_writer::table($table);
+        // Build launch link to continue session.
+        $newsession = "false";
+        $infofornextpage = $sessionid . "," . $newsession;
 
-     //Save the session scores to AU, it is ok to overwrite
-    	$au->scores = json_encode($sessionScores);
+        $sessioninfo[] = "<a tabindex=\"0\" id='cmi5relaunch_attempt'
+        onkeyup=\"key_test('" . $infofornextpage . "')\" onclick=\"mod_cmi5launch_launchexperience('"
+        . $infofornextpage . "')\" style='cursor: pointer;'>"
+        . get_string('cmi5launchviewlaunchlink', 'cmi5launch') . "</a>";
 
-    //Update AU in table with new info
-	$DB->update_record('cmi5launch_aus', $au);
+        // Add to be fed to table.
+        $tabledata[] = $sessioninfo;
+    }
+
+    // Write table.
+    $table->data = $tabledata;
+    echo html_writer::table($table);
+
+    // Save the session scores to AU, it is ok to overwrite.
+    $au->scores = json_encode($sessionscores);
+
+    // Update AU in table with new info.
+    $DB->update_record('cmi5launch_aus', $au);
 }
 
-//Build the new session link
-$newSession = "true";
-//Create a string to pass the auid and new session info to next page (launch.php)
-$infoForNextPage = $auID . "," . $newSession;
-//New attempt
+// Build the new session link.
+$newsession = "true";
+// Create a string to pass the auid and new session info to next page (launch.php).
+$infofornextpage = $auid . "," . $newsession;
+// New attempt.
 echo "<p tabindex=\"0\"
-          onkeyup=\"key_test('" . $infoForNextPage . "')\"
+          onkeyup=\"key_test('" . $infofornextpage . "')\"
           id='cmi5launch_newattempt'><a onclick=\"mod_cmi5launch_launchexperience('"
-          . $infoForNextPage
+          . $infofornextpage
           . "')\" style=\"cursor: pointer;\">"
           . get_string('cmi5launch_attempt', 'cmi5launch')
           . "</a></p>";
