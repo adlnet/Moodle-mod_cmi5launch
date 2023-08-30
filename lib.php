@@ -1024,9 +1024,11 @@ function cmi5_update_grades($cmi5launch, $userid=0, $nullifnone=true) {
  * @param mixed $grades optional array/object of grade(s); 'reset' means reset grades in gradebook
  * @return object grade_item
  */
-//TODO MB
-//Return to this for grades
-/*
+// MB.
+// Ok, according to the forum I found this is the only place their grade_update should be called.
+// And this func should be called from 'myplugin'_add_instance, 'myplugin'_update_instance and 'myplugin'_update_grades.
+
+
 //Whereever 'scorm' is replace with 'cmi5launch'
 function cmi5_grade_item_update($record, $grades=null) {
     global $CFG, $DB, $cmi5launch;
@@ -1113,10 +1115,10 @@ function cmi5_grade_item_update($record, $grades=null) {
  * @param mixed  $itemdetails Object or array describing the grading item, NULL if no change
  * @param bool   $isbulkupdate If bulk grade update is happening.
  * @return int Returns GRADE_UPDATE_OK, GRADE_UPDATE_FAILED, GRADE_UPDATE_MULTIPLE or GRADE_UPDATE_ITEM_LOCKED
-     
+     */
     return grade_update('mod/cmi5launch', $cmi5launch->courseid, 'mod', 'cmi5', $cmi5launch->id, 0, $grades, $params);
 }
-*/
+
 
 /**
  * Delete grade item for given scorm

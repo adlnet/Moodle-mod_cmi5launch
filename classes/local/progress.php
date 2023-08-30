@@ -21,80 +21,80 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace mod_cmi5launch\local;
+defined('MOODLE_INTERNAL') || die();
 
 class progress  {
 
-	public function get_cmi5launch_retrieve_statements()
-	{
-	    return [$this, 'cmi5launch_retrieve_statements'];
-	}
+    public function get_cmi5launch_retrieve_statements() {
+        return [$this, 'cmi5launch_retrieve_statements'];
+    }
 
-	public function get_cmi5launch_request_completion_info()
-	{
-		return [$this, 'cmi5launch_request_completion_info'];
-	}
+    public function get_cmi5launch_request_completion_info() {
+        return [$this, 'cmi5launch_request_completion_info'];
+    }
 
-	public function get_cmi5launch_request_statements_from_lrs()
-	{
-	    return [$this, 'cmi5launch_request_statements_from_lrs'];
-	}
+    public function get_cmi5launch_request_statements_from_lrs() {
+        return [$this, 'cmi5launch_request_statements_from_lrs'];
+    }
 
-	/**
-	 * Send request to LRS
-	 * @param mixed $regId - registration id
-	 * @param mixed $session - a session object 
-	 * @return array
-	 */
-	public function cmi5launch_request_statements_from_lrs($registrationid, $session /*$id*/){
+    /**
+     * Send request to LRS
+     * @param mixed $regId - registration id
+     * @param mixed $session - a session object 
+     * @return array
+     */
+    public function cmi5launch_request_statements_from_lrs($registrationid, $session /*$id*/){
 
-		//Array to hold result
-		$result = array();
+        // Array to hold result.
+        $result = array();
 
-		//When searching by reg id, which is the option available to Moodle, many results are returned, so iterating through them is necessary
-		$data = array(
-			'registration' => $registrationid,
-			'since' => $session->createdAt
-		);
+        // When searching by reg id, which is the option available to Moodle,
+        // many results are returned, so iterating through them is necessary.
+        $data = array(
+            'registration' => $registrationid,
+            'since' => $session->createdAt
+        );
 
-		$statements = $this->cmi5launch_send_request_to_lrs($data, $registrationid);
-		//The results come back as nested array under more then statements. We only want statements, and we want them unique
-		$statement = array_chunk($statements["statements"], 1);
+        $statements = $this->cmi5launch_send_request_to_lrs($data, $registrationid);
+        // The results come back as nested array under more then statements.
+        // We only want statements, and we want them unique.
+        $statement = array_chunk($statements["statements"], 1);
 
-		$length = count($statement);
+        $length = count($statement);
 
-		for ($i = 0; $i < $length; $i++){
-		
-		//This separates the larger statement into the separate sessions and verbs
-			$current = ($statement[$i]);
-		array_push($result, array ($registrationid => $current) );
-		}
-	
-		return $result;
-	}
+        for ($i = 0; $i < $length; $i++){
+        
+        // This separates the larger statement into the separate sessions and verbs.
+            $current = ($statement[$i]);
+            array_push($result, array ($registrationid => $current) );
+        }
+
+        return $result;
+    }
 
 
-	/**
-	 * Builds and sends requests to LRS
-	 * @param mixed $data
-	 * @param mixed $id
-	 * @return mixed
-	 */
-	public function cmi5launch_send_request_to_lrs($data, $id)
-	{
+    /**
+     * Builds and sends requests to LRS
+     * @param mixed $data - the data to send.
+     * @param mixed $id - the course ID in MOODLE.
+     * @return mixed $resultDecoded - the result of the request, decoded into json.
+     */
+    public function cmi5launch_send_request_to_lrs($data, $id)
+    {
 		$settings = cmi5launch_settings($id);
 
-		//Url to request statements from
+		// Url to request statements from.
 		$url = $settings['cmi5launchlrsendpoint'] . "statements";
-		//Build query with data above
+		// Build query with data above.
 		$url = $url . '?' . http_build_query($data,"", '&',  PHP_QUERY_RFC1738);
 
-		//LRS username and password
+		// LRS username and password.
 		$user = $settings['cmi5launchlrslogin'];
 		$pass = $settings['cmi5launchlrspass'];
 
-		// use key 'http' even if you send the request to https://...
-		//There can be multiple headers but as an array under the ONE header
-		//content(body) must be JSON encoded here, as that is what CMI5 player accepts
+		// Use key 'http' even if you send the request to https://...
+		// There can be multiple headers but as an array under the ONE header.
+		// Content(body) must be JSON encoded here, as that is what CMI5 player accepts.
 		$options = array(
 			'http' => array(
 				'method'  => 'GET',
@@ -104,10 +104,11 @@ class progress  {
 				)
 			)
 		);
-		//the options are here placed into a stream to be sent
+		// The options are here placed into a stream to be sent.
 		$context  = stream_context_create($options);
 
-		//sends the stream to the specified URL and stores results (the false is use_include_path, which we dont want in this case, we want to go to the url)
+		// Sends the stream to the specified URL and stores results.
+        // The false is use_include_path, which we dont want in this case, we want to go to the url.
 		$result = file_get_contents( $url, false, $context );
 
 		$resultDecoded = json_decode($result, true);
