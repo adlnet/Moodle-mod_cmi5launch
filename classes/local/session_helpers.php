@@ -47,12 +47,14 @@ class session_helpers {
      * @param mixed $cmi5id - cmi5 instance id
      * @return session
      */
+
+     // MB, maybe here? whenever a session is updated check the grades?
     public function cmi5launch_update_sessions($sessionid, $cmi5id) {
 
         global $CFG, $DB;
 
         $connector = new cmi5_connectors;
-        $getsessioninfo = $connector->cmi5launch_get_session_from_player();
+        $getsessioninfo = $connector->cmi5launch_get_session_info();
 
         // Get the session from DB with session id.
         $session = $this->cmi5launch_retrieve_sessions_from_db($sessionid);

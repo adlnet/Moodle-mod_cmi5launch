@@ -43,7 +43,7 @@ $createaus = $aushelpers->get_cmi5launch_create_aus();
 $getaus = $aushelpers->get_cmi5launch_retrieve_aus_from_db();
 $getregistration = $connectors->cmi5launch_get_registration_with_post();
 $getregistrationinfo = $connectors->cmi5launch_get_registration_with_get();
-$getprogress = $progress->get_cmi5launch_retrieve_statements();
+$getprogress = $progress->cmi5launch_get_retrieve_statements();
 $updatesession = $sessionhelpers->cmi5launch_get_update_session();
 
 global $cmi5launch, $USER, $mod;
@@ -189,6 +189,8 @@ $table->head = array(
 // TODO MB.
 // Return to for grades.
 // CMI5_update_grades($cmi5launch, 0).
+// Seems like I was ahead of myself. so if this is to return to for grades
+// maybe later this update spiel can run in the grades fuc of lib.php?
 
 // Cycle through AU IDs.
 foreach ($auids as $key => $auid) {
@@ -304,7 +306,23 @@ foreach ($auids as $key => $auid) {
             if ($grade == 0) {
                 $auinfo[] = ("Passed");
             } else {
-                $auinfo[] = ($grade);;
+                $auinfo[] = ($grade);
+
+                // MB, 
+                // Could this be a good place to check and call update grades?
+                // Or is that better done where  the session is updated? Cause that would be a constant check right
+                //What is auinfo here, can we pass THIS to grade?
+                echo"<br>";
+                echo "auinfo: ";
+                var_dump($auinfo);
+                echo"<br>";
+                // This may work, it has quiz and satisified! What if our update grades goes whereever this does?
+                // Except! The freaing things has very specific params....
+                // Dagum! So maybe can we grab this info ourselves? With these paramrs? 
+                // Yeah grabbing the score will work, at elast for nwo
+
+                cmi5launch_update_grades($cmi5launch, $USER->id);
+
             }
 
         } else {

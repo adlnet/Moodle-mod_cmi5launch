@@ -186,6 +186,11 @@ if (!$au->sessions == null) {
         // Add score to array for AU.
         $sessionscores[] = $session->score;
 
+        // MB Test.
+        // Ok so maybe here? //maybe we pass in the session?
+        //cmi5launch_update_grades();
+        //But it  lso needs name of activity right?
+
         // Update session in DB.
         $DB->update_record('cmi5launch_sessions', $session);
 

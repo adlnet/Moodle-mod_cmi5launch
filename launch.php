@@ -47,7 +47,7 @@ $event->trigger();
 // External class and funcs to use.
 $auhelper = new au_helpers;
 $connectors = new cmi5_connectors;
-$ses_helpers = new session_helpers;
+$sessionhelper = new session_helpers;
 
 $savesession = $sessionhelper->cmi5launch_get_create_session();
 $cmi5launchretrieveurl = $connectors->cmi5launch_get_retrieve_url();

@@ -25,7 +25,7 @@ defined('MOODLE_INTERNAL') || die();
 
 class progress  {
 
-    public function get_cmi5launch_retrieve_statements() {
+    public function cmi5launch_get_retrieve_statements() {
         return [$this, 'cmi5launch_retrieve_statements'];
     }
 
@@ -324,6 +324,8 @@ class progress  {
                     $returnscore = round($score["scaled"], 2);
                     return $returnscore;
                 }
+
+                // Maybe here, I can have like it update here.... MB.
             }
         } else {
 
@@ -356,6 +358,9 @@ class progress  {
         // Array to hold score and be returned.
         $returnscore = 0;
 
+        // How bout an array to hold ALL scores and attempts?
+        $allscores = array();
+
         $resultDecoded = $this->cmi5launch_request_statements_from_lrs($registrationid, $session);
 			//We need to sort the statements by finding their session id
 			//parse through array 'ext' to find the one holding session id, 
@@ -386,6 +391,8 @@ class progress  {
                 $date = $this->cmi5launch_retrieve_timestamp($singlestatement, $registrationid);
                 $score = $this->cmi5launch_retrieve_score($singlestatement, $registrationid);
 
+                // Add score to array of scores
+                $allscores[] = $score;
                 // If a session has more than one score, we only want the highest.
                 if (!$score == null && $score > $returnscore) {
 
@@ -397,6 +404,11 @@ class progress  {
 
             }
         }
+            // Now an iff statment to iterate through allscores array assigning them to first attempt, next attempt, etc.
+            // If there is only one score, it is the first attempt.
+           // for
+
+
             $session->progress = json_encode($progressupdate);
             $session->score = $returnscore;
 
