@@ -23,7 +23,8 @@
  */
 
 require_once("../../config.php");
-
+require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
+require('header.php');
 // MB TODO.
 // Maybe return later? Framework for Gradebook in Moodle integration.
 
@@ -33,8 +34,12 @@ $id = required_param('id', PARAM_INT);
 $itemnumber = optional_param('itemnumber', 0, PARAM_INT); 
  // Graded user ID (optional).
 $userid = optional_param('userid', 0, PARAM_INT);
+global $cmi5launch, $USER, $mod;
 
-if (! $cm = get_coursemodule_from_id('cmi5', $id)) {
+// why is cmi5launch null??? 
+
+// Get the course module.
+if (! $cm = get_coursemodule_from_id('cmi5launch', $cm->id)) {
     throw new \moodle_exception('invalidcoursemodule');
 }
 
@@ -42,11 +47,16 @@ if (! $scorm = $DB->get_record('cmi5launch', array('id' => $cm->instance))) {
     throw new \moodle_exception('invalidcoursemodule');
 }
 
-if (! $course = $DB->get_record('cmi5launch', array('id' => $cm->id))) {
+if (! $course = $DB->get_record('cmi5launch', array('course' => $cm->course, 'name' => $cm->name))) {
+   echo"<br>";
+    $returned = $DB->get_record('cmi5launch', array('course' => $cm->course, 'name' => $cm->name));
+    echo "returned is: ";                   
+    var_dump($returned);
+    echo"<br>";
     throw new \moodle_exception('coursemisconf');
 }
 
-require_login($course, false, $cm);
+//require_login($course, false, $cm);
 
 //How scorm did it
 /*

@@ -185,6 +185,7 @@ if (!$au->sessions == null) {
         $sessioninfo[] = $session->score;
         // Add score to array for AU.
         $sessionscores[] = $session->score;
+        // Ok, maybe here it is where we can put session1->score, etc
 
         // MB Test.
         // Ok so maybe here? //maybe we pass in the session?
@@ -211,8 +212,22 @@ if (!$au->sessions == null) {
     $table->data = $tabledata;
     echo html_writer::table($table);
 
+    //Ok, lets see if we are getting the bracket here?
+    echo "<br>";
+    echo "This is the bracket: ";
+    var_dump($sessionscores);
+    echo "<br>";
+
     // Save the session scores to AU, it is ok to overwrite.
     $au->scores = json_encode($sessionscores);
+  //Ok, lets see if we are getting the bracket here?
+  echo "<br>";
+  echo "This is the au after scores is added: ";
+  var_dump($au);
+  echo "<br>";
+
+    //And here we can add the au name and record scores? 
+    // Well mybe not, cause it is already in only ONE au here
 
     // Update AU in table with new info.
     $DB->update_record('cmi5launch_aus', $au);

@@ -172,6 +172,9 @@ if ($exists == false) {
 // Array to hold info for table population.
 $tabledata = array();
 
+// Array to hold Au scores!
+$auscores = array();
+
 // We need id to get progress.
 $cmid = $cmi5launch->id;
 
@@ -213,11 +216,18 @@ foreach ($auids as $key => $auid) {
     // Take only info about AUs out of registrationinfofromcmi5.
     $ausfromcmi5 = array_chunk($registrationinfofromcmi5["metadata"]["moveOn"]["children"], 1, true);
 
+    //We will make a func here for this, but right now, can we take
+    // the au id and use it to get and save score to course?
+    ///Ooooh yes, lets make an array to add to!
+
+    //Wait, if this is PER au, then there should only be one grade, unless they do it multiple times dangit
+    // if we decode its a dang array and if we dont its a string!!!!caugh!!!
+    $auscores[($au->title)] = ($au->scores);
     // TODO now we can get the AU's satisifed FROM the CMI5 player.
     // TODO (for that matter couldn't we make it, notattempetd, satisifed, not satisfied??).
     foreach ($ausfromcmi5 as $key => $auinfo) {
 
-        // Array to hold scores for AU.
+        // Arra4ry to hold scores for AU.
         $sessionscores = array();
 
         if ($auinfo[$key]["lmsId"] == $aulmsid) {
@@ -269,15 +279,20 @@ foreach ($auids as $key => $auid) {
             // Get progress from LRS.
             $session = $getprogress($registrationid, $cmi5launch->id, $session);
 
+            // Ok, so above, when session is returned we know there is no bracket
+            // so maybe it happens here? 
             // Add score to array for AU.
             $sessionscores[] = $session->score;
 
+     
             // Update session in DB.
             $DB->update_record('cmi5launch_sessions', $session);
         }
 
          // Save the session scores to AU, it is ok to overwrite.
-         $au->scores = json_encode($sessionscores);
+         $au->scores = json_encode($sessionscores, JSON_NUMERIC_CHECK );
+       
+    
     };
 
         // Create array of info to place in table.
@@ -312,16 +327,13 @@ foreach ($auids as $key => $auid) {
                 // Could this be a good place to check and call update grades?
                 // Or is that better done where  the session is updated? Cause that would be a constant check right
                 //What is auinfo here, can we pass THIS to grade?
-                echo"<br>";
-                echo "auinfo: ";
-                var_dump($auinfo);
-                echo"<br>";
+        
                 // This may work, it has quiz and satisified! What if our update grades goes whereever this does?
                 // Except! The freaing things has very specific params....
                 // Dagum! So maybe can we grab this info ourselves? With these paramrs? 
                 // Yeah grabbing the score will work, at elast for nwo
 
-                cmi5launch_update_grades($cmi5launch, $USER->id);
+              //  cmi5launch_update_grades($cmi5launch, $USER->id);
 
             }
 
@@ -358,8 +370,15 @@ foreach ($auids as $key => $auid) {
         $DB->update_record("cmi5launch_aus", $au);
 }
 
+
+// Add our newly updated auscores array to the course record.
+$userscourse->ausgrades = json_encode($auscores);
+
+
 // Lastly, update our course table.
 $updated = $DB->update_record("cmi5launch_course", $userscourse);
+
+cmi5launch_update_grades($cmi5launch, $USER->id);
 
 // This feeds the table.
 $table->data = $tabledata;

@@ -408,10 +408,21 @@ class progress  {
             // If there is only one score, it is the first attempt.
            // for
 
+         
+
+
 
             $session->progress = json_encode($progressupdate);
             $session->score = $returnscore;
 
+              // IS there brackets here?
+           //echo"<br>";
+           //echo "This is the session when score is FIRST applied: ";
+           //  var_dump($session);
+        // echo " and this is score of it ";
+         //var_dump($session->score);
+          //  echo"<br>";
+           // ok, no brackets here, lets continue
             return $session;
     }
 
