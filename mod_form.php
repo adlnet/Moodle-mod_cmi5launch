@@ -69,6 +69,7 @@ class mod_cmi5launch_mod_form extends moodleform_mod {
         );
 
         // Start required Fields for Activity.
+        /*
         $mform->addElement('text', 'cmi5launchurl', get_string('cmi5launchurl', 'cmi5launch'), array('size' => '64'));
         $mform->setType('cmi5launchurl', PARAM_TEXT);
         $mform->addRule('cmi5launchurl', null, 'required', null, 'client');
@@ -82,6 +83,7 @@ class mod_cmi5launch_mod_form extends moodleform_mod {
         $mform->addRule('cmi5activityid', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
         $mform->addHelpButton('cmi5activityid', 'cmi5activityid', 'cmi5launch');
         $mform->setDefault('cmi5activityid', 'https://example.com/example-activity');
+        */
         // End required Fields for Activity.
 
         // New local package upload.

@@ -181,8 +181,8 @@ $string['cmi5activityid_help'] = 'The identifying IRI for the primary activity b
 $string['cmi5package'] = 'Zip package';
 $string['cmi5package_help'] = 'If you have a packaged cmi5 course, you can upload it here. If you upload a package, the Launch URL and Activity ID fields above will be automatically populated when you save using data from the cmi5.xml file contained in the zip. You can edit these settings at any time, but should not change the Activity ID (either directly or by file upload) unless you understand the consequences.';
 
-$string['cmi5packagetitle'] = 'Launch settings';
-$string['cmi5packagetext'] = 'You can populate the Launch URL and Activity ID settings directly, or by uploading a zip package containing a cmi5.xml file. The launch url defined in the cmi5.xml may point to other files in the zip package, or to an external URL. The Activity ID must always be a full URL (or other IRI).';
+$string['cmi5packagetitle'] = 'CMI5 Package Upload';
+$string['cmi5packagetext'] = 'Here you upload a zip package containing a cmi5.xml file. The launch url defined in the cmi5.xml may point to other files in the zip package, or to an external URL.';
 
 $string['lrsheading'] = 'LRS settings';
 $string['lrsdefaults'] = 'LRS Default Settings';

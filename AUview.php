@@ -67,11 +67,32 @@ if ($cmi5launch->intro) { // Conditions to show the intro can change to look for
         'cmi5launchintro'
     );
 }
+/*
+?>
+<a href="http://google.com">
+<button>Back</button>
+</a>
+<?php
+*/
+?>
+<form action="view.php" method="get" target="_blank">
+    <input id="id" name="id" type="hidden" value="<?php echo $id ?>">
+  <input type="submit" value="Back"/>
+</form>
+<?php
 
 // TODO: Put all the php inserted data as parameters on the functions and put the functions in a separate JS file.
 ?>
 
     <script>
+
+
+        // Function to run when back button is pushed.
+        function back() {
+            // This is what AI wants to do, but I may want redirect? of course its a php value 
+             window.history.back();
+
+        }
 
         function key_test(registration) {
 
@@ -213,18 +234,11 @@ if (!$au->sessions == null) {
     echo html_writer::table($table);
 
     //Ok, lets see if we are getting the bracket here?
-    echo "<br>";
-    echo "This is the bracket: ";
-    var_dump($sessionscores);
-    echo "<br>";
-
+   
     // Save the session scores to AU, it is ok to overwrite.
     $au->scores = json_encode($sessionscores);
   //Ok, lets see if we are getting the bracket here?
-  echo "<br>";
-  echo "This is the au after scores is added: ";
-  var_dump($au);
-  echo "<br>";
+
 
     //And here we can add the au name and record scores? 
     // Well mybe not, cause it is already in only ONE au here
@@ -246,6 +260,8 @@ echo "<p tabindex=\"0\"
           . get_string('cmi5launch_attempt', 'cmi5launch')
           . "</a></p>";
 
+
+
 // Add a form to be posted based on the attempt selected.
 ?>
     <form id="launchform" action="launch.php" method="get" target="_blank">
@@ -253,6 +269,7 @@ echo "<p tabindex=\"0\"
         <input id="id" name="id" type="hidden" value="<?php echo $id ?>">
         <input id="n" name="n" type="hidden" value="<?php echo $n ?>">
     </form>
+
 <?php
 
 echo $OUTPUT->footer();
