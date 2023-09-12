@@ -86,14 +86,6 @@ if ($cmi5launch->intro) { // Conditions to show the intro can change to look for
 
     <script>
 
-
-        // Function to run when back button is pushed.
-        function back() {
-            // This is what AI wants to do, but I may want redirect? of course its a php value 
-             window.history.back();
-
-        }
-
         function key_test(registration) {
 
             if (event.keyCode === 13 || event.keyCode === 32) {
@@ -161,10 +153,12 @@ $regid = $userscourse->registrationid;
 // If it is null there have been no previous sessions.
 if (!$au->sessions == null) {
 
+
     // Array to hold info for table population.
     $tabledata = array();
 
     // Build table.
+
     $table = new html_table();
     $table->id = 'cmi5launch_auSessionTable';
     $table->caption = get_string('modulenameplural', 'cmi5launch');
@@ -252,6 +246,7 @@ $newsession = "true";
 // Create a string to pass the auid and new session info to next page (launch.php).
 $infofornextpage = $auid . "," . $newsession;
 // New attempt.
+
 echo "<p tabindex=\"0\"
           onkeyup=\"key_test('" . $infofornextpage . "')\"
           id='cmi5launch_newattempt'><a onclick=\"mod_cmi5launch_launchexperience('"

@@ -568,6 +568,7 @@ function cmi5launch_process_new_package($cmi5launch) {
     $cmid = $cmi5launch->coursemodule;
     $context = context_module::instance($cmid);
 
+
     // Bring in functions from classes cmi5Connector and AU helpers.
     $connectors = new cmi5_connectors;
     $auhelper = new au_helpers;

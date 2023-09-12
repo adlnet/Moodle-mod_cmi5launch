@@ -38,8 +38,10 @@ class cmi5_connectors {
     public function cmi5launch_get_create_course() {
         return [$this, 'cmi5launch_create_course'];
     }
+
     public function cmi5launch_get_session_info() {
         return [$this, 'cmi5launch_retrieve_session_info'];
+
     }
     public function cmi5launch_get_registration_with_post() {
         return [$this, 'cmi5launch_retrieve_registration_with_post'];
@@ -55,26 +57,32 @@ class cmi5_connectors {
     // @return  $result - Response from cmi5 player.
     public function cmi5launch_create_course($id, $tenanttoken, $fileName) {
 
+
         global $DB, $CFG;
         $settings = cmi5launch_settings($id);
+
 
         // Retrieve and assign params.
         $token = $tenanttoken;
         $file = $fileName;
+
 
         // Build URL to import course to.
         $url= $settings['cmi5launchplayerurl'] . "/api/v1/course" ;
 
         // The body of the request must be made as array first.
         $data = $file;
-  
+
         // Sends the stream to the specified URL.
         $result = $this->cmi5launch_send_request_to_cmi5_player($data, $url, $token);
+
 
         if ($result === FALSE) {
 
             if ($CFG->debugdeveloper) {
+              
                 echo "Something went wrong creating the course";
+
                 echo "<br>";
               
             }
@@ -92,6 +100,7 @@ class cmi5_connectors {
      * @param $pass - password.
      * @param $newtenantname - the name the new tenant will be, retreived from Tenant Name textbox.
      */
+
     public function cmi5launch_create_tenant($urltosend, $user, $pass, $newtenantname){
 
         global $CFG;
@@ -104,7 +113,7 @@ class cmi5_connectors {
         // The body of the request must be made as array first.
         $data = array(
             'code' => $tenant);
-    
+
         // Sends the stream to the specified URL 
         $result = $this->cmi5launch_send_request_to_cmi5_player($data, $url, $username, $password);
 
@@ -175,6 +184,7 @@ class cmi5_connectors {
             echo "<br>";
                
             restore_error_handler();
+
         }
 
             $registrationInfo = json_decode($result, true);
@@ -186,6 +196,7 @@ class cmi5_connectors {
             return $registrationInfo; //much better!
         }
     }
+
     /** 
      * Function to retreive registration from cmi5 player.
      * This way uses the course id and actor name.
@@ -195,6 +206,7 @@ class cmi5_connectors {
      * @param $id - the course id in MOODLE.
      */ 
     function cmi5launch_retrieve_registration_with_post($courseid, $id) {
+
 
         global $USER;
 
@@ -230,6 +242,7 @@ class cmi5_connectors {
             )
         );
 
+
         // The options are here placed into a stream to be sent.
         $context  = stream_context_create($options);
         
@@ -255,6 +268,7 @@ class cmi5_connectors {
             echo "<br>";
                
             restore_error_handler();
+
         }
 
             $registrationInfo = json_decode($result, true);
@@ -287,7 +301,9 @@ class cmi5_connectors {
         $tokenUser = $audience;
         $id = $tenantid;
 
+
         // The body of the request must be made as array first.
+
         $data = array(
             'tenantId' => $id,
             'audience' => $tokenUser
@@ -295,7 +311,6 @@ class cmi5_connectors {
 
         // Sends the stream to the specified URL.
         $token = $this->cmi5launch_send_request_to_cmi5_player($data, $url, $username, $password);
-
         
         if ($token === FALSE) {
 
@@ -305,6 +320,7 @@ class cmi5_connectors {
             } else {
                 return $token;
             }
+
 
         }
     }
@@ -353,6 +369,7 @@ class cmi5_connectors {
         // There can be multiple headers but as an array under the ONE header.
         // Content(body) must be JSON encoded here, as that is what CMI5 player accepts.
         // JSON_UNESCAPED_SLASHES used so http addresses are displayed correctly.
+
      	   $options = array(
             'http' => array(
                 'method'  => 'POST',
@@ -396,6 +413,7 @@ class cmi5_connectors {
         // Only return the URL.
         $urlDecoded = json_decode($launchresponse, true);
 
+
         return $urlDecoded;
     }
 
@@ -409,6 +427,7 @@ class cmi5_connectors {
         public function cmi5launch_send_request_to_cmi5_player($databody, $url, ...$tenantinfo) {
             $data = $databody;
             $tenantinformation = $tenantinfo;
+
     
                 //If number of args is greater than one it is for retrieving tenant info and args are username and password
                 if(count($tenantinformation) > 1 ){
@@ -514,12 +533,12 @@ class cmi5_connectors {
 
     /**
     *Retrieve session info from cmi5player
-    * @param mixed $sessionId - the session id to retrieve
+    * @param mixed $sessionid - the session id to retrieve
      * @param mixed $id - cmi5 id
      * @return mixed
      */
-    public function cmi5launch_retrieve_session_info($sessionId, $id){
 
+    public function cmi5launch_retrieve_session_info_from_player($sessionid, $id){
         global $DB;
 
 		$settings = cmi5launch_settings($id);
@@ -528,7 +547,7 @@ class cmi5_connectors {
 		$playerUrl = $settings['cmi5launchplayerurl'];
 
         //Build URL for launch URL request
-	    $url = $playerUrl . "/api/v1/session/" . $sessionId;
+	    $url = $playerUrl . "/api/v1/session/" . $sessionid;
 
 		// use key 'http' even if you send the request to https://...
         //There can be multiple headers but as an array under the ONE header

@@ -262,10 +262,10 @@ function xmldb_cmi5launch_upgrade($oldversion) {
         if (!$dbman->table_exists($table)) {
             $dbman->create_table($table);
         }
-
         upgrade_mod_savepoint(true, 2023081516, 'cmi5launch');
 
     }
+
 
     if ($oldversion < 2013083100) {
         // Define field cmi5activityid to be added to cmi5launch.
