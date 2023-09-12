@@ -86,6 +86,69 @@ class progress  {
     {
         global $CFG;
 
+
+class progress{
+
+	public function cmi5launch_get_retrieve_statements()
+	{
+	    return [$this, 'cmi5launch_retrieve_statements'];
+	}
+
+	public function cmi5launch_get_request_completion_info()
+	{
+		return [$this, 'cmi5launch_request_completion_info'];
+	}
+
+	public function cmi5launch_get_request_statements_from_lrs()
+	{
+	    return [$this, 'cmi5launch_request_statements_from_lrs'];
+	}
+
+	/**
+	 * Send request to LRS
+	 * @param mixed $regId - registration id
+	 * @param mixed $session - a session object 
+	 * @return array
+	 */
+	public function cmi5launch_request_statements_from_lrs($registrationid, $session /*$id*/){
+
+		//Array to hold result
+		$result = array();
+
+		//When searching by reg id, which is the option available to Moodle, many results are returned, so iterating through them is necessary
+		$data = array(
+			'registration' => $registrationid,
+			'since' => $session->createdAt
+		);
+
+		
+		$statements = $this->cmi5launch_send_request_to_lrs($data, $registrationid);
+
+	
+		//The results come back as nested array under more then statements. We only want statements, and we want them unique
+		$statement = array_chunk($statements["statements"], 1);
+
+		$length = count($statement);
+
+		for ($i = 0; $i < $length; $i++){
+		
+		//This separates the larger statement into the separate sessions and verbs
+			$current = ($statement[$i]);
+		array_push($result, array ($registrationid => $current) );
+		}
+	
+		return $result;
+	}
+
+
+	/**
+	 * Builds and sends requests to LRS
+	 * @param mixed $data
+	 * @param mixed $id
+	 * @return mixed
+	 */
+	public function cmi5launch_send_request_to_lrs($data, $id)
+	{
 		$settings = cmi5launch_settings($id);
 
 		// Url to request statements from.
@@ -100,6 +163,7 @@ class progress  {
 		// Use key 'http' even if you send the request to https://...
 		// There can be multiple headers but as an array under the ONE header.
 		// Content(body) must be JSON encoded here, as that is what CMI5 player accepts.
+
 		$options = array(
 			'http' => array(
 				'method'  => 'GET',
@@ -114,7 +178,6 @@ class progress  {
 
 		// Sends the stream to the specified URL and stores results.
         // The false is use_include_path, which we dont want in this case, we want to go to the url.
-
         try {
             // File_get_contents throws a warning not error, so wwe need a specific handler to catch and alert user. 
             set_error_handler(function ($severity, $message, $file, $line) {
@@ -132,46 +195,45 @@ class progress  {
             echo "<br>";
             echo "Be sure to check username and password for LRS in settings as well. ";
             echo "<br>";
-            
             echo 'Caught exception. Error message from LRS is: ',  $e->getMessage(), "\n";
                
             restore_error_handler();
-            
         }
 
 		$resultDecoded = json_decode($result, true);
-		
+
+
 		return $resultDecoded;
 	}
 	
 	/**
 	 * Returns an actor (name) retrieved from collected LRS data based on registration id
-	 * @param mixed $resultChunked - data retrieved from LRS, usually an array
+	 * @param mixed $resultarray - data retrieved from LRS, usually an array
 	 * @param mixed $i - the registration id
 	 * @return mixed - actor
 	 */
-	public function cmi5launch_retrieve_actor($info, $registrationid){
+	public function cmi5launch_retrieve_actor($resultarray, $registrationid){
 
-		$actor = $info[$registrationid][0]["actor"]["account"]["name"];
+		$actor = $resultarray[$registrationid][0]["actor"]["account"]["name"];
 		return $actor;
 	}
 
 		/**
 	 * Returns a verb retrieved from collected LRS data based on registration id
 	 * @param mixed $resultarray - data retrieved from LRS, usually an array
-	 * @param mixed $i - the registration id
+	 * @param mixed $registrationid - the registration id
 	 * @return mixed - verb
 	 */
-	public function cmi5launch_retrieve_verbs($resultarray, $i){
+	public function cmi5launch_retrieve_verbs($resultarray, $registrationid){
 
 		//Some verbs do not have an easy to display 'language' option, we need to check if 'display' is present			
-		$verbInfo = $resultarray[$i][0]["verb"];
+		$verbInfo = $resultarray[$registrationid][0]["verb"];
 		$display = array_key_exists("display", $verbInfo);
 
 			//If it is null then there is no display, so go by verb id
 			if(!$display ){
 				//retrieve id
-				$verbId = $resultarray[$i][0]["verb"]["id"];
+				$verbId = $resultarray[$registrationid][0]["verb"]["id"];
 
 				//SPLITS id in two on 'verbs/', we want the end which is the actual verb
 				$split = explode('verbs/', $verbId);
@@ -179,7 +241,7 @@ class progress  {
 
 			}else{
 				//IF it is not null then there is a language easy to read version of verb display, such as 'en' or 'en-us'
-				$verbLang =  $resultarray[$i][0]["verb"]["display"];
+				$verbLang =  $resultarray[$registrationid][0]["verb"]["display"];
 				//Retreive the language
 				$lang = array_key_first($verbLang);
 				//use it to retreive verb
@@ -394,6 +456,7 @@ class progress  {
 			//parse through array 'ext' to find the one holding session id, 
 			//grab id and go with it
 
+
 		foreach($resultDecoded as $singlestatement){
 
             // We need to sort the statements by finding their session id.
@@ -455,4 +518,3 @@ class progress  {
     }
 
 }
-?>

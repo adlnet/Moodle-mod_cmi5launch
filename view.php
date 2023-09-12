@@ -30,9 +30,11 @@ use mod_cmi5launch\local\session_helpers;
 require_once("../../config.php");
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require('header.php');
+require_login($course, false, $cm);
 
 // Bring in functions and classes.
 $progress = new progress;
+
 $aushelpers = new au_helpers;
 $connectors = new cmi5_connectors;
 $sessionhelpers = new session_helpers;
@@ -152,9 +154,11 @@ if ($exists == false) {
 
     // Retrieve AU ids for this user/course.
     $aus = json_decode($record->aus);
+
     $auids = $saveaus($createaus($aus));
     $userscourse->aus = (json_encode($auids));
     // Save new record to DB.
+
     $DB->insert_record('cmi5launch_course', $userscourse);
 
 } else {
@@ -167,6 +171,7 @@ if ($exists == false) {
 
     // Retrieve AU ids.
     $auids = (json_decode($userscourse->aus) );
+
 }
 
 // Array to hold info for table population.
@@ -197,6 +202,7 @@ $table->head = array(
 
 // Cycle through AU IDs.
 foreach ($auids as $key => $auid) {
+
 
     $au = $getaus($auid);
 
@@ -283,6 +289,7 @@ foreach ($auids as $key => $auid) {
             // so maybe it happens here? 
             // Add score to array for AU.
             $sessionscores[] = $session->score;
+
 
      
             // Update session in DB.

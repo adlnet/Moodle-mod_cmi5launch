@@ -45,12 +45,15 @@ $event->add_record_snapshot('cmi5launch', $cmi5launch);
 $event->trigger();
 
 // External class and funcs to use.
+
 $auhelper = new au_helpers;
 $connectors = new cmi5_connectors;
 $sessionhelper = new session_helpers;
 
+
 $savesession = $sessionhelper->cmi5launch_get_create_session();
 $cmi5launchretrieveurl = $connectors->cmi5launch_get_retrieve_url();
+
 $retrieveaus = $auhelper->get_cmi5launch_retrieve_aus_from_db();
 
 // Retrieve registration id and au index (from AUview.php).
@@ -69,6 +72,7 @@ $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
 $userscourse = $DB->get_record('cmi5launch_course', ['courseid'  => $record->courseid, 'userid'  => $USER->id]);
 
 // Retrieve registration id.
+
 $registrationid = $userscourse->registrationid;
 
 if (empty($registrationid)) {
@@ -91,6 +95,7 @@ if ($idandstatus[0] == "true") {
 
     // Retrieve AUs.
     $au = $retrieveaus($id);
+
 
     // Retrieve the au index.
     $auindex = $au->auindex;

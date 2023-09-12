@@ -27,6 +27,7 @@ defined('MOODLE_INTERNAL') || die();
 use mod_cmi5launch\local\cmi5_connectors;
 use mod_cmi5launch\local\session;
 
+
 class session_helpers {
 
     public function cmi5launch_get_create_session() {
