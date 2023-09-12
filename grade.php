@@ -1,5 +1,4 @@
-
-   <?php
+<?php
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -17,7 +16,6 @@
 
 /**
  * Redirect the user based on their capabilities to either a CMI5 activity or to CMI5 reports
- *
  * @package   mod_cmi5
  * @category  grade
  * @copyright 2023 M.Bohland
@@ -25,19 +23,23 @@
  */
 
 require_once("../../config.php");
-
-//MB TODO
-//Maybe return later? Framework for Gradebook in Moodle integration 
-
+require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
+require('header.php');
+// MB TODO.
+// Maybe return later? Framework for Gradebook in Moodle integration.
 
 // Course module ID
 $id = required_param('id', PARAM_INT);
-// Item number, may be != 0 for activities that allow more than one grade per user
+// Item number, may be != 0 for activities that allow more than one grade per user.
 $itemnumber = optional_param('itemnumber', 0, PARAM_INT); 
- // Graded user ID (optional)
+ // Graded user ID (optional).
 $userid = optional_param('userid', 0, PARAM_INT);
+global $cmi5launch, $USER, $mod;
 
-if (! $cm = get_coursemodule_from_id('cmi5', $id)) {
+// why is cmi5launch null??? 
+
+// Get the course module.
+if (! $cm = get_coursemodule_from_id('cmi5launch', $cm->id)) {
     throw new \moodle_exception('invalidcoursemodule');
 }
 
@@ -45,11 +47,16 @@ if (! $scorm = $DB->get_record('cmi5launch', array('id' => $cm->instance))) {
     throw new \moodle_exception('invalidcoursemodule');
 }
 
-if (! $course = $DB->get_record('cmi5launch', array('id' => $cm->id))) {
+if (! $course = $DB->get_record('cmi5launch', array('course' => $cm->course, 'name' => $cm->name))) {
+   echo"<br>";
+    $returned = $DB->get_record('cmi5launch', array('course' => $cm->course, 'name' => $cm->name));
+    echo "returned is: ";                   
+    var_dump($returned);
+    echo"<br>";
     throw new \moodle_exception('coursemisconf');
 }
 
-require_login($course, false, $cm);
+//require_login($course, false, $cm);
 
 //How scorm did it
 /*
@@ -62,9 +69,9 @@ if (has_capability('mod/scorm:viewreport', context_module::instance($cm->id))) {
 //TODO
 //We are currently using this capability, but we should make one for grading
 if (has_capability('mod/cmi5launch:addinstance', $context)) {
-	//This is teacher/manger/non editing teacher;
+	// This is teacher/manger/non editing teacher.
     redirect('report.php?id='.$cm->id);
-}else{
-    //This is student or other non-teacher role
+} else {
+    // This is student or other non-teacher role.
     redirect('view.php?id='.$cm->id);
 }   

@@ -53,7 +53,7 @@ class restore_cmi5launch_activity_task extends restore_activity_task {
      *
      * @return array
      */
-    static public function define_decode_contents() {
+    public static function define_decode_contents() {
         $contents = array();
 
         $contents[] = new restore_decode_content('cmi5launch', array('intro'), 'cmi5launch');
@@ -67,16 +67,16 @@ class restore_cmi5launch_activity_task extends restore_activity_task {
      *
      * @return array
      */
-    static public function define_decode_rules() {
+    public static function define_decode_rules() {
         $rules = array();
 
         // List of cmi5launchs in course.
         $rules[] = new restore_decode_rule('cmi5LAUNCHINDEX', '/mod/cmi5launch/index.php?id=$1', 'course');
 
-        // cmi5launch by cm->id.
+        // Cmi5launch by cm->id.
         $rules[] = new restore_decode_rule('cmi5LAUNCHVIEWBYID', '/mod/cmi5launch/view.php?id=$1', 'course_module');
 
-        // cmi5launch by cmi5launch->id.
+        // Cmi5launch by cmi5launch->id.
         $rules[] = new restore_decode_rule('cmi5LAUNCHVIEWBYB', '/mod/cmi5launch/view.php?b=$1', 'cmi5launch');
 
         // Convert old cmi5launch links MDL-33362 & MDL-35007.
@@ -93,7 +93,7 @@ class restore_cmi5launch_activity_task extends restore_activity_task {
      *
      * @return array
      */
-    static public function define_restore_log_rules() {
+    public static function define_restore_log_rules() {
         $rules = array();
 
         $rules[] = new restore_log_rule('cmi5launch', 'add', 'view.php?id={course_module}', '{cmi5launch}');
@@ -115,7 +115,7 @@ class restore_cmi5launch_activity_task extends restore_activity_task {
      *
      * @return array
      */
-    static public function define_restore_log_rules_for_course() {
+    public static function define_restore_log_rules_for_course() {
         $rules = array();
 
         $rules[] = new restore_log_rule('cmi5launch', 'view all', 'index.php?id={course}', null);

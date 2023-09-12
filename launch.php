@@ -20,10 +20,12 @@
  * @copyright  2023 Megan Bohland
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
+require('header.php');
 
- use mod_cmi5launch\au;
- use mod_cmi5launch\local\progress;
- use mod_cmi5launch\local\course;
+require_once("$CFG->dirroot/lib/outputcomponents.php");
+ require_login($course, false, $cm);
+
  use mod_cmi5launch\local\cmi5_connectors;
  use mod_cmi5launch\local\au_helpers;
  use mod_cmi5launch\local\session_helpers;
@@ -42,97 +44,102 @@ $event->add_record_snapshot('course_modules', $cm);
 $event->add_record_snapshot('cmi5launch', $cmi5launch);
 $event->trigger();
 
-//External class and funcs to use
+// External class and funcs to use.
+
 $auhelper = new au_helpers;
 $connectors = new cmi5_connectors;
 $sessionhelper = new session_helpers;
 
-$saveSession = $sessionhelper->cmi5launch_get_create_session();
-$cmi5launch_retrieve_url = $connectors->cmi5launch_get_retrieve_url();
+
+$savesession = $sessionhelper->cmi5launch_get_create_session();
+$cmi5launchretrieveurl = $connectors->cmi5launch_get_retrieve_url();
+
 $retrieveaus = $auhelper->get_cmi5launch_retrieve_aus_from_db();
 
-//Retrieve registration id and au index (from AUview.php)
-$fromAUview = required_param('launchform_registration', PARAM_TEXT);
+// Retrieve registration id and au index (from AUview.php).
+$fromauview = required_param('launchform_registration', PARAM_TEXT);
 
-//Break it into array (AU or session id is first index)
-$idAndStatus = explode(",", $fromAUview);
+// Break it into array (AU or session id is first index).
+$idandstatus = explode(",", $fromauview);
 
-//Retrieve AU OR session id
-$id = array_shift($idAndStatus);
+// Retrieve AU OR session id.
+$id = array_shift($idandstatus);
 
 // Reload cmi5 instance.
 $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
 
-//Retrieve user's course record
+// Retrieve user's course record.
 $userscourse = $DB->get_record('cmi5launch_course', ['courseid'  => $record->courseid, 'userid'  => $USER->id]);
 
+// Retrieve registration id.
 
-//Retrieve registration id
 $registrationid = $userscourse->registrationid;
 
 if (empty($registrationid)) {
-	echo "<div class='alert alert-error'>" . get_string('cmi5launch_regidempty', 'cmi5launch') . "</div>";
+    echo "<div class='alert alert-error'>" . get_string('cmi5launch_regidempty', 'cmi5launch') . "</div>";
 
-	// Failed to connect to LRS.
-	if ($CFG->debug == 32767) {
+    // Failed to connect to LRS.
+    if ($CFG->debug == 32767) {
 
-		echo "<p>Error attempting to get registration id querystring parameter.</p>";
+        echo "<p>Error attempting to get registration id querystring parameter.</p>";
 
-		die();
-	}
+        die();
+    }
 }
-//To hold launch url or whether launch url is new!
+
+// To hold launch url or whether launch url is new.
 $location = "";
 
-//If true, this is a NEW launch
-if ($idAndStatus[0] == "true") {
-        
-	//Retrieve AUs         
-	$au = $retrieveaus($id);
+// If true, this is a NEW launch.
+if ($idandstatus[0] == "true") {
 
-	//Retrieve AU index
-	$auIndex = $au->auindex;
+    // Retrieve AUs.
+    $au = $retrieveaus($id);
 
-	//Pass in the au index to retrieve a launchurl and session id
-	$urlDecoded = $cmi5launch_retrieve_url($cmi5launch->id, $auIndex);
 
-	//Retrieve and store session id in the aus table
-	$sessionID = intval($urlDecoded['id']);
-	
-	//Check if there are previous sessions
-    	if(!$au->sessions == NULL){
-		//We don't want to overwrite so retrieve the sessions
-		$sessionList = json_decode($au->sessions);
-		//now add the new session number
-		$sessionList[] = $sessionID;
+    // Retrieve the au index.
+    $auindex = $au->auindex;
 
-   	}else{
-		//It is null so just start fresh
-		$sessionList = array();
-		$sessionList[] = $sessionID;
-   	}
+    // Pass in the au index to retrieve a launchurl and session id.
+    $urldecoded = $cmi5launchretrieveurl($cmi5launch->id, $auindex);
 
-	//Save sessions   
-	$au->sessions =json_encode($sessionList );
+    // Retrieve and store session id in the aus table.
+    $sessionid = intval($urldecoded['id']);
 
-     //The record needs to updated in db
-   	$updated =  $DB->update_record('cmi5launch_aus', $au, true);
+    // Check if there are previous sessions.
+    if (!$au->sessions == null) {
+        // We don't want to overwrite so retrieve the sessions before changing them.
+        $sessionlist = json_decode($au->sessions);
+        // Now add the new session number.
+        $sessionlist[] = $sessionid;
 
-     //Retrieve the launch url
-	$location = $urlDecoded['url'];
-	//And launch method
-	$launchMethod = $urlDecoded['launchMethod'];
+    } else {
+        // If it is null just start fresh.
+        $sessionlist = array();
+        $sessionlist[] = $sessionid;
+    }
 
-	//Create and save session object to session table
-	$saveSession($sessionID, $location, $launchMethod);
+    // Save sessions.
+    $au->sessions = json_encode($sessionlist);
+
+    // The record needs to updated in DB.
+    $updated = $DB->update_record('cmi5launch_aus', $au, true);
+
+    // Retrieve the launch url.
+    $location = $urldecoded['url'];
+    // And launch method.
+    $launchmethod = $urldecoded['launchmethod'];
+
+    // Create and save session object to session table.
+    $savesession($sessionid, $location, $launchmethod);
 
 } else {
-    //This is a new session, we want to get the launch url from the sessions
+    // This is a new session, we want to get the launch url from the sessions.
     $session = $DB->get_record('cmi5launch_sessions',  array('sessionid' => $id));
-	
-    //Launch url isss in old session record
+
+    // Launch url is in old session record.
     $location = $session->launchurl;
-} 
+}
 
 header("Location: ". $location);
 

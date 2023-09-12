@@ -69,25 +69,26 @@ class mod_cmi5launch_mod_form extends moodleform_mod {
         );
 
         // Start required Fields for Activity.
+        /*
         $mform->addElement('text', 'cmi5launchurl', get_string('cmi5launchurl', 'cmi5launch'), array('size' => '64'));
         $mform->setType('cmi5launchurl', PARAM_TEXT);
         $mform->addRule('cmi5launchurl', null, 'required', null, 'client');
         $mform->addRule('cmi5launchurl', get_string('maximumchars', '', 1333), 'maxlength', 1333, 'client');
         $mform->addHelpButton('cmi5launchurl', 'cmi5launchurl', 'cmi5launch');
         $mform->setDefault('cmi5launchurl', 'https://example.com/example-activity/index.html');
-        
-        
+
         $mform->addElement('text', 'cmi5activityid', get_string('cmi5activityid', 'cmi5launch'), array('size' => '64'));
         $mform->setType('cmi5activityid', PARAM_TEXT);
         $mform->addRule('cmi5activityid', null, 'required', null, 'client');
         $mform->addRule('cmi5activityid', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
         $mform->addHelpButton('cmi5activityid', 'cmi5activityid', 'cmi5launch');
         $mform->setDefault('cmi5activityid', 'https://example.com/example-activity');
+        */
         // End required Fields for Activity.
 
         // New local package upload.
 
-        //Ok, this is making an array of filemanager
+        // This is making an array of filemanager.
         $filemanageroptions = array();
         $filemanageroptions['accepted_types'] = array('.zip');
         $filemanageroptions['maxbytes'] = 0;
@@ -105,7 +106,7 @@ class mod_cmi5launch_mod_form extends moodleform_mod {
 
         // Start advanced settings.
         $mform->addElement('header', 'lrsheading', get_string('lrsheading', 'cmi5launch'));
-                                       
+                    
         // Actor account homePage.
         $mform->addElement(
             'text',

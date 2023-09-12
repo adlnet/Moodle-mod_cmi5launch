@@ -28,7 +28,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2023081516;   // The current module version (Date: YYYYMMDDXX).
+$plugin->version   = 2023091300;      // The current module version (Date: YYYYMMDDXX).
+
 $plugin->requires  = 2015111000;      // Requires Moodle 3.0 version.
 $plugin->cron      = 0;               // Period for cron to check this module (secs).
 $plugin->component = 'mod_cmi5launch'; // To check on upgrade, that module sits in correct place.

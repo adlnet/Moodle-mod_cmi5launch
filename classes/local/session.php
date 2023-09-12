@@ -15,48 +15,34 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- *Class to handle Sessions. 
+ * Class to handle Sessions.
  *
  * @copyright  2023 Megan Bohland
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace mod_cmi5launch\local;
+defined('MOODLE_INTERNAL') || die();
 
 class session {
-  // Properties
-  //$id is session id
-  public $id, $tenantname, $tenantId, $registrationsCoursesAusId, $lmsid, $firstlaunch, $lastlaunch, 
-  $progress = [], $auid, $aulaunchurl, $launchurl, 
-  $completed_passed, $grade, $registrationid, $lrscode, 
-  $createdAt, $updatedAt, $registrationCourseAusId, 
-  $code, $lastRequestTime, $launchTokenId, $launchMode, $masteryScore, 
-  $contextTemplate, $isLaunched, $isInitialized, $initializedAt, $isCompleted, 
-  $isPassed, $isFailed, $isTerminated, $isAbandoned, $courseid;
+    // Properties.
+    // id is session id.
+    public $id, $tenantname, $tenantId, $registrationsCoursesAusId, $lmsid, $firstlaunch, $lastlaunch,
+    $progress = [], $auid, $aulaunchurl, $launchurl,
+    $completed_passed, $grade, $registrationid, $lrscode,
+    $createdAt, $updatedAt, $registrationCourseAusId,
+    $code, $lastRequestTime, $launchTokenId, $launchMode, $masteryScore,
+    $contextTemplate, $isLaunched, $isInitialized, $initializedAt, $isCompleted,
+    $isPassed, $isFailed, $isTerminated, $isAbandoned, $courseid, $completed, $passed, $inprogress;
 
+    // Constructs sessions. Is fed array and where array key matches property, sets the property.
+    public function __construct($statement) {
 
-  //Why did I ake these arrays? they should just be bools
-  public $completed, $passed, $inprogress = true | false;
-  //public $passed = array('finished'=> true|false, 'info' =>"");
-  //public $inProgress = array('finished'=> true|false, 'info' =>"");
+        foreach ($statement as $key => $value) {
 
-  // Methods
-  function set_name($name) {
-    $this->name = $name;
-  }
-  function get_name() {
-    return $this->name;
-  }
+            $this->$key = ($value);
+        }
 
-//Constructs sessionss. Is fed array and where array key matches property, sets the property.  
-function __construct($statement){
-
-  foreach($statement as $key => $value){
-    
-    $this->$key = ($value);
-	}	
+    }
 
 }
-
-}
-?>

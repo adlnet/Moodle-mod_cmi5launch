@@ -24,149 +24,138 @@
 namespace mod_cmi5launch\local;
 
 use mod_cmi5launch\local\au;
+defined('MOODLE_INTERNAL') || die();
 
-class au_helpers
-{
-	public function get_cmi5launch_retrieve_aus()
-	{
-		return [$this, 'cmi5launch_retrieve_aus'];
-	}
-	public function get_cmi5launch_create_aus()
-	{
-		return [$this, 'cmi5launch_create_aus'];
-	}
-	public function get_cmi5launch_save_aus()
-	{
-		return [$this, 'cmi5launch_save_aus'];
-	}
+class au_helpers {
+    public function get_cmi5launch_retrieve_aus() {
+        return [$this, 'cmi5launch_retrieve_aus'];
+    }
+    public function get_cmi5launch_create_aus() {
+        return [$this, 'cmi5launch_create_aus'];
+    }
+    public function get_cmi5launch_save_aus() {
+        return [$this, 'cmi5launch_save_aus'];
+    }
+    public function get_cmi5launch_retrieve_aus_from_db() {
+        return [$this, 'cmi5launch_retrieve_aus_from_db'];
+    }
 
-	public function get_cmi5launch_retrieve_aus_from_db()
-	{
-		return [$this, 'cmi5launch_retrieve_aus_from_db'];
-	}
+    /**
+     * Parses and retrieves AUs from the returned info from CMI5 player.
+     * @param mixed $returnedinfo
+     * @return array
+     */
+    public function cmi5launch_retrieve_aus($returnedinfo) {
+        // The results come back as nested array under more then just AUs.
+        // We only want the info pertaining to the AU.
+        $resultchunked = array_chunk($returnedinfo["metadata"]["aus"], 1, );
 
+        return $resultchunked;
+    }
 
-	/**
-	 * Parses and retrieves AUs from the returned info from CMI5
-	 * @param mixed $returnedinfo
-	 * @return array
-	 */
-	function cmi5launch_retrieve_aus($returnedinfo)
-	{
-		//The results come back as nested array under more then just AUs. We only want the info pertaining to AU
-		$resultChunked = array_chunk($returnedinfo["metadata"]["aus"], 1, );
+    /**
+     * So it should be fed an array of statements that then assigns the values to 
+     * several aus, and then returns them as au objects.
+     * @param mixed $austatements
+     * @return array<au>
+     */
+    public function cmi5launch_create_aus($austatements) {
+        
+        // Needs to return our new AU objects.
+        $newaus = array();
 
-		return $resultChunked;
-	}
+        foreach ($austatements as $int => $info) {
 
-	/**
-	 *So it should be fed an array of statements that then assigns the values to 
-	 *several aus, and then returns them as au objects!
-	 * @param mixed $austatements
-	 * @return array<au>
-	 */
-	function cmi5launch_create_aus($austatements)
-	{
-		//Needs to return our new AU objects
-		$newAus = array();
+            // The aus come back decoded from DB nestled in an array.
+            // So they are the first key, which is '0'.
+            $statement = $info[0];
 
-		//for ($i = 0; $i < count($auStatements); $i++) {
-		foreach ($austatements as $int => $info) {
+            $au = new au($statement);
 
-			//The aus come back decoded from DB nestled in an array, so they are the first key,
-			//which is '0'
-			$statement = $info[0];
+            // Assign the newly created au to the return array.
+            $newaus[] = $au;
+        }
 
-			//Maybe just combine 45 and 48? TODO
-			$au = new au($statement);
+        // Return our new list of AU.
+        return $newaus;
+    }
 
-			//assign the newly created au to the return array
-			$newAus[] = $au;
-		}
+    /**
+     * Takes a list of AUs and record and saves to the DB.
+     * @param mixed $auobjectarray
+     * @return array
+     */
+    public function cmi5launch_save_aus($auobjectarray) {
+        // Add userid to the record.
+        global $DB, $USER;
+        $table = "cmi5launch_aus";
 
-		//Return our new list of AU!
-		return $newAus;
-	}
+        // An array to hold the created ids.
+        $auids = array();
 
+        // For each AU in array build a new record and save it.
+        // Because of so many nested variables this needs to be done manually.
+        foreach ($auobjectarray as $auobject) {
+            // Make a newrecord to save.
+            $newrecord = new \stdClass();
 
-	/**
-	 * Takes a list of AUs and record and saves to DB
-	 * @param mixed $auobjectarray
-	 * @return array
-	 */
-	function cmi5launch_save_aus($auobjectarray)
-	{
-		//Add userid to the record
-		global $DB, $USER;
-		//$record;
-		$table = "cmi5launch_aus";
+            $newrecord->userid = $USER->id;
+            $newrecord->auid = $auobject->id;
+            $newrecord->launchmethod = $auobject->launchMethod;
+            $newrecord->lmsid = json_decode(json_encode($auobject->lmsId, true) );
+            $newrecord->url = $auobject->url;
+            $newrecord->type = $auobject->type;
+            $title = json_decode(json_encode($auobject->title), true);
+            $newrecord->title = $title[0]['text'];
+            $newrecord->moveon = $auobject->moveOn;
+            $newrecord->auindex = $auobject->auIndex;
+            $newrecord->parents = json_encode($auobject->parents, true);
+            $newrecord->objectives = $auobject->objectives;
+            $desc = json_decode(json_encode($auobject->description), true);
+            $newrecord->description = $desc[0]['text'];
+            $newrecord->activitytype = $auobject->activityType;
+            $newrecord->masteryscore = $auobject->masteryscore;
+            $newrecord->completed = $auobject->completed;
+            $newrecord->passed = $auobject->passed;
+            $newrecord->inprogress = $auobject->inprogress;
+            $newrecord->noattempt = $auobject->noattempt;
+            $newrecord->satisfied = $auobject->satisfied;
 
-		//Lets make an array to hold the created ids
-		$auIDs = array();
+            // Save the record and get the new id.
+            $newid = $DB->insert_record($table, $newrecord, true);
+            // Save new id to list to pass back.
+            $auids[] = $newid;
+        }
 
-		//for each AU in array build a new record and save it. Because of so many nested variables this needs to be done manually
-		foreach ($auobjectarray as $auObject) {
-			//Make a newRecord to save
-			$newRecord = new \stdClass();
-			$newRecord->userid = $USER->id;
-			$newRecord->auid = $auObject->id;
-			$newRecord->launchmethod = $auObject->launchMethod;
-			$newRecord->lmsid = json_decode(json_encode($auObject->lmsId, true) );
-			$newRecord->url = $auObject->url;
-			$newRecord->type = $auObject->type;
-			$title = json_decode(json_encode($auObject->title), true);
-			$newRecord->title = $title[0]['text'];
-			$newRecord->moveon = $auObject->moveOn;
-			$newRecord->auindex = $auObject->auIndex;
-			$newRecord->parents = json_encode($auObject->parents, true);
-			$newRecord->objectives = $auObject->objectives;
-			$desc = json_decode(json_encode($auObject->description), true);
-			$newRecord->description = $desc[0]['text'];
-			$newRecord->activitytype = $auObject->activityType;
-			$newRecord->masteryscore = $auObject->masteryscore;
-			$newRecord->completed = $auObject->completed;
-			$newRecord->passed = $auObject->passed;
-			$newRecord->inprogress = $auObject->inprogress;
-			$newRecord->noattempt = $auObject->noattempt;
-			$newRecord->satisfied = $auObject->satisfied;
+        return $auids;
+    }
 
-			//Save the record and get the new id
-			$newId = $DB->insert_record($table, $newRecord, true);
-			//Save new id to list to pass back
-			$auIDs[] = $newId;
-		}
+    /**
+     * Retrieves a list of AU's from DB and makes them AU objects
+     * @param mixed $auid
+     * @return au
+     */
+    public function cmi5launch_retrieve_aus_from_db($auid) {
+        
+        global $DB;
 
-		return $auIDs;
-	}
+        $check = $DB->record_exists( 'cmi5launch_aus', ['id' => $auid], '*', IGNORE_MISSING);
 
-	/**
-	 * Retrieves a list of AU's from DB and makes them AU objects
-	 * @param mixed $auid
-	 * @return au
-	 */
-	function cmi5launch_retrieve_aus_from_db($auid)
-	{
-		global $DB;
+        // If check is negative, the record does not exist. It should so throw error.
+        if (!$check) {
 
-		$check = $DB->record_exists( 'cmi5launch_aus', ['id' => $auid], '*', IGNORE_MISSING);
-	
-		//If check is negative, the record doesnot exist. It should so throw error
-		if(!$check){
+            echo "<p>Error attempting to get AU data from DB. Check AU id.</p>";
+            echo "<pre>";
+            var_dump($auid);
+            echo "</pre>";
+        } else {
+            $auitem = $DB->get_record('cmi5launch_aus',  array('id' => $auid));
 
-			echo "<p>Error attempting to get AU data from DB. Check AU id.</p>";
-			echo "<pre>";
-		   var_dump($auid);
-			echo "</pre>";
-		}
-		else{
-			$auItem = $DB->get_record('cmi5launch_aus',  array('id' => $auid));
-			
-			$au = new au($auItem);
-		}
+            $au = new au($auitem);
+        }
 
-		//Return our new list of AU!
-		return $au;
-	}
+        // Return our new list of AU.
+        return $au;
+    }
 
 }
-?>

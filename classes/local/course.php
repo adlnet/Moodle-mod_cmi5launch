@@ -15,61 +15,41 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- *Class to handle invidual courses
- *experimental 
- *
+ * Class to handle invidual courses.
  * @copyright  2023 Megan Bohland
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
  namespace mod_cmi5launch\local;
+ defined('MOODLE_INTERNAL') || die();
 
 class course {
-  // Properties
-  public $id, $url, $type, $lmsid, $grade, $scores, $title, $moveon, $auindex, $parents, $objectives, $description = [], $activitytype, $launchmethod, $masteryscore, $satisfied ;
-public $courseid; //The id assigned by cmi5
-public $userid; //The user id who is taking the course
-  public $returnurl; //the users returnurl? needed?
-  public $registrationid; //the registration id assigned by the CMI5 player
-  public $aus = array(); //array of AUs in the course
+    public $id, $url, $type, $lmsid, $grade, $scores, $title, $moveon, $auindex,
+    $parents, $objectives, $launchurl, $sessions = array(), $sessionid, $returnurl, $description = [], $activitytype, $launchmethod, $masteryscore,
+    $progress, $noattempt, $completed, $passed, $inprogress, $satisfied ;
 
-  //Holds launch url, this may be the way to have separate sessions.
-  public $launchurl, $sessionid;
-
-  //Maybe an array will hold info better
-  //I'm thinkig sessionId->launchurl (for that session)
-  public $sessions = array(); //Sessions still needed?
-  
-
-  //These may be needed later if AU's become part of a block to keep track of 
-  //being finished.
-  public $progress;
-  
-  public  $noattempt = true|false;
-
-  public $completed, $passed, $inprogress = true | false;
-
-  // Methods
-  function set_name($name) {
-    $this->name = $name;
-  }
-  function get_name() {
-    return $this->name;
-  }
-
-//Constructs courses. Is fed array and where array key matches property, sets the property.  
-function __construct($statement){
-
-  foreach($statement as $key => $value){
+    // The id assigned by cmi5 player.
+    public $courseid;
     
-    //If the key exists as a property, set it.
-    if(property_exists($this, $key) ){
+    // The user id who is taking the course.
+    public $userid;
+
+    // The registration id assigned by the CMI5 player.
+    public $registrationid;
+    
+    // Array of AUs in the course
+    public $aus = array();
+
+    // Constructs courses. Is fed array and where array key matches property, sets the property.  
+    function __construct($statement) {
+
+        foreach($statement as $key => $value){
+    
+            //If the key exists as a property, set it.
+            if(property_exists($this, $key) ){
       
-      $this->$key = ($value);
+                $this->$key = ($value);
+            }
+	    }	
     }
-	}	
-
 }
-
-}
-?>

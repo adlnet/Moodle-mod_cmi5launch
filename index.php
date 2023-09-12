@@ -77,7 +77,7 @@ foreach ($cmi5launchs as $cmi5launch) {
             format_string($cmi5launch->name, true));
     }
 
-    if ($course->format == 'weeks' or $course->format == 'topics') {
+    if ($course->format == 'weeks' || $course->format == 'topics') {
         $table->data[] = array($cmi5launch->section, $link);
     } else {
         $table->data[] = array($link);

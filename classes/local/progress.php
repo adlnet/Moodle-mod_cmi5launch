@@ -17,11 +17,75 @@
 /**
  * //Class to retrieve progress statements from LRS
  * //Holds methods for tracking and displaying student progress
- *
  * @copyright  2023 Megan Bohland
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace mod_cmi5launch\local;
+use Exception;
+defined('MOODLE_INTERNAL') || die();
+
+class progress  {
+
+    public function cmi5launch_get_retrieve_statements() {
+        return [$this, 'cmi5launch_retrieve_statements'];
+    }
+
+    public function get_cmi5launch_request_completion_info() {
+        return [$this, 'cmi5launch_request_completion_info'];
+    }
+
+    public function get_cmi5launch_request_statements_from_lrs() {
+        return [$this, 'cmi5launch_request_statements_from_lrs'];
+    }
+
+    /**
+     * Send request to LRS
+     * @param mixed $regId - registration id
+     * @param mixed $session - a session object 
+     * @return array
+     */
+    public function cmi5launch_request_statements_from_lrs($registrationid, $session /*$id*/){
+
+        // Array to hold result.
+        $result = array();
+
+        // When searching by reg id, which is the option available to Moodle,
+        // many results are returned, so iterating through them is necessary.
+        $data = array(
+            'registration' => $registrationid,
+            'since' => $session->createdAt
+        );
+
+        $statements = $this->cmi5launch_send_request_to_lrs($data, $registrationid);
+        // The results come back as nested array under more then statements.
+        // We only want statements, and we want them unique.
+        $statement = array_chunk($statements["statements"], 1);
+
+        $length = count($statement);
+
+        for ($i = 0; $i < $length; $i++){
+        
+        // This separates the larger statement into the separate sessions and verbs.
+            $current = ($statement[$i]);
+            array_push($result, array ($registrationid => $current) );
+        }
+
+        return $result;
+    }
+    public function exceptions_error_handler($severity, $message, $filename, $lineno) {
+        throw new ErrorException($message, 0, $severity, $filename, $lineno);
+    }
+
+    /**
+     * Builds and sends requests to LRS
+     * @param mixed $data - the data to send.
+     * @param mixed $id - the course ID in MOODLE.
+     * @return mixed $resultDecoded - the result of the request, decoded into json.
+     */
+    public function cmi5launch_send_request_to_lrs($data, $id)
+    {
+        global $CFG;
+
 
 class progress{
 
@@ -87,20 +151,19 @@ class progress{
 	{
 		$settings = cmi5launch_settings($id);
 
-		//Url to request statements from
+		// Url to request statements from.
 		$url = $settings['cmi5launchlrsendpoint'] . "statements";
-		//Build query with data above
+		// Build query with data above.
 		$url = $url . '?' . http_build_query($data,"", '&',  PHP_QUERY_RFC1738);
 
-		
-		//LRS username and password
+		// LRS username and password.
 		$user = $settings['cmi5launchlrslogin'];
 		$pass = $settings['cmi5launchlrspass'];
 
+		// Use key 'http' even if you send the request to https://...
+		// There can be multiple headers but as an array under the ONE header.
+		// Content(body) must be JSON encoded here, as that is what CMI5 player accepts.
 
-		// use key 'http' even if you send the request to https://...
-		//There can be multiple headers but as an array under the ONE header
-		//content(body) must be JSON encoded here, as that is what CMI5 player accepts
 		$options = array(
 			'http' => array(
 				'method'  => 'GET',
@@ -110,11 +173,32 @@ class progress{
 				)
 			)
 		);
-		//the options are here placed into a stream to be sent
+		// The options are here placed into a stream to be sent.
 		$context  = stream_context_create($options);
 
-		//sends the stream to the specified URL and stores results (the false is use_include_path, which we dont want in this case, we want to go to the url)
-		$result = file_get_contents( $url, false, $context );
+		// Sends the stream to the specified URL and stores results.
+        // The false is use_include_path, which we dont want in this case, we want to go to the url.
+        try {
+            // File_get_contents throws a warning not error, so wwe need a specific handler to catch and alert user. 
+            set_error_handler(function ($severity, $message, $file, $line) {
+                throw new \ErrorException($message, $severity, $severity, $file, $line);
+            });
+    
+            $result = file_get_contents($url, false, $context);
+           
+        } catch (Exception $e) {
+            
+            echo"<br>";
+            echo "Error connecting to LRS.";
+            echo "<br>";
+            echo "Trying to connect to LRS URL at " . $url; 
+            echo "<br>";
+            echo "Be sure to check username and password for LRS in settings as well. ";
+            echo "<br>";
+            echo 'Caught exception. Error message from LRS is: ',  $e->getMessage(), "\n";
+               
+            restore_error_handler();
+        }
 
 		$resultDecoded = json_decode($result, true);
 
@@ -166,202 +250,271 @@ class progress{
 			return $verb;
 	}
 
-	/**
-	 * Returns a name (the au title) retrieved from collected LRS data based on registration id
-	 * @param mixed $resultarray - data retrieved from LRS, usually an array
-	 * @param mixed $registrationid - the registration id
-	 * @return mixed - object name
-	 */
-	public function cmi5launch_retrieve_name($resultarray, $registrationid){
-		//THIS is the SECOND chunk, this is the problem
-		$objectInfo = $resultarray[$registrationid][0]["object"];
-		$definition = array_key_exists("definition", $objectInfo);
-		//If it is null then there is no "definition", so go by object id
-		if(!$definition ){
-			//retrieve id
-			$object = $resultarray[$registrationid][0]["object"]["id"];
-			//I have noticed that in the LRS when it can't find a name it references the WHOLE id as in "actor did WHOLEID", so I will do the same here
-		}else{
-			//IF it is not null then there is a language easy to read version of object definition, such as 'en' or 'en-us'
-			$objectLang =  $resultarray[$registrationid][0]["object"]["definition"]["name"];
-			//Retreive the language
-			$lang = array_key_first($objectLang);
-			//use it to retreive verb
-			$object = [$objectLang][0][$lang];
-		}
-		return $object;
-	}
-	/**
-	 * TODO MB - This is able to get all results for later grading
-	 * Result params when returned with statements can have 5 fields (not including extensions)
-	 * Success - a true/false to provide for a pass/fail of Activity
-	 * Completion - a true/false to provide for completion of Activity
-	 * Score - takes a Score object
-	 * Response - a string value that can contain anything, such as an answer to a question
-	 * Duration - length of time taken for experience
-	 * 
-	 * We are concerned with  the top three for Moodle reporting purposes
-	 * 
-	 * Summary of cmi5launch_retrieve_result
-	 * @param mixed $resultarray - data retrieved from LRS, usually an array
-	 * @param mixed $registrationid - the registration id
-	 * @return mixed
-	 */
-	public function cmi5launch_retrieve_result($resultarray, $registrationid){
+    /**
+     * Returns a name (the au title) retrieved from collected LRS data based on registration id
+     * Statements are returned in an array, with the registration id as the key.
+     * Often they are nested, and sometimes in differnt order, so to avoid errors we need to check for each piece as a key.
+     * Then if found, use that key to navigate.
+     * @param mixed $resultarray - data retrieved from LRS, usually an array
+     * @param mixed $registrationid - the registration id
+     * @return mixed - object name
+     */
+    public function cmi5launch_retrieve_object_name($resultarray, $registrationid) {
 
-		//Verify this statement has a 'result' param
-		if (array_key_exists("result", $resultarray ) )
-		{
-			//If it exists, grab it
-			$resultInfo = $resultarray[$registrationid][0]["result"];
-		
-			//Check which keys exist in 'result'
-			$success = array_key_exists("success", $resultInfo);
-			$completion = array_key_exists("completion", $resultInfo);
-			$score = array_key_exists("score", $resultInfo);
-			//Andy seeemed interested in durations?
-			$duration = array_key_exists("score", $resultInfo);
-			$response = array_key_exists("response", $resultInfo);
-	
-		}
-		
-		//How should we save and return these infos? A key value array maybe?
-			//If it is null then the item in question doesn't exist in this statement
-			if($success){
-				//no need to make new variable, save over
-				$success = $resultarray[$registrationid][0]["result"]["success"];
-				
-				//now that we have success, save to db. This means we need an object right? Can we update afield?
-				//even if we could we need id to find it...
-			}else{
-			}
+        Global $CFG;
 
-			//Maybe it would be better to just have a 'cmi5launch_retrieve_score' for now
-	}
+        // First find the object, it should always be second level of statement (so third level array).
+        if (array_key_exists("object", $resultarray[$registrationid][0])) {
 
-	/**
-	 * Returns a timestamp retrieved from collected LRS data based on registration id
-	 * @param mixed $resultarray - data retrieved from LRS, usually an array
-	 * @param mixed $registrationid - the registration id
-	 * @return string - date/time
-	 */
-	public function cmi5launch_retrieve_timestamp($resultarray, $registrationid){
-		
-		
-		$date = new \DateTime($resultarray[$registrationid][0]["timestamp"], new \DateTimeZone('US/Eastern'));
-		
-		$date->setTimezone(new \DateTimeZone('America/New_York'));
+            if (array_key_exists("definition", $resultarray[$registrationid][0]["object"])) {
 
-		$date = $date->format('d-m-Y' . " ".  'h:i a');
+                // If 'definition' exists, check if 'name' does.
+                if (array_key_exists("name", $resultarray[$registrationid][0]["object"]["definition"])) {
 
-		return $date;
-	}
+                    // Retrieve the name.
+                    $objectarray = $resultarray[$registrationid][0]["object"]["definition"]["name"];
 
-	/**
-	 * 
-	 * Summary of cmi5launch_retrieve_score
-	 * @param mixed $resultarray - data retrieved from LRS, usually an array
-	 * @param mixed $registrationid - the registration id
-	 * @return mixed
-	 */
-	//Ok, if we change so session id goes through, can we update DB in this func	
-	public function cmi5launch_retrieve_score($resultarray, $registrationid){
+                    // There may be more than one languages string to choose from. First we want to
+                    // select the language that matches the language of the course, then if not available, the first key.
+                    // System language setting.
+                    $language = $CFG->lang;
+                    if (array_key_exists($language, $objectarray)) {
+                        $object = $objectarray[$language];
+                    } else {
+                        $defaultlanguage = array_key_first($objectarray);
+                        $object = $objectarray[$defaultlanguage];
+                    }
+                    return $object;
+                }
 
-		//variable to hold score
-		$score = null;
+            } else if (array_key_exists("id", $resultarray[$registrationid][0]["object"])) {
 
-		//Verify this statement has a 'result' param
-		if (array_key_exists("result", $resultarray[$registrationid][0] ) )
-		{
-			//If it exists, grab it
-			$resultInfo = $resultarray[$registrationid][0]["result"];
-		
-			$score = array_key_exists("score", $resultInfo);
+                // If name is missing check for id.
+                // Retrieve id.
+                $object = $resultarray[$registrationid][0]["object"]["id"];
+                return $object;
 
-		}
-		
-			//If it is null then the item in question doesn't exist in this statement
-		if ($score) {
+            } else {
 
-			$score = $resultarray[$registrationid][0]["result"]["score"];
+                // If both name and id are missing throw error.
+                $this->cmi5launch_statement_retrieval_error("Object name and id ");
+            }
 
-			//Raw score preferred to scaled
-			if($score["raw"]){
-		
-				$returnScore = $score["raw"];
-				return $returnScore;
-			}
-			elseif($score["scaled"]){
-		
-				$returnScore = round($score["scaled"], 2) ;
-				return $returnScore;
-			}
-			
-		}
-	
-	}
-	
-	/**
-	 * Summary of cmi5launch_retrieve_statements
-	 * //Retrieves statements from LRS
-	 * @param mixed $registrationid
-	 * @param mixed $id
-	 * @param mixed $lmsId
-	 * @return array<string>
-	 */
+        } else {
 
-	public function cmi5launch_retrieve_statements($registrationid, $id, $session)
-	{
-		//Array to hold verbs and be returned
-		$progressUpdate = array();
-		//Array to hold score and be returned
-		$returnScore = 0;
+            $this->cmi5launch_statement_retrieval_error("Object ");
+        }
+    }
 
-		$resultDecoded = $this->cmi5launch_request_statements_from_lrs($registrationid, $session);
+    /**
+     * TODO MB - This is able to get all results for later grading
+     * Result params when returned with statements can have 5 fields (not including extensions)
+     * Success - a true/false to provide for a pass/fail of Activity
+     * Completion - a true/false to provide for completion of Activity
+     * Score - takes a Score object
+     * Response - a string value that can contain anything, such as an answer to a question
+     * Duration - length of time taken for experience
+     * We are concerned with  the top three for Moodle reporting purposes
+     * Summary of cmi5launch_retrieve_result
+     * @param mixed $resultarray - data retrieved from LRS, usually an array
+     * @param mixed $registrationid - the registration id
+     * @return mixed
+     */
+    public function cmi5launch_retrieve_result($resultarray, $registrationid) {
 
+        // Verify this statement has a 'result' param.
+        if (array_key_exists("result", $resultarray )) {
+            // If it exists, grab it.
+            $resultinfo = $resultarray[$registrationid][0]["result"];
+
+            // Check which keys exist in 'result'.
+            $success = array_key_exists("success", $resultinfo);
+            $completion = array_key_exists("completion", $resultinfo);
+            $score = array_key_exists("score", $resultinfo);
+            // Andy seeemed interested in durations?
+            $duration = array_key_exists("score", $resultinfo);
+            $response = array_key_exists("response", $resultinfo);
+
+        }
+
+            // How should we save and return these infos? A key value array maybe?
+            // If it is null then the item in question doesn't exist in this statement.
+        if ($success) {
+
+            // No need to make new variable, save over.
+            $success = $resultarray[$registrationid][0]["result"]["success"];
+
+            // Now that we have success, save to db. This means we need an object right? Can we update afield?
+            // Even if we could we need id to find it...
+        }
+            // Maybe it would be better to just have a 'cmi5launch_retrieve_score' for now.
+    }
+
+    /**
+     * Returns a timestamp retrieved from collected LRS data based on registration id
+     * @param mixed $resultarray - data retrieved from LRS, usually an array
+     * @param mixed $registrationid - the registration id
+     * @return string - date/time
+     */
+    public function cmi5launch_retrieve_timestamp($resultarray, $registrationid){
+        
+        
+        //Verify this statement has a 'timestamp' param
+        if (array_key_exists("timestamp", $resultarray[$registrationid][0] ) ) {
+
+            $date = new \DateTime($resultarray[$registrationid][0]["timestamp"], new \DateTimeZone('US/Eastern'));
+            
+            $date->setTimezone(new \DateTimeZone('America/New_York'));
+
+            $date = $date->format('d-m-Y' . " ".  'h:i a');
+
+            return $date;
+
+        } else {
+
+            $this->cmi5launch_statement_retrieval_error("Timestamp ");
+        }
+
+    }
+
+    /**
+     * Returns an actor's score retrieved from collected LRS data based on registration id
+     * Statements are returned in an array, with the registration id as the key.
+     * Often they are nested, and sometimes in differnt order, so to avoid errors we need to check for each piece as a key.
+     * Then if found, use that key to navigate.
+     * @param mixed $resultarray - data retrieved from LRS, usually an array
+     * @param mixed $registrationid - the registration id
+     * @return mixed
+     */
+    public function cmi5launch_retrieve_score($resultarray, $registrationid) {
+
+        // Variable to hold score.
+        $score = null;
+
+        //Verify this statement has a 'result' param
+        if (array_key_exists("result", $resultarray[$registrationid][0] ) )
+        {
+            //If it exists, grab it
+            $resultInfo = $resultarray[$registrationid][0]["result"];
+        
+            $score = array_key_exists("score", $resultInfo);
+        
+            //If it is null then the item in question doesn't exist in this statement
+        if ($score) {
+
+            $score = $resultarray[$registrationid][0]["result"]["score"];
+
+                // Raw score preferred to scaled.
+                if ($score["raw"]) {
+
+                    $returnscore = $score["raw"];
+                    return $returnscore;
+                } else if ($score["scaled"]) {
+
+                    $returnscore = round($score["scaled"], 2);
+                    return $returnscore;
+                }
+
+                // Maybe here, I can have like it update here.... MB.
+            }
+        } else {
+
+            Global $CFG;
+
+            // If admin debugging is enabled.
+            if ($CFG->debugdeveloper) {
+
+                    // Print that it is missing.
+                    echo"<br>";
+                    echo "No score in this statement.";
+                    echo "<br>";
+            }
+        }
+    }
+
+
+    /**
+     * Retrieves xAPI statements from LRS
+     * @param mixed $registrationid
+     * @param mixed $id
+     * @param mixed $session
+     * @return array<string>
+     */
+    public function cmi5launch_retrieve_statements($registrationid, $id, $session) {
+
+        // Array to hold verbs and be returned.
+        $progressupdate = array();
+
+        // Array to hold score and be returned.
+        $returnscore = 0;
+
+        // How bout an array to hold ALL scores and attempts?
+        $allscores = array();
+
+        $resultDecoded = $this->cmi5launch_request_statements_from_lrs($registrationid, $session);
 			//We need to sort the statements by finding their session id
 			//parse through array 'ext' to find the one holding session id, 
 			//grab id and go with it
 
-		foreach($resultDecoded as $singleStatment){
 
-			//We need to sort the statements by finding their session id
-			//parse through array 'ext' to find the one holding session id, 
-			//grab id and go and compare to saved session 'code'
-			$code = $session->code;
-			$currentSessID = "";
-			$ext = $singleStatment[$registrationid][0]["context"]["extensions"];
-				foreach ($ext as $key => $value) {
-				
-					//if key contains "sessionid" in string
-					if(str_contains($key, "sessionid")){
-						$currentSessID= $value;
-					}
-				}
+		foreach($resultDecoded as $singlestatement){
 
-			//Now if code equals currentSessID, this is a statement pertaining to this session
-			if($code == $currentSessID){
+            // We need to sort the statements by finding their session id.
+            // Parse through array 'ext' to find the one holding session id.
+            // Grab id and go with it.
+            $code = $session->code;
+            $currentsessionid = "";
+            $ext = $singlestatement[$registrationid][0]["context"]["extensions"];
+            foreach ($ext as $key => $value) {
 
-				$actor = $this->cmi5launch_retrieve_actor($singleStatment, $registrationid);
-				$verb = $this->cmi5launch_retrieve_verbs($singleStatment, $registrationid);
-				$object = $this->cmi5launch_retrieve_name($singleStatment, $registrationid);
-				$date = $this->cmi5launch_retrieve_timestamp($singleStatment, $registrationid);
-				$score = $this->cmi5launch_retrieve_score($singleStatment, $registrationid);
-				
-				//If a session has more than one score, we only want the highest
-				if(!$score == null && $score > $returnScore){
-					$returnScore = $score;
-				}
-				//Update to return
-				$progressUpdate[] = "$actor $verb $object on $date";
-			
-			}
-				
-		}
-			$session->progress = json_encode($progressUpdate);
-			$session->score = $returnScore;
-		
-			return $session;
-	}
+                // If key contains "sessionid" in string.
+                if (str_contains($key, "sessionid")) {
+                    $currentsessionid = $value;
+                }
+            }
+
+            // Now if code equals currentsessionid, this is a statement pertaining to this session.
+            if ($code === $currentsessionid) {
+
+                $actor = $this->cmi5launch_retrieve_actor($singlestatement, $registrationid);
+                $verb = $this->cmi5launch_retrieve_verbs($singlestatement, $registrationid);
+                $object = $this->cmi5launch_retrieve_object_name($singlestatement, $registrationid);
+                $date = $this->cmi5launch_retrieve_timestamp($singlestatement, $registrationid);
+                $score = $this->cmi5launch_retrieve_score($singlestatement, $registrationid);
+
+                // Add score to array of scores
+                $allscores[] = $score;
+                // If a session has more than one score, we only want the highest.
+                if (!$score == null && $score > $returnscore) {
+
+                    $returnscore = $score;
+                }
+
+                // Update to return.
+                $progressupdate[] = "$actor $verb $object on $date";
+
+            }
+        }
+            // Now an iff statment to iterate through allscores array assigning them to first attempt, next attempt, etc.
+            // If there is only one score, it is the first attempt.
+           // for
+
+         
+
+
+
+            $session->progress = json_encode($progressupdate);
+            $session->score = $returnscore;
+
+              // IS there brackets here?
+           //echo"<br>";
+           //echo "This is the session when score is FIRST applied: ";
+           //  var_dump($session);
+        // echo " and this is score of it ";
+         //var_dump($session->score);
+          //  echo"<br>";
+           // ok, no brackets here, lets continue
+            return $session;
+    }
 
 }

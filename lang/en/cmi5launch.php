@@ -28,8 +28,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-//$string['trialname'] = "Is this working? If so I rock!";
-
 $string['modulename'] = 'cmi5 Launch Link';
 $string['modulenameplural'] = 'cmi5 Launch Links';
 $string['modulename_help'] = 'A plug in for Moodle that allows the launch of cmi5 (xAPI) content which is then tracked to a separate LRS.';
@@ -71,20 +69,19 @@ If the ID number is not entered for a learner, they will instead be identified b
 Note: If a learner\'s id changes, they will lose access to registrations associated with former ids and completion data may be reset. Reports in your LRS may also be affected.';
 $string['cmi5launchcustomacchp_default'] = 'https://moodle.com';
 
-//Cmi5 grades admin
+// Cmi5 grades admin.
 // Start Default LRS Admin Settings.
 $string['cmi5launchgradesettings'] = 'Default values for cmi5 Launch Link activity settings';
 $string['cmi5launchgradesettings_help'] = 'These are site-wide, default values used when creating a new activity. Each activity has the ability to override and provide alternative values.';
 
-///
 $string['othersettings'] = 'Additional settings';
 
-//cmi5 player root location
+// Cmi5 player root location.
 $string['cmi5launchplayerurl'] = 'cmi5 Player URL';
 $string['cmi5launchplayerurl_help'] = 'The url to communicate with CMI5 player, can include port number(e.g. http://player.example.com or http://localhost:63398). Must NOT include a trailing forward slash.';
 $string['cmi5launchplayerurl_default'] = '';
 
-//cmi5 player credentials
+// Cmi5 player credentials.
 $string['cmi5launchtenantname'] = 'cmi5 Player: Basic Username';
 $string['cmi5launchtenantname_help'] = 'The cmi5 tenant username.';
 $string['cmi5launchtenantname_default'] = '';
@@ -97,13 +94,12 @@ $string['cmi5launchtenanttoken'] = 'cmi5 Player: Bearer Token';
 $string['cmi5launchtenanttoken_help'] = 'The cmi5 tenant bearer token (should be a long string).';
 $string['cmi5launchtenanttoken_default'] = '';
 
-//Grading info - MB
-
-//Headers
+// Grading info - MB.
+// Headers.
 $string['defaultgradesettings'] = 'Default values for CMI5 Launch Link activity grades';
 $string['defaultothersettings'] = 'Default values for CMI5 Launch Link activity attempts and completion';
 
-//other
+// Other.
 $string['maximumgradedesc'] = 'The maximum grade for a CMI5 Launch Link activity';
 
 $string['maximumattempts'] = 'Maxium Attempt Amount';
@@ -128,11 +124,12 @@ $string['last_attempt_cmi5_lock'] = 'Lock after final attempt';
 $string['lastattemptlock_help'] = 'If enabled, a student is prevented from launching the CMI5 player after using up all their allocated attempts.';
 $string['last_attempt_cmi5_lockdesc'] = 'If enabled, a student is prevented from launching the CMI5 player after using up all their allocated attempts.';
 
-//-MB - Not sure if we need ALL of these
-//* No - If a previous attempt is completed, passed or failed, the student will be provided with the option to enter in review mode or start a new attempt.
-//* When previous attempt completed, passed or failed - This relies on the SCORM package setting the status of \'completed\', \'passed\' or \'failed\'.
-//* Always - Each re-entry to the SCORM activity will generate a new attempt and the student will not be returned to the same point they reached in their previous attempt.';
 /*
+MB - Not sure if we need ALL of these
+No - If a previous attempt is completed, passed or failed, the student will be provided with the option to enter in review mode or start a new attempt.
+When previous attempt completed, passed or failed - This relies on the SCORM package setting the status of \'completed\', \'passed\' or \'failed\'.
+Always - Each re-entry to the SCORM activity will generate a new attempt and the student will not be returned to the same point they reached in their previous attempt.';
+
 $string['forceattemptalways'] = 'Always';
 $string['forceattemptoncomplete'] = 'When previous attempt completed, passed or failed';
 $string['forcejavascript'] = 'Force users to enable JavaScript';
@@ -143,10 +140,10 @@ $string['frameheight'] = 'The height of the stage frame or window.';
 $string['framewidth'] = 'The width of the stage frame or window.';
 $string['fromleft'] = 'From left';
 $string['fromtop'] = 'From top';
-$string['fullscreen'] = 'Fill the whole screen';*/
+$string['fullscreen'] = 'Fill the whole screen';
 
-//Not sure if we want to implement these?
-/*$string['masteryoverride'] = 'Mastery score overrides status';
+Not sure if we want to implement these?
+$string['masteryoverride'] = 'Mastery score overrides status';
 $string['masteryoverride_help'] = 'If enabled and a mastery score is provided, when LMSFinish is called and a raw score has been set, status will be recalculated using the raw score and mastery score and any status provided by the SCORM (including "incomplete") will be overridden.';
 $string['masteryoverridedesc'] = 'This preference sets the default for the mastery score override setting';
 */
@@ -156,7 +153,7 @@ $string['GRADE_AVERAGE_CMI5'] = 'Average grade';
 $string['gradeforattempt'] = 'Grade for attempt';
 $string['GRADE_HIGHEST_CMI5'] = 'Highest grade';
 $string['grademethod'] = 'Grading method';
-//TODO - Is this accurate? Does it define for only ONE attempt?  
+// TODO - Is this accurate? Does it define for only ONE attempt?  
 $string['grademethod_help'] = 'The grading method defines how the grade for a single attempt of the activity is determined.
 
 There are 4 grading methods:
@@ -171,7 +168,6 @@ $string['gradesettings'] = 'Grade settings';
 $string['GRADE_CMI5_AUS'] = 'Learning objects';
 $string['GRADE_SUM_CMI5'] = 'Sum grade';
 
-
 // Start Activity Settings.
 $string['cmi5launchname'] = 'Launch link name';
 $string['cmi5launchname_help'] = 'The name of the launch link as it will appear to the user.';
@@ -185,14 +181,12 @@ $string['cmi5activityid_help'] = 'The identifying IRI for the primary activity b
 $string['cmi5package'] = 'Zip package';
 $string['cmi5package_help'] = 'If you have a packaged cmi5 course, you can upload it here. If you upload a package, the Launch URL and Activity ID fields above will be automatically populated when you save using data from the cmi5.xml file contained in the zip. You can edit these settings at any time, but should not change the Activity ID (either directly or by file upload) unless you understand the consequences.';
 
-$string['cmi5packagetitle'] = 'Launch settings';
-$string['cmi5packagetext'] = 'You can populate the Launch URL and Activity ID settings directly, or by uploading a zip package containing a cmi5.xml file. The launch url defined in the cmi5.xml may point to other files in the zip package, or to an external URL. The Activity ID must always be a full URL (or other IRI).';
+$string['cmi5packagetitle'] = 'CMI5 Package Upload';
+$string['cmi5packagetext'] = 'Here you upload a zip package containing a cmi5.xml file. The launch url defined in the cmi5.xml may point to other files in the zip package, or to an external URL.';
 
 $string['lrsheading'] = 'LRS settings';
 $string['lrsdefaults'] = 'LRS Default Settings';
 $string['lrssettingdescription'] = 'By default, this activity uses the global LRS settings found in Site administration > Plugins > Activity modules > cmi5 Launch Link. To change the settings for this specific activity, select Unlock Defaults.';
-//$string['overridedefaults'] = 'Unlock Defaults';
-//$string['overridedefaults_help'] = 'Allows activity to have different LRS settings than the site-wide, default LRS settings.';
 
 $string['behaviorheading'] = 'Module behavior';
 

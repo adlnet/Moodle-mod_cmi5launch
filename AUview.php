@@ -67,6 +67,19 @@ if ($cmi5launch->intro) { // Conditions to show the intro can change to look for
         'cmi5launchintro'
     );
 }
+/*
+?>
+<a href="http://google.com">
+<button>Back</button>
+</a>
+<?php
+*/
+?>
+<form action="view.php" method="get" target="_blank">
+    <input id="id" name="id" type="hidden" value="<?php echo $id ?>">
+  <input type="submit" value="Back"/>
+</form>
+<?php
 
 // TODO: Put all the php inserted data as parameters on the functions and put the functions in a separate JS file.
 ?>
@@ -140,10 +153,12 @@ $regid = $userscourse->registrationid;
 // If it is null there have been no previous sessions.
 if (!$au->sessions == null) {
 
-    //Array to hold info for table population
-    $tableData = array();
 
-    //Build table
+    // Array to hold info for table population.
+    $tabledata = array();
+
+    // Build table.
+
     $table = new html_table();
     $table->id = 'cmi5launch_auSessionTable';
     $table->caption = get_string('modulenameplural', 'cmi5launch');
@@ -155,75 +170,92 @@ if (!$au->sessions == null) {
     get_string('cmi5launchviewlaunchlinkheader', 'cmi5launch'),
     );
 
-	//Retrieve session ids
-	$sessionIDs = json_decode($au->sessions);
+    // Retrieve session ids.
+    $sessionids = json_decode($au->sessions);
 
-	//Iterate through each session by id
-	foreach($sessionIDs as $key => $sessionID){
+    // Iterate through each session by id.
+    foreach ($sessionids as $key => $sessionid) {
 
-	     //Retrieve new info (if any) from CMI5 player on session
-		$session = $updatesession($sessionID, $cmi5launch->id);
+        // Retrieve new info (if any) from CMI5 player on session.
+        $session = $updatesession($sessionid, $cmi5launch->id);
 
-        	//array to hold data for table
-        	$sessionInfo = array();
+        // Array to hold data for table.
+        $sessioninfo = array();
 
-        	//Retrieve createdAt and format
-		$date = new DateTime($session->createdAt, new DateTimeZone('US/Eastern'));
-		$date->setTimezone(new DateTimeZone('America/New_York'));
-        	$sessionInfo[] = $date->format('D d M Y H:i:s');
+        // Retrieve createdAt and format.
+        $date = new DateTime($session->createdAt, new DateTimeZone('US/Eastern'));
+        $date->setTimezone(new DateTimeZone('America/New_York'));
+        $sessioninfo[] = $date->format('D d M Y H:i:s');
 
-        	///Retrieve lastRequestTime and format
-        	$date = new DateTime($session->lastRequestTime, new DateTimeZone('US/Eastern'));
-		$date->setTimezone(new DateTimeZone('America/New_York'));
-        	$sessionInfo[] = $date->format('D d M Y H:i:s');
+        // Retrieve lastRequestTime and format.
+        $date = new DateTime($session->lastRequestTime, new DateTimeZone('US/Eastern'));
+        $date->setTimezone(new DateTimeZone('America/New_York'));
+        $sessioninfo[] = $date->format('D d M Y H:i:s');
 
-		//Get progress from LRS
-		$session = $getprogress($regid, $cmi5launch->id, $session);
-		$sessionInfo[] = ("<pre>" . implode("\n ", json_decode($session->progress) ) . "</pre>");
+        // Get progress from LRS.
+        $session = $getprogress($regid, $cmi5launch->id, $session);
+        $sessioninfo[] = ("<pre>" . implode("\n ", json_decode($session->progress) ) . "</pre>");
 
-		//add score to table
-		$sessionInfo[] = $session->score;
-		//Add score to array for AU
-		$sessionscores[] = $session->score;
+        // Add score to table.
+        $sessioninfo[] = $session->score;
+        // Add score to array for AU.
+        $sessionscores[] = $session->score;
+        // Ok, maybe here it is where we can put session1->score, etc
 
-		//Update session in DB
-		$DB->update_record('cmi5launch_sessions', $session);
+        // MB Test.
+        // Ok so maybe here? //maybe we pass in the session?
+        //cmi5launch_update_grades();
+        //But it  lso needs name of activity right?
 
-        	//Build launch link to continue session
-		$newSession = "false";
-	    	$infoForNextPage = $sessionID . "," . $newSession;
+        // Update session in DB.
+        $DB->update_record('cmi5launch_sessions', $session);
 
-        	$sessionInfo[] = "<a tabindex=\"0\" id='cmi5relaunch_attempt'
-			onkeyup=\"key_test('" . $infoForNextPage . "')\" onclick=\"mod_cmi5launch_launchexperience('" . $infoForNextPage . "')\" style='cursor: pointer;'>"
-            . get_string('cmi5launchviewlaunchlink', 'cmi5launch') . "</a>";
+        // Build launch link to continue session.
+        $newsession = "false";
+        $infofornextpage = $sessionid . "," . $newsession;
 
-          //add to be fed to table
-          $tableData[] = $sessionInfo;
-     }
+        $sessioninfo[] = "<a tabindex=\"0\" id='cmi5relaunch_attempt'
+        onkeyup=\"key_test('" . $infofornextpage . "')\" onclick=\"mod_cmi5launch_launchexperience('"
+        . $infofornextpage . "')\" style='cursor: pointer;'>"
+        . get_string('cmi5launchviewlaunchlink', 'cmi5launch') . "</a>";
 
-	//Write table
-	$table->data = $tableData;
-    	echo html_writer::table($table);
+        // Add to be fed to table.
+        $tabledata[] = $sessioninfo;
+    }
 
-     //Save the session scores to AU, it is ok to overwrite
-    	$au->scores = json_encode($sessionscores);
+    // Write table.
+    $table->data = $tabledata;
+    echo html_writer::table($table);
 
-    //Update AU in table with new info
-	$DB->update_record('cmi5launch_aus', $au);
+    //Ok, lets see if we are getting the bracket here?
+   
+    // Save the session scores to AU, it is ok to overwrite.
+    $au->scores = json_encode($sessionscores);
+  //Ok, lets see if we are getting the bracket here?
+
+
+    //And here we can add the au name and record scores? 
+    // Well mybe not, cause it is already in only ONE au here
+
+    // Update AU in table with new info.
+    $DB->update_record('cmi5launch_aus', $au);
 }
 
-//Build the new session link
-$newSession = "true";
-//Create a string to pass the auid and new session info to next page (launch.php)
-$infoForNextPage = $auid . "," . $newSession;
-//New attempt
+// Build the new session link.
+$newsession = "true";
+// Create a string to pass the auid and new session info to next page (launch.php).
+$infofornextpage = $auid . "," . $newsession;
+// New attempt.
+
 echo "<p tabindex=\"0\"
-          onkeyup=\"key_test('" . $infoForNextPage . "')\"
+          onkeyup=\"key_test('" . $infofornextpage . "')\"
           id='cmi5launch_newattempt'><a onclick=\"mod_cmi5launch_launchexperience('"
-          . $infoForNextPage
+          . $infofornextpage
           . "')\" style=\"cursor: pointer;\">"
           . get_string('cmi5launch_attempt', 'cmi5launch')
           . "</a></p>";
+
+
 
 // Add a form to be posted based on the attempt selected.
 ?>
@@ -232,6 +264,7 @@ echo "<p tabindex=\"0\"
         <input id="id" name="id" type="hidden" value="<?php echo $id ?>">
         <input id="n" name="n" type="hidden" value="<?php echo $n ?>">
     </form>
+
 <?php
 
 echo $OUTPUT->footer();

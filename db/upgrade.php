@@ -165,7 +165,7 @@ function xmldb_cmi5launch_upgrade($oldversion) {
         if (!$dbman->table_exists($table)) {
             $dbman->create_table($table);
         }
-        
+
         // Define table cmi5launch_sessions to be created.
         $table = new xmldb_table('cmi5launch_sessions');
 
@@ -262,11 +262,8 @@ function xmldb_cmi5launch_upgrade($oldversion) {
         if (!$dbman->table_exists($table)) {
             $dbman->create_table($table);
         }
-        
-        
         upgrade_mod_savepoint(true, 2023081516, 'cmi5launch');
 
-        
     }
 
 
@@ -330,7 +327,7 @@ function xmldb_cmi5launch_upgrade($oldversion) {
             $dbman->create_table($table);
         }
 
-        // cmi5launch savepoint reached.
+        // CMI5launch savepoint reached.
         upgrade_mod_savepoint(true, 2015032500, 'cmi5launch');
     }
 
