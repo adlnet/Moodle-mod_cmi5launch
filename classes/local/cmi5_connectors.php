@@ -40,7 +40,7 @@ class cmi5_connectors {
     }
 
     public function cmi5launch_get_session_info() {
-        return [$this, 'cmi5launch_retrieve_session_info'];
+        return [$this, 'cmi5launch_retrieve_session_info_from_player'];
 
     }
     public function cmi5launch_get_registration_with_post() {
@@ -139,7 +139,7 @@ class cmi5_connectors {
      * @param $registration - registration UUID
      * @param $id - launch id
      */
-    function cmi5launch_retrieve_registration_with_get($registration, $id) {
+    public function cmi5launch_retrieve_registration_with_get($registration, $id) {
 
         $settings = cmi5launch_settings($id);
 
@@ -195,7 +195,7 @@ class cmi5_connectors {
             
             return $registrationInfo; //much better!
         }
-    }
+    
 
     /** 
      * Function to retreive registration from cmi5 player.
@@ -205,7 +205,7 @@ class cmi5_connectors {
      * @param $courseid - course id - The course ID in the CMI5 player.
      * @param $id - the course id in MOODLE.
      */ 
-    function cmi5launch_retrieve_registration_with_post($courseid, $id) {
+    public function cmi5launch_retrieve_registration_with_post($courseid, $id) {
 
 
         global $USER;
@@ -289,7 +289,7 @@ class cmi5_connectors {
      * @param $audience - the name the of the audience using the token,
      * @param #tenantid - the id of the tenant
      */
-    function cmi5launch_retrieve_token($urltosend, $user, $pass, $audience, $tenantid)
+    public function cmi5launch_retrieve_token($urltosend, $user, $pass, $audience, $tenantid)
     {
 
         global $CFG;
