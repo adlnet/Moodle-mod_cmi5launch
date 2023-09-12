@@ -114,7 +114,6 @@ class progress  {
 
 		// Sends the stream to the specified URL and stores results.
         // The false is use_include_path, which we dont want in this case, we want to go to the url.
-
         try {
             // File_get_contents throws a warning not error, so wwe need a specific handler to catch and alert user. 
             set_error_handler(function ($severity, $message, $file, $line) {
@@ -132,11 +131,9 @@ class progress  {
             echo "<br>";
             echo "Be sure to check username and password for LRS in settings as well. ";
             echo "<br>";
-            
             echo 'Caught exception. Error message from LRS is: ',  $e->getMessage(), "\n";
                
             restore_error_handler();
-            
         }
 
 		$resultDecoded = json_decode($result, true);

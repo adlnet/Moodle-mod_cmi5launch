@@ -155,18 +155,27 @@ class cmi5_connectors {
         
         // Sends the stream to the specified URL and stores results.
         // The false is use_include_path, which we dont want in this case, we want to go to the url.
-        $result = file_get_contents( $url, false, $context );
-        
-        if ($result === FALSE){
-
-            if ($CFG->debugdeveloper)  {
-                echo "Something went wrong retrieving the registration info with a GET request to CMI5 player";
-                echo "<br>";
-                echo "Registration id is: " . $registration;
-                echo "<br>";
-                
-                }
-        } else {
+        try {
+            // File_get_contents throws a warning not error, so wwe need a specific handler to catch and alert user. 
+            set_error_handler(function ($severity, $message, $file, $line) {
+                throw new \ErrorException($message, $severity, $severity, $file, $line);
+            });
+    
+            $result = file_get_contents($url, false, $context);
+           
+        } catch (Exception $e) {
+            
+            echo "Something went wrong retrieving the registration info with a GET request to CMI5 player";
+            echo "<br>";
+            echo "Registration id is: " . $registration;
+            echo "<br>";
+            echo "Sent to URL : " . $url;
+            echo "<br>";
+            echo 'Caught exception. Error message from CMI5 is: ',  $e->getMessage(), "\n";
+            echo "<br>";
+               
+            restore_error_handler();
+        }
 
             $registrationInfo = json_decode($result, true);
     
@@ -226,18 +235,27 @@ class cmi5_connectors {
         
         // Sends the stream to the specified URL and stores results.
         // The false is use_include_path, which we dont want in this case, we want to go to the url.
-        $result = file_get_contents( $url, false, $context );
-
-        if ($result === FALSE){
-
-            if ($CFG->debugdeveloper)  {
-                echo "Something went wrong retrieving the registration info with a POST request to CMI5 player";
-                echo "<br>";
-                echo "Course id is: " . $courseid;
-                echo "<br>";
+        try {
+            // File_get_contents throws a warning not error, so wwe need a specific handler to catch and alert user. 
+            set_error_handler(function ($severity, $message, $file, $line) {
+                throw new \ErrorException($message, $severity, $severity, $file, $line);
+            });
+    
+            $result = file_get_contents($url, false, $context);
+           
+        } catch (Exception $e) {
+            
+            echo "Something went wrong retrieving the registration info with a POST request to CMI5 player";
+            echo "<br>";
+            echo "Course id is: " . $courseid;
+            echo "<br>";
+            echo "Sent to URL : " . $url;
+            echo "<br>";
+            echo 'Caught exception. Error message from CMI5 is: ',  $e->getMessage(), "\n";
+            echo "<br>";
                
-                }
-        } else {
+            restore_error_handler();
+        }
 
             $registrationInfo = json_decode($result, true);
           
@@ -246,7 +264,7 @@ class cmi5_connectors {
             $registration = $registrationInfo["code"];
             
             return $registration;
-        }
+        
     }
 
     /**
@@ -278,6 +296,7 @@ class cmi5_connectors {
         // Sends the stream to the specified URL.
         $token = $this->cmi5launch_send_request_to_cmi5_player($data, $url, $username, $password);
 
+        
         if ($token === FALSE) {
 
             if ($CFG->debugdeveloper) {
@@ -349,10 +368,30 @@ class cmi5_connectors {
         // The options are here placed into a stream to be sent.
         $context  = stream_context_create(($options));
 
-        // Sends the stream to the specified URL and stores results
+        // Sends the stream to the specified URL and stores results.
         // The false is use_include_path, which we dont want in this case, we want to go to the url.
-        $launchresponse = file_get_contents( $url, false, $context );
+        try {
+            // File_get_contents throws a warning not error, so wwe need a specific handler to catch and alert user. 
+            set_error_handler(function ($severity, $message, $file, $line) {
+                throw new \ErrorException($message, $severity, $severity, $file, $line);
+            });
+    
+            $launchresponse = file_get_contents( $url, false, $context ); 
 
+        } catch (Exception $e) {
+            
+            echo "Something went wrong retrieving the launch URL from CMI5 player";
+            echo "<br>";
+            echo "Params sent are : ";
+            var_dump($data);
+            echo "<br>";
+            echo "Sent to URL : " . $url;
+            echo "<br>";
+            echo 'Caught exception. Error message from CMI5 is: ',  $e->getMessage(), "\n";
+            echo "<br>";
+               
+            restore_error_handler();
+        }
 
         // Only return the URL.
         $urlDecoded = json_decode($launchresponse, true);
@@ -392,9 +431,31 @@ class cmi5_connectors {
                     //the options are here placed into a stream to be sent
                     $context  = stream_context_create($options);
                 
-                    //sends the stream to the specified URL and stores results (the false is use_include_path, which we dont want in this case, we want to go to the url)
-                    $result = file_get_contents( $url, false, $context );
+                    
+                    // Sends the stream to the specified URL and stores results.
+                    // The false is use_include_path, which we dont want in this case, we want to go to the url.
+                    try {
+                        // File_get_contents throws a warning not error, so wwe need a specific handler to catch and alert user. 
+                        set_error_handler(function ($severity, $message, $file, $line) {
+                            throw new \ErrorException($message, $severity, $severity, $file, $line);
+                        });
                 
+                       //sends the stream to the specified URL and stores results (the false is use_include_path, which we dont want in this case, we want to go to the url)
+                        $result = file_get_contents( $url, false, $context );
+                
+
+                    } catch (Exception $e) {
+                        
+                        echo "Something went wrong retrieving the tenant info from CMI5 player";
+                        echo "<br>";
+                        echo "Sent to URL : " . $url;
+                        echo "<br>";
+                        echo 'Caught exception. Error message from CMI5 is: ',  $e->getMessage(), "\n";
+                        echo "<br>";
+                        
+                        restore_error_handler();
+                    }
+
                     //return response
                     return $result;
                 }
@@ -422,8 +483,29 @@ class cmi5_connectors {
                  //the options are here placed into a stream to be sent
                  $context  = stream_context_create(($options));
     
-                 //sends the stream to the specified URL and stores results (the false is use_include_path, which we dont want in this case, we want to go to the url)
-                 $result = file_get_contents( $url, false, $context );
+                // Sends the stream to the specified URL and stores results.
+                // The false is use_include_path, which we dont want in this case, we want to go to the url.
+                try {
+                    // File_get_contents throws a warning not error, so wwe need a specific handler to catch and alert user. 
+                    set_error_handler(function ($severity, $message, $file, $line) {
+                        throw new \ErrorException($message, $severity, $severity, $file, $line);
+                    });
+            
+                    //sends the stream to the specified URL and stores results (the false is use_include_path, which we dont want in this case, we want to go to the url)
+                    $result = file_get_contents( $url, false, $context );
+            
+
+                } catch (Exception $e) {
+                    
+                    echo "Something went wrong creating the course with the CMI5 player";
+                    echo "<br>";
+                    echo "Sent to URL : " . $url;
+                    echo "<br>";
+                    echo 'Caught exception. Error message from CMI5 is: ',  $e->getMessage(), "\n";
+                    echo "<br>";
+                    
+                    restore_error_handler();
+                }
 
       	      return $result;
                 }
