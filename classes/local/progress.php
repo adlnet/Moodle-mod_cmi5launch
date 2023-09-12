@@ -21,6 +21,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace mod_cmi5launch\local;
+use Exception;
 defined('MOODLE_INTERNAL') || die();
 
 class progress  {
@@ -71,7 +72,9 @@ class progress  {
 
         return $result;
     }
-
+    public function exceptions_error_handler($severity, $message, $filename, $lineno) {
+        throw new ErrorException($message, 0, $severity, $filename, $lineno);
+    }
 
     /**
      * Builds and sends requests to LRS
@@ -81,6 +84,8 @@ class progress  {
      */
     public function cmi5launch_send_request_to_lrs($data, $id)
     {
+        global $CFG;
+
 		$settings = cmi5launch_settings($id);
 
 		// Url to request statements from.
@@ -109,7 +114,30 @@ class progress  {
 
 		// Sends the stream to the specified URL and stores results.
         // The false is use_include_path, which we dont want in this case, we want to go to the url.
-		$result = file_get_contents( $url, false, $context );
+
+        try {
+            // File_get_contents throws a warning not error, so wwe need a specific handler to catch and alert user. 
+            set_error_handler(function ($severity, $message, $file, $line) {
+                throw new \ErrorException($message, $severity, $severity, $file, $line);
+            });
+    
+            $result = file_get_contents($url, false, $context);
+           
+        } catch (Exception $e) {
+            
+            echo"<br>";
+            echo "Error connecting to LRS.";
+            echo "<br>";
+            echo "Trying to connect to LRS URL at " . $url; 
+            echo "<br>";
+            echo "Be sure to check username and password for LRS in settings as well. ";
+            echo "<br>";
+            
+            echo 'Caught exception. Error message from LRS is: ',  $e->getMessage(), "\n";
+               
+            restore_error_handler();
+            
+        }
 
 		$resultDecoded = json_decode($result, true);
 		

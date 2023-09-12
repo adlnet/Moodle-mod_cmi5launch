@@ -74,11 +74,9 @@ class cmi5_connectors {
         if ($result === FALSE) {
 
             if ($CFG->debugdeveloper) {
-                echo "Something went wrong sending the request";
+                echo "Something went wrong creating the course";
                 echo "<br>";
-                echo "Response from CMI5 player: ";
-                var_dump($result);
-                echo "<br>";
+              
             }
             } else {
 
@@ -112,9 +110,9 @@ class cmi5_connectors {
 
         if ($result === FALSE){
             if ($CFG->debugdeveloper)  {
-                    echo "Something went wrong!";
+                    echo "Something went wrong creating the tenant";
                     echo "<br>";
-                    var_dump($_SESSION);
+                  
                 }
         }
 
@@ -162,9 +160,11 @@ class cmi5_connectors {
         if ($result === FALSE){
 
             if ($CFG->debugdeveloper)  {
-                echo "Something went wrong!";
+                echo "Something went wrong retrieving the registration info with a GET request to CMI5 player";
                 echo "<br>";
-                var_dump($_SESSION);
+                echo "Registration id is: " . $registration;
+                echo "<br>";
+                
                 }
         } else {
 
@@ -231,9 +231,11 @@ class cmi5_connectors {
         if ($result === FALSE){
 
             if ($CFG->debugdeveloper)  {
-                echo "Something went wrong!";
+                echo "Something went wrong retrieving the registration info with a POST request to CMI5 player";
                 echo "<br>";
-                var_dump($_SESSION);
+                echo "Course id is: " . $courseid;
+                echo "<br>";
+               
                 }
         } else {
 
@@ -255,37 +257,37 @@ class cmi5_connectors {
      * @param $audience - the name the of the audience using the token,
      * @param #tenantid - the id of the tenant
      */
-     function cmi5launch_retrieve_token($urltosend, $user, $pass, $audience, $tenantid){
+    function cmi5launch_retrieve_token($urltosend, $user, $pass, $audience, $tenantid)
+    {
 
         global $CFG;
-        
+
         // Retrieve and assign params
         $url = $urltosend;
         $username = $user;
         $password = $pass;
         $tokenUser = $audience;
         $id = $tenantid;
-    
+
         // The body of the request must be made as array first.
         $data = array(
             'tenantId' => $id,
             'audience' => $tokenUser
         );
-    
+
         // Sends the stream to the specified URL.
         $token = $this->cmi5launch_send_request_to_cmi5_player($data, $url, $username, $password);
 
-        if ($token === FALSE){
+        if ($token === FALSE) {
 
-            if ($CFG->debugdeveloper)  {
-                echo "Something went wrong!";
+            if ($CFG->debugdeveloper) {
+                echo "Something went wrong retrieving the bearer token";
                 echo "<br>";
-                var_dump($_SESSION);
-                }
-        } else {
-            return $token;
-        }
+            } else {
+                return $token;
+            }
 
+        }
     }
 
     /**
