@@ -568,7 +568,7 @@ function cmi5launch_process_new_package($cmi5launch) {
     $cmid = $cmi5launch->coursemodule;
     $context = context_module::instance($cmid);
 
-
+    echo "-----111111";
     // Bring in functions from classes cmi5Connector and AU helpers.
     $connectors = new cmi5_connectors;
     $auhelper = new au_helpers;
@@ -576,10 +576,11 @@ function cmi5launch_process_new_package($cmi5launch) {
     // Bring in functions from class cmi5_table_connectors and AU helpers.
     $createcourse = $connectors->cmi5launch_get_create_course();
     $retrieveaus = $auhelper-> get_cmi5launch_retrieve_aus();
-    
+    echo "0000";
     // Reload cmi5 instance.
     $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
 
+    echo "111111";
     $fs = get_file_storage();
 
     $fs->delete_area_files($context->id, 'mod_cmi5launch', 'package');
@@ -591,7 +592,7 @@ function cmi5launch_process_new_package($cmi5launch) {
         0,
         array('subdirs' => 0, 'maxfiles' => 1)
     );
-
+    echo "222222";
     // Get filename of zip that was uploaded.
     $files = $fs->get_area_files($context->id, 'mod_cmi5launch', 'package', 0, '', false);
     if (count($files) < 1) {
@@ -600,7 +601,7 @@ function cmi5launch_process_new_package($cmi5launch) {
 
     $zipfile = reset($files);
     $zipfilename = $zipfile->get_filename();
-
+echo "333333";
     $packagefile = false;
 
     $packagefile = $fs->get_file($context->id, 'mod_cmi5launch', 'package', 0, '/', $zipfilename);
@@ -608,7 +609,7 @@ function cmi5launch_process_new_package($cmi5launch) {
     // Retrieve user settings to apply to newly created record.
     $settings = cmi5launch_settings($cmi5launch->id);
     $token = $settings['cmi5launchtenanttoken'];
-
+echo "444444";
     // Create the course and retrieve info for saving to DB.
     $courseresults = $createcourse($context->id, $token, $packagefile);
 
@@ -616,7 +617,7 @@ function cmi5launch_process_new_package($cmi5launch) {
     $record->courseinfo = $courseresults;
 
     $returnedinfo = json_decode($courseresults, true);
-
+echo "555555";
     // Retrieve the lmsId of course.
     $lmsid = $returnedinfo["lmsId"];
     $record->cmi5activityid = $lmsid;
@@ -630,6 +631,8 @@ function cmi5launch_process_new_package($cmi5launch) {
     $url = $playerurl . "/api/v1/". $record->courseid. "/launch-url/";
     $record->launchurl = $url;
 
+    //Can we cut out some of the 0s here -MB
+    // no i dont think so dang it -MB
     $aus = ($retrieveaus($returnedinfo));
 
     $record->aus = (json_encode($aus));

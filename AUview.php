@@ -183,12 +183,12 @@ if (!$au->sessions == null) {
         $sessioninfo = array();
 
         // Retrieve createdAt and format.
-        $date = new DateTime($session->createdAt, new DateTimeZone('US/Eastern'));
+        $date = new DateTime($session->createdat, new DateTimeZone('US/Eastern'));
         $date->setTimezone(new DateTimeZone('America/New_York'));
         $sessioninfo[] = $date->format('D d M Y H:i:s');
 
         // Retrieve lastRequestTime and format.
-        $date = new DateTime($session->lastRequestTime, new DateTimeZone('US/Eastern'));
+        $date = new DateTime($session->lastrequesttime, new DateTimeZone('US/Eastern'));
         $date->setTimezone(new DateTimeZone('America/New_York'));
         $sessioninfo[] = $date->format('D d M Y H:i:s');
 

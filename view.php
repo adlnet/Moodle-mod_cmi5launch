@@ -30,7 +30,7 @@ use mod_cmi5launch\local\session_helpers;
 require_once("../../config.php");
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require('header.php');
-require_login($course, false, $cm);
+//require_login($course, false, $cm);
 
 // Bring in functions and classes.
 $progress = new progress;
@@ -290,8 +290,6 @@ foreach ($auids as $key => $auid) {
             // Add score to array for AU.
             $sessionscores[] = $session->score;
 
-
-     
             // Update session in DB.
             $DB->update_record('cmi5launch_sessions', $session);
         }

@@ -116,6 +116,11 @@ class session_helpers {
 
         global $DB, $CFG;
 
+        
+        echo"<br>";
+        echo "DID IT WORK WHAT IS SESSION?";
+        var_dump($sessionid);
+        echo "<br>";
         $check = $DB->record_exists('cmi5launch_sessions', ['sessionid' => $sessionid], '*', IGNORE_MISSING);
 
         // If check is negative, the record does not exist. Throw error.

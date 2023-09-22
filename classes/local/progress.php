@@ -24,7 +24,6 @@ namespace mod_cmi5launch\local;
 use Exception;
 defined('MOODLE_INTERNAL') || die();
 
-
         class progress
         {
 
@@ -250,6 +249,27 @@ defined('MOODLE_INTERNAL') || die();
                 }
             }
 
+/**
+ * Summary of cmi5launch_statement_retrieval_error
+ *  Error message for statment retrieval to mark if something is missing
+ * @param mixed $missingitem - the missing item(s)
+ * @return void
+ */
+public function cmi5launch_statement_retrieval_error($missingitem)
+            {
+
+                global $CFG;
+
+                // If admin debugging is enabled.
+                if ($CFG->debugdeveloper) {
+
+                    // Print that it is missing.
+                    echo "<br>";
+                    echo $missingitem . "is missing from this statement.";
+                    echo "<br>";
+                }
+            }
+
             /**
              * TODO MB - This is able to get all results for later grading
              * Result params when returned with statements can have 5 fields (not including extensions)
@@ -464,4 +484,3 @@ defined('MOODLE_INTERNAL') || die();
                 return $session;
             }
         }
-
