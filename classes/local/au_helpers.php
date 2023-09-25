@@ -48,6 +48,7 @@ class au_helpers {
     public function cmi5launch_retrieve_aus($returnedinfo) {
         // The results come back as nested array under more then just AUs.
         // We only want the info pertaining to the AU.
+        // MB would making this true stop the nesting? TODO
         $resultchunked = array_chunk($returnedinfo["metadata"]["aus"], 1, );
 
         return $resultchunked;
@@ -100,6 +101,7 @@ class au_helpers {
             $newrecord = new \stdClass();
 
             $newrecord->userid = $USER->id;
+            $newrecord->attempt = $auobject->attempt;
             $newrecord->auid = $auobject->id;
             $newrecord->launchmethod = $auobject->launchMethod;
             $newrecord->lmsid = json_decode(json_encode($auobject->lmsId, true) );
@@ -144,7 +146,7 @@ class au_helpers {
         // If check is negative, the record does not exist. It should so throw error.
         if (!$check) {
 
-            echo "<p>Error attempting to get AU data from DB. Check AU id.</p>";
+            echo "<p>Error attempting to get AU data from DB. Check AU id. AU id is: </p>";
             echo "<pre>";
             var_dump($auid);
             echo "</pre>";

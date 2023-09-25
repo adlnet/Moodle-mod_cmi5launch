@@ -66,6 +66,9 @@ class session_helpers {
         // Update session.
         foreach ($sessioninfo as $key => $value) {
             // We don't want to overwrite id.
+
+            //Will making it lowercase help?
+            $key = mb_convert_case($key, MB_CASE_LOWER, "UTF-8");
             if (property_exists($session, $key ) && $key != 'id' ) {
                 // If it's an array, encode it so it can be saved to DB.
                 if (is_array($value)) {

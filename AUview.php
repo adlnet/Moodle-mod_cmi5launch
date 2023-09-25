@@ -135,6 +135,10 @@ $fromview = explode(",", $fromview);
 // Retrieve AU ID.
 $auid = array_shift($fromview);
 
+echo"<br>";
+echo "auid is: ";
+var_dump($auid);
+echo"<br>";
 // Retrieve appropriate AU from DB.
 $au = $retrieveaus($auid);
 
@@ -173,9 +177,19 @@ if (!$au->sessions == null) {
     // Retrieve session ids.
     $sessionids = json_decode($au->sessions);
 
+    echo "<br>";
+    echo "sessionids is: ";
+    var_dump($sessionids);
+    echo "<br>";
+
     // Iterate through each session by id.
     foreach ($sessionids as $key => $sessionid) {
 
+        
+    echo "<br>";
+    echo "sessionids is: ";
+    var_dump($sessionid);
+    echo "<br>";
         // Retrieve new info (if any) from CMI5 player on session.
         $session = $updatesession($sessionid, $cmi5launch->id);
 
@@ -183,12 +197,12 @@ if (!$au->sessions == null) {
         $sessioninfo = array();
 
         // Retrieve createdAt and format.
-        $date = new DateTime($session->createdAt, new DateTimeZone('US/Eastern'));
+        $date = new DateTime($session->createdat, new DateTimeZone('US/Eastern'));
         $date->setTimezone(new DateTimeZone('America/New_York'));
         $sessioninfo[] = $date->format('D d M Y H:i:s');
 
         // Retrieve lastRequestTime and format.
-        $date = new DateTime($session->lastRequestTime, new DateTimeZone('US/Eastern'));
+        $date = new DateTime($session->lastrequesttime, new DateTimeZone('US/Eastern'));
         $date->setTimezone(new DateTimeZone('America/New_York'));
         $sessioninfo[] = $date->format('D d M Y H:i:s');
 

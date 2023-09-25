@@ -250,3 +250,16 @@ $string['cmi5launch:addinstance'] = 'Add a new cmi5 (xAPI) activity to a course'
 
 $string['expirecredentials'] = 'Expire credentials';
 $string['checkcompletion'] = 'Check Completion';
+
+// For reports.
+$string['report'] = 'Report';
+$string['attempt'] = 'Attempt';
+$string['started'] = 'Started';
+$string['last'] = 'Finished';
+$string['score'] = 'Score';
+
+$string['autitle'] = 'AU Title';
+$string['attempt'] = 'Attempt';
+$string['started'] = 'Started';
+$string['last'] = 'Finished';
+$string['score'] = 'Score';

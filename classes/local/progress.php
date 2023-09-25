@@ -24,7 +24,6 @@ namespace mod_cmi5launch\local;
 use Exception;
 defined('MOODLE_INTERNAL') || die();
 
-
         class progress
         {
 
@@ -119,14 +118,14 @@ defined('MOODLE_INTERNAL') || die();
 
                 // Sends the stream to the specified URL and stores results.
                 // The false is use_include_path, which we dont want in this case, we want to go to the url.
-                try {
+           /*     try {
                     // File_get_contents throws a warning not error, so wwe need a specific handler to catch and alert user. 
                     set_error_handler(function ($severity, $message, $file, $line) {
                         throw new \ErrorException($message, $severity, $severity, $file, $line);
                     });
-
+*/
                     $result = file_get_contents($url, false, $context);
-
+/*
                 } catch (Exception $e) {
 
                     echo "<br>";
@@ -140,7 +139,7 @@ defined('MOODLE_INTERNAL') || die();
 
                     restore_error_handler();
                 }
-
+*/
                 $resultDecoded = json_decode($result, true);
 
 
@@ -247,6 +246,27 @@ defined('MOODLE_INTERNAL') || die();
                 } else {
 
                     $this->cmi5launch_statement_retrieval_error("Object ");
+                }
+            }
+
+/**
+ * Summary of cmi5launch_statement_retrieval_error
+ *  Error message for statment retrieval to mark if something is missing
+ * @param mixed $missingitem - the missing item(s)
+ * @return void
+ */
+public function cmi5launch_statement_retrieval_error($missingitem)
+            {
+
+                global $CFG;
+
+                // If admin debugging is enabled.
+                if ($CFG->debugdeveloper) {
+
+                    // Print that it is missing.
+                    echo "<br>";
+                    echo $missingitem . "is missing from this statement.";
+                    echo "<br>";
                 }
             }
 
@@ -446,10 +466,6 @@ defined('MOODLE_INTERNAL') || die();
                 // If there is only one score, it is the first attempt.
                 // for
 
-
-
-
-
                 $session->progress = json_encode($progressupdate);
                 $session->score = $returnscore;
 
@@ -464,4 +480,3 @@ defined('MOODLE_INTERNAL') || die();
                 return $session;
             }
         }
-
