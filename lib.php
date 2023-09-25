@@ -578,6 +578,7 @@ function cmi5launch_process_new_package($cmi5launch) {
     // Reload cmi5 instance.
     $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
 
+    echo "111111";
     $fs = get_file_storage();
 
     $fs->delete_area_files($context->id, 'mod_cmi5launch', 'package');
@@ -624,8 +625,6 @@ function cmi5launch_process_new_package($cmi5launch) {
     $url = $playerurl . "/api/v1/". $record->courseid. "/launch-url/";
     $record->launchurl = $url;
 
-    //Can we cut out some of the 0s here -MB
-    // no i dont think so dang it -MB
     $aus = ($retrieveaus($returnedinfo));
 
     $record->aus = (json_encode($aus));
