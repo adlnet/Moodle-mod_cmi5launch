@@ -261,6 +261,8 @@ $newsession = "true";
 $infofornextpage = $auid . "," . $newsession;
 // New attempt.
 
+//Mybe  something like thia with an auto assigned id number?
+// so the id chnages? 
 echo "<p tabindex=\"0\"
           onkeyup=\"key_test('" . $infofornextpage . "')\"
           id='cmi5launch_newattempt'><a onclick=\"mod_cmi5launch_launchexperience('"

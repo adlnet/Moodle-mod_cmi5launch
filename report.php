@@ -97,27 +97,25 @@ navigation_node::override_active_url(new moodle_url('/mod/cmi5launch/report.php'
 ?>
     <script>
       
-        function key_test(userscore) {
+      function key_test(userscore) {
         
-            //Onclick calls this
-            if (event.keyCode === 13 || event.keyCode === 32) {
+        //Onclick calls this
+        if (event.keyCode === 13 || event.keyCode === 32) {
 
-                mod_cmi5launch_open_report(userscore);
-            }
+            mod_cmi5launch_open_report(userscore);
         }
-
-    // Function to run when the experience is launched (on click).
-    function mod_cmi5launch_open_report(userscore) {
-        
-          // Set the form paramters.
-          $('#launchform_registration').val(userscore);
-            // Post it.
-            $('#launchform').submit();
-            <?php
-        //redirect('session_report.php?id='. userscore);
-        ?>
     }
-       
+
+// Function to run when the experience is launched (on click).
+function mod_cmi5launch_open_report(userscore) {
+    
+      // Set the form paramters.
+      $('#AU_view').val(userscore);
+        // Post it.
+        $('#launchform').submit();
+     
+}
+   
         </script>
 <?php
 // Hmmmm and this?
@@ -278,9 +276,10 @@ onclick=\"redirect?('" . $useridtosend . "')\" style='cursor: pointer;'>"
 */
 $rowdata = array(); 
 $outertable->setup();
+
 // IS there a way to do this without a GROUP of arrays, just one long thing?
     foreach ($aus2[0] as $au) {
-        
+        $infofornextpage = array();
         $row = array();
 // So like make a new array for each row? Theres got to be some better way,
 // why wont it takes arrays
@@ -296,14 +295,22 @@ $outertable->setup();
     
     //REtrieve the current au id, this is always unique and will help with retreiving the 
     // student grades
-    $currentcmi5id = $au[0]['id'];
+    $infofornextpage[] = $au[0]['id'];
 
     echo"<br>";
-    echo"what is current auid?";
-    var_dump($currentcmi5id);
+    echo"what is info fornext page now";
+    var_dump($infofornextpage);
     echo"<br>";
     // Then current title is 
-    $currenttitle = $au[0]['title'][0]['text'];
+    $currenttitle= $au[0]['title'][0]['text'];
+    
+    
+    $infofornextpage[] = $currenttitle;
+    echo"<br>";
+    echo"what is info fornext page 2";
+    var_dump($infofornextpage);
+    echo"<br>";
+   
     /*
     echo"<br>";
     echo"what is current title?";
@@ -320,20 +327,40 @@ $outertable->setup();
     //$rowdata[] =array ("AU Title" => $currenttitle);
     // Well not two dimensional ,just key pair>
     $rowdata["AU Title"] =  ($currenttitle);
+    
     foreach($users as $user){
+
+        echo"<br>";
+        echo"what is user?";
+          var_dump($user);
+         echo"<br>";
+        
         $username = $user->username;
         //$headers[] = $username;
     //$columns[] = $username;
         
      //   echo $user->username;
        // echo"<br>";
-       $userrecord =$DB->get_record('cmi5launch_course', ['courseid'  => $record->courseid, 'userid'  => $USER->id]);
+
+       // II see, this may be because if the user hasn't done anything in class yet? 
+       // Well here's the problem! IT's getting the global or signed in user
+       $userrecord =$DB->get_record('cmi5launch_course', ['courseid'  => $record->courseid, 'userid'  => $user->id]);
          // echo"what is user record?";
        $usergrades = json_decode($userrecord->ausgrades, true);
       
+       // This isnt working cause the whole screen runs before button are clicked, we may need to pass them somewho differntly. or change how the button access them
+       // like if button clicked it...does something
+       // Like each butttton can have a code, and that code retrieves ITS's opbjects?
+       // like an id, and this is gneretead programmatically?
+       // fudge
        //These are the AUS we want to send on if clicked, the more specific ids.
        $currentauids = $userrecord->aus;
        
+       $infofornextpage[] = $currentauids;
+       echo"<br>";
+    echo"what is info fornext page 3";
+    var_dump($infofornextpage);
+    echo"<br>";
        echo"<br>";
        echo"what is currenntauids?";
          var_dump($currentauids);
@@ -356,26 +383,28 @@ $outertable->setup();
         
         // Ok, what is this iterates through all user info and uses this to stop on right one
         // could we grab auid that way?
-        if(array_key_exists($currenttitle, $usergrades)){
-            
-            $userscore = $usergrades[$currenttitle];
+        if (!$usergrades == null) {
+            if (array_key_exists($currenttitle, $usergrades)) {
 
-                echo"<br>";
-        echo"what is user score?";
-        var_dump($userscore);
-        echo"<br>";
+                $userscore = $usergrades[$currenttitle];
 
-            $url = ('report.php?id='.$cm->id);
-            //Can we make the userscore a link?
-           // $userscorelink = html_writer::link("google.com", $userscore);
-           
-           
-           // Remove []
-            $toremove = array("[", "]");
-            if(str_contains($userscore, "[")){
-                $userscore = str_replace($toremove, "", $userscore);
+                echo "<br>";
+                echo "what is user score?";
+                var_dump($userscore);
+                echo "<br>";
+
+                $url = ('report.php?id=' . $cm->id);
+                //Can we make the userscore a link?
+                // $userscorelink = html_writer::link("google.com", $userscore);
+
+
+                // Remove []
+                $toremove = array("[", "]");
+                if (str_contains($userscore, "[")) {
+                    $userscore = str_replace($toremove, "", $userscore);
+                }
+                // $userscore = $usergrades[$currenttitle];
             }
-           // $userscore = $usergrades[$currenttitle];
         }
         else{
             $userscore = "N/A";
@@ -390,17 +419,41 @@ $outertable->setup();
          
         // Ok so apparently the key needs to be column title?
    // $rowdata[] = array ($username => $userscore);
-   $useridtosend = $user->id;
+   $infofornextpage[] = $user->id;
+   echo"<br>";
+    echo"what is info fornext page 4";
+    var_dump($infofornextpage);
+    echo"<br>";
    $userscoreasstring = strval($userscore);
            //can this just be a string that is populated later?
        //  $button = "<a onclick=mod_cmi5launch_open_report("
         //   . $useridtosend . ")"
           // . $userscoreasstring . "</a>";
           
-        
+
+
+        echo"<br>";
+    echo"what is send to page?";
+  //  var_dump($sendtopage);
+    echo"<br>";
+
+         // Encode to send to next page
+         // bas encode enables it to travel! //now just decod eon other page?
+         $sendtopage = base64_encode(json_encode($infofornextpage, JSON_HEX_QUOT));
+    // Ok thisis it, it's not good as an encoded array
+    // It's the "" I think, since this encodes it it meses up with all the qoutation makts
+    // lets try using this flag - JSON_HEX_QUOT
+        //$sendtopage = "problem";
+        echo"<br>";
+        echo"what is send to page?";
+        var_dump($sendtopage);
+        echo"<br>";
+          //So here like lets make a button id?
+          // or is that necessary, the 'sendtonext page string will be diff each time, we just need an arrayt like in th
+          // other paes
            $button = "<a tabindex=\"0\" id='newreport'
-        onkeyup=\"key_test('" . $useridtosend . "')\" onclick=\"mod_cmi5launch_open_report('"
-        . $useridtosend . "')\" style='cursor: pointer;'>"
+           onkeyup=\"key_test('" . $sendtopage . "')\" onclick=\"mod_cmi5launch_open_report('"
+        . $sendtopage . "')\" style='cursor: pointer;'>"
         . $userscoreasstring . "</a>";
           
            // View.phpo or wherever we send them now is very similar or the same with diff ino, to what the student will see, cause it just one perosn right? 
@@ -450,7 +503,7 @@ $outertable->finish_output();
         <input id="user" name="user" type="hidden" value="<?php echo $useridtosend ?>">
         <input id="autitle" name="autitle" type="hidden" value="<?php echo $currenttitle ?>">
         <input id="currentcmi5id" name="currentcmi5id" type="hidden" value="<?php echo $currentcmi5id ?>">
-
+        <input id="AU_view" name="AU_view" type="hidden" value="default">
         <input id="auid" name="auid" type="hidden" value="<?php echo $currentauids ?>">
     </form>
 <?php

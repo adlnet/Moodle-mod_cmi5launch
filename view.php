@@ -379,11 +379,6 @@ foreach ($auids as $key => $auid) {
 // Add our newly updated auscores array to the course record.
 $userscourse->ausgrades = json_encode($auscores);
 
-echo"<br>"; 
-echo "What is userscourse here?";
-var_dump($userscourse->ausgrades);
-echo "<br>";
-
 
 // Lastly, update our course table.
 $updated = $DB->update_record("cmi5launch_course", $userscourse);

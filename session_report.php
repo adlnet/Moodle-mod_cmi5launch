@@ -39,10 +39,26 @@ define('CMI5LAUNCH_REPORT_ATTEMPTS_STUDENTS_WITH', 1);
 define('CMI5LAUNCH_REPORT_ATTEMPTS_STUDENTS_WITH_NO', 2);
 $PAGE->requires->jquery();
 $id = required_param('id', PARAM_INT);// Course Module ID, or ...
-$userid = required_param('user', PARAM_INT);// Course Module ID, or ...
-$currenttitle = required_param('autitle', PARAM_TEXT);// Course Module ID, or ...
-$cmi5idprevpage = required_param('currentcmi5id', PARAM_TEXT);// Course Module ID, or ...
-$auidprevpage = required_param('auid', PARAM_TEXT);// Course Module ID, or ...
+// $userid = required_param('user', PARAM_INT);// Course Module ID, or ...
+//$currenttitle = required_param('autitle', PARAM_TEXT);// Course Module ID, or ...
+//$cmi5idprevpage = required_param('currentcmi5id', PARAM_TEXT);// Course Module ID, or ...
+//$auidprevpage = required_param('auid', PARAM_TEXT);// Course Module ID, or ...
+// Retrieve the registration and AU ID from view.php.
+$fromreportpage = base64_decode(required_param('AU_view', PARAM_TEXT) );
+// Break it into array (AU is first index).
+$fromreportpage = json_decode($fromreportpage, true);
+
+// The args from the previous page come through in this order:
+// 0: cmi5 unique AU ID
+// 1: AU title
+// 2: AU IDs to retrieve AUs from DB for this user
+// 3: The user id, the one whose grades we need
+$cmi5idprevpage = $fromreportpage[0];
+$currenttitle = $fromreportpage[1];
+$auidprevpage = $fromreportpage[2];
+$userid = $fromreportpage[3];
+// Retrieve AU ID
+//$auid = array_shift($fromreportpage);
 
 
 
@@ -75,7 +91,9 @@ $contextmodule = context_module::instance($cm->id);
 // Can we gett herE?
 $url = new moodle_url('/mod/cmi5launch/session_report.php');
 
+//They are passed sd url params?
 $url->param('id', $id);
+//....this maybe got easier 
 $PAGE->set_url($url);
 
 require_login($course, false, $cm);
@@ -90,12 +108,12 @@ global $cmi5launch, $USER;
 
         // Reload cmi5 course instance.
         $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
-
+/*
         echo"<br>";
         echo " What is record here?";
         var_dump($record);
         echo "<br>";
-        
+  */      
 // Activate the secondary nav tab.
 navigation_node::override_active_url(new moodle_url('/mod/cmi5launch/session_report.php', ['id' => $id]));
 
@@ -113,7 +131,7 @@ if (empty($noheader)) {
     
     // MB
     // We dont so attempts yet, but we do auas
-    $strattempt = get_string('attempt', 'cmi5launch');
+  //  $strattempt = get_string('attempt', 'cmi5launch');
 
     $PAGE->set_title("$course->shortname: ".format_string($cm->name));
     $PAGE->set_heading($course->fullname);
@@ -125,13 +143,19 @@ if (empty($noheader)) {
 
     echo $OUTPUT->header();
 }
+echo"<br>";
+echo"did it work??";
+var_dump($fromreportpage);
+echo"<br>";
 
+// Maybe the problem is the reistration id? It's only grabbing certain record, not user records
 $registrationid = $getregistration($record->courseid, $cmi5launch->id);
+/*
 echo"<br>";
 echo " Will this work??";
 var_dump(json_decode($auidprevpage, true));
 echo "<br>";
-
+*/
 // Yes it will!! Now we have the riht auid!!!!
 
 
@@ -139,15 +163,6 @@ echo "<br>";
 
 // This table holds the user and au names 
 $table = new \flexible_table('mod-cmi5launch-report');
-/*
-$columns[] = 'AU Title';
-$headers[] = $currenttitle;
-$headers[] = get_string('started', 'cmi5launch');
-$columns[] = 'finish';
-$headers[] = get_string('last', 'cmi5launch');
-$columns[] = 'score';
-$headers[] = get_string('score', 'cmi5launch');
-*/
 
 $columns[] = 'Attempt';
 $headers[] = get_string('attempt', 'cmi5launch');
@@ -155,67 +170,58 @@ $columns[] = 'Started';
 $headers[] = get_string('started', 'cmi5launch');
 $columns[] = 'Finished';
 $headers[] = get_string('last', 'cmi5launch');
-//$columns[] = 'Session info';
-//$headers[] = "Session info";
+$columns[] = 'Status';
+$headers[] = "Status";
 $columns[] = 'Score';
 $headers[] = get_string('score', 'cmi5launch');
-        $table->define_columns($columns);
-     $table->define_headers($headers);
-       $table->define_baseurl($PAGE->url);
+        
+$table->define_columns($columns);
+$table->define_headers($headers);
+$table->define_baseurl($PAGE->url);
 
-       //The problem is this wants the 'course' id as in the moodle assigned ACTIVITY id, I thouggggght they were courses
-       // so like not 2 but 185
-       //so the 185 is course id noit id
-      $specificcourse= $DB->get_record('cmi5launch_course', ['courseid'  => $record->courseid, 'userid'  => $userid]);
-      $aushelpers = new au_helpers;
-         // Retrieve AU ids.
-         $getaus = $aushelpers->get_cmi5launch_retrieve_aus_from_db();
-    
-    
-         //NOW we have the correct AUS!!! THESE ids should have progress
-         $auids = (json_decode($auidprevpage, true) );
+//The problem is this wants the 'course' id as in the moodle assigned ACTIVITY id, I thouggggght they were courses
+// so like not 2 but 185
+//so the 185 is course id noit id
+$specificcourse= $DB->get_record('cmi5launch_course', ['courseid'  => $record->courseid, 'userid'  => $userid]);
+$aushelpers = new au_helpers;
+// Retrieve AU ids.
+$getaus = $aushelpers->get_cmi5launch_retrieve_aus_from_db();
 
 
-    $table->define_columns($columns);
-    $table->define_headers($headers);
-    $table->define_baseurl($PAGE->url);
-    // For each au id, find the one that matches our auid from previous pae, this is the record 
-    // we want
-    foreach ($auids as $key => $auid) {
+//NOW we have the correct AUS!!! THESE ids should have progress
+$auids = (json_decode($auidprevpage, true) );
+
+echo"<br>";
+echo " is userid diff?";
+var_dump($userid);
+echo "<br>";
+
+echo"<br>";
+echo " What is auids here?";
+var_dump($auids);
+echo "<br>";
+
+
+$table->define_columns($columns);
+$table->define_headers($headers);
+$table->define_baseurl($PAGE->url);
+
+// For each au id, find the one that matches our auid from previous pae, this is the record 
+// we want
+foreach ($auids as $key => $auid) {
         $au = $getaus($auid);
-       
-        echo"<br>";
-        echo "DID IT WORK WHAT care the auid";
-        var_dump($auids);
-        echo "<br>";
 
         $au = $DB->get_record('cmi5launch_aus', ['id' => $auid, 'auid' => $cmi5idprevpage]);
         
-        echo"<br>";
-        echo "DID IT WORK WHAT came back?";
-        var_dump($au);
-        echo "<br>";
-        echo"<br>";
-        echo "what is currenttitle we want tomatch?";
-        var_dump($cmi5idprevpage);
-        echo "<br>";
-        
         // When it is not null this is our aurecord
-        // 
         if (!$au == null || false) {
-        echo "Entering?";
-
+       
+            echo "Entering?";
 
             $aurecord = $au;
         }
     }
     
-
-    echo"<br>";
-echo "DID IT WORK WHAT IS AU record?";
-var_dump($aurecord);
-echo "<br>";
-
        // Now we pull up the au record from the DB and the sessions will be
     //   $aurecord =$DB->get_record('cmi5launch_aus', ['courseid'  => $course->id, 'userid'  => $userid, 'auid' => $auid]);
 // Is it not getting ocurse>?
@@ -233,38 +239,37 @@ echo " What is auid here?";
 var_dump($auid);
 echo "<br>";
 */
-       //Ok, now instead of all the users, we want the suer from the previous page
+
+//Ok, now instead of all the users, we want the suer from the previous page
 $users = get_enrolled_users($contextmodule);; //returns an array of users
 
 // Retrieve AU ids for this course.
 $sessions = json_decode($aurecord->sessions, true);
-$attempt = 0;
+$attempt = 1;
 $rowdata = array();
 $table->setup();
-
-
-echo "<br>";
-echo "sessionids is: ";
+echo"<br>";
+echo " What is sessionS when retrievedfrom aurecord?";
 var_dump($sessions);
 echo "<br>";
+
 //There may be more than one session
 foreach ($sessions as $sessionid) {
 
-    echo "<br>";
-    echo "sessionids is: ";
-    var_dump($sessionid);
+    //Can we just retrieve the session from DB? Since we are writing a cron to udate
+    //session
+    $session = $DB->get_record('cmi5launch_sessions', ['sessionid' => $sessionid]);
+
+    echo"<br>";
+    echo " What is session when retrieved from DB?";
+    var_dump($session);
     echo "<br>";
     ///////
     // Retrieve new info (if any) from CMI5 player on session.
-    $session = $updatesession($sessionid, $cmi5launch->id);
+//$session = $updatesession($sessionid, $cmi5launch->id);
 
     // Get progress from LRS.
-    $session = $getprogress($registrationid, $cmi5launch->id, $session);
-
-    echo "<br>";
-    echo " What is session HER?";
-    var_dump($session);
-    echo "<br>";
+   // $session = $getprogress($registrationid, $cmi5launch->id, $session);
 
     // Ok, so above, when session is returned we know there is no bracket
     // so maybe it happens here? 
@@ -289,20 +294,14 @@ foreach ($sessions as $sessionid) {
 
     //The users sessions
     $usersession = $DB->get_record('cmi5launch_sessions', array('sessionid' => $sessionid));
-    echo "<br>";
-    echo " What is session here?";
-    var_dump($usersession);
-    echo "<br>";
+
     // $headers[] = $session;
     // $columns[] = $session;
    // $sessionprogress = ("<pre>" . implode("\n ", json_decode($session->progress)) . "</pre>");
     
     // we may not be able to display this, is it necessary even? 
     // But this table doesn't seem to like rows in rows
-    echo"<br>";
-    echo " What is sessionprogress here?";
-    var_dump($sessionprogress);
-    echo "<br>";
+
     // You know itttt doesn't say if it's right or wrong, is it even necessary? 
     //$rowdata["Session info"] = $session->progress;
     $rowdata["Attempt"] = "Attempt " . $attempt;
@@ -312,45 +311,76 @@ foreach ($sessions as $sessionid) {
     // Retrieve AUs moveon specification.
     $aumoveon = $au->moveon;
 
+
+
     ////maybe a CASE here
-    // 0 is no 1 i yyes, these are from players
+    // 0 is no 1 is yes, these are from players
     $iscompleted = $session->iscompleted;
     $ispassed = $session->ispassed;
     $isfailed = $session->isfailed;
     $isterminated = $session->isterminated;
     $isabanadoned = $session->isabandoned;
+
+    //$ausatisfied = $session->satisfied;
+    
+
     // If it's been attempted but no moveon value.
-    if ($aumoveon == "NotApplicable") {
-        $austatus = "viewed";
-    } else { // IF it DOES have a moveon value.
+    if ($iscompleted == 1 ) {
+        
+            $austatus = "Completed";
+
+            if($ispassed == 1){
+                $austatus = "Completed and Passed";
+            }
+            if($isfailed == 1){
+                $austatus = "Completed and Failed";
+            }
+   
+    } 
+    
+    /*else //if($aumoveon == "CompletedOrPassed" || "Passed")
+     { // IF it DOES have a moveon value.
 
         // If satisifed is returned true.
         if ($ausatisfied == "true") {
 
             $austatus = "Satisfied";
             // Also update AU.
-            $au->satisfied = "true";
+            //$au->satisfied = "true";
         } else {
 
+            if($isfailed == 1 || $isfailed == true){
+                $austatus = "Failed";
+            }
             // If not, its in progress.
-            $austatus = "In Progress";
+            $austatus = "Not satisfied";
             // Also update AU.
-            $au->satisfied = "false";
+         //  $au->satisfied = "false";
         }
     }
     ;
+    */
 
-    if ($au->moveon == "CompletedOrPassed" || "Passed") {
+   // if ($aumoveon == "CompletedOrPassed" || "Passed") {
 
 
-        $rowdata[] = $sessionprogress;
-        $rowdata["Score"] = $session->score;
+      //  $rowdata[] = $sessionprogress;
+       
 
-        $attempt++;
-    }
+       
+   // }
+    $attempt++;
+    
+    $rowdata["Status"] = $austatus;
+
+    $rowdata["Score"] = $usersession->score;
+
     $row[] = $rowdata;
-    //$i++;
+
     $table->add_data_keyed($rowdata);
+}
+    //$i++;
+
 
     $table->get_page_start();
     $table->get_page_size();
@@ -367,5 +397,5 @@ foreach($users as $user){
     $columns[] = $user->username;
 }
 */
-}
+
 
