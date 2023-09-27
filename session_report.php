@@ -57,6 +57,10 @@ $cmi5idprevpage = $fromreportpage[0];
 $currenttitle = $fromreportpage[1];
 $auidprevpage = $fromreportpage[2];
 $userid = $fromreportpage[3];
+
+//What is user id here
+//echo "USER ID IS: ";
+//var_dump($userid);
 // Retrieve AU ID
 //$auid = array_shift($fromreportpage);
 
@@ -117,9 +121,7 @@ global $cmi5launch, $USER;
 // Activate the secondary nav tab.
 navigation_node::override_active_url(new moodle_url('/mod/cmi5launch/session_report.php', ['id' => $id]));
 
-//echo "CONGRATS!";
 
-$userdata = null;
 if (!empty($download)) {
     $noheader = true;
 }
@@ -143,11 +145,33 @@ if (empty($noheader)) {
 
     echo $OUTPUT->header();
 }
-echo"<br>";
-echo"did it work??";
-var_dump($fromreportpage);
-echo"<br>";
 
+//echo "CONGRATS!";
+$fromreportpage = base64_decode(required_param('AU_view', PARAM_TEXT) );
+// Break it into array (AU is first index).
+$fromreportpage = json_decode($fromreportpage, true);
+
+echo"<br>";
+echo " What is from report page?";
+var_dump($fromreportpage);
+echo "<br>";
+
+
+// The args from the previous page come through in this order:
+// 0: cmi5 unique AU ID
+// 1: AU title
+// 2: AU IDs to retrieve AUs from DB for this user
+// 3: The user id, the one whose grades we need
+$cmi5idprevpage = $fromreportpage[0];
+$currenttitle = $fromreportpage[1];
+$auidprevpage = $fromreportpage[2];
+$userid = $fromreportpage[3];
+
+// Retrieve the registration and AU ID from view.php.
+echo"<br>";
+echo "USER ID IS: ";
+var_dump($userid);
+echo "<br>";
 // Maybe the problem is the reistration id? It's only grabbing certain record, not user records
 $registrationid = $getregistration($record->courseid, $cmi5launch->id);
 /*
@@ -164,6 +188,9 @@ echo "<br>";
 // This table holds the user and au names 
 $table = new \flexible_table('mod-cmi5launch-report');
 
+// This table holds the overall scofre, maybe shows score type selected
+$scoretable = new \flexible_table('mod-cmi5launch-report');
+
 $columns[] = 'Attempt';
 $headers[] = get_string('attempt', 'cmi5launch');
 $columns[] = 'Started';
@@ -174,10 +201,11 @@ $columns[] = 'Status';
 $headers[] = "Status";
 $columns[] = 'Score';
 $headers[] = get_string('score', 'cmi5launch');
-        
+
 $table->define_columns($columns);
 $table->define_headers($headers);
 $table->define_baseurl($PAGE->url);
+
 
 //The problem is this wants the 'course' id as in the moodle assigned ACTIVITY id, I thouggggght they were courses
 // so like not 2 but 185
@@ -191,79 +219,49 @@ $getaus = $aushelpers->get_cmi5launch_retrieve_aus_from_db();
 //NOW we have the correct AUS!!! THESE ids should have progress
 $auids = (json_decode($auidprevpage, true) );
 
-echo"<br>";
-echo " is userid diff?";
-var_dump($userid);
-echo "<br>";
-
-echo"<br>";
-echo " What is auids here?";
-var_dump($auids);
-echo "<br>";
-
-
-$table->define_columns($columns);
-$table->define_headers($headers);
-$table->define_baseurl($PAGE->url);
-
+$scorecolumns = array();
+$scoreheaders = array();
 // For each au id, find the one that matches our auid from previous pae, this is the record 
 // we want
 foreach ($auids as $key => $auid) {
         $au = $getaus($auid);
 
+        // This uses the auid to pull the right record from the aus table
         $au = $DB->get_record('cmi5launch_aus', ['id' => $auid, 'auid' => $cmi5idprevpage]);
-        
+     
         // When it is not null this is our aurecord
         if (!$au == null || false) {
-       
-            echo "Entering?";
 
             $aurecord = $au;
         }
     }
     
-       // Now we pull up the au record from the DB and the sessions will be
-    //   $aurecord =$DB->get_record('cmi5launch_aus', ['courseid'  => $course->id, 'userid'  => $userid, 'auid' => $auid]);
-// Is it not getting ocurse>?
-/*
-echo"<br>";
-echo " What is course id here?";
-var_dump($course->id);
-echo "<br>";
-echo"<br>";
-echo " What is userid  here?";
-var_dump($userid);
-echo "<br>";
-echo"<br>";
-echo " What is auid here?";
-var_dump($auid);
-echo "<br>";
-*/
-
+       
 //Ok, now instead of all the users, we want the suer from the previous page
 $users = get_enrolled_users($contextmodule);; //returns an array of users
 
-// Retrieve AU ids for this course.
+// Retrieve session ids for this course.
 $sessions = json_decode($aurecord->sessions, true);
-$attempt = 1;
-$rowdata = array();
-$table->setup();
-echo"<br>";
-echo " What is sessionS when retrievedfrom aurecord?";
-var_dump($sessions);
-echo "<br>";
 
-//There may be more than one session
+// Start Attempt at one
+$attempt = 1;
+
+//Array to hold row info
+$rowdata = array();
+//
+$scorerow = array();
+//An array to hold grades for max or mean scoring
+$sessionscores = array();
+// Set table up, this needs to be done before rows added
+$table->setup();
+
+// There may be more than one session
 foreach ($sessions as $sessionid) {
 
-    //Can we just retrieve the session from DB? Since we are writing a cron to udate
-    //session
+    // Can we just retrieve the session from DB? Since we are writing a cron to udate
+    // session
     $session = $DB->get_record('cmi5launch_sessions', ['sessionid' => $sessionid]);
 
-    echo"<br>";
-    echo " What is session when retrieved from DB?";
-    var_dump($session);
-    echo "<br>";
     ///////
     // Retrieve new info (if any) from CMI5 player on session.
 //$session = $updatesession($sessionid, $cmi5launch->id);
@@ -308,8 +306,8 @@ foreach ($sessions as $sessionid) {
     $rowdata["Started"] = $datestart;
     $rowdata["Finished"] = $datefinish;
 
-    // Retrieve AUs moveon specification.
-    $aumoveon = $au->moveon;
+    // ....... ...............AUs moveon specification.
+    $aumoveon = $aurecord->moveon;
 
 
 
@@ -337,65 +335,65 @@ foreach ($sessions as $sessionid) {
             }
    
     } 
-    
-    /*else //if($aumoveon == "CompletedOrPassed" || "Passed")
-     { // IF it DOES have a moveon value.
+        //can we just fill space with blank
+        $scorecolumns[] = "Attempt " . $attempt;
+        $scoreheaders[] = "Attempt " . $attempt;
+        $scorerow["Attempt " . $attempt] = $usersession->score;
+        //TODO
+        //Later, this will take the rading type from settings, for now we will just manually assign highest
+        $scorerow["Grading type"] = "Highest";
 
-        // If satisifed is returned true.
-        if ($ausatisfied == "true") {
-
-            $austatus = "Satisfied";
-            // Also update AU.
-            //$au->satisfied = "true";
-        } else {
-
-            if($isfailed == 1 || $isfailed == true){
-                $austatus = "Failed";
-            }
-            // If not, its in progress.
-            $austatus = "Not satisfied";
-            // Also update AU.
-         //  $au->satisfied = "false";
-        }
-    }
-    ;
-    */
-
-   // if ($aumoveon == "CompletedOrPassed" || "Passed") {
-
-
-      //  $rowdata[] = $sessionprogress;
-       
-
-       
-   // }
     $attempt++;
     
     $rowdata["Status"] = $austatus;
 
     $rowdata["Score"] = $usersession->score;
-
-    $row[] = $rowdata;
+  
+    //$row[] = $rowdata;
 
     $table->add_data_keyed($rowdata);
-}
-    //$i++;
+  //  $table->add_separator();
 
+  }
+  
+  //Here is the grading type, highest, ave, etc
+  $scorecolumns[] = 'Grading type';
+  $scoreheaders[] = 'Gradingtype';
+  $scorecolumns[] = 'Overall Score';
+  $scoreheaders[] = 'Overall Score';
 
+  //TODO
+  // and here we can later use an if or switcvh nd adjust on gradetype
+$scorerow["verall Score"] = max($sessionscores);
+//$scorecolumns[] = 'Overall Score';
+//$scoreheaders[] = 'Overall Score';
+    
+$scoretable->define_columns($scorecolumns);
+$scoretable->define_headers($scoreheaders);
+$scoretable->define_baseurl($PAGE->url);
+
+$scoretable->setup();
+
+$scoretable->add_data_keyed($scorerow);
+
+//$i++;
+
+$scoretable->add_data_keyed("SCORE");
+
+   
     $table->get_page_start();
     $table->get_page_size();
 
+    $scoretable->get_page_start();
+    $scoretable->get_page_size();
+ 
+ 
+    // TODO
+    // I'm not sure I like the way this looks? Maybe adda div or something?
+    $table->add_separator();
+    $scoretable->finish_output();
     $table->finish_output();
-    // Is it not getting ocurse>?
-/*
-echo"<br>";
-echo " What is sessions here?";
-var_dump($sessions);
-echo "<br>";
-foreach($users as $user){
-    $headers[] = $user->username;
-    $columns[] = $user->username;
-}
-*/
+
+
 
 

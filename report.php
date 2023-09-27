@@ -182,52 +182,6 @@ foreach($users as $user){
     $columns[] = $user->username;
 }
 
-// inner table or table that will be on new pages
-    /*
-    $headers[] = get_string('started', 'cmi5launch');
-    $columns[] = 'finish';
-    $headers[] = get_string('last', 'cmi5launch');
-    $columns[] = 'score';
-    $headers[] = get_string('score', 'cmi5launch');
-    */
-
-
-    //And we can make funcs to query the table and return the data we want! maybe in our report lib?
-//$table = new \flexible_table('mod-cmi5launch-report');
-
-    // hmmmm
-        // inner table or table that will be on new pages
-    /*
-    $headers[] = get_string('started', 'cmi5launch');
-    $columns[] = 'finish';
-    $headers[] = get_string('last', 'cmi5launch');
-    $columns[] = 'score';
-    $headers[] = get_string('score', 'cmi5launch');
-    *
-    $columns[] = 'attempt';
-    $headers[] = get_string('attempt', 'cmi5launch');
-    $columns[] = 'start';
-    $headers[] = get_string('started', 'cmi5launch');
-    $columns[] = 'finish';
-    $headers[] = get_string('last', 'cmi5launch');
-    $columns[] = 'score';
-    $headers[] = get_string('score', 'cmi5launch');
-*/
-
-
-       // $table->define_columns($columns);
-       // $table->define_headers($headers);
-       // $table->define_baseurl($PAGE->url);
-
-
-       // $table->column_class('picture', 'picture');
-        //$table->column_class('fullname', 'bold');
-        //$table->column_class('score', 'bold');
-
-        //$table->set_attribute('cellspacing', '0');
-        //$table->set_attribute('id', 'attempts');
-        //$table->set_attribute('class', 'generaltable generalbox');
-
         // Reload cmi5 course instance.
         $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
 
@@ -236,12 +190,6 @@ foreach($users as $user){
         // Retrieve AU ids for this course.
         // Yes cause this is the OVERALL au info, their base info, not the users AU versions
         $aus = json_decode($record->aus, true);
-
-     //  How about the aus num,?
-     echo"<br>";
-        echo"what is record?"; 
-        var_dump($record);
-        echo"<br>";
 
 // we can use array_chunk to separate AUS. lets eparate on id
 // ITs annoying but I don't think theres getting around it nested....
@@ -259,64 +207,20 @@ $i = 0;
     $outertable->define_columns($columns);
 $outertable->define_headers($headers);
 $outertable->define_baseurl($PAGE->url);
-//$outertable->is_collapsible(true);
 
-// start working!!!
-//echo"<br>";
-//echo"what is COLUMNS";
-//var_dump($columns);
-//echo"<br>";
-/*
-$useridtosend = "1";
-//can this just be a string that is populated later?
-$button = " <a tabindex=\"0\" id='userScore'
-onkeyup=\"key_test('" . $useridtosend . "')\"
-onclick=\"redirect?('" . $useridtosend . "')\" style='cursor: pointer;'>"
-. get_string("This is where userscore goes") . "</a>";
-*/
 $rowdata = array(); 
 $outertable->setup();
 
 // IS there a way to do this without a GROUP of arrays, just one long thing?
     foreach ($aus2[0] as $au) {
-        $infofornextpage = array();
-        $row = array();
-// So like make a new array for each row? Theres got to be some better way,
-// why wont it takes arrays
+       ////// $infofornextpage = array();
+       ///// $row = array();
 
 
-//$headers[] = get_string('autitle', 'cmi5launch');
-    //$i = 0;
-   
-    echo"<br>";
-    echo"what is au?";
-    var_dump($au);
-    echo"<br>";
-    
-    //REtrieve the current au id, this is always unique and will help with retreiving the 
-    // student grades
-    $infofornextpage[] = $au[0]['id'];
 
-    echo"<br>";
-    echo"what is info fornext page now";
-    var_dump($infofornextpage);
-    echo"<br>";
-    // Then current title is 
-    $currenttitle= $au[0]['title'][0]['text'];
     
     
-    $infofornextpage[] = $currenttitle;
-    echo"<br>";
-    echo"what is info fornext page 2";
-    var_dump($infofornextpage);
-    echo"<br>";
-   
-    /*
-    echo"<br>";
-    echo"what is current title?";
-    var_dump($currenttitle);
-    echo"<br>";
-    */
+  
 
     //Makes more sense to feed row an array of data
     // Nope it doent like arrays
@@ -326,117 +230,100 @@ $outertable->setup();
     // Ok so apparently the key needs to be column title?
     //$rowdata[] =array ("AU Title" => $currenttitle);
     // Well not two dimensional ,just key pair>
-    $rowdata["AU Title"] =  ($currenttitle);
+    
     
     foreach($users as $user){
+        $rowdata["AU Title"] =  ($currenttitle);
+        $infofornextpage = array();
+        $row = array();
+            //REtrieve the current au id, this is always unique and will help with retreiving the 
+    // student grades
+    $infofornextpage[] = $au[0]['id'];
 
-        echo"<br>";
-        echo"what is user?";
-          var_dump($user);
-         echo"<br>";
-        
+    // Then current title is 
+    $currenttitle= $au[0]['title'][0]['text'];
+    $infofornextpage[] = $currenttitle;
+
         $username = $user->username;
-        //$headers[] = $username;
-    //$columns[] = $username;
-        
-     //   echo $user->username;
-       // echo"<br>";
 
        // II see, this may be because if the user hasn't done anything in class yet? 
        // Well here's the problem! IT's getting the global or signed in user
        $userrecord =$DB->get_record('cmi5launch_course', ['courseid'  => $record->courseid, 'userid'  => $user->id]);
-         // echo"what is user record?";
-       $usergrades = json_decode($userrecord->ausgrades, true);
-      
-       // This isnt working cause the whole screen runs before button are clicked, we may need to pass them somewho differntly. or change how the button access them
-       // like if button clicked it...does something
-       // Like each butttton can have a code, and that code retrieves ITS's opbjects?
-       // like an id, and this is gneretead programmatically?
-       // fudge
-       //These are the AUS we want to send on if clicked, the more specific ids.
-       $currentauids = $userrecord->aus;
        
-       $infofornextpage[] = $currentauids;
-       echo"<br>";
-    echo"what is info fornext page 3";
-    var_dump($infofornextpage);
-    echo"<br>";
-       echo"<br>";
-       echo"what is currenntauids?";
-         var_dump($currentauids);
-        echo"<br>";
-       
-       echo"<br>";
-       echo"what is user record?";
-         var_dump($userrecord);
-        echo"<br>";
-       // Getting closer? But is the id correct, they all really have an 80?
-       
-       echo"<br>";
-        echo"what is usergrades?";
-        var_dump($usergrades);
-        echo"<br>";
-        //well maybe the problem is the usergrades are o????
-        
-        // Now compare the usergreades array keys to name of current autitle, if t 
-        // it matches then display, that's what userscore is
-        
-        // Ok, what is this iterates through all user info and uses this to stop on right one
-        // could we grab auid that way?
-        if (!$usergrades == null) {
-            if (array_key_exists($currenttitle, $usergrades)) {
+       // Userrecord may be null if user has not aprticipated in course yet
+       if($userrecord == null){
+           $userscore = " ";
+       } else {
 
-                $userscore = $usergrades[$currenttitle];
+            // echo"what is user record?";
+            $usergrades = json_decode($userrecord->ausgrades, true);
 
-                echo "<br>";
-                echo "what is user score?";
-                var_dump($userscore);
-                echo "<br>";
+            // This isnt working cause the whole screen runs before button are clicked, we may need to pass them somewho differntly. or change how the button access them
+            // like if button clicked it...does something
+            // Like each butttton can have a code, and that code retrieves ITS's opbjects?
+            // like an id, and this is gneretead programmatically?
+            // fudge
+            //These are the AUS we want to send on if clicked, the more specific ids.
+            $currentauids = $userrecord->aus;
 
-                $url = ('report.php?id=' . $cm->id);
-                //Can we make the userscore a link?
-                // $userscorelink = html_writer::link("google.com", $userscore);
+            $infofornextpage[] = $currentauids;
 
 
-                // Remove []
-                $toremove = array("[", "]");
-                if (str_contains($userscore, "[")) {
-                    $userscore = str_replace($toremove, "", $userscore);
+            //well maybe the problem is the usergrades are o????
+
+            // Now compare the usergreades array keys to name of current autitle, if t 
+            // it matches then display, that's what userscore is
+
+            // Ok, what is this iterates through all user info and uses this to stop on right one
+            // could we grab auid that way?
+            if (!$usergrades == null) {
+                if (array_key_exists($currenttitle, $usergrades)) {
+
+                    $userscore = $usergrades[$currenttitle];
+
+
+                    $url = ('report.php?id=' . $cm->id);
+                    //Can we make the userscore a link?
+                    // $userscorelink = html_writer::link("google.com", $userscore);
+
+
+                    // Remove []
+                    $toremove = array("[", "]");
+                    if (str_contains($userscore, "[")) {
+                        $userscore = str_replace($toremove, "", $userscore);
+                    }
+                    // $userscore = $usergrades[$currenttitle];
                 }
-                // $userscore = $usergrades[$currenttitle];
+            } else {
+                $userscore = "N/A";
             }
-        }
-        else{
-            $userscore = "N/A";
-        }
-        //Now we retrieve the users grade for each au
+            //Now we retrieve the users grade for each au
 
-        // Nevermind, we want individual not overall $userscore = cmi5launch_highest_grade($cmi5launch, $user->id);
-        //$headers[] = $user->username;
-        //$columns[] = $user->username;
-        //Oh! we need columns for each user
-        // array_push($rowdata, $userScore);
-         
-        // Ok so apparently the key needs to be column title?
-   // $rowdata[] = array ($username => $userscore);
-   $infofornextpage[] = $user->id;
+            // Nevermind, we want individual not overall $userscore = cmi5launch_highest_grade($cmi5launch, $user->id);
+            //$headers[] = $user->username;
+            //$columns[] = $user->username;
+            //Oh! we need columns for each user
+            // array_push($rowdata, $userScore);
+
+            // Ok so apparently the key needs to be column title?
+            // $rowdata[] = array ($username => $userscore);
+        }
+   //Why isnt user id going oveR?
    echo"<br>";
-    echo"what is info fornext page 4";
-    var_dump($infofornextpage);
+    echo"what is user id?";
+    var_dump($user->id);
     echo"<br>";
+   $infofornextpage[] = $user->id;
+
    $userscoreasstring = strval($userscore);
            //can this just be a string that is populated later?
        //  $button = "<a onclick=mod_cmi5launch_open_report("
         //   . $useridtosend . ")"
           // . $userscoreasstring . "</a>";
-          
-
-
-        echo"<br>";
-    echo"what is send to page?";
-  //  var_dump($sendtopage);
-    echo"<br>";
-
+          echo"<br>";
+          echo"what is send to page?";
+          var_dump($infofornextpage);
+          echo"<br>";
          // Encode to send to next page
          // bas encode enables it to travel! //now just decod eon other page?
          $sendtopage = base64_encode(json_encode($infofornextpage, JSON_HEX_QUOT));
