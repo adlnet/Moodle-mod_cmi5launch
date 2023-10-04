@@ -151,10 +151,6 @@ $fromreportpage = base64_decode(required_param('AU_view', PARAM_TEXT) );
 // Break it into array (AU is first index).
 $fromreportpage = json_decode($fromreportpage, true);
 
-echo"<br>";
-echo " What is from report page?";
-var_dump($fromreportpage);
-echo "<br>";
 
 
 // The args from the previous page come through in this order:
@@ -182,6 +178,16 @@ echo "<br>";
 */
 // Yes it will!! Now we have the riht auid!!!!
 
+
+echo"<br>";
+echo " What is user page?";
+$user = $DB->get_record('user', ['id' => $userid]);
+var_dump($user);
+echo "<br>";
+echo "and what would all enrolled user llook like?";
+$users = get_enrolled_users($contextmodule);; //returns an array of users
+var_dump($users);
+echo "<br>";
 
 // Create table to display on page.
 

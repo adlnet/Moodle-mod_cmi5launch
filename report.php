@@ -21,8 +21,15 @@
 //defined('MOODLE_INTERNAL') || die(); //Causing it to not display anything.
 
 //echo("This is the report page.");
-//This is scorms reports page.
+
+//So this report page is accesed by clicking the course title in the grader report and the magnifin glass
+//to zoom in on certain things.
+
+// So currently ittt all takes to same page, if glass is picked wee want only that students info, and consequestnyl,
+// only students who should see themselves, only teachers see it all.
+
 use core_reportbuilder\local\report\column;
+use mod_cmi5launch\local\grade_helpers;
 
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require('header.php');
@@ -43,20 +50,31 @@ $PAGE->requires->jquery();
 //Wed how can i add jquery commands? it is not seeing my jquery????
 
 
-$id = required_param('id', PARAM_INT);// Course Module ID, or ...
+$id = required_param('id', PARAM_INT);// Course Module ID, i think, like 417?
 
 // MB
 // I have no idea what downlaod and mode are....
 $download = optional_param('download', '', PARAM_RAW);
 $mode = optional_param('mode', '', PARAM_ALPHA); // Report mode.
+$report = optional_param('report', '', PARAM_ALPHA);
 
+$page2 = optional_param('page', '', PARAM_ALPHA);
 $cm = get_coursemodule_from_id('cmi5launch', $id, 0, false, MUST_EXIST);
 $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
 ////$scorm = $DB->get_record('scorm', array('id' => $cm->instance), '*', MUST_EXIST);
 
+/////
+$page= optional_param('page', 0, PARAM_INT);   // active page
+///////////////
+
 $contextmodule = context_module::instance($cm->id);
 // MB - Generates and returns list of available Scorm report sub-plugins in their reportlib page 
 //$reportlist = scorm_report_list($contextmodule);
+
+// Will this allopw me to grage a certain user id?
+//$userid = required_param('userid', PARAM_INT);// Course Module ID, or ...
+// That seems to only work if I setit up as form in pervious page, which is a moodle page, can we take from url? 
+
 
 $url = new moodle_url('/mod/cmi5launch/report.php');
 
@@ -108,7 +126,7 @@ navigation_node::override_active_url(new moodle_url('/mod/cmi5launch/report.php'
 
 // Function to run when the experience is launched (on click).
 function mod_cmi5launch_open_report(userscore) {
-    
+
       // Set the form paramters.
       $('#AU_view').val(userscore);
         // Post it.
@@ -166,6 +184,90 @@ if (empty($noheader)) {
     echo $OUTPUT->header();
 }
 
+// Ok, can we ge treport?
+echo"<br>";
+echo"what is report?";
+var_dump($report);
+echo"<br>";
+
+echo"<br>";
+echo"what is page2?";
+var_dump($page2);
+echo"<br>";
+
+
+/// what is this?
+// return tracking object
+$gpr = new grade_plugin_return(
+    array(
+        'type' => 'report',
+        'plugin' => 'grader',
+        'course' => $course,
+        'page' => $page
+    )
+);
+
+//What is gpr
+echo"<br>";
+echo"what is gpr?";
+var_dump($gpr);
+echo"<br>";
+//Could this woprk on next pager????
+
+///LEts see what we captured
+echo"<br>";     
+echo"what is userid?";
+var_dump($userid);
+echo"<br>";
+$download = optional_param('download', '', PARAM_RAW);
+$mode = optional_param('mode', '', PARAM_ALPHA); // Report mode.
+
+//what are thes eoptionalparams
+echo"<br>";
+echo"what is download?";
+var_dump($download);
+echo"<br>";
+echo"what is mode?";
+var_dump($mode);
+echo"<br>";
+//What is session const here
+echo"<br>";
+echo"what is server const?";
+var_dump($_SERVER);
+echo"<br>";
+//What is session const here
+echo"<br>";
+echo"what is session const?";
+var_dump($_SESSION);
+echo"<br>";
+
+// what about $_GET
+echo"<br>";
+echo"what is get const?";
+var_dump($_GET);
+echo"<br>";
+
+// what about $_GET
+echo"<br>";
+echo"what is POST const?";
+var_dump($_POST);
+echo"<br>";
+$url = new moodle_url('/mod/cmi5launch/report.php');
+
+/*
+$url->param('id', $id);
+if (empty($mode)) {
+    $mode = reset($reportlist);
+} else if (!in_array($mode, $reportlist)) {
+    throw new \moodle_exception('erroraccessingreport', 'scorm');
+}
+*/
+$url->param('mode', $mode);
+// What is url->param
+echo"<br>";
+echo"what is url param?";
+var_dump($url->param);
+echo"<br>";
 // Create table to display on page.
 
 // What about a table in a table? 
@@ -175,7 +277,19 @@ $outertable = new \flexible_table('mod-cmi5launch-report');
 $columns[] = 'AU Title';
 $headers[] = get_string('autitle', 'cmi5launch');
 
+
+//SEe here we are getting all users, but it may only be one user, lets see what we can do if wecan grad user id from previous screen
 $users = get_enrolled_users($contextmodule);; //returns an array of users
+
+
+// Here? We should update here right!
+// And all users should be checked cause the teacher is looking at all their students
+    
+$gradehelpers = new grade_helpers;
+
+$updategrades = $gradehelpers->get_cmi5launch_check_user_grades_for_updates();
+
+$updategrades($cmi5launch);
 
 foreach($users as $user){
     $headers[] = $user->username;
@@ -213,29 +327,10 @@ $outertable->setup();
 
 // IS there a way to do this without a GROUP of arrays, just one long thing?
     foreach ($aus2[0] as $au) {
-       ////// $infofornextpage = array();
-       ///// $row = array();
-
-
-
-    
-    
-  
-
-    //Makes more sense to feed row an array of data
-    // Nope it doent like arrays
-    // We need a freakin double array!! The array[i] is  string value apparenlty
-    //array_push($rowdata, $currenttitle);
-    
-    // Ok so apparently the key needs to be column title?
-    //$rowdata[] =array ("AU Title" => $currenttitle);
-    // Well not two dimensional ,just key pair>
-    
+       
     
     foreach($users as $user){
-        $rowdata["AU Title"] =  ($currenttitle);
-        $infofornextpage = array();
-        $row = array();
+       
             //REtrieve the current au id, this is always unique and will help with retreiving the 
     // student grades
     $infofornextpage[] = $au[0]['id'];
@@ -243,7 +338,9 @@ $outertable->setup();
     // Then current title is 
     $currenttitle= $au[0]['title'][0]['text'];
     $infofornextpage[] = $currenttitle;
-
+    $rowdata["AU Title"] =  ($currenttitle);
+    $infofornextpage = array();
+    $row = array();
         $username = $user->username;
 
        // II see, this may be because if the user hasn't done anything in class yet? 

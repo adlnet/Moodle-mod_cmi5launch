@@ -247,7 +247,7 @@ if (!$au->sessions == null) {
     $au->scores = json_encode($sessionscores);
   //Ok, lets see if we are getting the bracket here?
 
-
+  cmi5launch_update_grades($cmi5launch, $USER->id);
     //And here we can add the au name and record scores? 
     // Well mybe not, cause it is already in only ONE au here
 

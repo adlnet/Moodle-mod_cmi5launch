@@ -222,6 +222,7 @@ foreach ($auids as $key => $auid) {
     // Take only info about AUs out of registrationinfofromcmi5.
     $ausfromcmi5 = array_chunk($registrationinfofromcmi5["metadata"]["moveOn"]["children"], 1, true);
 
+
     //We will make a func here for this, but right now, can we take
     // the au id and use it to get and save score to course?
     ///Ooooh yes, lets make an array to add to!
@@ -249,6 +250,8 @@ foreach ($auids as $key => $auid) {
         $austatus = "Not attempted";
 
     } else {
+
+        // We need this part cause I think we need it to updat db? MB
 
         // Retrieve AUs moveon specification.
         $aumoveon = $au->moveon;
