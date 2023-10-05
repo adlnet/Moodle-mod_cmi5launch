@@ -56,16 +56,39 @@ $id = required_param('id', PARAM_INT);// Course Module ID, i think, like 417?
 // I have no idea what downlaod and mode are....
 $download = optional_param('download', '', PARAM_RAW);
 $mode = optional_param('mode', '', PARAM_ALPHA); // Report mode.
-$report = optional_param('report', '', PARAM_ALPHA);
 
-$page2 = optional_param('page', '', PARAM_ALPHA);
+
 $cm = get_coursemodule_from_id('cmi5launch', $id, 0, false, MUST_EXIST);
 $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
 ////$scorm = $DB->get_record('scorm', array('id' => $cm->instance), '*', MUST_EXIST);
-
+// Item number, may be != 0 for activities that allow more than one grade per user.
+// itemnumber is from the moodle grade_items table, which holds info on the grade item itself such as course, mod type, activity title, etc
+$itemnumber = optional_param('itemnumber', 0, PARAM_INT); 
+// Graded user ID (optional) (not currenlty loged in user).
+$userid = optional_param('userid', 0, PARAM_INT);
+// The itemid is from the moooodle grade_grades table I believe, appears to correspond to a grade column (for like
+// one cmi5launch or other activity part of a course)
+$itemid = optional_param('itemid', 0, PARAM_INT);
+// This is the gradeid, which is the id, in the same grade_grades table. So like a row entry, a particular users info
+$gradeid = optional_param('gradeid', 0, PARAM_INT);
 /////
+//$actionlink = required_param('Grade analysis', PARAM_TEXT);// Course Module ID, or ...
+
 $page= optional_param('page', 0, PARAM_INT);   // active page
 ///////////////
+//$attemptid = required_param('attempt', PARAM_INT);
+$page      = optional_param('page', 0, PARAM_INT);
+$showall   = optional_param('showall', null, PARAM_BOOL);
+$cmid      = optional_param('cmid', null, PARAM_INT);
+
+$url = new moodle_url('/mod/quiz/review.php', array('attempt'=>$attemptid));
+if ($page !== 0) {
+    $url->param('page', $page);
+} else if ($showall) {
+    $url->param('showall', $showall);
+}
+$request_body = file_get_contents('php://input');
+
 
 $contextmodule = context_module::instance($cm->id);
 // MB - Generates and returns list of available Scorm report sub-plugins in their reportlib page 
@@ -76,9 +99,9 @@ $contextmodule = context_module::instance($cm->id);
 // That seems to only work if I setit up as form in pervious page, which is a moodle page, can we take from url? 
 
 
-$url = new moodle_url('/mod/cmi5launch/report.php');
+//$url = new moodle_url('/mod/cmi5launch/report.php');
 
-$url->param('id', $id);
+//$url->param('id', $id);
 
 // MB what is this?
 /*
@@ -184,6 +207,47 @@ if (empty($noheader)) {
     echo $OUTPUT->header();
 }
 
+// Now are all my optional params coming through???
+echo"<br>";
+echo"what is id?";
+var_dump($id);
+echo"<br>";
+echo"what is itemid?";
+var_dump($itemid);
+echo"<br>";
+echo"<br>";
+echo "what is itemnumber";
+var_dump($itemnumber);
+echo"<br>";
+echo"<br>";
+echo "what is gradeid";
+var_dump($gradeid);
+echo"<br>";
+echo"<br>";
+echo "what is userid";
+var_dump($userid);
+echo"<br>";
+
+
+
+
+//New snippet I found
+echo"<br>";
+echo"what is request_body?";
+var_dump($request_body);
+
+echo"<br>";
+echo"what is page thinabo?";
+var_dump($page);
+echo"<br>";
+echo" what is showall?:'";
+var_dump($showall);
+echo"<br>";
+
+echo "<br>";
+echo "what is this thinggg?";
+var_dump($actionlink);
+echo "<br>";
 // Ok, can we ge treport?
 echo"<br>";
 echo"what is report?";
@@ -245,6 +309,11 @@ echo"<br>";
 echo"<br>";
 echo"what is get const?";
 var_dump($_GET);
+echo"<br>";
+
+echo"<br>";
+echo"what is cookie const?";
+var_dump($_COOKIE);
 echo"<br>";
 
 // what about $_GET
