@@ -58,12 +58,6 @@ $currenttitle = $fromreportpage[1];
 $auidprevpage = $fromreportpage[2];
 $userid = $fromreportpage[3];
 
-//What is user id here
-//echo "USER ID IS: ";
-//var_dump($userid);
-// Retrieve AU ID
-//$auid = array_shift($fromreportpage);
-
 
 
 //////
@@ -146,28 +140,20 @@ if (empty($noheader)) {
     echo $OUTPUT->header();
 }
 
-//echo "CONGRATS!";
-$fromreportpage = base64_decode(required_param('AU_view', PARAM_TEXT) );
-// Break it into array (AU is first index).
-$fromreportpage = json_decode($fromreportpage, true);
-
-
-
-// The args from the previous page come through in this order:
-// 0: cmi5 unique AU ID
-// 1: AU title
-// 2: AU IDs to retrieve AUs from DB for this user
-// 3: The user id, the one whose grades we need
-$cmi5idprevpage = $fromreportpage[0];
-$currenttitle = $fromreportpage[1];
-$auidprevpage = $fromreportpage[2];
-$userid = $fromreportpage[3];
-
+// What is coming from other page?
+echo"<br>";
+echo " What is fromreportpage?";
+var_dump($fromreportpage);
+echo "<br>";
 // Retrieve the registration and AU ID from view.php.
+
+
 echo"<br>";
 echo "USER ID IS: ";
 var_dump($userid);
 echo "<br>";
+
+
 // Maybe the problem is the reistration id? It's only grabbing certain record, not user records
 $registrationid = $getregistration($record->courseid, $cmi5launch->id);
 /*
@@ -178,7 +164,7 @@ echo "<br>";
 */
 // Yes it will!! Now we have the riht auid!!!!
 
-
+/*
 echo"<br>";
 echo " What is user page?";
 $user = $DB->get_record('user', ['id' => $userid]);
@@ -188,6 +174,7 @@ echo "and what would all enrolled user llook like?";
 $users = get_enrolled_users($contextmodule);; //returns an array of users
 var_dump($users);
 echo "<br>";
+*/
 
 // Create table to display on page.
 
@@ -249,6 +236,11 @@ $users = get_enrolled_users($contextmodule);; //returns an array of users
 // Retrieve session ids for this course.
 $sessions = json_decode($aurecord->sessions, true);
 
+//Are we getting the right sessions?
+echo"<br>";
+echo " What are the sessions?";
+var_dump($sessions);
+echo "<br>";
 // Start Attempt at one
 $attempt = 1;
 
@@ -368,9 +360,14 @@ foreach ($sessions as $sessionid) {
   $scorecolumns[] = 'Overall Score';
   $scoreheaders[] = 'Overall Score';
 
+  // Session score may be null or empty
+  if(!empty($sessionscores)){
+
+  
   //TODO
   // and here we can later use an if or switcvh nd adjust on gradetype
-$scorerow["verall Score"] = max($sessionscores);
+$scorerow["Overall Score"] = max($sessionscores);
+  }
 //$scorecolumns[] = 'Overall Score';
 //$scoreheaders[] = 'Overall Score';
     
