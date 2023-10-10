@@ -99,5 +99,5 @@ if (has_capability('mod/cmi5launch:addinstance', $context)) {
 
 } else {
     // This is student or other non-teacher role.
-    redirect('view.php?id='.$cm->id);
+    redirect('report.php?id='.$cm->id .'&userid=' . $userid );
 }   

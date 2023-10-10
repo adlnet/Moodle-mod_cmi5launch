@@ -18,17 +18,9 @@
 // TODO MB.
 // Teachers should be directed here when we implement grading.
 //
-//defined('MOODLE_INTERNAL') || die(); //Causing it to not display anything.
+// The report page. Displays either the course grades for teacher, or user grades for student. 
+// Megan Bohland 2023
 
-//echo("This is the report page.");
-
-//So this report page is accesed by clicking the course title in the grader report and the magnifin glass
-//to zoom in on certain things.
-
-// So currently ittt all takes to same page, if glass is picked wee want only that students info, and consequestnyl,
-// only students who should see themselves, only teachers see it all.
-
-use core_reportbuilder\local\report\column;
 use mod_cmi5launch\local\grade_helpers;
 
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
@@ -37,7 +29,6 @@ require_login($course, false, $cm);
 require_once("../../config.php");
 require_once($CFG->libdir.'/tablelib.php');
 require_once($CFG->dirroot.'/mod/cmi5launch/locallib.php');
-//require_once($CFG->dirroot.'/mod//reportsettings_form.php');
 require_once($CFG->dirroot.'/mod/cmi5launch/report/basic/classes/report.php');
 require_once($CFG->libdir.'/formslib.php');
 require_once($CFG->dirroot. '/reportbuilder/classes/local/report/column.php');
@@ -48,33 +39,30 @@ define('CMI5LAUNCH_REPORT_ATTEMPTS_STUDENTS_WITH', 1);
 define('CMI5LAUNCH_REPORT_ATTEMPTS_STUDENTS_WITH_NO', 2);
 $PAGE->requires->jquery();
 
-$id = required_param('id', PARAM_INT);// Course Module ID, i think, like 417?
-
-// MB
-// I have no idea what downlaod and mode are....
-$download = optional_param('download', '', PARAM_RAW);
-$mode = optional_param('mode', '', PARAM_ALPHA); // Report mode.
 
 
 $cm = get_coursemodule_from_id('cmi5launch', $id, 0, false, MUST_EXIST);
 $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
 
+$id = required_param('id', PARAM_INT);// Activity Module ID, i think, like 417?
+$download = optional_param('download', '', PARAM_RAW);
+$mode = optional_param('mode', '', PARAM_ALPHA); // Report mode.
 // Item number, may be != 0 for activities that allow more than one grade per user.
-// itemnumber is from the moodle grade_items table, which holds info on the grade item itself such as course, mod type, activity title, etc
+// Itemnumber is from the moodle grade_items table, which holds info on the grade item itself such as course, mod type, activity title, etc
 $itemnumber = optional_param('itemnumber', 0, PARAM_INT); 
-// Graded user ID (optional) (not currenlty loged in user).
+// Currently logged in user
 $userid = optional_param('userid', 0, PARAM_INT);
-// The itemid is from the moooodle grade_grades table I believe, appears to correspond to a grade column (for like
-// one cmi5launch or other activity part of a course)
+// The itemid is from the Moodle grade_grades table, corresponds to a grade column (such as
+// one cmi5launch or other activity part of a course).
 $itemid = optional_param('itemid', 0, PARAM_INT);
-// This is the gradeid, which is the id, in the same grade_grades table. So like a row entry, a particular users info
+// This is the gradeid, which is the id in the same grade_grades table. A row entry, a particular users info
 $gradeid = optional_param('gradeid', 0, PARAM_INT);
-
-$page= optional_param('page', 0, PARAM_INT);   // active page
+// Active page.
+$page= optional_param('page', 0, PARAM_INT);
 $showall   = optional_param('showall', null, PARAM_BOOL);
 $cmid      = optional_param('cmid', null, PARAM_INT);
 
-$url = new moodle_url('/mod/quiz/review.php', array('attempt'=>$attemptid));
+$url = new moodle_url('/mod/quiz/review.php');
 if ($page !== 0) {
     $url->param('page', $page);
 } else if ($showall) {
@@ -82,26 +70,18 @@ if ($page !== 0) {
 }
 $request_body = file_get_contents('php://input');
 
-
 $contextmodule = context_module::instance($cm->id);
 
-
 $PAGE->set_url($url);
-
 require_login($course, false, $cm);
 $PAGE->set_pagelayout('report');
 
-// MB
-// We will need to set and create a capability for teachers to view reports.
-//require_capability('mod/scorm:viewreport', $contextmodule);
-
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require('header.php');
-
 require_once("$CFG->dirroot/lib/outputcomponents.php");
 require_login($course, false, $cm);
 
-
+// Functions from other classes
 $gradehelpers = new grade_helpers;
 $updategrades = $gradehelpers->get_cmi5launch_check_user_grades_for_updates();
 
@@ -115,7 +95,7 @@ navigation_node::override_active_url(new moodle_url('/mod/cmi5launch/report.php'
       
       function key_test(inforfornextpage) {
         
-        //Onclick calls this
+        // Onclick calls this
         if (event.keyCode === 13 || event.keyCode === 32) {
 
             mod_cmi5launch_open_report(inforfornextpage);
@@ -132,7 +112,7 @@ function mod_cmi5launch_open_report(inforfornextpage) {
      
 }
    
-        </script>
+    </script>
 <?php
 
 
@@ -156,14 +136,12 @@ $event->trigger();
 
 // Print the page header.
 if (empty($noheader)) {
-    // I think I understand. This string arument is looking at cmi5launch.php, thats what the second
-    // param refers to
+
     $strreport = get_string('report', 'cmi5launch');
-    
     $strattempt = get_string('attempt', 'cmi5launch');
 
     // Setup the page
-    $PAGE->set_title("$course->shortname: ".format_string($cm->name));
+    $PAGE->set_title("$course->shortname: ".format_string($course->id));
     $PAGE->set_heading($course->fullname);
     $PAGE->activityheader->set_attrs([
         'hidecompletion' => true,
@@ -181,17 +159,13 @@ $columns[] = 'AU Title';
 $headers[] = get_string('autitle', 'cmi5launch');
 
 // The table is always the same, but the amount of users shown varies.
-// Retrieve info from previous page
-// If the user is null, or most likely 0 since it has to be an int, this means there is no
-// specific user and show all enrolled users.
-if ($userid == null || 0) {
+// If user has capability, they can see all users.
+if (has_capability('mod/cmi5launch:addinstance', $context)) {
+    // This is a teacher, show all users.
 
     // The users are indexed by their userid.
     $users = get_enrolled_users($contextmodule);
 
-    
-
-    // Each user needs their own column.
     foreach ($users as $user) {
 
         // Call updategrades to ensure all grades are up to date before view.
@@ -200,8 +174,15 @@ if ($userid == null || 0) {
         // Each user needs their own column.
         $headers[] = $user->username;
         $columns[] = $user->username;
+
+        // Backbutton goes to grader 
+        $backurl = $CFG->wwwroot . '/grade/report/grader/index.php' . '?id=' .$cmi5launch->course;
+
+        
     }
-} else { // If the user is not null, then we are looking at a specific user.
+} else { 
+    // If the user does not have the correct capability then we are looking at a specific user, 
+    // who is not a teacher and needs to see only their grades .
     
     // Retrieve that user from DB.
     $user = $DB->get_record('user', array('id' => $userid));
@@ -214,8 +195,18 @@ if ($userid == null || 0) {
     // Each user needs their own column.
     $headers[] = $user->username;
     $columns[] = $user->username;
+    
+    $backurl = $CFG->wwwroot . '/grade/report/user/index.php' . '?id=' .$cmi5launch->course;
 
     }
+
+    // Create back button.
+    ?>
+    <form action="<?php echo $backurl ?>" method="get" target="_blank">
+        <input id="id" name="id" type="hidden" value="<?php echo $cmi5launch->course ?>">
+      <input type="submit" value="Back"/>
+    </form>
+    <?php
 
 // Reload cmi5 course instance.
 $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
@@ -244,13 +235,11 @@ foreach ($auschunked[0] as $au) {
     // Array to hold info for next page, that will be placed into buttons for user to click.
     $infofornextpage = array();
     
-
-
-    //Retrieve the current au id, this is always unique and will help with retreiving the 
+    //Retrieve the current au id, this is always unique and will help with retrieving the 
     // student grades. It is the uniquie id cmi5 spec id.
     $infofornextpage[] = $au[0]['id'];
 
-    // Grabe the current title of the AU for the row header, also to be sent to next page.
+    // Grab the current title of the AU for the row header, also to be sent to next page.
     $currenttitle = $au[0]['title'][0]['text'];
     $infofornextpage[] = $currenttitle;
     $rowdata["AU Title"] = ($currenttitle);
@@ -336,5 +325,4 @@ $reporttable->finish_output();
 
 if (empty($noheader)) {
     echo $OUTPUT->footer();
-    // 
 }

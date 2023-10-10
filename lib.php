@@ -579,7 +579,6 @@ function cmi5launch_process_new_package($cmi5launch) {
     // Reload cmi5 instance.
     $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
 
-    echo "111111";
     $fs = get_file_storage();
 
     $fs->delete_area_files($context->id, 'mod_cmi5launch', 'package');
@@ -930,10 +929,7 @@ function cmi5launch_get_user_grades($cmi5launch, $userid=0) {
                $users = get_enrolled_users($contextmodule);; //returns an array of users
 
         // AHA! We are  not getting into these for some reaons, lets check users
-        echo "<br>";
-        echo "well what is USERS ";
-        var_dump($users);
-        echo "<br>";
+ 
         // If there is a list of users then they iterate through it and make user objects with the individual users.
         if ($users) {
         
@@ -947,10 +943,7 @@ function cmi5launch_get_user_grades($cmi5launch, $userid=0) {
             // then one that does below? (above)
             //Aha! We are not entering this
             foreach ($users as $user) {
-                echo "<br>";
-                echo "well what is user ";
-                var_dump($user);
-                echo "<br>";
+             
                 // If there is a lis
                 $grades[$user->id] = new stdClass();
                 $grades[$user->id]->id         = $user->id;
@@ -1065,10 +1058,6 @@ function cmi5launch_highest_grade($scores)
        // $highestgrade = (max(json_decode($scores, true)) );
         // Ok intval is not working due to those damn brackeeets,
 
-        echo"<br>";
-        echo "what is highestgrade";
-        var_dump($highestgrade);
-        echo"<br>";
         // so lets make an if clause that checks for them and removes them if found, that way it can handle both
         if(str_contains($highestgrade, "[")){
             $highestgrade = str_replace("[", "", $highestgrade);
@@ -1189,20 +1178,14 @@ function cmi5launch_update_grades($cmi5launch, $userid = 0, $nullifnone = true)
     // maybe needs to be separate func to keep nesting away?
     if ($userid) {
         $grades = cmi5launch_get_user_grades($cmi5launch, $userid);
-        echo "11";
         //Grades is coming bakc nested in array, with keys being the user id so this should work
         $grades = $grades[$userid];
-        echo "<br>";
-        echo "what is grades";
-        var_dump($grades);
-        echo "<br>";
         cmi5launch_grade_item_update($cmi5launch, $grades);
         
 
         // Set complete.
         ///scorm_set_completion($scorm, $userid, COMPLETION_COMPLETE, $grades);
     } else if ($userid and $nullifnone) {
-        echo "122";
         $grade = new stdClass();
         $grade->userid   = $userid;
         $grade->rawgrade = null;
@@ -1213,7 +1196,6 @@ function cmi5launch_update_grades($cmi5launch, $userid = 0, $nullifnone = true)
         // Set incomplete.
        /// scorm_set_completion($scorm, $userid, COMPLETION_INCOMPLETE);
     } else {
-        echo "1333";
         cmi5launch_grade_item_update($cmi5launch);
     }
         // Ok so if this does whatever is needed to generate the relevant grades to push into gradebook
@@ -1315,15 +1297,7 @@ function cmi5launch_update_grades($cmi5launch, $userid = 0, $nullifnone = true)
 // So retrieve the settings for course gradin
 
         $gradetype = $cmi5launchsettings["grademethod"];
-
-        // LEts see if grade method is correct
-        echo "<br>";
-        echo "Grade method is: ";
-        //And this is coming in as a 1???
-        // did they have it a 1 2 3 aligned kinda thing?
-
-        var_dump($gradetype);
-        echo "<br>";
+        
             $maxgrade = $settings['maxgrade'];
             //What is grademax here
             //Heres whats weird, why is settings not holding our max grade?
@@ -1363,12 +1337,7 @@ function cmi5launch_update_grades($cmi5launch, $userid = 0, $nullifnone = true)
                  */
             case 1:
 
-                // Ok, so this is an array not object, can we convert or better to grab key?
-                echo "<br>";
-                echo " what is grades here?;";
-                var_dump($grades);
-                echo "<br>";
-
+        
                 //We need to update rawgrade not all of rades, that wipes out the array format it needs
                 foreach ($grades as $key => $grade) {
                ///Ohhhh its IN an array, we need to get it out
