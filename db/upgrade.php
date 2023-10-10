@@ -42,7 +42,7 @@ function xmldb_cmi5launch_upgrade($oldversion) {
 
     $dbman = $DB->get_manager();
 
-    if ($oldversion < 2023081516) {
+    if ($oldversion < 2023101013) {
 
         // Define table cmi5launch to be created.
         $table = new xmldb_table('cmi5launch');

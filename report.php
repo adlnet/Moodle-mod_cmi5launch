@@ -44,7 +44,8 @@ $PAGE->requires->jquery();
 $cm = get_coursemodule_from_id('cmi5launch', $id, 0, false, MUST_EXIST);
 $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
 
-$id = required_param('id', PARAM_INT);// Activity Module ID, i think, like 417?
+// Activity Module ID
+$id = required_param('id', PARAM_INT);
 $download = optional_param('download', '', PARAM_RAW);
 $mode = optional_param('mode', '', PARAM_ALPHA); // Report mode.
 // Item number, may be != 0 for activities that allow more than one grade per user.
