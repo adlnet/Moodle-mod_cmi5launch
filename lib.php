@@ -630,7 +630,7 @@ function cmi5launch_process_new_package($cmi5launch) {
     $record->aus = (json_encode($aus));
 
 	// Populate player table with new course info.
-    $DB->update_record('cmi5launch', $record, true);
+   // $DB->update_record('cmi5launch', $record, true);
 
     $fs->delete_area_files($context->id, 'mod_cmi5launch', 'content');
 
@@ -1154,8 +1154,9 @@ function cmi5launch_update_grades($cmi5launch, $userid = 0, $nullifnone = true)
     foreach ($users as $user) {
         $updategrades($user);
     }
+    /*
     // Then we have a record, so we need to retrieve it.
-    $userscourse = $DB->get_record('cmi5launch_course', ['courseid' => $record->courseid, 'userid' => $USER->id]);
+    $userscourse = $DB->get_record('cmi5launch_course', ['courseid' => $record->courseid, $userid]);
 
     // Retrieve registration id.
     $registrationid = $userscourse->registrationid;
@@ -1165,10 +1166,10 @@ function cmi5launch_update_grades($cmi5launch, $userid = 0, $nullifnone = true)
 
     // We need id to get progress.
     $cmid = $cmi5launch->id;
-
+*/
 
         // Ok, now we need to retrieve the sessions and find the average score.
-        $grade = json_decode($userscourse->ausgrades, true);
+      //  $grade = json_decode($userscourse->ausgrades, true);
   
 
     //The rawgarde is now coming back as an int, but I wonder if it needs to be somethin 
@@ -1297,7 +1298,7 @@ function cmi5launch_update_grades($cmi5launch, $userid = 0, $nullifnone = true)
 // So retrieve the settings for course gradin
 
         $gradetype = $cmi5launchsettings["grademethod"];
-        
+
             $maxgrade = $settings['maxgrade'];
             //What is grademax here
             //Heres whats weird, why is settings not holding our max grade?

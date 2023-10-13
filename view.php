@@ -134,8 +134,11 @@ if ($cmi5launch->intro) {
     </script>
 <?php
 
+
 // Check if a course record exists for this user yet.
+//I bet it's checking the wrong id here!!! So it thinks its false and makes it again!
 $exists = $DB->record_exists('cmi5launch_course', ['courseid'  => $record->courseid, 'userid'  => $USER->id]);
+
 
 // If it does not exist, create it.
 if ($exists == false) {
@@ -154,18 +157,18 @@ if ($exists == false) {
 
     // Retrieve AU ids for this user/course.
     $aus = json_decode($record->aus);
-
     $auids = $saveaus($createaus($aus));
     $userscourse->aus = (json_encode($auids));
     // Save new record to DB.
 
+    //This should be where course id is made
     $DB->insert_record('cmi5launch_course', $userscourse);
 
 } else {
 
     // Then we have a record, so we need to retrieve it.
     $userscourse = $DB->get_record('cmi5launch_course', ['courseid'  => $record->courseid, 'userid'  => $USER->id]);
-
+ 
     // Retrieve registration id.
     $registrationid = $userscourse->registrationid;
 
@@ -222,13 +225,6 @@ foreach ($auids as $key => $auid) {
     // Take only info about AUs out of registrationinfofromcmi5.
     $ausfromcmi5 = array_chunk($registrationinfofromcmi5["metadata"]["moveOn"]["children"], 1, true);
 
-
-    //We will make a func here for this, but right now, can we take
-    // the au id and use it to get and save score to course?
-    ///Ooooh yes, lets make an array to add to!
-
-    //Wait, if this is PER au, then there should only be one grade, unless they do it multiple times dangit
-    // if we decode its a dang array and if we dont its a string!!!!caugh!!!
     $auscores[($au->title)] = ($au->scores);
     // TODO now we can get the AU's satisifed FROM the CMI5 player.
     // TODO (for that matter couldn't we make it, notattempetd, satisifed, not satisfied??).
@@ -250,8 +246,6 @@ foreach ($auids as $key => $auid) {
         $austatus = "Not attempted";
 
     } else {
-
-        // We need this part cause I think we need it to updat db? MB
 
         // Retrieve AUs moveon specification.
         $aumoveon = $au->moveon;
@@ -288,8 +282,6 @@ foreach ($auids as $key => $auid) {
             // Get progress from LRS.
             $session = $getprogress($registrationid, $cmi5launch->id, $session);
 
-            // Ok, so above, when session is returned we know there is no bracket
-            // so maybe it happens here? 
             // Add score to array for AU.
             $sessionscores[] = $session->score;
 
@@ -299,8 +291,6 @@ foreach ($auids as $key => $auid) {
 
          // Save the session scores to AU, it is ok to overwrite.
          $au->scores = json_encode($sessionscores, JSON_NUMERIC_CHECK );
-       
-    
     };
 
         // Create array of info to place in table.
@@ -315,13 +305,6 @@ foreach ($auids as $key => $auid) {
 
     if ($au->moveon == "CompletedOrPassed" || "Passed") {
 
-        // Currently it takes the highest grade out of sessions for grade.
-        // Later this can be changed by linking it to plugin options.
-        // However, since CMI5 player does not count any sessions after the first for scoring, by averaging we are adding unnessary.
-        // 0', and artificailly lowering the grade.
-        // Also, should we query for 'passed' or 'completed'? statements here?
-        // Or can we have the cmi5player update our AU's moveon to 'passed' or 'completed'?
-
         if (!$sessionscores == null) {
             // If the grade is empty, we need to pass a null or NA.
             $grade = max($sessionscores);
@@ -330,19 +313,6 @@ foreach ($auids as $key => $auid) {
                 $auinfo[] = ("Passed");
             } else {
                 $auinfo[] = ($grade);
-
-                // MB, 
-                // Could this be a good place to check and call update grades?
-                // Or is that better done where  the session is updated? Cause that would be a constant check right
-                //What is auinfo here, can we pass THIS to grade?
-        
-                // This may work, it has quiz and satisified! What if our update grades goes whereever this does?
-                // Except! The freaing things has very specific params....
-                // Dagum! So maybe can we grab this info ourselves? With these paramrs? 
-                // Yeah grabbing the score will work, at elast for nwo
-
-              //  cmi5launch_update_grades($cmi5launch, $USER->id);
-
             }
 
         } else {
@@ -352,7 +322,11 @@ foreach ($auids as $key => $auid) {
 
         if (!$sessionscores == null) {
             // If the grade is empty, we need to pass a null or NA.
+
+            //Maybe move this to auview, it should be saved when created right? 
+            // Should we call my grade_helpers? 
             $grade = max($sessionscores);
+            // Yeah this needs to be elsewhere not just here.
             $au->grade = $grade;
             $auinfo[] = ($grade);
 
@@ -381,7 +355,6 @@ foreach ($auids as $key => $auid) {
 
 // Add our newly updated auscores array to the course record.
 $userscourse->ausgrades = json_encode($auscores);
-
 
 // Lastly, update our course table.
 $updated = $DB->update_record("cmi5launch_course", $userscourse);

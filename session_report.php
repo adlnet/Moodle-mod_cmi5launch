@@ -117,7 +117,7 @@ if (empty($noheader)) {
 }
 // Back button.
 ?>
-<form action="report.php" method="get" target="_blank">
+<form action="report.php" method="get">
     <input id="id" name="id" type="hidden" value="<?php echo $id ?>">
   <input type="submit" value="Back"/>
 </form>

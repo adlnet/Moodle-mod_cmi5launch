@@ -14,24 +14,16 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-
 /**
- * Defines the version of cmi5launch
+ * Description of cmi5launch backup settings
  *
- * This code fragment is called by moodle_needs_upgrading() and
- * /admin/index.php
- *
- * @package mod_cmi5launch
- * @copyright  2013 Andrew Downes
+ * @package    mod_cmi5launch
+ * @copyright  2016 onward Remote-Learner.net Inc
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+defined('MOODLE_INTERNAL') || die;
 
-$plugin->version   = 2023101217;      // The current module version (Date: YYYYMMDDXX).
-
-$plugin->requires  = 2015111000;      // Requires Moodle 3.0 version.
-$plugin->cron      = 0;               // Period for cron to check this module (secs).
-$plugin->component = 'mod_cmi5launch'; // To check on upgrade, that module sits in correct place.
-$plugin->maturity = MATURITY_STABLE;
-$plugin->release = '1.3RC2 (Build: 2016060300)';
+ // This activity has not particular settings but the inherited from the generic
+ // backup_activity_task so here there isn't any class definition, like the ones
+ // existing in /backup/moodle2/backup_settingslib.php (activities section).

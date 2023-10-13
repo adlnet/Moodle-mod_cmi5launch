@@ -153,7 +153,7 @@
         <TABLE NAME="cmi5launch_aus" COMMENT="Stores a courses AUs">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="true" COMMENT="The id of the AU (assigned by Moodle). "/>
-        <FIELD NAME="attempt" TYPE="int" LENGTH="10" NOTNULL="false" COMMENT="The attempt of the au, ie, first, second, third "/>
+        <FIELD NAME="attempt" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="The attempt of the au, ie, first, second, third "/>
         <FIELD NAME="auid" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="CMI5 compliant ID"/>        
         <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The course id this AU belongs to"/>
         <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="The user id"/>

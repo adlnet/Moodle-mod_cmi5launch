@@ -75,7 +75,7 @@ if ($cmi5launch->intro) { // Conditions to show the intro can change to look for
 <?php
 */
 ?>
-<form action="view.php" method="get" target="_blank">
+<form action="view.php" method="get">
     <input id="id" name="id" type="hidden" value="<?php echo $id ?>">
   <input type="submit" value="Back"/>
 </form>
@@ -135,10 +135,7 @@ $fromview = explode(",", $fromview);
 // Retrieve AU ID.
 $auid = array_shift($fromview);
 
-echo"<br>";
-echo "auid is: ";
-var_dump($auid);
-echo"<br>";
+
 // Retrieve appropriate AU from DB.
 $au = $retrieveaus($auid);
 
@@ -156,7 +153,6 @@ $regid = $userscourse->registrationid;
 
 // If it is null there have been no previous sessions.
 if (!$au->sessions == null) {
-
 
     // Array to hold info for table population.
     $tabledata = array();
@@ -177,19 +173,9 @@ if (!$au->sessions == null) {
     // Retrieve session ids.
     $sessionids = json_decode($au->sessions);
 
-    echo "<br>";
-    echo "sessionids is: ";
-    var_dump($sessionids);
-    echo "<br>";
-
     // Iterate through each session by id.
     foreach ($sessionids as $key => $sessionid) {
 
-        
-    echo "<br>";
-    echo "sessionids is: ";
-    var_dump($sessionid);
-    echo "<br>";
         // Retrieve new info (if any) from CMI5 player on session.
         $session = $updatesession($sessionid, $cmi5launch->id);
 
@@ -210,15 +196,13 @@ if (!$au->sessions == null) {
         $session = $getprogress($regid, $cmi5launch->id, $session);
         $sessioninfo[] = ("<pre>" . implode("\n ", json_decode($session->progress) ) . "</pre>");
 
+  
         // Add score to table.
         $sessioninfo[] = $session->score;
         // Add score to array for AU.
         $sessionscores[] = $session->score;
-        // Ok, maybe here it is where we can put session1->score, etc
 
-        // MB Test.
-        // Ok so maybe here? //maybe we pass in the session?
-        //cmi5launch_update_grades();
+      //  cmi5launch_update_grades($cmi5launch, $USER->id);
         //But it  lso needs name of activity right?
 
         // Update session in DB.
@@ -244,7 +228,7 @@ if (!$au->sessions == null) {
     //Ok, lets see if we are getting the bracket here?
    
     // Save the session scores to AU, it is ok to overwrite.
-    $au->scores = json_encode($sessionscores);
+    //$au->scores = json_encode($sessionscores);
   //Ok, lets see if we are getting the bracket here?
 
   cmi5launch_update_grades($cmi5launch, $USER->id);

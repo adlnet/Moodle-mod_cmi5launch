@@ -63,11 +63,9 @@ if (! $scorm = $DB->get_record('cmi5launch', array('id' => $cm->instance))) {
 }
 
 if (! $course = $DB->get_record('cmi5launch', array('course' => $cm->course, 'name' => $cm->name))) {
-   echo"<br>";
+
     $returned = $DB->get_record('cmi5launch', array('course' => $cm->course, 'name' => $cm->name));
-    echo "returned is: ";                   
-    var_dump($returned);
-    echo"<br>";
+   
     throw new \moodle_exception('coursemisconf');
 }
 

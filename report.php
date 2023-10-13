@@ -203,7 +203,7 @@ if (has_capability('mod/cmi5launch:addinstance', $context)) {
 
     // Create back button.
     ?>
-    <form action="<?php echo $backurl ?>" method="get" target="_blank">
+    <form action="<?php echo $backurl ?>" method="get">
         <input id="id" name="id" type="hidden" value="<?php echo $cmi5launch->course ?>">
       <input type="submit" value="Back"/>
     </form>
@@ -252,6 +252,9 @@ foreach ($auschunked[0] as $au) {
 
         // Retrieve users specific info for this course.
         $userrecord = $DB->get_record('cmi5launch_course', ['courseid' => $record->courseid, 'userid' => $user->id]);
+
+        // Retrieve/update the users grades for this course.
+        cmi5launch_update_grades($cmi5launch, $user->id);
 
         // Userrecord may be null if user has not participated in course yet.
         if ($userrecord == null) {
@@ -318,7 +321,7 @@ $reporttable->finish_output();
 
 ?>
 
-<form id="launchform" action="session_report.php" method="get" target="_blank">
+<form id="launchform" action="session_report.php" method="get">
         <input id="id" name="id" type="hidden" value="<?php echo $id ?>">
         <input id="AU_view" name="AU_view" type="hidden" value="default">
     </form>
