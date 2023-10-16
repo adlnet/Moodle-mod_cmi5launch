@@ -143,6 +143,10 @@ $exists = $DB->record_exists('cmi5launch_course', ['courseid'  => $record->cours
 // If it does not exist, create it.
 if ($exists == false) {
 
+    // Maybe the problem is here, how we make a course! IT's suppossed to use returned id
+    // but somehow we are MAKING one
+
+    //Because it's takingg the ID from record!!
     $userscourse = new course($record);
 
     $userscourse->userid = $USER->id;
@@ -162,13 +166,16 @@ if ($exists == false) {
     // Save new record to DB.
 
     //This should be where course id is made
-    $DB->insert_record('cmi5launch_course', $userscourse);
+    $newid = $DB->insert_record('cmi5launch_course', $userscourse);
+  
+    //Now assign id?
+    $userscourse->id = $newid;
 
 } else {
 
     // Then we have a record, so we need to retrieve it.
     $userscourse = $DB->get_record('cmi5launch_course', ['courseid'  => $record->courseid, 'userid'  => $USER->id]);
- 
+
     // Retrieve registration id.
     $registrationid = $userscourse->registrationid;
 
@@ -180,8 +187,6 @@ if ($exists == false) {
 // Array to hold info for table population.
 $tabledata = array();
 
-// Array to hold Au scores!
-$auscores = array();
 
 // We need id to get progress.
 $cmid = $cmi5launch->id;
@@ -202,11 +207,15 @@ $table->head = array(
 // CMI5_update_grades($cmi5launch, 0).
 // Seems like I was ahead of myself. so if this is to return to for grades
 // maybe later this update spiel can run in the grades fuc of lib.php?
+// Array to hold Au scores!
+$auscores = array();
 
 // Cycle through AU IDs.
 foreach ($auids as $key => $auid) {
 
 
+// Arra4ry to hold scores for AU.
+$sessionscores = array();
     $au = $getaus($auid);
 
     // Verify object is an au object.
@@ -225,13 +234,12 @@ foreach ($auids as $key => $auid) {
     // Take only info about AUs out of registrationinfofromcmi5.
     $ausfromcmi5 = array_chunk($registrationinfofromcmi5["metadata"]["moveOn"]["children"], 1, true);
 
-    $auscores[($au->title)] = ($au->scores);
+
     // TODO now we can get the AU's satisifed FROM the CMI5 player.
     // TODO (for that matter couldn't we make it, notattempetd, satisifed, not satisfied??).
     foreach ($ausfromcmi5 as $key => $auinfo) {
 
-        // Arra4ry to hold scores for AU.
-        $sessionscores = array();
+        
 
         if ($auinfo[$key]["lmsId"] == $aulmsid) {
 
@@ -348,15 +356,20 @@ foreach ($auids as $key => $auid) {
         // Add to be fed to table.
         $tabledata[] = $auinfo;
 
+        $auscores[($au->title)] = ($au->scores);
         // Update the au in DB.
         $DB->update_record("cmi5launch_aus", $au);
 }
 
 
+// This is it, right? This is where we update the course record with the new auscores array?
 // Add our newly updated auscores array to the course record.
 $userscourse->ausgrades = json_encode($auscores);
+// THIS is why this is working and the other wasn't
 
 // Lastly, update our course table.
+// I wonder if its this update? If something is diff in users course, cause the issue seems to appear
+// when aus are added? And they are added on this pae as well as it's created
 $updated = $DB->update_record("cmi5launch_course", $userscourse);
 
 cmi5launch_update_grades($cmi5launch, $USER->id);

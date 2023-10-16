@@ -102,10 +102,14 @@ class grade_helpers
                 // The user has Au, the Aus have sessions. Each user will pull out their Aus, and update each one
                 // Each AU will update its sessions, and then update its own grades
 
-                //Array to hold session scores for update
-                $sessiongrades = array();
+               
+                // Array to hold Au scores!
+$auscores = array();
+
                 foreach ($auids as $key => $auid) {
-                    //$au = $getaus($auid);
+                     //Array to hold session scores for update
+                $sessiongrades = array();
+                    $au = $getaus($auid);
 
                     // This uses the auid to pull the right record from the aus table
                     $aurecord = $DB->get_record('cmi5launch_aus', ['id' => $auid]);
@@ -157,21 +161,23 @@ class grade_helpers
 
                                 //Add the session grade to array
                                 $sessiongrades[] = $session->score;
-
+// Update session in DB.
+$DB->update_record('cmi5launch_sessions', $session);
                             }
                             // Save the session scores to AU, it is ok to overwrite.
                             $aurecord->scores = json_encode($sessiongrades);
                             // ok so that handled sessions, now we need to update AU rihgt?
                             $aurecord = $DB->update_record('cmi5launch_aus', $aurecord);
-
-                        } else {
-                            $sessiongrades = 0;
-                        }
+                            $auscores[($au->title)] = ($au->scores);
+                        } 
                     }
-
+                    
                 }
+                $userscourse->ausgrades = json_encode($auscores);
+                $updated = $DB->update_record("cmi5launch_course", $userscourse);
+
             } else {
-                $sessiongrades = 0;
+             //   $sessiongrades[] = 0;
             }
             //REturn scores
             return $sessiongrades;

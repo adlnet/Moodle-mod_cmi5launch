@@ -49,6 +49,11 @@ class course {
             if(property_exists($this, $key) ){
       
                 $this->$key = ($value);
+
+                // We want the ID to be null here, so we can assign it later.
+                if($key == 'id'){
+                    $this->$key = null;
+                }
             }
 	    }	
     }

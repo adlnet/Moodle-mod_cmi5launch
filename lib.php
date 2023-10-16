@@ -1151,9 +1151,9 @@ function cmi5launch_update_grades($cmi5launch, $userid = 0, $nullifnone = true)
     $users = get_enrolled_users($contextmodule);; //returns an array of users
 
     //update all grades regartdless
-    foreach ($users as $user) {
-        $updategrades($user);
-    }
+    //foreach ($users as $user) {
+     //   $updategrades($user);
+   // }
     /*
     // Then we have a record, so we need to retrieve it.
     $userscourse = $DB->get_record('cmi5launch_course', ['courseid' => $record->courseid, $userid]);
@@ -1181,9 +1181,10 @@ function cmi5launch_update_grades($cmi5launch, $userid = 0, $nullifnone = true)
         $grades = cmi5launch_get_user_grades($cmi5launch, $userid);
         //Grades is coming bakc nested in array, with keys being the user id so this should work
         $grades = $grades[$userid];
+
         cmi5launch_grade_item_update($cmi5launch, $grades);
         
-
+    
         // Set complete.
         ///scorm_set_completion($scorm, $userid, COMPLETION_COMPLETE, $grades);
     } else if ($userid and $nullifnone) {
@@ -1197,6 +1198,7 @@ function cmi5launch_update_grades($cmi5launch, $userid = 0, $nullifnone = true)
         // Set incomplete.
        /// scorm_set_completion($scorm, $userid, COMPLETION_INCOMPLETE);
     } else {
+
         cmi5launch_grade_item_update($cmi5launch);
     }
         // Ok so if this does whatever is needed to generate the relevant grades to push into gradebook

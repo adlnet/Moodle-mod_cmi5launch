@@ -164,8 +164,10 @@ $headers[] = get_string('autitle', 'cmi5launch');
 if (has_capability('mod/cmi5launch:addinstance', $context)) {
     // This is a teacher, show all users.
 
+  //  echo "CAPABLE";
     // The users are indexed by their userid.
     $users = get_enrolled_users($contextmodule);
+
 
     foreach ($users as $user) {
 
@@ -233,6 +235,8 @@ foreach ($auschunked[0] as $au) {
     // Array to hold data for rows.
     $rowdata = array();
     
+    // For each AU, iterate through each user.
+    foreach ($users as $user) {
     // Array to hold info for next page, that will be placed into buttons for user to click.
     $infofornextpage = array();
     
@@ -245,14 +249,14 @@ foreach ($auschunked[0] as $au) {
     $infofornextpage[] = $currenttitle;
     $rowdata["AU Title"] = ($currenttitle);
 
-    // For each AU, iterate through each user.
-    foreach ($users as $user) {
-
+            //$sendtopage = array();
+ 
         $username = $user->username;
 
         // Retrieve users specific info for this course.
         $userrecord = $DB->get_record('cmi5launch_course', ['courseid' => $record->courseid, 'userid' => $user->id]);
 
+  
         // Retrieve/update the users grades for this course.
         cmi5launch_update_grades($cmi5launch, $user->id);
 
@@ -260,7 +264,7 @@ foreach ($auschunked[0] as $au) {
         if ($userrecord == null) {
             
             $userscore = " ";
-        
+            $infofornextpage[] = null;
         } else {
 
             // Retrieve the users grades for this course.
@@ -280,7 +284,7 @@ foreach ($auschunked[0] as $au) {
 
                         // Remove [] from userscore if they are there.
                         $toremove = array("[", "]");
-                        if (str_contains($userscore, "[")) {
+                        if ($userscore != null && str_contains($userscore, "[")) {
                             $userscore = str_replace($toremove, "", $userscore);
                         }
                     }
@@ -295,7 +299,8 @@ foreach ($auschunked[0] as $au) {
             
             // Convert their grade to string to be passed into html button.
             $userscoreasstring = strval($userscore);
-   
+
+        
             // Encode to send to next page, because it has to go as a string and pass through the Javascript function.
             $sendtopage = base64_encode(json_encode($infofornextpage, JSON_HEX_QUOT));
            
@@ -311,7 +316,10 @@ foreach ($auschunked[0] as $au) {
         }
         // Add the row data to the table.
         $reporttable->add_data_keyed($rowdata);
+    
+        // wipe infofornextpage for next AU.
     }
+
   
 // Finish building table now that all data is passed in.
 $reporttable->get_page_start();
