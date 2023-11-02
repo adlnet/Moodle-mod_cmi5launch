@@ -59,25 +59,53 @@ class session_helpers {
 
         // Get the session from DB with session id.
         $session = $this->cmi5launch_retrieve_sessions_from_db($sessionid);
-
+/*
+        echo"<br>";
+        echo "Ok, what is session at the beginning?";
+        var_dump($session);
+        echo "<br>";;
+*/
         // This is sessioninfo from CMI5 player.
         $sessioninfo = $getsessioninfo($sessionid, $cmi5id);
-
+/*
+        echo"<br>";
+        echo "Ok, what is session INBOFFOFO here?";
+        var_dump($sessioninfo);
+        echo "<br>";;
+     */
         // Update session.
         foreach ($sessioninfo as $key => $value) {
             // We don't want to overwrite id.
 
-            //Will making it lowercase help?
-            $key = mb_convert_case($key, MB_CASE_LOWER, "UTF-8");
+            //Will making it lowercase help? 
+            // This seemed to solve the issue with DB thank oodness. 
+           // $key = mb_convert_case($key, MB_CASE_LOWER, "UTF-8");
             if (property_exists($session, $key ) && $key != 'id' ) {
                 // If it's an array, encode it so it can be saved to DB.
                 if (is_array($value)) {
                     $value = json_encode($value);
                 }
-                    $session->$key = $value;
+/*
+                                echo "<br>";
+
+                echo "Ok, what is value here?";
+                var_dump($value);
+
+                echo "<br>";
+                echo "Ok, what is key here?";
+                var_dump($key);
+                echo "<br>";
+*/
+                $session->$key = $value;
             }
         }
-
+/*
+        ///What is dang session here?
+        echo"<br>";
+        echo "Ok, what is session here?";
+        var_dump($session);
+        echo "<br>";
+  */  
         // Now update to table.
         $DB->update_record('cmi5launch_sessions', $session);
 

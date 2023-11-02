@@ -31,7 +31,7 @@ class session {
     $progress = [], $auid, $aulaunchurl, $launchurl, $grade, $registrationid, $lrscode,
     $createdAt, $updatedAt, $registrationCourseAusId,
     $code, $lastRequestTime, $launchTokenId, $launchMode, $masteryScore,
-    $contextTemplate, $isLaunched, $isInitialized, $initializedAt, $isCompleted,
+    $isLaunched, $isInitialized, $initializedAt, $isCompleted,
     $isPassed, $isFailed, $isTerminated, $isAbandoned, $courseid, $completed, $passed, $inprogress;
 
     // Constructs sessions. Is fed array and where array key matches property, sets the property.

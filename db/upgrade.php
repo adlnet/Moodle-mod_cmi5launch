@@ -192,14 +192,13 @@ function xmldb_cmi5launch_upgrade($oldversion) {
           $table->add_field('createdat', XMLDB_TYPE_CHAR, '30', null, null, null, null);
           $table->add_field('updatedat', XMLDB_TYPE_CHAR, '30', null, null, null, null);
           $table->add_field('registrationcourseausid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
-          $table->add_field('code', XMLDB_TYPE_CHAR, '255', null, null, null, null);
-          $table->add_field('launchtokenid', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+          $table->add_field('code', XMLDB_TYPE_CHAR, '550', null, null, null, null);
+          $table->add_field('launchtokenid', XMLDB_TYPE_CHAR, '550', null, null, null, null);
           $table->add_field('lastrequesttime', XMLDB_TYPE_CHAR, '30', null, null, null, null);
           $table->add_field('launchmode', XMLDB_TYPE_CHAR, '25', null, null, null, null);
           $table->add_field('masteryscore', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
           $table->add_field('score', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
           $table->add_field('response', XMLDB_TYPE_TEXT, null, null, null, null, null);
-          $table->add_field('contexttemplate', XMLDB_TYPE_CHAR, '255', null, null, null, null);
           $table->add_field('islaunched', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
           $table->add_field('isinitialized', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
           $table->add_field('initializedat', XMLDB_TYPE_CHAR, '30', null, null, null, null);
@@ -229,20 +228,26 @@ function xmldb_cmi5launch_upgrade($oldversion) {
           }else{
                 // Define fields to be dropped from cmi5launch_sessions.
                 $table = new xmldb_table('cmi5launch_sessions');
-                $field = new xmldb_field('firstlaunch');
-                $field2 = new xmldb_field('lastlaunch');
-                $field3 = new xmldb_field('completed_passed');
+                $firstlaunch = new xmldb_field('firstlaunch');
+                $lastlaunch = new xmldb_field('lastlaunch');
+                $completed_passed = new xmldb_field('completed_passed');
+                $contexttemplate = new xmldb_field('contexttemplate');
+
                 // Conditionally launch drop field firstlaunch.
-                if ($dbman->field_exists($table, $field)) {
-                        $dbman->drop_field($table, $field);
+                if ($dbman->field_exists($table, $firstlaunch)) {
+                        $dbman->drop_field($table, $firstlaunch);
                 }
                 // Conditionally launch drop field lastlaunch.
-                if ($dbman->field_exists($table, $field2)) {
-                        $dbman->drop_field($table, $field2);
+                if ($dbman->field_exists($table, $lastlaunch)) {
+                        $dbman->drop_field($table, $lastlaunch);
                 }
                 // Conditionally launch drop field completed_passed.
-                if ($dbman->field_exists($table, $field3)) {
-                        $dbman->drop_field($table, $field3);
+                if ($dbman->field_exists($table, $completed_passed)) {
+                        $dbman->drop_field($table, $completed_passed);
+                }
+                // Conditionally launch drop field contexttemplate.
+                if ($dbman->field_exists($table, $contexttemplate)) {
+                        $dbman->drop_field($table, $contexttemplate);
                 }
             }
 
