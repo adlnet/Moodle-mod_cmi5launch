@@ -28,7 +28,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+//defined('MOODLE_INTERNAL') || die();
 
 // Cmi5PHP - required for interacting with the LRS in cmi5launch_get_statements.
 require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/autoload.php");
@@ -989,7 +989,10 @@ function cmi5launch_get_user_grades($cmi5launch, $userid=0) {
 function cmi5launch_grade_user($cmi5launch, $userid, $requestedgrade) {
 
 
+    $gradehelpers = new grade_helpers;
 
+    $highest = $gradehelpers->get_cmi5launch_highest_grade();
+   
     // So what we now actually want thsi to do is to get the grade from the DB
     // AFTER updating it. 
     switch ($requestedgrade) {
@@ -998,7 +1001,14 @@ function cmi5launch_grade_user($cmi5launch, $userid, $requestedgrade) {
             // Sessions go into AUs and AUs into sessions, so ....whatever is in grade should be highest
             // I wonder if we need a grade class, might make sense
 
-            return cmi5launch_highest_grade($cmi5launch, $userid);
+            return $highest($cmi5launch, $userid);
+        break;
+        case 'overall':
+            // Let make a func that gets the highest grade in a COURSE.
+            // Sessions go into AUs and AUs into sessions, so ....whatever is in grade should be highest
+            // I wonder if we need a grade class, might make sense
+
+            return $highest($cmi5launch, $userid);
         break;
       //  case LASTATTEMPT:
         //    return scorm_grade_user_attempt($cmi5launch, $userid, scorm_get_last_completed_attempt($scorm->id, $userid));
@@ -1031,59 +1041,6 @@ function cmi5launch_grade_user($cmi5launch, $userid, $requestedgrade) {
     }
 }
 
-function cmi5launch_highest_grade($scores)
-{
-
-    global $cmi5launch, $USER, $DB;
-
-   // $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
-
-//    $userrecord =$DB->get_record('cmi5launch_course', ['courseid'  => $record->courseid, 'userid'  => $USER->id]);
-
-    // So grade is 0, we need this updated,maybe even in one of our new fancy updates fucns
-    // But for here we need to focus on the fact that this function is meant to get the highest grade,
-    // So lets do that from all our AUs
-   // $allscores[] = array();
-      // Lets see what we get here in augrades
-
-      //So if it is an array it doesn't work, can we check its a string and if NOT then json decode
-      if (!$scores == null) {
-
-      //It needs to not be array?
-      //Lets add an if for when max is null
-   // if (!json_decode($scores, true) == null) {
-        // Add score to array of scores
-        $highestgrade = (max($scores) );
-
-       // $highestgrade = (max(json_decode($scores, true)) );
-        // Ok intval is not working due to those damn brackeeets,
-
-        // so lets make an if clause that checks for them and removes them if found, that way it can handle both
-        if(str_contains($highestgrade, "[")){
-            $highestgrade = str_replace("[", "", $highestgrade);
-        }
-        // Now lets apply intval
-        $highestgrade = intval($highestgrade);
-        //what is it now
-      
-    }else{
-        $highestgrade = 0;
-    }
-   // $highestgrade = 0;
-   /* foreach ($augrades as $key => $augrade) {
-        
-        // If a session has more than one score, we only want the highest.
-        if (!$augrade == null && $augrade > $highestgrade) {
-
-            $highestgrade = $augrade;
-        }
-    }*/
-  
-    // Aha! ITs 0 and it shouldnt be!!!
-
-    return $highestgrade;
-
-}
 // MB this is the one we should call I think 
 // So like whenever I want the DB updated, which means this should also query 
 // the LRS, not cause this doe whateer it needs to to manufactor the greade
@@ -1116,6 +1073,9 @@ function cmi5launch_highest_grade($scores)
 
 function cmi5launch_update_grades($cmi5launch, $userid = 0, $nullifnone = true)
 {
+
+    echo "func fired";
+
     //TODO - Need to implement if it is called plural or not, it canbe called for all if no userid passed
     
     //What we need ot do is encapsulate my LRS querying even more, so it can be called in view and here and in report
@@ -1150,23 +1110,6 @@ function cmi5launch_update_grades($cmi5launch, $userid = 0, $nullifnone = true)
     $contextmodule = context_module::instance($cm->id);
     $users = get_enrolled_users($contextmodule);; //returns an array of users
 
-    //update all grades regartdless
-    //foreach ($users as $user) {
-     //   $updategrades($user);
-   // }
-    /*
-    // Then we have a record, so we need to retrieve it.
-    $userscourse = $DB->get_record('cmi5launch_course', ['courseid' => $record->courseid, $userid]);
-
-    // Retrieve registration id.
-    $registrationid = $userscourse->registrationid;
-
-    // Retrieve AU ids.
-    $auids = (json_decode($userscourse->aus));
-
-    // We need id to get progress.
-    $cmid = $cmi5launch->id;
-*/
 
         // Ok, now we need to retrieve the sessions and find the average score.
       //  $grade = json_decode($userscourse->ausgrades, true);
@@ -1230,6 +1173,14 @@ function cmi5launch_update_grades($cmi5launch, $userid = 0, $nullifnone = true)
     {
         global $CFG, $DB, $cmi5launch, $USER;
         global $cmi5launchsettings;
+        
+        // Bring in grade helpers.
+        $gradehelpers = new grade_helpers;
+
+        // Functions from other classes.
+        $highestgrade = $gradehelpers->get_cmi5launch_highest_grade();
+        $averagegrade = $gradehelpers->get_cmi5launch_average_grade();
+
         //Note the SCORM version called it's locallib, we may need to get funcs from there as well and place into 
         //OUR locallib
         //May be where those constants were kept
@@ -1255,52 +1206,14 @@ function cmi5launch_update_grades($cmi5launch, $userid = 0, $nullifnone = true)
             //I think its just id, or is in another part of code
         }
 
-        //Ok this is passing as arrays the grades to be updated and the params to do so
-        //GRADE_TYPE_VALUE  appears to be a moodle constant, so should be found when proggram, runs lovally
-      //  if ($cmi5launch->grademethod == GRADE_AUS_CMI5) {
-            /// Three slashes means I don't think we need. -MB. 
-            ///   $maxgrade = $DB->count_records_select('scorm_scoes', 'scorm = ? AND '.
-            ///                                        $DB->sql_isnotempty('scorm_scoes', 'launch', false, true), array($scorm->id));
-            
-            //That's weird, they should exist
-            //what is cmi5launch properteis
-        // Iterate through grades and grab the max grade.
-       // $overallgrade = 0;
+  
 
-        //Grades are an int?
-        /*
-        foreach ($grades as $key => $grade) {
-        
-            echo "<br>";
-            echo "grade D +A LOOP IS : ";
-            $toprint = ($grade);
-            var_dump($toprint);
-            echo "<br>";
-        echo " and its intval is";
-        var_dump(intval($grade));
-        echo "<br>";
-        echo "What does this find? isnumeric? :";
-        var_dump(is_numeric($grade));
-        echo "<br>";
-        //Will trim work?
-        echo "Will trim work :";
-       // var_dump(trim($grade, '[]'));
-        echo "<br>";
-        // OH yess! the brackets were a problem!
-          /*  if (intval(trim($grade, '[]')) >= $overallgrade) {
-                $overallgrade = intval(trim($grade, '[]'));
-                echo"<br>";
-                echo "Overall grade in if loop is is: ";
-                var_dump($overallgrade);
-                echo"<br>";
-     
-            }*/
-//    }
 
 // So retrieve the settings for course gradin
 
         $gradetype = $cmi5launchsettings["grademethod"];
-
+       //$gradetype =  cmi5launch_retrieve_gradetype();
+    
             $maxgrade = $settings['maxgrade'];
             //What is grademax here
             //Heres whats weird, why is settings not holding our max grade?
@@ -1330,7 +1243,15 @@ function cmi5launch_update_grades($cmi5launch, $userid = 0, $nullifnone = true)
 
             // Ok so if they are not reset, they are a number right? So here based on what
             // grademethod is we figure grades
-            switch($gradetype){
+
+
+
+       //$gradetype =  cmi5launch_retrieve_gradetype();
+      
+  
+
+        switch($gradetype){
+
 
                 /**
                  * ('GRADE_AUS_CMI5' = '0');
@@ -1338,65 +1259,36 @@ function cmi5launch_update_grades($cmi5launch, $userid = 0, $nullifnone = true)
                     *'GRADE_AVERAGE_CMI5', =  '2');
                     *('GRADE_SUM_CMI5', = '3');
                  */
-            case 1:
+                case 1:
+
+            
+                        //We need to update rawgrade not all of rades, that wipes out the array format it needs
+                        foreach ($grades as $key => $grade) {
+
+
+                            $grades->rawgrade = $highestgrade($grades->rawgrade);
+                        }
+                    break;
+                    
+                        
+                case 2:
 
         
-                //We need to update rawgrade not all of rades, that wipes out the array format it needs
-                foreach ($grades as $key => $grade) {
-               ///Ohhhh its IN an array, we need to get it out
-               $grades->rawgrade = cmi5launch_highest_grade($grades->rawgrade);
-               break;
-               
+                    //We need to update rawgrade not all of rades, that wipes out the array format it needs
+                    foreach ($grades as $key => $grade) {
+                    ///Ohhhh its IN an array, we need to get it out
+                    $grades->rawgrade = $averagegrade($grades->rawgrade);
+
+                    }
+                    break;
                 }
-                    
-            }
+                
         }
+        
 
 
-       // $grades = $record->grade;
-
-        // Why are grades blank? Why is record not havving grades?
-     /*  echo"<br>";
-        echo "Record full is  are: ";
-        var_dump($record);
-        //So if grades arent gettin set in record...himmmm...thats an issue elsewhere righ?
-        echo "<br>";
-        // LEt's try a little debugging
-        echo "<br>";
-        echo "cmi5launch_grade_item_update called overall are: ";
-        var_dump($overallgrade);
-        echo "<br>";
-
-        //Where  is the 179 coming from? 
-    echo "<br>";
-    echo" record id is: ";
-    var_dump($record->id);
-    echo "<br>"; */
-    // Ok, the abov eis the 179
-    // Then we have a record, so we need to retrieve it.
-    //$userscourse = $DB->get_record('cmi5launch_course', ['courseid'  => $record->courseid, 'userid'  => $USER->id]);
-    //Maybe we needd the VERY specific usercourse?
-        //A bool?
-
-        ///what is overall grade?
-       /* echo "<br>";
-        echo "Overall grade is: ";
-        var_dump($overallgrade);
-        echo "<br>";
-        */
-
-        //if grades are SUPPOSED to be an array, even singular??? Does this mean we dont have to worry about brackets above?
    
-    //The table course has TWO only two courses, Moodle- 1 and test-2. What id is this? How to grab this?
-    /// Lets look at everything in a cmi5launch
-    //echo "<br>";
-    ///echo "CMI% launch is :";
-   //var_dump($cmi5launch);
-   /// echo "<br>";
-    // Ok, look here at this part of cmi5
-    //["course"]=> string(1) "2"
-    //Yeay! cmi5launch->course is what we need as a param!
-    //Now, to get the grades to show
+
     // ok and they don't want 'cmi5, here, they want what is in ['modulename] so - cmi5 Launch Link - or not that broke it!
         return grade_update('mod/cmi5launch', $cmi5launch->course, 'mod', 'cmi5launch', $cmi5launch->id, 0, $grades, $params);
     
@@ -1408,6 +1300,49 @@ function cmi5launch_update_grades($cmi5launch, $userid = 0, $nullifnone = true)
     
     }
 
+ /**
+ *  Rerieve the grade setting type (this is because other pages can't see gradint type) 
+ *
+ * @category gradetype - the grade type
+ * @return string gradetypestring - the string version of the grade type
+ */
+ function cmi5launch_retrieve_gradetype() {
+    
+    global $CFG, $cmi5launchsettings;
+
+   // $gradetype1 = $CFG->grademethod;
+    $gradetypestring = "";
+
+    $gradetype = $cmi5launchsettings["grademethod"];
+
+
+    // If we make thhhe switch HERE it's only one place that needs to understand the 1 or 2
+    // and other code can run on the easier to read string versions!
+    // ALas, gradetype needs 1 or 2 in other places... maybe just for my funcs?
+    switch($gradetype){
+
+        /**
+         * ('GRADE_AUS_CMI5' = '0');
+            *('GRADE_HIGHEST_CMI5' = '1');
+            *'GRADE_AVERAGE_CMI5', =  '2');
+            *('GRADE_SUM_CMI5', = '3');
+         */
+    case 1:
+        $gradetypestring = "Highest";
+        break;
+    case 2:
+        $gradetypestring = "Average";
+        break;
+
+
+    }
+   // echo"<br>";
+    //echo" so what is the diff of rade tyopes? maybe this will be work around!";
+
+    //require_once($CFG->libdir.'/gradelib.php');
+
+    return $gradetypestring;
+}
 
 /**
  * Delete grade item for given scorm

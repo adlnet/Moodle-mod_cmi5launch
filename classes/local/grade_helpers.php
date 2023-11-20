@@ -42,6 +42,132 @@ class grade_helpers
         return [$this, 'cmi5launch_check_user_grades_for_updates'];
     }
 
+
+    public function get_cmi5launch_highest_grade()
+    {
+        return [$this, 'cmi5launch_highest_grade'];
+    }
+
+    public function get_cmi5launch_average_grade()
+    {
+        return [$this, 'cmi5launch_average_grade'];
+    }
+
+/**
+ * Takes in an array of scores and returns the average grade
+ * @param mixed $scores
+ * @return int
+ */
+function cmi5launch_average_grade($scores)
+{
+
+    global $cmi5launch, $USER, $DB;
+
+      //So if it is an array it doesn't work, can we check its a string and if NOT then json decode
+      if (!$scores == null) {
+
+
+        //same issue as in the other....
+        // This is ridiculous, but I have to write my own sum? func to get around the php/moodle error
+
+        //Brilliant!
+        //array_sum($scores) / count($scores)
+        // Find the average of the scores
+
+        // what is scores here
+  
+        $averagegrade = (array_sum($scores) / count($scores));
+
+        // so lets make an if clause that checks for them and removes them if found, that way it can handle both
+        if(str_contains($averagegrade, "[")){
+            $averagegrade = str_replace("[", "", $averagegrade);
+        }
+        // Now lets apply intval
+        $averagegrade = intval($averagegrade);
+        //what is it now
+      
+    }else{
+        $averagegrade = 0;
+    }
+
+
+    return $averagegrade;
+
+}
+/**
+ * Takes in an array of scores and returns the highest grade
+ * @param mixed $scores
+ * @return int
+ */
+function cmi5launch_highest_grade($scores)
+{
+
+    global $cmi5launch, $USER, $DB;
+
+    // This is ridiculous, but I have to write my own MAX func to get around the php/moodle error
+        // Highest equals 0 to start
+        $highestgrade = 0;
+
+      //So if it is an array it doesn't work, can we check its a string and if NOT then json decode
+      //Is this the problme
+      if (!$scores == null && is_array($scores)) {
+
+        // This is ridiculous, but I have to write my own MAX func to get around the php/moodle error
+        // Highest equals 0 to start
+            $highestgrade = 0;
+        foreach($scores as $key => $value){
+            
+            if($value > $highestgrade){
+                $highestgrade = $value;
+            }
+        
+        }
+        //I UNDERSTAND!!! Sometimes it's an array and sometimes not,.
+        // Depending on if they have more than one grade or not. Huh, so that's why I never noticed the error before
+        // 
+        //heres the problem i think, coming in as array here?
+        /*  
+        echo "<br>";
+            echo "scores  ";
+            var_dump($scores);
+            echo "<br>";
+            $top_score = array_search(max($scores), $scores); // john
+            echo "<br>";
+            echo "NOW WHAT IS TOP SCORE  ";
+            var_dump($top_score);
+            echo "<br>";
+       */
+            // Add score to array of scores
+        //So...aparently know a named array doesn't work, it has to be just data, ie (1, 2, 3)
+        //$highestgrade = (max($scores) );
+
+        // so lets make an if clause that checks for them and removes them if found, that way it can handle both
+     /*   if(str_contains($highestgrade, "[")){
+            $highestgrade = str_replace("[", "", $highestgrade);
+        }
+        // Now lets apply intval
+        $highestgrade = intval($highestgrade);
+        //what is it now
+      */
+    }elseif($scores > $highestgrade && !is_array($scores)){ 
+        $highestgrade = $scores;
+
+    } else {
+        $highestgrade = 0;
+        }
+
+        //This is coming in array? That's why str_contains is throwing an error
+   // Format answer before returning     
+   if(str_contains($highestgrade, "[")){
+            $highestgrade = str_replace("[", "", $highestgrade);
+        }
+        // Now lets apply intval
+        $highestgrade = intval($highestgrade);
+
+    return $highestgrade;
+
+}
+
     /**
      * Parses and retrieves AUs from the returned info from CMI5 player.
      * @param array $users - an array of enrolled users
@@ -49,7 +175,6 @@ class grade_helpers
      */
     public function cmi5launch_check_user_grades_for_updates($user)
     {
-
 
         // Bring in functions and classes.
         $progress = new progress;

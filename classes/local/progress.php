@@ -57,7 +57,7 @@ defined('MOODLE_INTERNAL') || die();
                 //When searching by reg id, which is the option available to Moodle, many results are returned, so iterating through them is necessary
                 $data = array(
                     'registration' => $registrationid,
-                    'since' => $session->createdAt
+                    'since' => $session->createdat
                 );
 
 

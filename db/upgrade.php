@@ -41,6 +41,25 @@ function xmldb_cmi5launch_upgrade($oldversion) {
     global $DB;
 
     $dbman = $DB->get_manager();
+    if ($oldversion < 2023111714) {
+
+        // Changing type of field objectives on table cmi5launch_aus to text.
+        $table = new xmldb_table('cmi5launch_aus');
+        $objectives = new xmldb_field('objectives', XMLDB_TYPE_TEXT, null, null, null, null, null, 'parents');
+        $description = new xmldb_field('description', XMLDB_TYPE_TEXT, null, null, null, null, null, 'objectives');
+
+        // Launch change of type for field objectives.
+        $dbman->change_field_type($table, $objectives);
+
+
+        // Launch change of type for field description.
+        $dbman->change_field_type($table, $description);
+
+        // Cmi5launch savepoint reached.
+        upgrade_mod_savepoint(true, 2023111714, 'cmi5launch');
+
+    }
+
     if ($oldversion < 2023101217) {
 
     

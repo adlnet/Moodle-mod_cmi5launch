@@ -42,6 +42,10 @@ class session_helpers {
         return [$this, 'cmi5launch_retrieve_sessions_from_db'];
     }
 
+    public function cmi5launch_get_convert_session() {
+        return [$this, 'cmi5launch_session_for_db'];
+    }
+
     /**
      * Gets updated session information from CMI5 player
      * @param mixed $sessionid - the session id
@@ -80,14 +84,20 @@ class session_helpers {
             //Will making it lowercase help? 
             // This seemed to solve the issue with DB thank oodness. 
            // $key = mb_convert_case($key, MB_CASE_LOWER, "UTF-8");
-            if (property_exists($session, $key ) && $key != 'id' ) {
+            if (property_exists($session, $key ) && $key != 'id' && $key != 'sessionid') {
                 // If it's an array, encode it so it can be saved to DB.
                 if (is_array($value)) {
                     $value = json_encode($value);
                 }
-/*
-                                echo "<br>";
 
+                if(is_string($key)){
+                    // MAKE IT LOWERCASE? IS THAT ENOUH?
+                    $key = mb_convert_case($key, MB_CASE_LOWER, "UTF-8");
+                   // $newsession->$smallkey = ($value);
+                }
+                //Can we see if property is a strin and then convert that>?
+
+/*
                 echo "Ok, what is value here?";
                 var_dump($value);
 
@@ -96,16 +106,12 @@ class session_helpers {
                 var_dump($key);
                 echo "<br>";
 */
+              //  $key = mb_convert_case($key, MB_CASE_LOWER, "UTF-8");
                 $session->$key = $value;
             }
         }
-/*
-        ///What is dang session here?
-        echo"<br>";
-        echo "Ok, what is session here?";
-        var_dump($session);
-        echo "<br>";
-  */  
+
+
         // Now update to table.
         $DB->update_record('cmi5launch_sessions', $session);
 
@@ -125,6 +131,7 @@ class session_helpers {
         global $DB, $CFG, $cmi5launch, $USER;
 
         $table = "cmi5launch_sessions";
+// Well, maybe this is the problem, its not making them riiiht
 
         // Make a new record to save.
         $newrecord = new \stdClass();
@@ -167,5 +174,23 @@ class session_helpers {
 
         // Return new session object.
         return $session;
+    }
+
+        // Constructs sessions with lowercase values to work with DB. Is fed array and where array key matches property, sets the property.
+    public function cmi5launch_session_for_db($statement)
+    {
+
+
+        //make a new session object
+        $newsession = new \stdClass();
+        foreach ($statement as $key => $value) {
+
+            if (!$key == 'id' && !$key == 'sessionid') {
+                $smallkey = mb_convert_case($key, MB_CASE_LOWER, "UTF-8");
+                $newsession->$smallkey = ($value);
+            }
+            $newsession->id = $statement['id'];
+            $newsession->sessionid = $statement['sessionid'];
+        }
     }
 }

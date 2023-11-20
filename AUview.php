@@ -38,6 +38,7 @@ $sessionhelper = new session_helpers;
 $progress = new progress;
 $getprogress = $progress->cmi5launch_get_retrieve_statements();
 $updatesession = $sessionhelper->cmi5launch_get_update_session();
+$convertsession = $sessionhelper->cmi5launch_get_convert_session();
 $retrieveaus = $auhelper->get_cmi5launch_retrieve_aus_from_db();
 
 // Trigger module viewed event.
@@ -178,7 +179,7 @@ if (!$au->sessions == null) {
 
         // Retrieve new info (if any) from CMI5 player on session.
         $session = $updatesession($sessionid, $cmi5launch->id);
-
+     
         // Array to hold data for table.
         $sessioninfo = array();
 
@@ -204,6 +205,9 @@ if (!$au->sessions == null) {
 
       //  cmi5launch_update_grades($cmi5launch, $USER->id);
         //But it  lso needs name of activity right?
+
+        // lets try converin, i dunno 
+       // $session = $convertsession($session);
 
         // Update session in DB.
         $DB->update_record('cmi5launch_sessions', $session);

@@ -112,7 +112,8 @@ class au_helpers {
             $newrecord->moveon = $auobject->moveOn;
             $newrecord->auindex = $auobject->auIndex;
             $newrecord->parents = json_encode($auobject->parents, true);
-            $newrecord->objectives = $auobject->objectives;
+            //let try to encode
+            $newrecord->objectives = json_encode($auobject->objectives);
             $desc = json_decode(json_encode($auobject->description), true);
             $newrecord->description = $desc[0]['text'];
             $newrecord->activitytype = $auobject->activityType;

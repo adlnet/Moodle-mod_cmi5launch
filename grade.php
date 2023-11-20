@@ -50,6 +50,8 @@ $itemid = optional_param('itemid', 0, PARAM_INT);
 // This is the gradeid, which is the id, in the same grade_grades table. So like a row entry, a particular users info
 $gradeid = optional_param('gradeid', 0, PARAM_INT);
 
+$contextmodule = context_module::instance($cm->id);
+
 global $cmi5launch, $USER, $mod;
 
 
@@ -80,12 +82,29 @@ if (has_capability('mod/scorm:viewreport', context_module::instance($cm->id))) {
 } else {
     redirect('view.php?id='.$cm->id);
 }
+
+// Well if I cant control the report pae, maybe I can call it here, when it evaluates the user? 
+
 */
 //TODO
 //We are currently using this capability, but we should make one for grading
 if (has_capability('mod/cmi5launch:addinstance', $context)) {
 	// This is teacher/manger/non editing teacher.
    
+    // If this is the teacher, lets update all grades
+
+    //get all registered users
+        // The users are indexed by their userid.
+        $users = get_enrolled_users($contextmodule);
+
+
+    foreach ($users as $user) {
+
+        // Call updategrades to ensure all grades are up to date before view.
+        cmi5launch_update_grades($cm, $user->id);
+    }    
+
+
    if($userid != 0 || null){
     
     redirect('report.php?id=' . $cm->id . '&userid=' . $userid . '&itemnumber=' . $itemnumber . '&itemid=' . $itemid . '&gradeid=' . $gradeid);
@@ -97,5 +116,10 @@ if (has_capability('mod/cmi5launch:addinstance', $context)) {
 
 } else {
     // This is student or other non-teacher role.
+
+    //IF this is just the student we only need to worry about uipdating their rades, cause thats all theyll see
+    // Retrieve/update the users grades for this course.
+    cmi5launch_update_grades($cmi5launch, $user->id);
+
     redirect('report.php?id='.$cm->id .'&userid=' . $userid );
 }   

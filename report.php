@@ -25,6 +25,7 @@ use mod_cmi5launch\local\grade_helpers;
 
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require('header.php');
+//require('../../header.php');
 require_login($course, false, $cm);
 require_once("../../config.php");
 require_once($CFG->libdir.'/tablelib.php');
@@ -63,7 +64,7 @@ $page= optional_param('page', 0, PARAM_INT);
 $showall   = optional_param('showall', null, PARAM_BOOL);
 $cmid      = optional_param('cmid', null, PARAM_INT);
 
-$url = new moodle_url('/mod/quiz/review.php');
+$url = new moodle_url('/mod/cmi5launch/report.php');
 if ($page !== 0) {
     $url->param('page', $page);
 } else if ($showall) {
@@ -77,16 +78,12 @@ $PAGE->set_url($url);
 require_login($course, false, $cm);
 $PAGE->set_pagelayout('report');
 
-require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
-require('header.php');
-require_once("$CFG->dirroot/lib/outputcomponents.php");
-require_login($course, false, $cm);
 
 // Functions from other classes
 $gradehelpers = new grade_helpers;
 $updategrades = $gradehelpers->get_cmi5launch_check_user_grades_for_updates();
 
-global $cmi5launch, $USER;
+global $cmi5launch, $USER, $cmi5launchsettings;
 
 // Activate the secondary nav tab.
 navigation_node::override_active_url(new moodle_url('/mod/cmi5launch/report.php', ['id' => $id]));
@@ -107,7 +104,7 @@ navigation_node::override_active_url(new moodle_url('/mod/cmi5launch/report.php'
 function mod_cmi5launch_open_report(inforfornextpage) {
 
       // Set the form paramters.
-      $('#AU_view').val(inforfornextpage);
+      $('#session_report').val(inforfornextpage);
         // Post it.
         $('#launchform').submit();
      
@@ -256,9 +253,11 @@ foreach ($auschunked[0] as $au) {
         // Retrieve users specific info for this course.
         $userrecord = $DB->get_record('cmi5launch_course', ['courseid' => $record->courseid, 'userid' => $user->id]);
 
-  
+        $gradehelpers = new grade_helpers;
+
+        $updategrades = $gradehelpers->get_cmi5launch_check_user_grades_for_updates();
         // Retrieve/update the users grades for this course.
-        cmi5launch_update_grades($cmi5launch, $user->id);
+        $updategrades($cmi5launch, $user->id);
 
         // Userrecord may be null if user has not participated in course yet.
         if ($userrecord == null) {
@@ -273,14 +272,50 @@ foreach ($auschunked[0] as $au) {
             //These are the AUS we want to send on if clicked, the more specific ids (THIS users AU ids).
             $currentauids = $userrecord->aus;
             $infofornextpage[] = $currentauids;
+     // Bring in grade helpers.
+     $gradehelpers = new grade_helpers;
 
+     // Functions from other classes.
+     $highestgrade = $gradehelpers->get_cmi5launch_highest_grade();
+     $averagegrade = $gradehelpers->get_cmi5launch_average_grade();
+
+            //////// userscore is what is displsayion multiple and we want it based on radetypoe
                 // Now compare the usergrades array keys to name of current autitle, if
                 // it matches then we want to display, that's what userscore is.
                 if (!$usergrades == null) {
                     
-                    if (array_key_exists($currenttitle, $usergrades)) {
+                    $gradetype = $cmi5launchsettings["grademethod"];
 
-                        $userscore = $usergrades[$currenttitle];
+                if (array_key_exists($currenttitle, $usergrades)) {
+                switch($gradetype){
+                    /**
+                     * ('GRADE_AUS_CMI5' = '0');
+                        *('GRADE_HIGHEST_CMI5' = '1');
+                        *'GRADE_AVERAGE_CMI5', =  '2');
+                        *('GRADE_SUM_CMI5', = '3');
+                     */
+                    case 1:
+    
+    
+                                $userscore = $highestgrade($usergrades);
+                            
+                        break;
+                        
+                            
+                    case 2:
+    
+            
+                        //We need to update rawgrade not all of rades, that wipes out the array format it needs
+                        foreach ($grades as $key => $grade) {
+                        ///Ohhhh its IN an array, we need to get it out
+                        $userscores = $averagegrade($usergrades);
+
+                        
+                        }
+                        break;
+                    }
+
+//                        $userscore = $usergrades[$currenttitle];
 
                         // Remove [] from userscore if they are there.
                         $toremove = array("[", "]");
@@ -296,7 +331,12 @@ foreach ($auschunked[0] as $au) {
         }
             // Add the userid to info for next page.
             $infofornextpage[] = $user->id;
-            
+
+            //Add the gradetyope TODO: this should be accessable through settins, but those are blank
+            // on next pae? 
+            $infofornextpage[] = $gradetype;
+
+       
             // Convert their grade to string to be passed into html button.
             $userscoreasstring = strval($userscore);
 
@@ -331,7 +371,7 @@ $reporttable->finish_output();
 
 <form id="launchform" action="session_report.php" method="get">
         <input id="id" name="id" type="hidden" value="<?php echo $id ?>">
-        <input id="AU_view" name="AU_view" type="hidden" value="default">
+        <input id="session_report" name="session_report" type="hidden" value="default">
     </form>
 <?php
 
