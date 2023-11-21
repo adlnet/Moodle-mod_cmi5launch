@@ -39,8 +39,21 @@ defined('MOODLE_INTERNAL') || die();
  */
 function xmldb_cmi5launch_upgrade($oldversion) {
     global $DB;
-
     $dbman = $DB->get_manager();
+
+    if ($oldversion < 2023112113) {
+
+        // Changing the default of field grade on table cmi5launch_aus to drop it.
+        $table = new xmldb_table('cmi5launch_aus');
+        $field = new xmldb_field('grade', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'scores');
+
+        // Launch change of default for field grade.
+        $dbman->change_field_default($table, $field);
+
+        // Cmi5launch savepoint reached.
+        upgrade_mod_savepoint(true, 2023112113, 'cmi5launch');
+    }
+    
     if ($oldversion < 2023111714) {
 
         // Changing type of field objectives on table cmi5launch_aus to text.

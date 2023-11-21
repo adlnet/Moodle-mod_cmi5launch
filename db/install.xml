@@ -177,7 +177,7 @@
         <FIELD NAME="satisfied" TYPE="char" LENGTH="5" NOTNULL="false" SEQUENCE="false" DEFAULT="0" COMMENT="Whether an AU has been SATISIFED (0 if false, 1 if true)"/>
         <FIELD NAME="sessions" TYPE="text" LENGTH="4000" NOTNULL="false" SEQUENCE="false" COMMENT="The session ids of the AU, saved as array"/>              
         <FIELD NAME="scores" TYPE="text" LENGTH="4000" NOTNULL="false" SEQUENCE="false" COMMENT="The sessions scores, saved as array"/>              
-        <FIELD NAME="grade" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" DEFAULT="0" COMMENT="The overall grade (average of session scores)"/>
+        <FIELD NAME="grade" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="The overall grade (based on what grade type setting is)"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="id" TYPE="primary" FIELDS="id"/>

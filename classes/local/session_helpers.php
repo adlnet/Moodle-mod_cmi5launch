@@ -63,12 +63,8 @@ class session_helpers {
 
         // Get the session from DB with session id.
         $session = $this->cmi5launch_retrieve_sessions_from_db($sessionid);
-/*
-        echo"<br>";
-        echo "Ok, what is session at the beginning?";
-        var_dump($session);
-        echo "<br>";;
-*/
+
+    
         // This is sessioninfo from CMI5 player.
         $sessioninfo = $getsessioninfo($sessionid, $cmi5id);
 /*

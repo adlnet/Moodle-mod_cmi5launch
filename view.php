@@ -50,16 +50,18 @@ $updatesession = $sessionhelpers->cmi5launch_get_update_session();
 
 global $cmi5launch, $USER, $mod;
 
+/*
 // Trigger module viewed event.
 $event = \mod_cmi5launch\event\course_module_viewed::create(array(
     'objectid' => $cmi5launch->id,
     'context' => $context,
 ));
+
 $event->add_record_snapshot('course', $course);
 $event->add_record_snapshot('cmi5launch', $cmi5launch);
 $event->add_record_snapshot('course_modules', $cm);
 $event->trigger();
-
+*/
 $PAGE->set_url('/mod/cmi5launch/view.php', array('id' => $cm->id));
 $PAGE->set_title(format_string($cmi5launch->name));
 $PAGE->set_heading(format_string($course->fullname));
@@ -72,6 +74,10 @@ echo $OUTPUT->header();
 
 // Reload cmi5 course instance.
 $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
+
+//Check for updates
+cmi5launch_update_grades($cmi5launch, $USER->id);
+
 
 if ($cmi5launch->intro) {
     // Conditions to show the intro can change to look for own settings or whatever.
@@ -214,8 +220,8 @@ $auscores = array();
 foreach ($auids as $key => $auid) {
 
 
-// Arra4ry to hold scores for AU.
-$sessionscores = array();
+    // Arra4ry to hold scores for AU.
+    $sessionscores = array();
     $au = $getaus($auid);
 
     // Verify object is an au object.
@@ -239,67 +245,69 @@ $sessionscores = array();
     // TODO (for that matter couldn't we make it, notattempetd, satisifed, not satisfied??).
     foreach ($ausfromcmi5 as $key => $auinfo) {
 
-        
+
 
         if ($auinfo[$key]["lmsId"] == $aulmsid) {
 
             // Grab it's 'satisfied' info.
             $ausatisfied = $auinfo[$key]["satisfied"];
         }
-    }
+        ////////   }
 
-    // If the 'sessions' in this AU are null we know this hasn't even been attempted.
-    if ($au->sessions == null ) {
+        // If the 'sessions' in this AU are null we know this hasn't even been attempted.
+        if ($au->sessions == null) {
 
-        $austatus = "Not attempted";
+            $austatus = "Not attempted";
 
-    } else {
+        } else {
 
-        // Retrieve AUs moveon specification.
-        $aumoveon = $au->moveon;
+            // Retrieve AUs moveon specification.
+            $aumoveon = $au->moveon;
 
-        // If it's been attempted but no moveon value.
-        if ($aumoveon == "NotApplicable") {
-            $austatus = "viewed";
-        } else { // IF it DOES have a moveon value.
+            // If it's been attempted but no moveon value.
+            if ($aumoveon == "NotApplicable") {
+                $austatus = "viewed";
+            } else { // IF it DOES have a moveon value.
 
-            // If satisifed is returned true.
-            if ($ausatisfied == "true") {
+                // If satisifed is returned true.
+                if ($ausatisfied == "true") {
 
-                $austatus = "Satisfied";
-                // Also update AU.
-                $au->satisfied = "true";
-            } else {
+                    $austatus = "Satisfied";
+                    // Also update AU.
+                    $au->satisfied = "true";
+                } else {
 
-                // If not, its in progress.
-                $austatus = "In Progress";
-                // Also update AU.
-                $au->satisfied = "false";
+                    // If not, its in progress.
+                    $austatus = "In Progress";
+                    // Also update AU.
+                    $au->satisfied = "false";
+                }
             }
-        };
-        // Ensure sessions are up to date.
-        // Retrieve session ids.
-        $sessionids = json_decode($au->sessions);
+            ;
+            // Ensure sessions are up to date.
+            // Retrieve session ids.
+            $sessionids = json_decode($au->sessions);
 
-        // Iterate through each session by id.
-        foreach ($sessionids as $key => $sessionid) {
+            // Iterate through each session by id.
+            foreach ($sessionids as $key => $sessionid) {
 
-            // Retrieve new info (if any) from CMI5 player on session.
-            $session = $updatesession($sessionid, $cmi5launch->id);
+                // Retrieve new info (if any) from CMI5 player on session.
+                $session = $updatesession($sessionid, $cmi5launch->id);
 
-            // Get progress from LRS.
-            $session = $getprogress($registrationid, $cmi5launch->id, $session);
+                // Get progress from LRS.
+                $session = $getprogress($registrationid, $cmi5launch->id, $session);
 
-            // Add score to array for AU.
-            $sessionscores[] = $session->score;
+                // Add score to array for AU.
+                $sessionscores[] = $session->score;
 
-            // Update session in DB.
-            $DB->update_record('cmi5launch_sessions', $session);
+                // Update session in DB.
+                $DB->update_record('cmi5launch_sessions', $session);
+            }
+
+            // Save the session scores to AU, it is ok to overwrite.
+            $au->scores = json_encode($sessionscores, JSON_NUMERIC_CHECK);
         }
-
-         // Save the session scores to AU, it is ok to overwrite.
-         $au->scores = json_encode($sessionscores, JSON_NUMERIC_CHECK );
-    };
+        ;
 
         // Create array of info to place in table.
         $auinfo = array();
@@ -311,47 +319,36 @@ $sessionscores = array();
         // Ok, now we need to retrieve the sessions and find the average score.
         $grade = 0;
 
-    if ($au->moveon == "CompletedOrPassed" || "Passed") {
+        // I think the issue here is 'rade' should not be so tied to AU satisfactions.
+        // They are separate concepts
 
-        if (!$sessionscores == null) {
-            // If the grade is empty, we need to pass a null or NA.
-            $grade = max($sessionscores);
-            $au->grade = $grade;
-            if ($grade == 0) {
-                $auinfo[] = ("Passed");
-            } else {
-                $auinfo[] = ($grade);
-            }
+   
+        // Well this is the overall grade right? So maybe it hasn't been confiured. Is grade update called on AUview?
+        if (!$au->grade == 0 || $au->grade == null) {
 
-        } else {
-            $auinfo[] = ("Not Applicable");
-        }
-    } else {
 
-        if (!$sessionscores == null) {
-            // If the grade is empty, we need to pass a null or NA.
+            $grade = $au->grade;
 
-            //Maybe move this to auview, it should be saved when created right? 
-            // Should we call my grade_helpers? 
-            $grade = max($sessionscores);
-            // Yeah this needs to be elsewhere not just here.
-            $au->grade = $grade;
             $auinfo[] = ($grade);
+        } elseif ($au->grade == 0) {
 
+            // Display the 0.
+            $auinfo[] = ($grade);
         } else {
-            $auinfo[] = ("Not Attempted");
+            // There is no grade, leave blank
+            $auinfo[] = (" ");
         }
-    }
+
         $auindex = $au->auindex;
 
         // AU id for next page (to be loaded).
         $infoForNextPage = $auid;
 
         // Assign au link to auviews.
-        $auinfo[] = "<a tabindex=\"0\" id='cmi5relaunch_attempt'
+        $auinfo[] = "<button tabindex=\"0\" id='cmi5relaunch_attempt'
             onkeyup=\"key_test('" . $infoForNextPage . "')\"
             onclick=\"mod_cmi5launch_launchexperience('" . $infoForNextPage . "')\" style='cursor: pointer;'>"
-            . get_string('cmi5launchviewlaunchlink', 'cmi5launch') . "</a>";
+            . get_string('cmi5launchviewlaunchlink', 'cmi5launch') . "</button>";
 
         // Add to be fed to table.
         $tabledata[] = $auinfo;
@@ -359,8 +356,8 @@ $sessionscores = array();
         $auscores[($au->title)] = ($au->scores);
         // Update the au in DB.
         $DB->update_record("cmi5launch_aus", $au);
+    }
 }
-
 
 // This is it, right? This is where we update the course record with the new auscores array?
 // Add our newly updated auscores array to the course record.
@@ -372,7 +369,7 @@ $userscourse->ausgrades = json_encode($auscores);
 // when aus are added? And they are added on this pae as well as it's created
 $updated = $DB->update_record("cmi5launch_course", $userscourse);
 
-cmi5launch_update_grades($cmi5launch, $USER->id);
+
 
 // This feeds the table.
 $table->data = $tabledata;

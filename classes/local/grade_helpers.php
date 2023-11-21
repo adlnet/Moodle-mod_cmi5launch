@@ -229,7 +229,7 @@ function cmi5launch_highest_grade($scores)
 
                
                 // Array to hold Au scores!
-$auscores = array();
+                $auscores = array();
 
                 foreach ($auids as $key => $auid) {
                      //Array to hold session scores for update
@@ -286,11 +286,39 @@ $auscores = array();
 
                                 //Add the session grade to array
                                 $sessiongrades[] = $session->score;
-// Update session in DB.
-$DB->update_record('cmi5launch_sessions', $session);
+
+                                // Update session in DB.
+                                $DB->update_record('cmi5launch_sessions', $session);
                             }
                             // Save the session scores to AU, it is ok to overwrite.
                             $aurecord->scores = json_encode($sessiongrades);
+
+                            // can we access the gradetype here?
+                            $gradetype = cmi5launch_retrieve_gradetype();
+
+                            //YES! So know we can update AU grade!
+                            // Determine gradetype and use it to save overall grade to 
+                            // Thats the problem we are not entering switch
+                          
+                          /*  echo "<br>";
+                            echo "What is gradetype??";
+                            var_dump($gradetype);
+                            echo "<br>";
+*/
+
+                            switch($gradetype){
+                                case "Highest":
+
+                                    $aurecord->grade = $this->cmi5launch_highest_grade($sessiongrades);
+                                    break;
+                                case "Average":
+                                    $aurecord->grade = $this->cmi5launch_average_grade($sessiongrades);
+                                    break;
+                                default:
+                                echo "Gradetype not found.";
+                            }
+                       
+                            //
                             // ok so that handled sessions, now we need to update AU rihgt?
                             $aurecord = $DB->update_record('cmi5launch_aus', $aurecord);
                             $auscores[($au->title)] = ($au->scores);

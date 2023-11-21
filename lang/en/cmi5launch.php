@@ -225,7 +225,7 @@ $string['cmi5launchviewgradeheader'] = 'Grade';
 
 // View settings.
 $string['cmi5launchviewAUname'] = 'Name';
-$string['cmi5launchviewstatus'] = 'Status';
+$string['cmi5launchviewstatus'] = 'AU Satisfied Status';
 $string['cmi5launchviewregistrationheader'] = 'Sessions';
 $string['cmi5launchviewgradeheader'] = 'Grade';
 $string['cmi5launchviewlaunchlink'] = 'view';

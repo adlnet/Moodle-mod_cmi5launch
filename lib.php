@@ -193,14 +193,9 @@ function cmi5launch_build_lrs_settings(stdClass $cmi5launch) {
 
     // Data for cmi5launch_lrs table.
     $cmi5launchlrs = new stdClass();
-    $cmi5launchlrs->lrsendpoint = $cmi5launch->cmi5launchlrsendpoint;
-    $cmi5launchlrs->lrsauthentication = $cmi5launch->cmi5launchlrsauthentication;
     $cmi5launchlrs->customacchp = $cmi5launch->cmi5launchcustomacchp;
     $cmi5launchlrs->useactoremail = $cmi5launch->cmi5launchuseactoremail;
-    $cmi5launchlrs->lrsduration = $cmi5launch->cmi5launchlrsduration;
     $cmi5launchlrs->cmi5launchid = $cmi5launch->instance;
-    $cmi5launchlrs->lrslogin = $cmi5launch->cmi5launchlrslogin;
-    $cmi5launchlrs->lrspass = $cmi5launch->cmi5launchlrspass;
 
     return $cmi5launchlrs;
 }
@@ -1074,7 +1069,7 @@ function cmi5launch_grade_user($cmi5launch, $userid, $requestedgrade) {
 function cmi5launch_update_grades($cmi5launch, $userid = 0, $nullifnone = true)
 {
 
-    echo "func fired";
+   
 
     //TODO - Need to implement if it is called plural or not, it canbe called for all if no userid passed
     

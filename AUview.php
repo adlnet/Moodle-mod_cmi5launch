@@ -41,6 +41,7 @@ $updatesession = $sessionhelper->cmi5launch_get_update_session();
 $convertsession = $sessionhelper->cmi5launch_get_convert_session();
 $retrieveaus = $auhelper->get_cmi5launch_retrieve_aus_from_db();
 
+/*
 // Trigger module viewed event.
 $event = \mod_cmi5launch\event\course_module_viewed::create(array(
     'objectid' => $cmi5launch->id,
@@ -50,6 +51,7 @@ $event->add_record_snapshot('course', $course);
 $event->add_record_snapshot('cmi5launch', $cmi5launch);
 $event->add_record_snapshot('course_modules', $cm);
 $event->trigger();
+*/
 
 // Print the page header.
 $PAGE->set_url('/mod/cmi5launch/view.php', array('id' => $cm->id));
@@ -216,10 +218,10 @@ if (!$au->sessions == null) {
         $newsession = "false";
         $infofornextpage = $sessionid . "," . $newsession;
 
-        $sessioninfo[] = "<a tabindex=\"0\" id='cmi5relaunch_attempt'
+        $sessioninfo[] = "<button tabindex=\"0\" id='cmi5relaunch_attempt'
         onkeyup=\"key_test('" . $infofornextpage . "')\" onclick=\"mod_cmi5launch_launchexperience('"
         . $infofornextpage . "')\" style='cursor: pointer;'>"
-        . get_string('cmi5launchviewlaunchlink', 'cmi5launch') . "</a>";
+        . get_string('cmi5launchviewlaunchlink', 'cmi5launch') . "</button>";
 
         // Add to be fed to table.
         $tabledata[] = $sessioninfo;
@@ -253,11 +255,11 @@ $infofornextpage = $auid . "," . $newsession;
 // so the id chnages? 
 echo "<p tabindex=\"0\"
           onkeyup=\"key_test('" . $infofornextpage . "')\"
-          id='cmi5launch_newattempt'><a onclick=\"mod_cmi5launch_launchexperience('"
+          id='cmi5launch_newattempt'><button onclick=\"mod_cmi5launch_launchexperience('"
           . $infofornextpage
           . "')\" style=\"cursor: pointer;\">"
           . get_string('cmi5launch_attempt', 'cmi5launch')
-          . "</a></p>";
+          . "</button></p>";
 
 
 
