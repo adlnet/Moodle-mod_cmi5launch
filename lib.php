@@ -1115,6 +1115,7 @@ function cmi5launch_update_grades($cmi5launch, $userid = 0, $nullifnone = true)
 
     //Ok, get user grades returns both for all or one, maybe that is the issue
     // maybe needs to be separate func to keep nesting away?
+    //if a teahcer logs in will it check all user 
     if ($userid) {
         $grades = cmi5launch_get_user_grades($cmi5launch, $userid);
         //Grades is coming bakc nested in array, with keys being the user id so this should work

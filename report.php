@@ -163,6 +163,7 @@ if (has_capability('mod/cmi5launch:addinstance', $context)) {
 
   //  echo "CAPABLE";
     // The users are indexed by their userid.
+    // What is a teacher has more than one course? IS this the problem? 
     $users = get_enrolled_users($contextmodule);
 
 

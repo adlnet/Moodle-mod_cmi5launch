@@ -40,7 +40,18 @@ defined('MOODLE_INTERNAL') || die();
 function xmldb_cmi5launch_upgrade($oldversion) {
     global $DB;
     $dbman = $DB->get_manager();
+    if ($oldversion < 2023112117) {
 
+        // Changing type of field masteryscore on table cmi5launch_sessions to number.
+        $table = new xmldb_table('cmi5launch_sessions');
+        $field = new xmldb_field('masteryscore', XMLDB_TYPE_NUMBER, '10', null, null, null, null, 'launchmode');
+
+        // Launch change of type for field masteryscore.
+        $dbman->change_field_type($table, $field);
+
+        // Cmi5launch savepoint reached.
+        upgrade_mod_savepoint(true, 2023112117, 'cmi5launch');
+    }
     if ($oldversion < 2023112113) {
 
         // Changing the default of field grade on table cmi5launch_aus to drop it.

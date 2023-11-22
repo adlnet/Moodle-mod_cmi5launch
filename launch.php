@@ -140,6 +140,8 @@ if ($idandstatus[0] == "true") {
     // Launch url is in old session record.
     $location = $session->launchurl;
 }
+// last thing check for updates
+cmi5launch_update_grades($cmi5launch, $USER->id);
 
 header("Location: ". $location);
 

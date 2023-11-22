@@ -266,10 +266,10 @@ function cmi5launch_highest_grade($scores)
 
                                 //And here is also gets the progress stuff from lrs
                                 // Get progress from LRS.
-                                $session = $getprogress($registrationid, $cmi5launch->id, $session);
+                            //    $session = $getprogress($registrationid, $cmi5launch->id, $session);
 
                                 // Update session in DB.
-                                $DB->update_record('cmi5launch_sessions', $session);
+                              //  $DB->update_record('cmi5launch_sessions', $session);
 
                                 //Now if the session is complete, we want to update the AU
                                 // Also if terminated
@@ -288,7 +288,7 @@ function cmi5launch_highest_grade($scores)
                                 $sessiongrades[] = $session->score;
 
                                 // Update session in DB.
-                                $DB->update_record('cmi5launch_sessions', $session);
+                               // $DB->update_record('cmi5launch_sessions', $session);
                             }
                             // Save the session scores to AU, it is ok to overwrite.
                             $aurecord->scores = json_encode($sessiongrades);

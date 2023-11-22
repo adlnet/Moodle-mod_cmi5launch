@@ -355,6 +355,8 @@ public function cmi5launch_statement_retrieval_error($missingitem)
             public function cmi5launch_retrieve_score($resultarray, $registrationid)
             {
 
+    
+                
                 // Variable to hold score.
                 $score = null;
 
@@ -392,7 +394,7 @@ public function cmi5launch_statement_retrieval_error($missingitem)
 
                         // Print that it is missing.
                         echo "<br>";
-                        echo "No score in this statement.";
+                        echo 'No score in statement with id ' .$resultarray[""][0]['id'];
                         echo "<br>";
                     }
                 }
@@ -469,7 +471,7 @@ public function cmi5launch_statement_retrieval_error($missingitem)
                 $session->progress = json_encode($progressupdate);
                 $session->score = $returnscore;
 
-     
+        
                 return $session;
             }
         }

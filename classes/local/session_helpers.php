@@ -56,15 +56,22 @@ class session_helpers {
      // MB, maybe here? whenever a session is updated check the grades?
     public function cmi5launch_update_sessions($sessionid, $cmi5id) {
 
-        global $CFG, $DB;
+        global $CFG, $DB, $cmi5launch;
 
         $connector = new cmi5_connectors;
         $getsessioninfo = $connector->cmi5launch_get_session_info();
+        $progress = new progress;
+        $getprogress = $progress->cmi5launch_get_retrieve_statements();
+
+        //Yeah, lets put the proress update her too., too combine
 
         // Get the session from DB with session id.
         $session = $this->cmi5launch_retrieve_sessions_from_db($sessionid);
 
+        // Get updates from lrs as well
+        $session = $getprogress($session->registrationid, $cmi5launch->id, $session);
     
+        // Get updates from cmi5player
         // This is sessioninfo from CMI5 player.
         $sessioninfo = $getsessioninfo($sessionid, $cmi5id);
 /*

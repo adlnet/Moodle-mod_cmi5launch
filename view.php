@@ -78,7 +78,10 @@ $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
 //Check for updates
 cmi5launch_update_grades($cmi5launch, $USER->id);
 
+// Not sure if this is still needed
 
+// I bet this is it! 
+/*
 if ($cmi5launch->intro) {
     // Conditions to show the intro can change to look for own settings or whatever.
     echo $OUTPUT->box(
@@ -87,6 +90,7 @@ if ($cmi5launch->intro) {
         'cmi5launchintro'
     );
 }
+*/
 
 // TODO: Put all the php inserted data as parameters on the functions and put the functions in a separate JS file.
 ?>
@@ -245,6 +249,7 @@ foreach ($auids as $key => $auid) {
     // TODO (for that matter couldn't we make it, notattempetd, satisifed, not satisfied??).
     foreach ($ausfromcmi5 as $key => $auinfo) {
 
+        $ausatisfied = "";
 
 
         if ($auinfo[$key]["lmsId"] == $aulmsid) {

@@ -63,6 +63,8 @@ $PAGE->requires->jquery();
 // Output starts here.
 echo $OUTPUT->header();
 
+// Not sure if this is still needed
+/*
 if ($cmi5launch->intro) { // Conditions to show the intro can change to look for own settings or whatever.
     echo $OUTPUT->box(
         format_module_intro('cmi5launch', $cmi5launch, $cm->id),
@@ -70,6 +72,8 @@ if ($cmi5launch->intro) { // Conditions to show the intro can change to look for
         'cmi5launchintro'
     );
 }
+*/
+
 /*
 ?>
 <a href="http://google.com">
@@ -138,6 +142,8 @@ $fromview = explode(",", $fromview);
 // Retrieve AU ID.
 $auid = array_shift($fromview);
 
+// First thing check for updates
+cmi5launch_update_grades($cmi5launch, $USER->id);
 
 // Retrieve appropriate AU from DB.
 $au = $retrieveaus($auid);
@@ -196,7 +202,7 @@ if (!$au->sessions == null) {
         $sessioninfo[] = $date->format('D d M Y H:i:s');
 
         // Get progress from LRS.
-        $session = $getprogress($regid, $cmi5launch->id, $session);
+      //  $session = $getprogress($regid, $cmi5launch->id, $session);
         $sessioninfo[] = ("<pre>" . implode("\n ", json_decode($session->progress) ) . "</pre>");
 
   
@@ -212,7 +218,7 @@ if (!$au->sessions == null) {
        // $session = $convertsession($session);
 
         // Update session in DB.
-        $DB->update_record('cmi5launch_sessions', $session);
+       // $DB->update_record('cmi5launch_sessions', $session);
 
         // Build launch link to continue session.
         $newsession = "false";
@@ -237,7 +243,7 @@ if (!$au->sessions == null) {
     //$au->scores = json_encode($sessionscores);
   //Ok, lets see if we are getting the bracket here?
 
-  cmi5launch_update_grades($cmi5launch, $USER->id);
+  
     //And here we can add the au name and record scores? 
     // Well mybe not, cause it is already in only ONE au here
 
@@ -265,7 +271,7 @@ echo "<p tabindex=\"0\"
 
 // Add a form to be posted based on the attempt selected.
 ?>
-    <form id="launchform" action="launch.php" method="get" target="_blank">
+    <form id="launchform" action="launch.php" method="get">
         <input id="launchform_registration" name="launchform_registration" type="hidden" value="default">
         <input id="id" name="id" type="hidden" value="<?php echo $id ?>">
         <input id="n" name="n" type="hidden" value="<?php echo $n ?>">
