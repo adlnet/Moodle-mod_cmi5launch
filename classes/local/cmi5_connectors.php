@@ -164,37 +164,16 @@ class cmi5_connectors {
         
         // Sends the stream to the specified URL and stores results.
         // The false is use_include_path, which we dont want in this case, we want to go to the url.
-     
-     /*   try {
-            // File_get_contents throws a warning not error, so wwe need a specific handler to catch and alert user. 
-            set_error_handler(function ($severity, $message, $file, $line) {
-                throw new \ErrorException($message, $severity, $severity, $file, $line);
-            });
-    */
-            $result = file_get_contents($url, false, $context);
-      /*     
-        } catch (Exception $e) {
-            
-            echo "Something went wrong retrieving the registration info with a GET request to CMI5 player";
-            echo "<br>";
-            echo "Registration id is: " . $registration;
-            echo "<br>";
-            echo "Sent to URL : " . $url;
-            echo "<br>";
-            echo 'Caught exception. Error message from CMI5 is: ',  $e->getMessage(), "\n";
-            echo "<br>";
-               
-            restore_error_handler();
+        $result = file_get_contents($url, false, $context);
 
-        }
-*/
-            $registrationInfo = json_decode($result, true);
-    
-            // The returned 'registration info' is a large json object.
-            // Code is the registration id we want.
-            $registration = $registrationInfo["code"];
-            
-            return $registrationInfo; //much better!
+        $registrationInfo = json_decode($result, true);
+
+        // The returned 'registration info' is a large json object.
+        // Code is the registration id we want.
+        $registration = $registrationInfo["code"];
+        
+        return $registrationInfo; 
+
         }
     
 
@@ -207,7 +186,6 @@ class cmi5_connectors {
      * @param $id - the course id in MOODLE.
      */ 
     public function cmi5launch_retrieve_registration_with_post($courseid, $id) {
-
 
         global $USER;
 
@@ -249,37 +227,15 @@ class cmi5_connectors {
         
         // Sends the stream to the specified URL and stores results.
         // The false is use_include_path, which we dont want in this case, we want to go to the url.
-   /*     try {
-            // File_get_contents throws a warning not error, so wwe need a specific handler to catch and alert user. 
-            set_error_handler(function ($severity, $message, $file, $line) {
-                throw new \ErrorException($message, $severity, $severity, $file, $line);
-            });
-    */
-            $result = file_get_contents($url, false, $context);
-      /*     
-        } catch (Exception $e) {
-            
-            echo "Something went wrong retrieving the registration info with a POST request to CMI5 player";
-            echo "<br>";
-            echo "Course id is: " . $courseid;
-            echo "<br>";
-            echo "Sent to URL : " . $url;
-            echo "<br>";
-            echo 'Caught exception. Error message from CMI5 is: ',  $e->getMessage(), "\n";
-            echo "<br>";
-               
-            restore_error_handler();
+        $result = file_get_contents($url, false, $context);
 
-        }
-*/
-            $registrationInfo = json_decode($result, true);
-          
-            // The returned 'registration info' is a large json object.
-            // Code is the registration id we want.
-            $registration = $registrationInfo["code"];
-            
-            return $registration;
+        $registrationInfo = json_decode($result, true);
         
+        // The returned 'registration info' is a large json object.
+        // Code is the registration id we want.
+        $registration = $registrationInfo["code"];
+        
+        return $registration;
     }
 
     /**
@@ -295,7 +251,7 @@ class cmi5_connectors {
 
         global $CFG;
 
-        // Retrieve and assign params
+        // Retrieve and assign params.
         $url = $urltosend;
         $username = $user;
         $password = $pass;
@@ -304,7 +260,6 @@ class cmi5_connectors {
 
 
         // The body of the request must be made as array first.
-
         $data = array(
             'tenantId' => $id,
             'audience' => $tokenUser
@@ -321,8 +276,6 @@ class cmi5_connectors {
             } else {
                 return $token;
             }
-
-
         }
     }
 
@@ -370,7 +323,6 @@ class cmi5_connectors {
         // There can be multiple headers but as an array under the ONE header.
         // Content(body) must be JSON encoded here, as that is what CMI5 player accepts.
         // JSON_UNESCAPED_SLASHES used so http addresses are displayed correctly.
-
      	   $options = array(
             'http' => array(
                 'method'  => 'POST',
@@ -388,34 +340,11 @@ class cmi5_connectors {
 
         // Sends the stream to the specified URL and stores results.
         // The false is use_include_path, which we dont want in this case, we want to go to the url.
-    
-     /* throwing the pg
-        try {
-            // File_get_contents throws a warning not error, so wwe need a specific handler to catch and alert user. 
-            set_error_handler(function ($severity, $message, $file, $line) {
-                throw new \ErrorException($message, $severity, $severity, $file, $line);
-            });
-    */
-            $launchresponse = file_get_contents( $url, false, $context ); 
-/*
-        } catch (Exception $e) {
-            
-            echo "Something went wrong retrieving the launch URL from CMI5 player";
-            echo "<br>";
-            echo "Params sent are : ";
-            var_dump($data);
-            echo "<br>";
-            echo "Sent to URL : " . $url;
-            echo "<br>";
-            echo 'Caught exception. Error message from CMI5 is: ',  $e->getMessage(), "\n";
-            echo "<br>";
-               
-            restore_error_handler();
-        }
-*/
+
+        $launchresponse = file_get_contents( $url, false, $context ); 
+
         // Only return the URL.
         $urlDecoded = json_decode($launchresponse, true);
-
 
         return $urlDecoded;
     }
@@ -428,71 +357,51 @@ class cmi5_connectors {
          * @return - $result is the response from cmi5 player.
          */
         public function cmi5launch_send_request_to_cmi5_player($databody, $url, ...$tenantinfo) {
+            
             $data = $databody;
             $tenantinformation = $tenantinfo;
 
-    
-                //If number of args is greater than one it is for retrieving tenant info and args are username and password
-                if(count($tenantinformation) > 1 ){
-                
-                    $username = $tenantinformation[0];
-                    $password = $tenantinformation[1];
+            //If number of args is greater than one it is for retrieving tenant info and args are username and password
+            if(count($tenantinformation) > 1 ){
+            
+                $username = $tenantinformation[0];
+                $password = $tenantinformation[1];
 
-                    // use key 'http' even if you send the request to https://...
-                    //There can be multiple headers but as an array under the ONE header
-                    //content(body) must be JSON encoded here, as that is what CMI5 player accepts
-                    $options = array(
-                        'http' => array(
-                            'method'  => 'POST',
-                            'header' => array('Authorization: Basic '. base64_encode("$username:$password"),  
-                                "Content-Type: application/json\r\n" .
-                                "Accept: application/json\r\n"),
-                            'content' => json_encode($data)
-                        )
-                    );
-                    //the options are here placed into a stream to be sent
-                    $context  = stream_context_create($options);
-                
+                // Use key 'http' even if you send the request to https://...
+                // There can be multiple headers but as an array under the ONE header
+                // content(body) must be JSON encoded here, as that is what CMI5 player accepts
+                $options = array(
+                    'http' => array(
+                        'method'  => 'POST',
+                        'header' => array('Authorization: Basic '. base64_encode("$username:$password"),  
+                            "Content-Type: application/json\r\n" .
+                            "Accept: application/json\r\n"),
+                        'content' => json_encode($data)
+                    )
+                );
+                // The options are here placed into a stream to be sent.
+                $context  = stream_context_create($options);
+            
                     
-                    // Sends the stream to the specified URL and stores results.
-                    // The false is use_include_path, which we dont want in this case, we want to go to the url.
-                /* This is causing the problem
-                    try {
-                        // File_get_contents throws a warning not error, so wwe need a specific handler to catch and alert user. 
-                        set_error_handler(function ($severity, $message, $file, $line) {
-                            throw new \ErrorException($message, $severity, $severity, $file, $line);
-                        });
-                */
-                       //sends the stream to the specified URL and stores results (the false is use_include_path, which we dont want in this case, we want to go to the url)
-                        $result = file_get_contents( $url, false, $context );
-                
-/*
-                    } catch (Exception $e) {
-                        
-                        echo "Something went wrong retrieving the tenant info from CMI5 player";
-                        echo "<br>";
-                        echo "Sent to URL : " . $url;
-                        echo "<br>";
-                        echo 'Caught exception. Error message from CMI5 is: ',  $e->getMessage(), "\n";
-                        echo "<br>";
-                        
-                        restore_error_handler();
-                    }
-*/
-                    //return response
-                    return $result;
-                }
+                // Sends the stream to the specified URL and stores results.
+                // The false is use_include_path, which we dont want in this case, we want to go to the url.
+                    $result = file_get_contents( $url, false, $context );
+
+                // Return response
+                return $result;
+            }
+            
             //Else the args are what we need for posting a course
-          	  else{
+          	else{
 
-				//First arg will be token
-                	$token = $tenantinformation[0];
-	            	$file_contents = $data->get_content();
+				// First arg will be token.
+                $token = $tenantinformation[0];
+                $file_contents = $data->get_content();
 
-                // use key 'http' even if you send the request to https://...
-                //There can be multiple headers but as an array under the ONE header
-                //content(body) must be JSON encoded here, as that is what CMI5 player accepts
-                //JSON_UNESCAPED_SLASHES used so http addresses are displayed correctly
+                // Use key 'http' even if you send the request to https://...
+                // There can be multiple headers but as an array under the ONE header
+                // content(body) must be JSON encoded here, as that is what CMI5 player accepts
+                // JSON_UNESCAPED_SLASHES used so http addresses are displayed correctly
                 $options = array(
                     'http' => array(
                         'method'  => 'POST',
@@ -503,42 +412,19 @@ class cmi5_connectors {
                     )
                 );
 
-                 //the options are here placed into a stream to be sent
+                //  he options are here placed into a stream to be sent.
                  $context  = stream_context_create(($options));
     
-                // Sends the stream to the specified URL and stores results.
-                // The false is use_include_path, which we dont want in this case, we want to go to the url.
-              /*
-                try {
-                    // File_get_contents throws a warning not error, so wwe need a specific handler to catch and alert user. 
-                    set_error_handler(function ($severity, $message, $file, $line) {
-                        throw new \ErrorException($message, $severity, $severity, $file, $line);
-                    });
-            */
-                    //sends the stream to the specified URL and stores results (the false is use_include_path, which we dont want in this case, we want to go to the url)
-                    $result = file_get_contents( $url, false, $context );
-            
-/* This is throwing the errors??
-                } catch (Exception $e) {
-                    
-                    echo "Something went wrong creating the course with the CMI5 player";
-                    echo "<br>";
-                    echo "Sent to URL : " . $url;
-                    echo "<br>";
-                    echo 'Caught exception. Error message from CMI5 is: ',  $e->getMessage(), "\n";
-                    echo "<br>";
-                    
-                    restore_error_handler();
-                }
-                */
+                //  Sends the stream to the specified URL and stores results.
+                //  The false is use_include_path, which we dont want in this case, we want to go to the url.
+                $result = file_get_contents( $url, false, $context );
 
-      	      return $result;
-                }
+      	        return $result;
+            }
     }
 
-
     /**
-    *Retrieve session info from cmi5player
+    * Retrieve session info from cmi5player
     * @param mixed $sessionid - the session id to retrieve
      * @param mixed $id - cmi5 id
      * @return mixed
@@ -552,13 +438,13 @@ class cmi5_connectors {
 		$token = $settings['cmi5launchtenanttoken'];
 		$playerUrl = $settings['cmi5launchplayerurl'];
 
-        //Build URL for launch URL request
+        // Build URL for launch URL request.
 	    $url = $playerUrl . "/api/v1/session/" . $sessionid;
 
 		// use key 'http' even if you send the request to https://...
-        //There can be multiple headers but as an array under the ONE header
-        //content(body) must be JSON encoded here, as that is what CMI5 player accepts
-        //JSON_UNESCAPED_SLASHES used so http addresses are displayed correctly
+        // There can be multiple headers but as an array under the ONE header
+        // content(body) must be JSON encoded here, as that is what CMI5 player accepts
+        // JSON_UNESCAPED_SLASHES used so http addresses are displayed correctly
      	   $options = array(
             'http' => array(
                 'method'  => 'GET',
@@ -569,10 +455,10 @@ class cmi5_connectors {
             )	
         );
 
-        //the options are here placed into a stream to be sent
+        // The options are here placed into a stream to be sent
         $context  = stream_context_create(($options));
 
-        //sends the stream to the specified URL and stores results (the false is use_include_path, which we dont want in this case, we want to go to the url)
+        // Sends the stream to the specified URL and stores results (the false is use_include_path, which we dont want in this case, we want to go to the url)
         $launchresponse = file_get_contents( $url, false, $context );
 
 		$sessionDecoded = json_decode($launchresponse, true);

@@ -947,9 +947,7 @@ function cmi5launch_get_user_grades($cmi5launch, $userid=0) {
              
              //Maybe we could pass rawgrade as an array and find its max in the other func?
                 //For debugging
-    
-           
-           
+
             }
         } else {
             return false;
@@ -1071,7 +1069,7 @@ function cmi5launch_update_grades($cmi5launch, $userid = 0, $nullifnone = true)
 
    
 
-    //TODO - Need to implement if it is called plural or not, it canbe called for all if no userid passed
+    //TODO - Need to implement if it is called plural or not, it can be called for all if no userid passed
     
     //What we need ot do is encapsulate my LRS querying even more, so it can be called in view and here and in report
     // Maybe not even in report anymore if this works and updates correctly. cause of the fact there is completed/pass/failed

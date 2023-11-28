@@ -61,7 +61,7 @@ defined('MOODLE_INTERNAL') || die();
                 );
 
 
-                $statements = $this->cmi5launch_send_request_to_lrs($data, $registrationid);
+                $statements = $this->cmi5launch_send_request_to_lrs($data, $session->id);
 
 
                 //The results come back as nested array under more then statements. We only want statements, and we want them unique
@@ -355,8 +355,14 @@ public function cmi5launch_statement_retrieval_error($missingitem)
             public function cmi5launch_retrieve_score($resultarray, $registrationid)
             {
 
-    
-                
+                // What id resultarray here
+               /*
+                echo"<br>";
+
+                echo" What is resultarray here?      2.111";
+                var_dump($resultarray);
+                echo"<br>";
+                */
                 // Variable to hold score.
                 $score = null;
 
@@ -394,7 +400,7 @@ public function cmi5launch_statement_retrieval_error($missingitem)
 
                         // Print that it is missing.
                         echo "<br>";
-                        echo 'No score in statement with id ' .$resultarray[""][0]['id'];
+                        echo 'No score in statement with id ' .$resultarray[$registrationid][0]['id'];
                         echo "<br>";
                     }
                 }
@@ -459,19 +465,49 @@ public function cmi5launch_statement_retrieval_error($missingitem)
                             $returnscore = $score;
                         }
 
+                        //Sometimes it's wi[in out]! Thats why its balnk we need cumulative??? Or more than one session?
+
                         // Update to return.
                         $progressupdate[] = "$actor $verb $object on $date";
-
-                    }
+/*
+                        echo "<br>";
+                echo " What the heck is progress update at this point";
+                var_dump($progressupdate);  
+                echo "<br>";
+                echo "<br>";
+                echo " Are we here 2.4";
+                echo "<br>";
+*/
+            }
+  /*
+            echo "<br>";
+            echo"Are we here 2.5";
+            echo "<br>";
+*/
                 }
                 // Now an iff statment to iterate through allscores array assigning them to first attempt, next attempt, etc.
                 // If there is only one score, it is the first attempt.
                 // for
-
+                  global $USER;
+             /*   if ($USER->id == 16 || $USER->id == 2) {
+                    echo "<br>";
+                    echo "Ok, what is session  here after to look at WITHIN progress->? 33333333";
+                    var_dump(($progressupdate));
+                    echo "<br>";
+                }
+*/
                 $session->progress = json_encode($progressupdate);
-                $session->score = $returnscore;
 
-        
+
+                $session->score = $returnscore;
+/*
+        if ($USER->id == 16 || $USER->id == 2) {
+            echo "<br>";
+            echo "Ok, what is session  here after WITHIN thegetprogress stetment 4444444444 ";
+            var_dump($session);
+            echo "<br>";
+        }
+    */    
                 return $session;
             }
         }

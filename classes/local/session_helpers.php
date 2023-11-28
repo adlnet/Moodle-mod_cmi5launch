@@ -42,10 +42,6 @@ class session_helpers {
         return [$this, 'cmi5launch_retrieve_sessions_from_db'];
     }
 
-    public function cmi5launch_get_convert_session() {
-        return [$this, 'cmi5launch_session_for_db'];
-    }
-
     /**
      * Gets updated session information from CMI5 player
      * @param mixed $sessionid - the session id
@@ -56,64 +52,49 @@ class session_helpers {
      // MB, maybe here? whenever a session is updated check the grades?
     public function cmi5launch_update_sessions($sessionid, $cmi5id) {
 
-        global $CFG, $DB, $cmi5launch;
+        global $CFG, $DB, $cmi5launch, $USER;
 
         $connector = new cmi5_connectors;
-        $getsessioninfo = $connector->cmi5launch_get_session_info();
         $progress = new progress;
+        $getsessioninfo = $connector->cmi5launch_get_session_info();
         $getprogress = $progress->cmi5launch_get_retrieve_statements();
-
-        //Yeah, lets put the proress update her too., too combine
 
         // Get the session from DB with session id.
         $session = $this->cmi5launch_retrieve_sessions_from_db($sessionid);
 
-        // Get updates from lrs as well
-        $session = $getprogress($session->registrationid, $cmi5launch->id, $session);
+        // Reload cmi5 instance.
+        $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
+
+        // Reload user course instance.
+        $usersCourse = $DB->get_record('cmi5launch_course', ['courseid'  => $record->courseid, 'userid'  => $USER->id]);
+
+        // Get updates from the LRS as well.
+        $session = $getprogress($usersCourse->registrationid, $cmi5launch->id, $session);
     
         // Get updates from cmi5player
         // This is sessioninfo from CMI5 player.
         $sessioninfo = $getsessioninfo($sessionid, $cmi5id);
-/*
-        echo"<br>";
-        echo "Ok, what is session INBOFFOFO here?";
-        var_dump($sessioninfo);
-        echo "<br>";;
-     */
+
         // Update session.
         foreach ($sessioninfo as $key => $value) {
-            // We don't want to overwrite id.
-
-            //Will making it lowercase help? 
-            // This seemed to solve the issue with DB thank oodness. 
-           // $key = mb_convert_case($key, MB_CASE_LOWER, "UTF-8");
+            
+            // We don't want to overwrite ids.
+            // If the property exists and it's not id or sessionid, set it to lowercase and 
+            // encode value if it is array. (DB needs properties in lowercase, but player returns camelcase.)
             if (property_exists($session, $key ) && $key != 'id' && $key != 'sessionid') {
+                
                 // If it's an array, encode it so it can be saved to DB.
                 if (is_array($value)) {
                     $value = json_encode($value);
                 }
 
                 if(is_string($key)){
-                    // MAKE IT LOWERCASE? IS THAT ENOUH?
                     $key = mb_convert_case($key, MB_CASE_LOWER, "UTF-8");
-                   // $newsession->$smallkey = ($value);
                 }
-                //Can we see if property is a strin and then convert that>?
 
-/*
-                echo "Ok, what is value here?";
-                var_dump($value);
-
-                echo "<br>";
-                echo "Ok, what is key here?";
-                var_dump($key);
-                echo "<br>";
-*/
-              //  $key = mb_convert_case($key, MB_CASE_LOWER, "UTF-8");
                 $session->$key = $value;
             }
         }
-
 
         // Now update to table.
         $DB->update_record('cmi5launch_sessions', $session);
@@ -121,9 +102,8 @@ class session_helpers {
         return $session;
     }
 
-
     /**
-     * Creates a session record in DB
+     * Creates a session record in DB.
      * @param mixed $sessionid - the session id
      * @param mixed $launchurl - the launch url
      * @param mixed $launchmethod - the launch method
@@ -134,7 +114,6 @@ class session_helpers {
         global $DB, $CFG, $cmi5launch, $USER;
 
         $table = "cmi5launch_sessions";
-// Well, maybe this is the problem, its not making them riiiht
 
         // Make a new record to save.
         $newrecord = new \stdClass();
@@ -179,21 +158,4 @@ class session_helpers {
         return $session;
     }
 
-        // Constructs sessions with lowercase values to work with DB. Is fed array and where array key matches property, sets the property.
-    public function cmi5launch_session_for_db($statement)
-    {
-
-
-        //make a new session object
-        $newsession = new \stdClass();
-        foreach ($statement as $key => $value) {
-
-            if (!$key == 'id' && !$key == 'sessionid') {
-                $smallkey = mb_convert_case($key, MB_CASE_LOWER, "UTF-8");
-                $newsession->$smallkey = ($value);
-            }
-            $newsession->id = $statement['id'];
-            $newsession->sessionid = $statement['sessionid'];
-        }
-    }
 }

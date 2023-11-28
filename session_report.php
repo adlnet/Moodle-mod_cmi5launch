@@ -25,7 +25,6 @@ use mod_cmi5launch\local\session_helpers;
 
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require('header.php');
-//require('../../header.php');
 require_login($course, false, $cm);
 require_once("../../config.php");
 require_once($CFG->libdir.'/tablelib.php');
@@ -40,15 +39,15 @@ define('CMI5LAUNCH_REPORT_ATTEMPTS_STUDENTS_WITH', 1);
 define('CMI5LAUNCH_REPORT_ATTEMPTS_STUDENTS_WITH_NO', 2);
 $PAGE->requires->jquery();
 
-
 global $cmi5launch, $USER, $cmi5launchsettings, $CFG;
-global $cmi5launch;
-global $cmi5launchsettings;
 
+// External classes and functions.
 $sessionhelper = new session_helpers;
-$updatesession = $sessionhelper->cmi5launch_get_update_session();
+$aushelpers = new au_helpers;
 
-$PAGE->requires->jquery();
+$updatesession = $sessionhelper->cmi5launch_get_update_session();
+$getaus = $aushelpers->get_cmi5launch_retrieve_aus_from_db();
+
 // Activity Module ID
 $id = required_param('id', PARAM_INT);
 
@@ -69,24 +68,16 @@ $auidprevpage = $fromreportpage[2];
 $userid = $fromreportpage[3];
 $gradetype = $fromreportpage[4];
 
-// Other classes.
-$aushelpers = new au_helpers;
-
-$getaus = $aushelpers->get_cmi5launch_retrieve_aus_from_db();
-
-//$url = new moodle_url('/mod/cmi5launch/classes/local/session_report.php');
-$url = new moodle_url('/mod/cmi5launch/session_report.php');
+// Retrieve the course module.
 $cm = get_coursemodule_from_id('cmi5launch', $id, 0, false, MUST_EXIST);
 $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
 $contextmodule = context_module::instance($cm->id);
 
+// Set page url.
+$url = new moodle_url('/mod/cmi5launch/session_report.php');
 $url->param('id', $id);
-$PAGE->set_url($url);
 
-$PAGE->set_pagelayout('report');
-
-global $cmi5launch, $USER, $cmi5launchsettings;
-
+global $cmi5launch, $USER, $cmi5launchsettings, $CFG;
 
 // Activate the secondary nav tab.
 navigation_node::override_active_url(new moodle_url('/mod/cmi5launch/classes/local/session_report.php', ['id' => $id]));
@@ -95,12 +86,15 @@ navigation_node::override_active_url(new moodle_url('/mod/cmi5launch/classes/loc
 if (!empty($download)) {
     $noheader = true;
 }
+
 // Print the page header.
 if (empty($noheader)) {
 
     $strreport = get_string('report', 'cmi5launch');
     
-    // Setup thew page
+    // Setup the page
+    $PAGE->set_url($url);
+    $PAGE->set_pagelayout('report');
     $PAGE->set_title("$course->shortname: ".format_string($cm->name));
     $PAGE->set_heading($course->fullname);
     $PAGE->activityheader->set_attrs([
@@ -111,6 +105,7 @@ if (empty($noheader)) {
 
     echo $OUTPUT->header();
 }
+
 // Back button.
 ?>
 <form action="report.php" method="get">
@@ -119,13 +114,9 @@ if (empty($noheader)) {
 </form>
 <?php
 
-global $cmi5launch, $USER;
-global $cmi5launchsettings, $CFG;
-
 // Create tables to display on page.
 // This is the main table with session info.
 $table = new \flexible_table('mod-cmi5launch-report');
-
 // This table holds the overall score, showing the grading type.
 $scoretable = new \flexible_table('mod-cmi5launch-report');
 
@@ -148,8 +139,7 @@ $table->define_columns($columns);
 $table->define_headers($headers);
 $table->define_baseurl($PAGE->url);
 
-
-//Decode and put AU ids in array.
+// Decode and put AU ids in array.
 $auids = (json_decode($auidprevpage, true) );
 
 // For each au id, find the one that matches our auid from previous page, this is the record 

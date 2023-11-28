@@ -253,7 +253,7 @@ foreach ($auschunked[0] as $au) {
 
         // Retrieve users specific info for this course.
         $userrecord = $DB->get_record('cmi5launch_course', ['courseid' => $record->courseid, 'userid' => $user->id]);
-
+            // Bring in grade helpers.
         $gradehelpers = new grade_helpers;
 
         $updategrades = $gradehelpers->get_cmi5launch_check_user_grades_for_updates();
@@ -273,92 +273,89 @@ foreach ($auschunked[0] as $au) {
             //These are the AUS we want to send on if clicked, the more specific ids (THIS users AU ids).
             $currentauids = $userrecord->aus;
             $infofornextpage[] = $currentauids;
-     // Bring in grade helpers.
-     $gradehelpers = new grade_helpers;
 
-     // Functions from other classes.
-     $highestgrade = $gradehelpers->get_cmi5launch_highest_grade();
-     $averagegrade = $gradehelpers->get_cmi5launch_average_grade();
+            // So its grading ALL , we need seach au to have the highest of ITS grades not overall
+            // Functions from other classes.
+            $highestgrade = $gradehelpers->get_cmi5launch_highest_grade();
+            $averagegrade = $gradehelpers->get_cmi5launch_average_grade();
 
-            //////// userscore is what is displsayion multiple and we want it based on radetypoe
+                    //////// userscore is what is displsayion multiple and we want it based on radetypoe
                 // Now compare the usergrades array keys to name of current autitle, if
                 // it matches then we want to display, that's what userscore is.
                 if (!$usergrades == null) {
                     
                     $gradetype = $cmi5launchsettings["grademethod"];
 
-                if (array_key_exists($currenttitle, $usergrades)) {
-                switch($gradetype){
-                    /**
-                     * ('GRADE_AUS_CMI5' = '0');
-                        *('GRADE_HIGHEST_CMI5' = '1');
-                        *'GRADE_AVERAGE_CMI5', =  '2');
-                        *('GRADE_SUM_CMI5', = '3');
-                     */
-                    case 1:
-    
-    
-                                $userscore = $highestgrade($usergrades);
-                            
-                        break;
-                        
-                            
-                    case 2:
-    
-            
-                        //We need to update rawgrade not all of rades, that wipes out the array format it needs
-                        foreach ($grades as $key => $grade) {
-                        ///Ohhhh its IN an array, we need to get it out
-                        $userscores = $averagegrade($usergrades);
+                    if (array_key_exists($currenttitle, $usergrades)) {
+                    
+                        $augrades = $usergrades[$currenttitle];
 
-                        
-                        }
-                        break;
-                    }
-
-//                        $userscore = $usergrades[$currenttitle];
-
-                        // Remove [] from userscore if they are there.
-                        $toremove = array("[", "]");
-                        if ($userscore != null && str_contains($userscore, "[")) {
-                            $userscore = str_replace($toremove, "", $userscore);
-                        }
-                    }
-                } else {
-
-                    $userscore = "N/A";
-                }
-
-        }
-            // Add the userid to info for next page.
-            $infofornextpage[] = $user->id;
-
-            //Add the gradetyope TODO: this should be accessable through settins, but those are blank
-            // on next pae? 
-            $infofornextpage[] = $gradetype;
-
-       
-            // Convert their grade to string to be passed into html button.
-            $userscoreasstring = strval($userscore);
-
+                        switch($gradetype){
+                        /**
+                         * ('GRADE_AUS_CMI5' = '0');
+                            *('GRADE_HIGHEST_CMI5' = '1');
+                            *'GRADE_AVERAGE_CMI5', =  '2');
+                            *('GRADE_SUM_CMI5', = '3');
+                        */
+                        case 1:
         
-            // Encode to send to next page, because it has to go as a string and pass through the Javascript function.
-            $sendtopage = base64_encode(json_encode($infofornextpage, JSON_HEX_QUOT));
-           
-            // Build the button to be displayed. It appears as the users score, but is also a link
-            // to session_report if user wants to break down the score.
-            $button = "<a tabindex=\"0\" id='newreport'
-           onkeyup=\"key_test('" . $sendtopage . "')\" onclick=\"mod_cmi5launch_open_report('"
-                . $sendtopage . "')\" style='cursor: pointer;'>"
-                . $userscoreasstring . "</a>";
+                                    $userscore = $highestgrade($augrades);
+                                
+                            break;
+                                    
+                        case 2:
+        
+                
+                            //We need to update rawgrade not all of rades, that wipes out the array format it needs
+                            foreach ($grades as $key => $grade) {
+                            ///Ohhhh its IN an array, we need to get it out
+                            $userscores = $averagegrade($augrades);
 
-            // Add the button to the row data under the correct user.
-            $rowdata[$username] = ($button);
-        }
+                            
+                            }
+                            break;
+                        }
+
+    //                        $userscore = $usergrades[$currenttitle];
+
+                            // Remove [] from userscore if they are there.
+                            $toremove = array("[", "]");
+                            if ($userscore != null && str_contains($userscore, "[")) {
+                                $userscore = str_replace($toremove, "", $userscore);
+                            }
+                        }
+                    } else {
+
+                        $userscore = "N/A";
+                    }
+
+            }
+                // Add the userid to info for next page.
+                $infofornextpage[] = $user->id;
+
+                //Add the gradetyope TODO: this should be accessable through settins, but those are blank
+                // on next pae? 
+                $infofornextpage[] = $gradetype;
+        
+                // Convert their grade to string to be passed into html button.
+                $userscoreasstring = strval($userscore);
+            
+                // Encode to send to next page, because it has to go as a string and pass through the Javascript function.
+                $sendtopage = base64_encode(json_encode($infofornextpage, JSON_HEX_QUOT));
+            
+                // Build the button to be displayed. It appears as the users score, but is also a link
+                // to session_report if user wants to break down the score.
+                $button = "<a tabindex=\"0\" id='newreport'
+            onkeyup=\"key_test('" . $sendtopage . "')\" onclick=\"mod_cmi5launch_open_report('"
+                    . $sendtopage . "')\" style='cursor: pointer;'>"
+                    . $userscoreasstring . "</a>";
+
+                // Add the button to the row data under the correct user.
+                $rowdata[$username] = ($button);
+            }
+
         // Add the row data to the table.
         $reporttable->add_data_keyed($rowdata);
-    
-        // wipe infofornextpage for next AU.
     }
 
   

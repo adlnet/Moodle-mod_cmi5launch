@@ -20,21 +20,20 @@
  * @copyright  2023 Megan Bohland
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+use mod_cmi5launch\local\cmi5_connectors;
+use mod_cmi5launch\local\au_helpers;
+use mod_cmi5launch\local\session_helpers;
+
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require('header.php');
-
 require_once("$CFG->dirroot/lib/outputcomponents.php");
- require_login($course, false, $cm);
-
- use mod_cmi5launch\local\cmi5_connectors;
- use mod_cmi5launch\local\au_helpers;
- use mod_cmi5launch\local\session_helpers;
-
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once('header.php');
 
 global $CFG, $cmi5launch, $USER, $DB;
 
+/*
 // Trigger Activity launched event.
 $event = \mod_cmi5launch\event\activity_launched::create(array(
     'objectid' => $cmi5launch->id,
@@ -43,17 +42,15 @@ $event = \mod_cmi5launch\event\activity_launched::create(array(
 $event->add_record_snapshot('course_modules', $cm);
 $event->add_record_snapshot('cmi5launch', $cmi5launch);
 $event->trigger();
+*/
 
 // External class and funcs to use.
-
 $auhelper = new au_helpers;
 $connectors = new cmi5_connectors;
 $sessionhelper = new session_helpers;
 
-
 $savesession = $sessionhelper->cmi5launch_get_create_session();
 $cmi5launchretrieveurl = $connectors->cmi5launch_get_retrieve_url();
-
 $retrieveaus = $auhelper->get_cmi5launch_retrieve_aus_from_db();
 
 // Retrieve registration id and au index (from AUview.php).
@@ -72,7 +69,6 @@ $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
 $userscourse = $DB->get_record('cmi5launch_course', ['courseid'  => $record->courseid, 'userid'  => $USER->id]);
 
 // Retrieve registration id.
-
 $registrationid = $userscourse->registrationid;
 
 if (empty($registrationid)) {
@@ -95,7 +91,6 @@ if ($idandstatus[0] == "true") {
 
     // Retrieve AUs.
     $au = $retrieveaus($id);
-
 
     // Retrieve the au index.
     $auindex = $au->auindex;
