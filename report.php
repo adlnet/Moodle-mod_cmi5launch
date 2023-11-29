@@ -30,7 +30,6 @@ require_login($course, false, $cm);
 require_once("../../config.php");
 require_once($CFG->libdir.'/tablelib.php');
 require_once($CFG->dirroot.'/mod/cmi5launch/locallib.php');
-require_once($CFG->dirroot.'/mod/cmi5launch/report/basic/classes/report.php');
 require_once($CFG->libdir.'/formslib.php');
 require_once($CFG->dirroot. '/reportbuilder/classes/local/report/column.php');
 
@@ -38,9 +37,6 @@ define('CMI5LAUNCH_REPORT_DEFAULT_PAGE_SIZE', 20);
 define('CMI5LAUNCH_REPORT_ATTEMPTS_ALL_STUDENTS', 0);
 define('CMI5LAUNCH_REPORT_ATTEMPTS_STUDENTS_WITH', 1);
 define('CMI5LAUNCH_REPORT_ATTEMPTS_STUDENTS_WITH_NO', 2);
-$PAGE->requires->jquery();
-
-
 
 $cm = get_coursemodule_from_id('cmi5launch', $id, 0, false, MUST_EXIST);
 $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
@@ -75,9 +71,8 @@ $request_body = file_get_contents('php://input');
 $contextmodule = context_module::instance($cm->id);
 
 $PAGE->set_url($url);
-require_login($course, false, $cm);
 $PAGE->set_pagelayout('report');
-
+$PAGE->requires->jquery();
 
 // Functions from other classes
 $gradehelpers = new grade_helpers;
@@ -113,10 +108,8 @@ function mod_cmi5launch_open_report(inforfornextpage) {
     </script>
 <?php
 
-
-// TODO
 // Trigger a report viewed event.
-// MB will we need to implement this?
+// MB - we don't currently do this, maybe in future.
 /*
 $event = \mod_scorm\event\report_viewed::create(array(
     'context' => $contextmodule,
@@ -158,10 +151,10 @@ $headers[] = get_string('autitle', 'cmi5launch');
 
 // The table is always the same, but the amount of users shown varies.
 // If user has capability, they can see all users.
-if (has_capability('mod/cmi5launch:addinstance', $context)) {
+if (has_capability('mod/cmi5launch:viewgrades', $context)) {
     // This is a teacher, show all users.
 
-  //  echo "CAPABLE";
+    // We should make a capabilittty for our plugin? 
     // The users are indexed by their userid.
     // What is a teacher has more than one course? IS this the problem? 
     $users = get_enrolled_users($contextmodule);

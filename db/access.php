@@ -56,9 +56,17 @@ $capabilities = array(
         )
     ),
 
+    'mod/cmi5launch:viewgrades' => array(
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(
+            'coursecreator' => CAP_ALLOW,
+            'teacher' => CAP_ALLOW,
+        )
+    ),
+
     'mod/cmi5launch:addinstance' => array(
         'riskbitmask' => RISK_XSS,
-
         'captype' => 'write',
         'contextlevel' => CONTEXT_COURSE,
         'archetypes' => array(

@@ -71,24 +71,10 @@ if (! $course = $DB->get_record('cmi5launch', array('course' => $cm->course, 'na
     throw new \moodle_exception('coursemisconf');
 }
 
-///THIS is where it redircts if first hit, maybe here I can redirect via student or tea ch and give them the stuff!!!
 
-//require_login($course, false, $cm);
-
-//How scorm did it
-/*
-if (has_capability('mod/scorm:viewreport', context_module::instance($cm->id))) {
-    redirect('report.php?id='.$cm->id);
-} else {
-    redirect('view.php?id='.$cm->id);
-}
-
-// Well if I cant control the report pae, maybe I can call it here, when it evaluates the user? 
-
-*/
 //TODO
 //We are currently using this capability, but we should make one for grading
-if (has_capability('mod/cmi5launch:addinstance', $context)) {
+if (has_capability('mod/cmi5launch:viewgrades', $context)) {
 	// This is teacher/manger/non editing teacher.
    
     // If this is the teacher, lets update all grades
@@ -119,7 +105,7 @@ if (has_capability('mod/cmi5launch:addinstance', $context)) {
 
     //IF this is just the student we only need to worry about uipdating their rades, cause thats all theyll see
     // Retrieve/update the users grades for this course.
-    cmi5launch_update_grades($cmi5launch, $user->id);
+    cmi5launch_update_grades($cmi5launch, $USER->id);
 
     redirect('report.php?id='.$cm->id .'&userid=' . $userid );
 }   

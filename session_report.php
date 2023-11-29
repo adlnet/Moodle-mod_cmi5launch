@@ -22,16 +22,15 @@
 use mod_cmi5launch\local\au_helpers;
 use mod_cmi5launch\local\session_helpers;
 
-
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require('header.php');
-require_login($course, false, $cm);
-require_once("../../config.php");
 require_once($CFG->libdir.'/tablelib.php');
 require_once($CFG->dirroot.'/mod/cmi5launch/locallib.php');
-require_once($CFG->dirroot.'/mod/cmi5launch/report/basic/classes/report.php');
+//require_once($CFG->dirroot.'/mod/cmi5launch/report/basic/classes/report.php');
 require_once($CFG->libdir.'/formslib.php');
 require_once($CFG->dirroot. '/reportbuilder/classes/local/report/column.php');
+
+require_login($course, false, $cm);
 
 define('CMI5LAUNCH_REPORT_DEFAULT_PAGE_SIZE', 20);
 define('CMI5LAUNCH_REPORT_ATTEMPTS_ALL_STUDENTS', 0);
@@ -76,8 +75,6 @@ $contextmodule = context_module::instance($cm->id);
 // Set page url.
 $url = new moodle_url('/mod/cmi5launch/session_report.php');
 $url->param('id', $id);
-
-global $cmi5launch, $USER, $cmi5launchsettings, $CFG;
 
 // Activate the secondary nav tab.
 navigation_node::override_active_url(new moodle_url('/mod/cmi5launch/classes/local/session_report.php', ['id' => $id]));
@@ -142,7 +139,7 @@ $table->define_baseurl($PAGE->url);
 // Decode and put AU ids in array.
 $auids = (json_decode($auidprevpage, true) );
 
-// For each au id, find the one that matches our auid from previous page, this is the record 
+// For each AU id, find the one that matches our auid from previous page, this is the record 
 // we want.
 foreach ($auids as $key => $auid) {
         
@@ -158,10 +155,9 @@ foreach ($auids as $key => $auid) {
             $aurecord = $au;
         }
     }
-    
        
-//Ok, now instead of all the users, we want the suer from the previous page
-$users = get_enrolled_users($contextmodule);; //returns an array of users
+//Ok, now instead of all the users, we want the user from the previous page
+//$users = get_enrolled_users($contextmodule);; //returns an array of users
 
 // Retrieve session ids for this course.
 $sessions = json_decode($aurecord->sessions, true);

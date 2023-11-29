@@ -247,6 +247,8 @@ $string['eventactivitylaunched'] = 'Activity launched';
 $string['eventactivitycompleted'] = 'Activity completed';
 
 $string['cmi5launch:addinstance'] = 'Add a new cmi5 (xAPI) activity to a course';
+$string['cmi5launch:view'] = 'View cmi5 (xAPI) activity';
+$string['cmi5launch:viewgrades'] = "Ability to view all of a course's grades. Often assigned to teachers.";
 
 $string['expirecredentials'] = 'Expire credentials';
 $string['checkcompletion'] = 'Check Completion';
