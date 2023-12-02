@@ -56,21 +56,24 @@ function cmi5launch_average_grade($scores)
 
     global $cmi5launch, $USER, $DB;
 
-        // If it is an array it doesn't work, check if it's a string and if NOT then json decode
-        if (!$scores == null) {
+        // If it isn't an array it (array_sum) doesn't work, check if it's a string and if NOT then json decode
+        if (!$scores == null && is_array($scores)) {
 
-        // Find the average of the scores
-        $averagegrade = (array_sum($scores) / count($scores));
+            // Find the average of the scores
+            $averagegrade = (array_sum($scores) / count($scores));
 
-        // If string it sometimes has brackets, check for them and remove them if found.
-        if (str_contains($averagegrade, "[")) {
-            $averagegrade = str_replace("[", "", $averagegrade);
+            // If string it sometimes has brackets, check for them and remove them if found.
+            if (str_contains($averagegrade, "[")) {
+                $averagegrade = str_replace("[", "", $averagegrade);
+            }
+            // Apply intval if string
+            $averagegrade = intval($averagegrade);
+        
+        } elseif  (!$scores == null && !is_array($scores)) {
+            // If it's an int, it's a single value so average is itself.
+            $averagegrade = $scores;
         }
-        // Apply intval if string
-        $averagegrade = intval($averagegrade);
-      
-        } else {
-            
+        else {
             $averagegrade = 0;
         }
 
@@ -134,11 +137,9 @@ function cmi5launch_highest_grade($scores)
     {
 
         // Bring in functions and classes.
-        $aushelpers = new au_helpers;
         $sessionhelper = new session_helpers;
 
         // Functions from other classes.
-        $getaus = $aushelpers->get_cmi5launch_retrieve_aus_from_db();
         $updatesession = $sessionhelper->cmi5launch_get_update_session();
 
         global $cmi5launch, $USER, $DB;

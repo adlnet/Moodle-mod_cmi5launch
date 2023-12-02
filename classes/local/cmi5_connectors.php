@@ -382,7 +382,6 @@ class cmi5_connectors {
                 // The options are here placed into a stream to be sent.
                 $context  = stream_context_create($options);
             
-                    
                 // Sends the stream to the specified URL and stores results.
                 // The false is use_include_path, which we dont want in this case, we want to go to the url.
                     $result = file_get_contents( $url, false, $context );
@@ -391,7 +390,7 @@ class cmi5_connectors {
                 return $result;
             }
             
-            //Else the args are what we need for posting a course
+            // Else the args are what we need for posting a course.
           	else{
 
 				// First arg will be token.
@@ -412,7 +411,7 @@ class cmi5_connectors {
                     )
                 );
 
-                //  he options are here placed into a stream to be sent.
+                //  The options are placed into a stream to be sent.
                  $context  = stream_context_create(($options));
     
                 //  Sends the stream to the specified URL and stores results.

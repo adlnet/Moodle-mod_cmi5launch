@@ -25,7 +25,6 @@ use mod_cmi5launch\local\progress;
 use mod_cmi5launch\local\course;
 use mod_cmi5launch\local\cmi5_connectors;
 use mod_cmi5launch\local\au_helpers;
-use mod_cmi5launch\local\session_helpers;
 
 require_once("../../config.php");
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
@@ -35,7 +34,6 @@ require('header.php');
 $progress = new progress;
 $aushelpers = new au_helpers;
 $connectors = new cmi5_connectors;
-$sessionhelpers = new session_helpers;
 
 // Functions from other classes.
 $saveaus = $aushelpers->get_cmi5launch_save_aus();
@@ -43,8 +41,6 @@ $createaus = $aushelpers->get_cmi5launch_create_aus();
 $getaus = $aushelpers->get_cmi5launch_retrieve_aus_from_db();
 $getregistration = $connectors->cmi5launch_get_registration_with_post();
 $getregistrationinfo = $connectors->cmi5launch_get_registration_with_get();
-$getprogress = $progress->cmi5launch_get_retrieve_statements();
-$updatesession = $sessionhelpers->cmi5launch_get_update_session();
 
 global $cmi5launch, $USER, $mod;
 
@@ -190,7 +186,6 @@ $table->head = array(
     get_string('cmi5launchviewregistrationheader', 'cmi5launch'),
 );
 
-
 // Array to hold Au scores.
 $auscores = array();
 
@@ -217,15 +212,14 @@ foreach ($auids as $key => $auid) {
     // Retrieve AU's lmsID.
     $aulmsid = $au->lmsid;
 
-     $ausatisfied = "";
-    // TODO now we can get the AU's satisifed FROM the CMI5 player.
-    // TODO (for that matter couldn't we make it, notattempetd, satisifed, not satisfied??).
+    $ausatisfied = "";
+
+    // Check AU's satisifeid value and display accordingly. 
     foreach ($ausfromcmi5 as $key => $auinfo) {
 
         // First check what 'type' is. If it's a block, we need to check the children for the AU's lmsid.
         if ($auinfo[$key]["type"] == "block") {
 
-            
             $lmsidfromplayer = $auinfo[$key]["children"][0]["lmsId"];
 
             // If it is, retrieve the satisfied value.
@@ -236,11 +230,11 @@ foreach ($auids as $key => $auid) {
             $lmsidfromplayer = $auinfo[$key]["lmsId"];
              
             // If it is, retrieve the satisfied value.
-            $ausatisfiedplayer = $auinfo[$key]["satisfied"]; //thae satisified may not be in the right place its also gonna be best
+            $ausatisfiedplayer = $auinfo[$key]["satisfied"];
 
             }
 
-            //And then compare the lmsids to see if this is the right AU.
+            // And then compare the lmsids to see if this is the right AU.
             if ($lmsidfromplayer == $aulmsid) {
 
                 // If it is, retrieve the satisfied value.
@@ -277,7 +271,6 @@ foreach ($auids as $key => $auid) {
                     $au->satisfied = "false";
                 }
             }
-           
         }
 
         // Create array of info to place in table.
@@ -287,10 +280,9 @@ foreach ($auids as $key => $auid) {
         $auinfo[] = $au->title;
         $auinfo[] = ($austatus);
 
-        // Ok, now we need to retrieve the sessions and find the average score.
         $grade = 0;
 
-        // Well this is the overall grade right? So maybe it hasn't been confiured. Is grade update called on AUview?
+        // Retrieve grade.
         if (!$au->grade == 0 || $au->grade == null) {
 
             $grade = $au->grade;
@@ -325,7 +317,6 @@ foreach ($auids as $key => $auid) {
         // Update the AU in DB.
         $DB->update_record("cmi5launch_aus", $au);
     }
-//}
 
 // Add our newly updated auscores array to the course record.
 $userscourse->ausgrades = json_encode($auscores);

@@ -26,7 +26,6 @@ require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require('header.php');
 require_once($CFG->libdir.'/tablelib.php');
 require_once($CFG->dirroot.'/mod/cmi5launch/locallib.php');
-//require_once($CFG->dirroot.'/mod/cmi5launch/report/basic/classes/report.php');
 require_once($CFG->libdir.'/formslib.php');
 require_once($CFG->dirroot. '/reportbuilder/classes/local/report/column.php');
 
@@ -38,7 +37,7 @@ define('CMI5LAUNCH_REPORT_ATTEMPTS_STUDENTS_WITH', 1);
 define('CMI5LAUNCH_REPORT_ATTEMPTS_STUDENTS_WITH_NO', 2);
 $PAGE->requires->jquery();
 
-global $cmi5launch, $USER, $cmi5launchsettings, $CFG;
+global $cmi5launch, $CFG;
 
 // External classes and functions.
 $sessionhelper = new session_helpers;
@@ -78,7 +77,6 @@ $url->param('id', $id);
 
 // Activate the secondary nav tab.
 navigation_node::override_active_url(new moodle_url('/mod/cmi5launch/classes/local/session_report.php', ['id' => $id]));
-
 
 if (!empty($download)) {
     $noheader = true;
@@ -139,8 +137,7 @@ $table->define_baseurl($PAGE->url);
 // Decode and put AU ids in array.
 $auids = (json_decode($auidprevpage, true) );
 
-// For each AU id, find the one that matches our auid from previous page, this is the record 
-// we want.
+// For each AU id, find the one that matches our auid from previous page, this is the record we want.
 foreach ($auids as $key => $auid) {
         
         // Retrieve AU from DB and make object. 
@@ -155,13 +152,9 @@ foreach ($auids as $key => $auid) {
             $aurecord = $au;
         }
     }
-       
-//Ok, now instead of all the users, we want the user from the previous page
-//$users = get_enrolled_users($contextmodule);; //returns an array of users
 
 // Retrieve session ids for this course.
 $sessions = json_decode($aurecord->sessions, true);
-
 
 // Start Attempts at one.
 $attempt = 1;
@@ -179,14 +172,9 @@ $austatus = "";
 // There may be more than one session.
 foreach ($sessions as $sessionid) {
     
-    // cHECK PLAYER FOR SESSION UPDATE
-  //  $updatesession($sessionid, $cmi5launch->id);
- //   $session = $DB->get_record('cmi5launch_sessions', ['sessionid' => $sessionid]);
-    // cHECK PLAYER FOR SESSION UPDATE
     $session = $updatesession($sessionid, $cmi5launch->id);
     // Add score to array for AU.
     $sessionscores[] = $session->score;
-
 
     // Retrieve createdAt and format.
     $date = new DateTime($session->createdat, new DateTimeZone('US/Eastern'));
@@ -219,57 +207,37 @@ foreach ($sessions as $sessionid) {
     // If it's been attempted but no moveon value.
     if ($iscompleted == 1 ) {
         
-            $austatus = "Completed";
+        $austatus = "Completed";
 
-            if($ispassed == 1){
-                $austatus = "Completed and Passed";
-            }
-            if($isfailed == 1){
-                $austatus = "Completed and Failed";
-            }
+        if($ispassed == 1){
+            $austatus = "Completed and Passed";
+        }
+        if($isfailed == 1){
+            $austatus = "Completed and Failed";
+        }
     } 
 
-        $scorecolumns[] = "Attempt " . $attempt;
-        $scoreheaders[] = "Attempt " . $attempt;
-        $scorerow["Attempt " . $attempt] = $usersession->score;
-        global $cmi5launchsettings;
+    $scorecolumns[] = "Attempt " . $attempt;
+    $scoreheaders[] = "Attempt " . $attempt;
+    $scorerow["Attempt " . $attempt] = $usersession->score;
 
-        //Wait! Other places get it from a table! And that table is IN lib.php, why can lib.php only
-        // access is? 
-        // Retrieve the grading type from the settings.
-     //   $gradetype = $cmi5launchsettings["grademethod"];
-    //$gradetype = cmi5launch_retrieve_gradetype();
 
-   // $gradetype = cmi5launch_retrieve_gradetype();
-        //TODO
-             // Ok so if they are not reset, they are a number right? So here based on what
-            // grademethod is we figure grades
+    switch($gradetype){
+    /**
+     * ('GRADE_AUS_CMI5' = '0');
+        *('GRADE_HIGHEST_CMI5' = '1');
+        *'GRADE_AVERAGE_CMI5', =  '2');
+        *('GRADE_SUM_CMI5', = '3');
+    */
+    case 1:
+        $grade = "Highest";
+        break;
+    case 2:
+        $grade = "Average";
+        break;
+    }
             
-            switch($gradetype){
-
-                /**
-                 * ('GRADE_AUS_CMI5' = '0');
-                    *('GRADE_HIGHEST_CMI5' = '1');
-                    *'GRADE_AVERAGE_CMI5', =  '2');
-                    *('GRADE_SUM_CMI5', = '3');
-              */
-            case 1:
-                $grade = "Highest";
-                break;
-            case 2:
-                $grade = "Average";
-                break;
-
-
-            }
-            
-
-                //Later, this will take the rading type from settings, for now we will just manually assign highest
-                $scorerow["Grading type"] = $grade;
-
-        // TODO
-        // I thinnk we need to make a gradetype retrieval method and put in grade_helpers, since its an int
-        // save some brain work
+    $scorerow["Grading type"] = $grade;
 
     $attempt++;
     
@@ -278,10 +246,9 @@ foreach ($sessions as $sessionid) {
     $rowdata["Score"] = $usersession->score;
   
     $table->add_data_keyed($rowdata);
-
   }
   
-  // Here is the grading type, highest, ave, etc.
+  // Display the grading type, highest, ave, etc.
   $scorecolumns[] = 'Grading type';
   $scoreheaders[] = 'Gradingtype';
   $scorecolumns[] = 'Overall Score';
@@ -311,9 +278,6 @@ $table->get_page_size();
 $scoretable->get_page_start();
 $scoretable->get_page_size();
 
-
-// TODO
-// I'm not sure I like the way this looks? Maybe adda div or something?
 $table->add_separator();
 $scoretable->finish_output();
 $table->finish_output();
