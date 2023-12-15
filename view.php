@@ -25,19 +25,15 @@ use mod_cmi5launch\local\progress;
 use mod_cmi5launch\local\course;
 use mod_cmi5launch\local\cmi5_connectors;
 use mod_cmi5launch\local\au_helpers;
-use mod_cmi5launch\local\session_helpers;
 
 require_once("../../config.php");
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require('header.php');
-require_login($course, false, $cm);
 
 // Bring in functions and classes.
 $progress = new progress;
-
 $aushelpers = new au_helpers;
 $connectors = new cmi5_connectors;
-$sessionhelpers = new session_helpers;
 
 // Functions from other classes.
 $saveaus = $aushelpers->get_cmi5launch_save_aus();
@@ -45,26 +41,28 @@ $createaus = $aushelpers->get_cmi5launch_create_aus();
 $getaus = $aushelpers->get_cmi5launch_retrieve_aus_from_db();
 $getregistration = $connectors->cmi5launch_get_registration_with_post();
 $getregistrationinfo = $connectors->cmi5launch_get_registration_with_get();
-$getprogress = $progress->cmi5launch_get_retrieve_statements();
-$updatesession = $sessionhelpers->cmi5launch_get_update_session();
 
 global $cmi5launch, $USER, $mod;
 
+// MB - Not currently using events, but may in future.
+/*
 // Trigger module viewed event.
 $event = \mod_cmi5launch\event\course_module_viewed::create(array(
     'objectid' => $cmi5launch->id,
     'context' => $context,
 ));
+
 $event->add_record_snapshot('course', $course);
 $event->add_record_snapshot('cmi5launch', $cmi5launch);
 $event->add_record_snapshot('course_modules', $cm);
 $event->trigger();
+*/
 
+// Print the page header.
 $PAGE->set_url('/mod/cmi5launch/view.php', array('id' => $cm->id));
 $PAGE->set_title(format_string($cmi5launch->name));
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($context);
-
 $PAGE->requires->jquery();
 
 // Output starts here.
@@ -72,15 +70,6 @@ echo $OUTPUT->header();
 
 // Reload cmi5 course instance.
 $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
-
-if ($cmi5launch->intro) {
-    // Conditions to show the intro can change to look for own settings or whatever.
-    echo $OUTPUT->box(
-        format_module_intro('cmi5launch', $cmi5launch, $cm->id),
-        'generalbox mod_introbox',
-        'cmi5launchintro'
-    );
-}
 
 // TODO: Put all the php inserted data as parameters on the functions and put the functions in a separate JS file.
 ?>
@@ -134,14 +123,19 @@ if ($cmi5launch->intro) {
     </script>
 <?php
 
+// Check for updates.
+cmi5launch_update_grades($cmi5launch, $USER->id);
+
 // Check if a course record exists for this user yet.
 $exists = $DB->record_exists('cmi5launch_course', ['courseid'  => $record->courseid, 'userid'  => $USER->id]);
 
 // If it does not exist, create it.
 if ($exists == false) {
 
+    // Make a new course record.
     $userscourse = new course($record);
 
+    // Retreive user id.
     $userscourse->userid = $USER->id;
 
     // Build url to pass as returnUrl.
@@ -154,16 +148,18 @@ if ($exists == false) {
 
     // Retrieve AU ids for this user/course.
     $aus = json_decode($record->aus);
-
     $auids = $saveaus($createaus($aus));
     $userscourse->aus = (json_encode($auids));
+
     // Save new record to DB.
+    $newid = $DB->insert_record('cmi5launch_course', $userscourse);
+  
+    // Now assign id created by DB.
+    $userscourse->id = $newid;
 
-    $DB->insert_record('cmi5launch_course', $userscourse);
+} else { // Record exists.
 
-} else {
-
-    // Then we have a record, so we need to retrieve it.
+    // We have a record, so we need to retrieve it.
     $userscourse = $DB->get_record('cmi5launch_course', ['courseid'  => $record->courseid, 'userid'  => $USER->id]);
 
     // Retrieve registration id.
@@ -171,14 +167,10 @@ if ($exists == false) {
 
     // Retrieve AU ids.
     $auids = (json_decode($userscourse->aus) );
-
 }
 
 // Array to hold info for table population.
 $tabledata = array();
-
-// Array to hold Au scores!
-$auscores = array();
 
 // We need id to get progress.
 $cmid = $cmi5launch->id;
@@ -194,16 +186,19 @@ $table->head = array(
     get_string('cmi5launchviewregistrationheader', 'cmi5launch'),
 );
 
-// TODO MB.
-// Return to for grades.
-// CMI5_update_grades($cmi5launch, 0).
-// Seems like I was ahead of myself. so if this is to return to for grades
-// maybe later this update spiel can run in the grades fuc of lib.php?
+// Array to hold Au scores.
+$auscores = array();
+
+// Query CMI5 player for updated registration info.
+$registrationinfofromcmi5 = $getregistrationinfo($registrationid, $cmi5launch->id);
+// Take only info about AUs out of registrationinfofromcmi5.
+$ausfromcmi5 = array_chunk($registrationinfofromcmi5["metadata"]["moveOn"]["children"], 1, true);
 
 // Cycle through AU IDs.
 foreach ($auids as $key => $auid) {
 
-
+    // Array to hold scores for AU.
+    $sessionscores = array();
     $au = $getaus($auid);
 
     // Verify object is an au object.
@@ -217,90 +212,66 @@ foreach ($auids as $key => $auid) {
     // Retrieve AU's lmsID.
     $aulmsid = $au->lmsid;
 
-    // Query CMI5 player for updated registration info.
-    $registrationinfofromcmi5 = $getregistrationinfo($registrationid, $cmi5launch->id);
-    // Take only info about AUs out of registrationinfofromcmi5.
-    $ausfromcmi5 = array_chunk($registrationinfofromcmi5["metadata"]["moveOn"]["children"], 1, true);
+    $ausatisfied = "";
 
-    //We will make a func here for this, but right now, can we take
-    // the au id and use it to get and save score to course?
-    ///Ooooh yes, lets make an array to add to!
-
-    //Wait, if this is PER au, then there should only be one grade, unless they do it multiple times dangit
-    // if we decode its a dang array and if we dont its a string!!!!caugh!!!
-    $auscores[($au->title)] = ($au->scores);
-    // TODO now we can get the AU's satisifed FROM the CMI5 player.
-    // TODO (for that matter couldn't we make it, notattempetd, satisifed, not satisfied??).
+    // Check AU's satisifeid value and display accordingly. 
     foreach ($ausfromcmi5 as $key => $auinfo) {
 
-        // Arra4ry to hold scores for AU.
-        $sessionscores = array();
+        // First check what 'type' is. If it's a block, we need to check the children for the AU's lmsid.
+        if ($auinfo[$key]["type"] == "block") {
 
-        if ($auinfo[$key]["lmsId"] == $aulmsid) {
+            $lmsidfromplayer = $auinfo[$key]["children"][0]["lmsId"];
 
-            // Grab it's 'satisfied' info.
-            $ausatisfied = $auinfo[$key]["satisfied"];
-        }
+            // If it is, retrieve the satisfied value.
+            $ausatisfiedplayer = $auinfo[$key]["children"][0]["satisfied"]; //thae satisified may not be in the right place its also gonna be best
+
+        }else{
+
+            $lmsidfromplayer = $auinfo[$key]["lmsId"];
+             
+            // If it is, retrieve the satisfied value.
+            $ausatisfiedplayer = $auinfo[$key]["satisfied"];
+
+            }
+
+            // And then compare the lmsids to see if this is the right AU.
+            if ($lmsidfromplayer == $aulmsid) {
+
+                // If it is, retrieve the satisfied value.
+                $ausatisfied = $ausatisfiedplayer;
+            }
     }
 
-    // If the 'sessions' in this AU are null we know this hasn't even been attempted.
-    if ($au->sessions == null ) {
+        // If the 'sessions' in this AU are null we know this hasn't even been attempted.
+        if ($au->sessions == null) {
 
-        $austatus = "Not attempted";
+            $austatus = "Not attempted";
 
-    } else {
+        } else {
 
-        // Retrieve AUs moveon specification.
-        $aumoveon = $au->moveon;
+            // Retrieve AUs moveon specification.
+            $aumoveon = $au->moveon;
 
-        // If it's been attempted but no moveon value.
-        if ($aumoveon == "NotApplicable") {
-            $austatus = "viewed";
-        } else { // IF it DOES have a moveon value.
+            // If it's been attempted but no moveon value.
+            if ($aumoveon == "NotApplicable") {
+                $austatus = "viewed";
+            } else { // IF it DOES have a moveon value.
 
-            // If satisifed is returned true.
-            if ($ausatisfied == "true") {
+                // If satisifed is returned true.
+                if ($ausatisfied == "true") {
 
-                $austatus = "Satisfied";
-                // Also update AU.
-                $au->satisfied = "true";
-            } else {
+                    $austatus = "Satisfied";
+                    // Also update AU.
+                    $au->satisfied = "true";
+                } else {
 
-                // If not, its in progress.
-                $austatus = "In Progress";
-                // Also update AU.
-                $au->satisfied = "false";
+                    // If not, its in progress.
+                    $austatus = "In Progress";
+                    // Also update AU.
+                    $au->satisfied = "false";
+                }
             }
-        };
-        // Ensure sessions are up to date.
-        // Retrieve session ids.
-        $sessionids = json_decode($au->sessions);
-
-        // Iterate through each session by id.
-        foreach ($sessionids as $key => $sessionid) {
-
-            // Retrieve new info (if any) from CMI5 player on session.
-            $session = $updatesession($sessionid, $cmi5launch->id);
-
-            // Get progress from LRS.
-            $session = $getprogress($registrationid, $cmi5launch->id, $session);
-
-            // Ok, so above, when session is returned we know there is no bracket
-            // so maybe it happens here? 
-            // Add score to array for AU.
-            $sessionscores[] = $session->score;
-
-
-     
-            // Update session in DB.
-            $DB->update_record('cmi5launch_sessions', $session);
         }
-
-         // Save the session scores to AU, it is ok to overwrite.
-         $au->scores = json_encode($sessionscores, JSON_NUMERIC_CHECK );
-       
-    
-    };
 
         // Create array of info to place in table.
         $auinfo = array();
@@ -309,83 +280,49 @@ foreach ($auids as $key => $auid) {
         $auinfo[] = $au->title;
         $auinfo[] = ($austatus);
 
-        // Ok, now we need to retrieve the sessions and find the average score.
         $grade = 0;
 
-    if ($au->moveon == "CompletedOrPassed" || "Passed") {
+        // Retrieve grade.
+        if (!$au->grade == 0 || $au->grade == null) {
 
-        // Currently it takes the highest grade out of sessions for grade.
-        // Later this can be changed by linking it to plugin options.
-        // However, since CMI5 player does not count any sessions after the first for scoring, by averaging we are adding unnessary.
-        // 0', and artificailly lowering the grade.
-        // Also, should we query for 'passed' or 'completed'? statements here?
-        // Or can we have the cmi5player update our AU's moveon to 'passed' or 'completed'?
+            $grade = $au->grade;
 
-        if (!$sessionscores == null) {
-            // If the grade is empty, we need to pass a null or NA.
-            $grade = max($sessionscores);
-            $au->grade = $grade;
-            if ($grade == 0) {
-                $auinfo[] = ("Passed");
-            } else {
-                $auinfo[] = ($grade);
-
-                // MB, 
-                // Could this be a good place to check and call update grades?
-                // Or is that better done where  the session is updated? Cause that would be a constant check right
-                //What is auinfo here, can we pass THIS to grade?
-        
-                // This may work, it has quiz and satisified! What if our update grades goes whereever this does?
-                // Except! The freaing things has very specific params....
-                // Dagum! So maybe can we grab this info ourselves? With these paramrs? 
-                // Yeah grabbing the score will work, at elast for nwo
-
-              //  cmi5launch_update_grades($cmi5launch, $USER->id);
-
-            }
-
-        } else {
-            $auinfo[] = ("Not Applicable");
-        }
-    } else {
-
-        if (!$sessionscores == null) {
-            // If the grade is empty, we need to pass a null or NA.
-            $grade = max($sessionscores);
-            $au->grade = $grade;
             $auinfo[] = ($grade);
+        } elseif ($au->grade == 0) {
 
+            // Display the 0.
+            $auinfo[] = ($grade);
         } else {
-            $auinfo[] = ("Not Attempted");
+            // There is no grade, leave blank
+            $auinfo[] = (" ");
         }
-    }
+
         $auindex = $au->auindex;
 
         // AU id for next page (to be loaded).
         $infoForNextPage = $auid;
 
         // Assign au link to auviews.
-        $auinfo[] = "<a tabindex=\"0\" id='cmi5relaunch_attempt'
+        $auinfo[] = "<button tabindex=\"0\" id='cmi5relaunch_attempt'
             onkeyup=\"key_test('" . $infoForNextPage . "')\"
             onclick=\"mod_cmi5launch_launchexperience('" . $infoForNextPage . "')\" style='cursor: pointer;'>"
-            . get_string('cmi5launchviewlaunchlink', 'cmi5launch') . "</a>";
+            . get_string('cmi5launchviewlaunchlink', 'cmi5launch') . "</button>";
 
         // Add to be fed to table.
         $tabledata[] = $auinfo;
 
-        // Update the au in DB.
+        // Update AU scores.
+        $auscores[($au->title)] = ($au->scores);
+        
+        // Update the AU in DB.
         $DB->update_record("cmi5launch_aus", $au);
-}
-
+    }
 
 // Add our newly updated auscores array to the course record.
 $userscourse->ausgrades = json_encode($auscores);
 
-
 // Lastly, update our course table.
 $updated = $DB->update_record("cmi5launch_course", $userscourse);
-
-cmi5launch_update_grades($cmi5launch, $USER->id);
 
 // This feeds the table.
 $table->data = $tabledata;

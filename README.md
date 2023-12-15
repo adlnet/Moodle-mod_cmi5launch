@@ -137,3 +137,12 @@ sequenceDiagram
 
 The cmi5 player tracks user progress by tracking whether an AU is satisfied or not. The LRS is a better way to track a users progress in any detail. Currently the Moodle plugin queries the LRS for progress. This in shows AUs as complete, in-progress, or not attempted. It also breaks down sessions into detail, ex; " The actor watched video at  certain time".
 
+### Notes
+
+#### Note about large packages.
+
+You can control the size of file uploads to Moodle in Site Administraion/General/Security/Site Security/Maximum uploaded file size. This setting is capped by the PHP settings post_max_size and upload_max_filesize, as well as the Apache setting LimitRequestBody. Be sure to increase these values, as well as php_max_execution or php_memory_limit if files are hanging. These can be adjusted in php.ini. If using Apache or similair their config files will need to be adjusted instead.
+
+#### Notes about capabilities.
+
+This plugin has a built in capability that allows users to view all the grades for a course, showing all enrolled user's grades. This is 'mod/cmi5launch:viewgrades'. It is automatically assigned to the roles of 'teacher' and 'course creator'. It can be added to other roles as required. 

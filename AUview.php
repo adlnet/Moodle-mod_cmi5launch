@@ -20,14 +20,13 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use mod_cmi5launch\local\progress;
 use mod_cmi5launch\local\session_helpers;
 use mod_cmi5launch\local\au_helpers;
 
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require('header.php');
-
 require_once("$CFG->dirroot/lib/outputcomponents.php");
+
 require_login($course, false, $cm);
 
 global $cmi5launch, $USER;
@@ -35,11 +34,12 @@ global $cmi5launch, $USER;
 // Classes and functions.
 $auhelper = new au_helpers;
 $sessionhelper = new session_helpers;
-$progress = new progress;
-$getprogress = $progress->cmi5launch_get_retrieve_statements();
+$retrievesession = $sessionhelper->cmi5launch_get_retrieve_sessions_from_db();
 $updatesession = $sessionhelper->cmi5launch_get_update_session();
 $retrieveaus = $auhelper->get_cmi5launch_retrieve_aus_from_db();
 
+// MB - Not currently using events, but may in future.
+/*
 // Trigger module viewed event.
 $event = \mod_cmi5launch\event\course_module_viewed::create(array(
     'objectid' => $cmi5launch->id,
@@ -49,6 +49,7 @@ $event->add_record_snapshot('course', $course);
 $event->add_record_snapshot('cmi5launch', $cmi5launch);
 $event->add_record_snapshot('course_modules', $cm);
 $event->trigger();
+*/
 
 // Print the page header.
 $PAGE->set_url('/mod/cmi5launch/view.php', array('id' => $cm->id));
@@ -60,22 +61,9 @@ $PAGE->requires->jquery();
 // Output starts here.
 echo $OUTPUT->header();
 
-if ($cmi5launch->intro) { // Conditions to show the intro can change to look for own settings or whatever.
-    echo $OUTPUT->box(
-        format_module_intro('cmi5launch', $cmi5launch, $cm->id),
-        'generalbox mod_introbox',
-        'cmi5launchintro'
-    );
-}
-/*
+// Create the back button.
 ?>
-<a href="http://google.com">
-<button>Back</button>
-</a>
-<?php
-*/
-?>
-<form action="view.php" method="get" target="_blank">
+<form action="view.php" method="get">
     <input id="id" name="id" type="hidden" value="<?php echo $id ?>">
   <input type="submit" value="Back"/>
 </form>
@@ -127,7 +115,6 @@ if ($cmi5launch->intro) { // Conditions to show the intro can change to look for
     </script>
 <?php
 
-
 // Retrieve the registration and AU ID from view.php.
 $fromview = required_param('AU_view', PARAM_TEXT);
 // Break it into array (AU is first index).
@@ -135,10 +122,13 @@ $fromview = explode(",", $fromview);
 // Retrieve AU ID.
 $auid = array_shift($fromview);
 
+// First thing check for updates.
+cmi5launch_update_grades($cmi5launch, $USER->id);
+
 // Retrieve appropriate AU from DB.
 $au = $retrieveaus($auid);
 
-// Array to hold session scores for the au.
+// Array to hold session scores for the AU.
 $sessionscores = array();
 
 // Reload cmi5 instance.
@@ -153,12 +143,10 @@ $regid = $userscourse->registrationid;
 // If it is null there have been no previous sessions.
 if (!$au->sessions == null) {
 
-
     // Array to hold info for table population.
     $tabledata = array();
 
     // Build table.
-
     $table = new html_table();
     $table->id = 'cmi5launch_auSessionTable';
     $table->caption = get_string('modulenameplural', 'cmi5launch');
@@ -175,49 +163,39 @@ if (!$au->sessions == null) {
 
     // Iterate through each session by id.
     foreach ($sessionids as $key => $sessionid) {
-
-        // Retrieve new info (if any) from CMI5 player on session.
-        $session = $updatesession($sessionid, $cmi5launch->id);
+        
+        // Get the session from DB with session id.
+        $session = $retrievesession($sessionid);
 
         // Array to hold data for table.
         $sessioninfo = array();
 
         // Retrieve createdAt and format.
-        $date = new DateTime($session->createdAt, new DateTimeZone('US/Eastern'));
+        $date = new DateTime($session->createdat, new DateTimeZone('US/Eastern'));
         $date->setTimezone(new DateTimeZone('America/New_York'));
         $sessioninfo[] = $date->format('D d M Y H:i:s');
 
         // Retrieve lastRequestTime and format.
-        $date = new DateTime($session->lastRequestTime, new DateTimeZone('US/Eastern'));
+        $date = new DateTime($session->lastrequesttime, new DateTimeZone('US/Eastern'));
         $date->setTimezone(new DateTimeZone('America/New_York'));
         $sessioninfo[] = $date->format('D d M Y H:i:s');
 
-        // Get progress from LRS.
-        $session = $getprogress($regid, $cmi5launch->id, $session);
+        // Add progress to table.
         $sessioninfo[] = ("<pre>" . implode("\n ", json_decode($session->progress) ) . "</pre>");
 
         // Add score to table.
         $sessioninfo[] = $session->score;
         // Add score to array for AU.
         $sessionscores[] = $session->score;
-        // Ok, maybe here it is where we can put session1->score, etc
-
-        // MB Test.
-        // Ok so maybe here? //maybe we pass in the session?
-        //cmi5launch_update_grades();
-        //But it  lso needs name of activity right?
-
-        // Update session in DB.
-        $DB->update_record('cmi5launch_sessions', $session);
 
         // Build launch link to continue session.
         $newsession = "false";
         $infofornextpage = $sessionid . "," . $newsession;
 
-        $sessioninfo[] = "<a tabindex=\"0\" id='cmi5relaunch_attempt'
+        $sessioninfo[] = "<button tabindex=\"0\" id='cmi5relaunch_attempt'
         onkeyup=\"key_test('" . $infofornextpage . "')\" onclick=\"mod_cmi5launch_launchexperience('"
         . $infofornextpage . "')\" style='cursor: pointer;'>"
-        . get_string('cmi5launchviewlaunchlink', 'cmi5launch') . "</a>";
+        . get_string('cmi5launchviewlaunchlink', 'cmi5launch') . "</button>";
 
         // Add to be fed to table.
         $tabledata[] = $sessioninfo;
@@ -227,16 +205,6 @@ if (!$au->sessions == null) {
     $table->data = $tabledata;
     echo html_writer::table($table);
 
-    //Ok, lets see if we are getting the bracket here?
-   
-    // Save the session scores to AU, it is ok to overwrite.
-    $au->scores = json_encode($sessionscores);
-  //Ok, lets see if we are getting the bracket here?
-
-
-    //And here we can add the au name and record scores? 
-    // Well mybe not, cause it is already in only ONE au here
-
     // Update AU in table with new info.
     $DB->update_record('cmi5launch_aus', $au);
 }
@@ -245,21 +213,19 @@ if (!$au->sessions == null) {
 $newsession = "true";
 // Create a string to pass the auid and new session info to next page (launch.php).
 $infofornextpage = $auid . "," . $newsession;
-// New attempt.
 
+// New attempt button.
 echo "<p tabindex=\"0\"
           onkeyup=\"key_test('" . $infofornextpage . "')\"
-          id='cmi5launch_newattempt'><a onclick=\"mod_cmi5launch_launchexperience('"
+          id='cmi5launch_newattempt'><button onclick=\"mod_cmi5launch_launchexperience('"
           . $infofornextpage
           . "')\" style=\"cursor: pointer;\">"
           . get_string('cmi5launch_attempt', 'cmi5launch')
-          . "</a></p>";
-
-
+          . "</button></p>";
 
 // Add a form to be posted based on the attempt selected.
 ?>
-    <form id="launchform" action="launch.php" method="get" target="_blank">
+    <form id="launchform" action="launch.php" method="get">
         <input id="launchform_registration" name="launchform_registration" type="hidden" value="default">
         <input id="id" name="id" type="hidden" value="<?php echo $id ?>">
         <input id="n" name="n" type="hidden" value="<?php echo $n ?>">

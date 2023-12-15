@@ -37,6 +37,26 @@ use mod_cmi5launch\local\au_helpers;
 use mod_cmi5launch\local\session_helpers;
 
 
+//Grade stuff from SCORM
+
+//Move these to top where they belong if they are what we need
+define('GRADE_AUS_CMI5', '0');
+define('GRADE_HIGHEST_CMI5', '1');
+define('GRADE_AVERAGE_CMI5', '2');
+define('GRADE_SUM_CMI5', '3');
+
+define('HIGHEST_ATTEMPT_CMI5', '0');
+define('AVERAGE_ATTEMPT_CMI5', '1');
+define('FIRST_ATTEMPT_CMI5', '2');
+define('LAST_ATTEMPT_CMI5', '3');
+
+define('CMI5_FORCEATTEMPT_NO', 0);
+define('CMI5_FORCEATTEMPT_ONCOMPLETE', 1);
+define('CMI5_FORCEATTEMPT_ALWAYS', 2);
+
+define('CMI5_UPDATE_NEVER', '0');
+define('CMI5_UPDATE_EVERYDAY', '2');
+define('CMI5_UPDATE_EVERYTIME', '3');
 
 /**
  * Send a statement that the activity was launched.
@@ -518,26 +538,7 @@ function cmi5launch_send_api_request($auth, $method, $url) {
     );
 }
 
-//Grade stuff from SCORM
 
-//Move these to top where they belong if they are what we need
-define('GRADE_AUS_CMI5', '0');
-define('GRADE_HIGHEST_CMI5', '1');
-define('GRADE_AVERAGE_CMI5', '2');
-define('GRADE_SUM_CMI5', '3');
-
-define('HIGHEST_ATTEMPT_CMI5', '0');
-define('AVERAGE_ATTEMPT_CMI5', '1');
-define('FIRST_ATTEMPT_CMI5', '2');
-define('LAST_ATTEMPT_CMI5', '3');
-
-define('CMI5_FORCEATTEMPT_NO', 0);
-define('CMI5_FORCEATTEMPT_ONCOMPLETE', 1);
-define('CMI5_FORCEATTEMPT_ALWAYS', 2);
-
-define('CMI5_UPDATE_NEVER', '0');
-define('CMI5_UPDATE_EVERYDAY', '2');
-define('CMI5_UPDATE_EVERYTIME', '3');
 
 /**
  * Returns an array of the array of update frequency options

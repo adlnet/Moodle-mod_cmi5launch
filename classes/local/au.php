@@ -23,7 +23,7 @@ namespace mod_cmi5launch\local;
 
 class au {
 
-    public $id, $url, $type, $lmsid, $grade, $scores, $title, $moveon, $auindex, $parents, $objectives, $description, $activitytype,
+    public $id, $attempt, $url, $type, $lmsid, $grade, $scores, $title, $moveon, $auindex, $parents, $objectives, $description, $activitytype,
     $launchmethod, $masteryscore, $satisfied, $launchurl, $sessionid, $sessions, $progress, $noattempt, $completed, $passed, $inprogress;
 
     // Constructs AUs. Is fed array and where array key matches property, sets the property.
