@@ -1054,6 +1054,9 @@ function cmi5launch_update_grades($cmi5launch, $userid = 0, $nullifnone = true)
             $grades = null;
         } else{
 
+            // Maybe this is where the problem is. IT is calling highest and average on grades here
+            // when update grade alreayd did that??? 
+
         // Calculate grade based on grade type, and udate rawgrade (a param of grade item).
         switch($gradetype){
 
@@ -1066,7 +1069,10 @@ function cmi5launch_update_grades($cmi5launch, $userid = 0, $nullifnone = true)
             case 1:
                 foreach ($grades as $key => $grade) {
 
+                    //does it need to be strings?
                     $grades->rawgrade = $highestgrade($grades->rawgrade);
+
+                 //$grades->rawgrade = strval($highestgrade($grades->rawgrade));
 
                 }
                 break;
@@ -1075,11 +1081,18 @@ function cmi5launch_update_grades($cmi5launch, $userid = 0, $nullifnone = true)
                 foreach ($grades as $key => $grade) {
 
                     $grades->rawgrade = $averagegrade($grades->rawgrade);
+                 $grades->rawgrade = strval($averagegrade($grades->rawgrade));
 
                 }
                 break;
             }
         }
+        echo "<br>";
+        echo" what is 'rades here? ";
+        var_dump($grades);
+    echo "<br>";
+        
+        // Call grade_update to update gradebook.
 
         return grade_update('mod/cmi5launch', $cmi5launch->course, 'mod', 'cmi5launch', $cmi5launch->id, 0, $grades, $params);
     }

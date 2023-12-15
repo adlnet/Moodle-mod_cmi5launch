@@ -23,14 +23,20 @@ namespace mod_cmi5launch\local;
 
 class au {
 
+    // Lowercase values are for saving to DB
     public $id, $attempt, $url, $type, $lmsid, $grade, $scores, $title, $moveon, $auindex, $parents, $objectives, $description, $activitytype,
     $launchmethod, $masteryscore, $satisfied, $launchurl, $sessionid, $sessions, $progress, $noattempt, $completed, $passed, $inprogress;
 
+    // Uppercase values because that's how they come from player.
+    public $launchMethod, $lmsId, $moveOn, $auIndex, $activityType, $masteryScore; 
     // Constructs AUs. Is fed array and where array key matches property, sets the property.
     public function __construct($statement) {
 
         foreach ($statement as $key => $value) {
 
+            //$key = mb_convert_case($key, MB_CASE_LOWER, "UTF-8");
+
+           // if($ )
             $this->$key = ($value);
         }
     }

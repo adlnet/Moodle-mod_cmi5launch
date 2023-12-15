@@ -150,15 +150,8 @@
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="true" COMMENT="The id of the AU (assigned by Moodle). "/>
         <FIELD NAME="attempt" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="The attempt of the au, ie, first, second, third "/>
-        <FIELD NAME="auid" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="CMI5 compliant ID"/>        
-        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The course id this AU belongs to"/>
-        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="The user id"/>
-        <FIELD NAME="tenantname" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="The tenant name"/> 
-        <FIELD NAME="currentgrade" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="The current aggregate grade"/>  
         <FIELD NAME="launchmethod" TYPE="char" LENGTH="10" NOTNULL="false" DEFAULT="AnyWindow" SEQUENCE="false" COMMENT="Whether the course's retrieved URL opens in it's own window or new one"/>
-        <FIELD NAME="registrationid" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" COMMENT="Course registration ID returned by CMI5 player."/>
         <FIELD NAME="sessionid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Id created when an AU launch URL is requested"/>
-        <FIELD NAME="returnurl" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="The url to return to when au window closes"/>      
         <FIELD NAME="lmsid" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="The au is from the course packet. The singular cmi5 compliant id"/>
         <FIELD NAME="url" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="The ending to be added to url that   takes you to specific au"/>
         <FIELD NAME="type" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" COMMENT="The AU activity type."/>
@@ -183,7 +176,7 @@
         <KEY NAME="id" TYPE="primary" FIELDS="id"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="courseid" UNIQUE="false" FIELDS="courseid"/>
+        <INDEX NAME="id" UNIQUE="false" FIELDS="id"/>
       </INDEXES>
     </TABLE>
   </TABLES>

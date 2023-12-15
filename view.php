@@ -148,6 +148,7 @@ if ($exists == false) {
 
     // Retrieve AU ids for this user/course.
     $aus = json_decode($record->aus);
+    //
     $auids = $saveaus($createaus($aus));
     $userscourse->aus = (json_encode($auids));
 

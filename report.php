@@ -160,6 +160,11 @@ if (has_capability('mod/cmi5launch:viewgrades', $context)) {
 
     foreach ($users as $user) {
 
+        echo "<br>";
+        echo"USER";
+        var_dump($user);
+        echo "<br>";
+        // Here??
         // Call updategrades to ensure all grades are up to date before view.
         $updategrades($user);
 
@@ -173,9 +178,9 @@ if (has_capability('mod/cmi5launch:viewgrades', $context)) {
 } else { 
     // If the user does not have the correct capability then we are looking at a specific user, 
     // who is not a teacher and needs to see only their grades.
-    
+    global $USER, $DB;
     // Retrieve that user from DB.
-    $user = $DB->get_record('user', array('id' => $userid));
+    $user = $DB->get_record('user', array('id' => $USER->id));
     
     // Make sure their grades are up to date.
     $updategrades($user);
@@ -223,7 +228,10 @@ foreach ($auschunked[0] as $au) {
     
     // For each AU, iterate through each user.
     foreach ($users as $user) {
-
+        echo "<br>";
+        echo"USER";
+        var_dump($user);
+        echo "<br>";
         // Array to hold info for next page, that will be placed into buttons for user to click.
         $infofornextpage = array();
         
@@ -241,8 +249,11 @@ foreach ($auschunked[0] as $au) {
         // Retrieve users specific info for this course.
         $userrecord = $DB->get_record('cmi5launch_course', ['courseid' => $record->courseid, 'userid' => $user->id]);
 
+      
+
+      
         // Retrieve/update the users grades for this course.
-        $updategrades($cmi5launch, $user->id);
+       // $updategrades($cmi5launch, $user->id);
 
         // Userrecord may be null if user has not participated in course yet.
         if ($userrecord == null) {
@@ -258,17 +269,23 @@ foreach ($auschunked[0] as $au) {
             $currentauids = $userrecord->aus;
             $infofornextpage[] = $currentauids;
                 
+    
+// Maybe the problem is the na? maybe it needs to be 0 in cse teacher views before students? 
+                $userscore = "";
             if (!$usergrades == null) {
-                
+               
                 // Retrieve grade type from settings.
                 $gradetype = $cmi5launchsettings["grademethod"];
-                
+      
                 // Now compare the usergrades array keys to name of current autitle, if
                 // it matches then we want to display, that's what userscore is.
                 if (array_key_exists($currenttitle, $usergrades)) {
                 
                     $augrades = $usergrades[$currenttitle];
-
+                  
+                    /// This is just tp display, and it calculates here so it doesn't effec the
+                    // base array stored for au
+                        echo "ptptptptptp";
                     switch($gradetype){
                     /**
                      * ('GRADE_AUS_CMI5' = '0');
@@ -276,20 +293,26 @@ foreach ($auschunked[0] as $au) {
                         *'GRADE_AVERAGE_CMI5', =  '2');
                         *('GRADE_SUM_CMI5', = '3');
                     */
-                        case 1:
+                            case 1:
+                                echo " reporrt 1";
+
                             $userscore = $highestgrade($augrades);
                             break;
-                        case 2:
+                            case 2:
+                                echo " report 2:";
                             //We need to update rawgrade not all of grades, that wipes out the array format it needs
-                                $userscore = $averagegrade($augrades);
+                            $userscore = $averagegrade($augrades);
                             break;
                     }
+         
+            
                     // Remove [] from userscore if they are there.
                     $toremove = array("[", "]");
                     if ($userscore != null && str_contains($userscore, "[")) {
                         $userscore = str_replace($toremove, "", $userscore);
                     }
                 }
+           
             } else {
                         $userscore = "N/A";
                 }
@@ -298,6 +321,8 @@ foreach ($auschunked[0] as $au) {
         // Add the userid to info for next page.
         $infofornextpage[] = $user->id;
 
+         // Retrieve grade type from settings.
+         $gradetype = $cmi5launchsettings["grademethod"];
         //Add the gradetype to info for next page.
         $infofornextpage[] = $gradetype;
 

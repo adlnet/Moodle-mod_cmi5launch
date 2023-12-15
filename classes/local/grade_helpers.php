@@ -53,30 +53,58 @@ class grade_helpers
  */
 function cmi5launch_average_grade($scores)
 {
-
-    global $cmi5launch, $USER, $DB;
-
+    // What is scores? 
+    //why is it erasing scores>?
+        echo "<br>";
+        echo " Average rade immedietlaye passed into func is :";
+        var_dump($scores);
+        echo "<br>";
         // If it isn't an array it (array_sum) doesn't work, check if it's a string and if NOT then json decode
         if (!$scores == null && is_array($scores)) {
 
+            echo "1";
             // Find the average of the scores
             $averagegrade = (array_sum($scores) / count($scores));
 
             // If string it sometimes has brackets, check for them and remove them if found.
-            if (str_contains($averagegrade, "[")) {
+          /*  if (str_contains($averagegrade, "[")) {
                 $averagegrade = str_replace("[", "", $averagegrade);
             }
+            */
             // Apply intval if string
             $averagegrade = intval($averagegrade);
         
         } elseif  (!$scores == null && !is_array($scores)) {
+            echo "2";
+            
             // If it's an int, it's a single value so average is itself.
             $averagegrade = $scores;
+
+              // If string it sometimes has brackets, check for them and remove them if found.
+          /*   if (str_contains($averagegrade, "[")) {
+                $averagegrade = str_replace("[", "", $averagegrade);
+            }*/
         }
         else {
+            echo "3";
             $averagegrade = 0;
         }
 
+          // Remove [] from userscore if they are there.
+          $toremove = array("[", "]");
+          if ($averagegrade != null && str_contains($averagegrade, "[")) {
+            $averagegrade = str_replace($toremove, "", $averagegrade);
+          }
+
+           // Now apply intval.
+           $averagegrade = intval($averagegrade);
+        // and cast it to int
+
+        //What is average grade is a string??
+        echo "<br>";
+        echo " Average rade before return is :";
+        var_dump($averagegrade);
+        echo "<br>";
     return $averagegrade;
 
 }
@@ -171,6 +199,13 @@ function cmi5launch_highest_grade($scores)
                     // This uses the auid to pull the right record from the aus table.
                     $aurecord = $DB->get_record('cmi5launch_aus', ['id' => $auid]);
 
+                    //
+                    /*
+                    echo "<br>";
+                    echo "Aurecord is :";
+                    var_dump($aurecord);
+                    echo "<br>";
+                    */
                     // When it is null it is because the user has not launched the AU yet.
                     if (!$aurecord == null || false) {
 
@@ -184,10 +219,16 @@ function cmi5launch_highest_grade($scores)
                             foreach ($sessions as $sessionid) {
 
                                 // Using current session id, retriev esession from DB. 
+                            
                                 $session = $DB->get_record('cmi5launch_sessions', ['sessionid' => $sessionid]);
-
+                            /*
+                                echo "<br>";
+                                echo "what is sSession is before update sessionssss :";
+                                var_dump($session);
+                                echo "<br>";
+                              */
                                 // Retrieve new info (if any) from CMI5 player and LRS on session.
-                                $session = $updatesession($sessionid, $cmi5launch->id);
+                                $session = $updatesession($sessionid, $cmi5launch->id, $user);
                 
                                 // Now if the session is complete, passed, or terminated, we want to update the AU.
                                 // These come in order, so the last one is the current status, so update on each one,
@@ -232,6 +273,10 @@ function cmi5launch_highest_grade($scores)
                     }
                 }
 
+                echo "<br>";
+                echo "Auscores before return is :";
+                var_dump($auscores);
+                echo "<br>";
                 // Update course record.
                 $userscourse->ausgrades = json_encode($auscores);
                 $DB->update_record("cmi5launch_course", $userscourse);
