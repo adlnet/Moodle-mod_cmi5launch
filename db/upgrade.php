@@ -42,18 +42,38 @@ function xmldb_cmi5launch_upgrade($oldversion) {
     $dbman = $DB->get_manager();
     if ($oldversion < 2023121209) {
 
+        
         // I need to remove 7 unused columns from the cmi5launch_aus table.
         // Define field auid to be dropped from cmi5launch_aus.
         $table = new xmldb_table('cmi5launch_aus');
+        
+        /*
+        
+             // drop index and add new one
+             $indexOld = new xmldb_index('courseid', XMLDB_INDEX_NOTUNIQUE, ['courseid']);
+             $indexNew = new xmldb_index('id', XMLDB_INDEX_NOTUNIQUE, ['courseid']);
+                    
+             // Conditionally launch drop index courseid.
+             if ($dbman->index_exists($table, $indexOld)) {
+                 $dbman->drop_index($table, $indexOld);
+             }
+     
+             // Conditionally launch add index courseid.
+             if (!$dbman->index_exists($table, $indexNew)) {
+                 $dbman->add_index($table, $indexNew);
+             }
+     
+        */
+        
         $fieldauid = new xmldb_field('auid');
-        $fieldcourseid = new xmldb_field('courseid');
+        //$fieldcourseid = new xmldb_field('courseid');
         $fielduserid = new xmldb_field('userid');
         $fieldtenantname = new xmldb_field('tenantname');
         $fieldcurrentgrade = new xmldb_field('currentgrade');
         $fieldregistrationid = new xmldb_field('registrationid');
         $fieldreturnurl = new xmldb_field('returnurl');
 
-        $arraytoremove = array($fieldauid, $fieldcourseid, $fielduserid, $fieldtenantname, $fieldcurrentgrade, $fieldregistrationid, $fieldreturnurl);
+        $arraytoremove = array($fieldauid, /*$fieldcourseid*/ $fielduserid, $fieldtenantname, $fieldcurrentgrade, $fieldregistrationid, $fieldreturnurl);
        
         // Now cycle through array and remove fields.
         foreach ($arraytoremove as $field) {
@@ -63,20 +83,7 @@ function xmldb_cmi5launch_upgrade($oldversion) {
             }
         }
 
-        // drop index and add new one
-        $indexOld = new xmldb_index('courseid', XMLDB_INDEX_NOTUNIQUE, ['courseid']);
-        $indexNew = new xmldb_index('courseid', XMLDB_INDEX_NOTUNIQUE, ['courseid']);
-               
-        // Conditionally launch drop index courseid.
-        if ($dbman->index_exists($table, $indexOld)) {
-            $dbman->drop_index($table, $indexOld);
-        }
-
-        // Conditionally launch add index courseid.
-        if (!$dbman->index_exists($table, $indexNew)) {
-            $dbman->add_index($table, $indexNew);
-        }
-
+   
         
         // Cmi5launch savepoint reached.
         upgrade_mod_savepoint(true, 2023121209, 'cmi5launch');

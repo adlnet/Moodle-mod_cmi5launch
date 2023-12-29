@@ -194,7 +194,6 @@ $auscores = array();
 $registrationinfofromcmi5 = $getregistrationinfo($registrationid, $cmi5launch->id);
 // Take only info about AUs out of registrationinfofromcmi5.
 $ausfromcmi5 = array_chunk($registrationinfofromcmi5["metadata"]["moveOn"]["children"], 1, true);
-
 // Cycle through AU IDs.
 foreach ($auids as $key => $auid) {
 
@@ -215,36 +214,33 @@ foreach ($auids as $key => $auid) {
 
     $ausatisfied = "";
 
-    // Check AU's satisifeid value and display accordingly. 
-    foreach ($ausfromcmi5 as $key => $auinfo) {
-
-        // First check what 'type' is. If it's a block, we need to check the children for the AU's lmsid.
-        if ($auinfo[$key]["type"] == "block") {
-
-            $lmsidfromplayer = $auinfo[$key]["children"][0]["lmsId"];
-
-            // If it is, retrieve the satisfied value.
-            $ausatisfiedplayer = $auinfo[$key]["children"][0]["satisfied"]; //thae satisified may not be in the right place its also gonna be best
-
-        }else{
-
-            $lmsidfromplayer = $auinfo[$key]["lmsId"];
-             
-            // If it is, retrieve the satisfied value.
-            $ausatisfiedplayer = $auinfo[$key]["satisfied"];
-
-            }
-
-            // And then compare the lmsids to see if this is the right AU.
-            if ($lmsidfromplayer == $aulmsid) {
-
-                // If it is, retrieve the satisfied value.
-                $ausatisfied = $ausatisfiedplayer;
-            }
-    }
-
+    // Cycle through AUs (or blocks) in registration info.
+    foreach($ausfromcmi5 as $key => $value){
+/*
+        echo"<br>";
+        echo "Are we entering here?";
+        echo"<br>";
+        echo " and what is value?: ";
+        var_dump($value);
+        echo"<br>";
+        echo " and what is ausfromcmi5?: ";
+        var_dump($ausfromcmi5);
+        echo"<br>";
+        echo " and what is aulmsid?: ";
+        var_dump($aulmsid);
+        echo"<br>";
+        */
+        // Check for the AUs satisfied status.
+        $ausatisfied = cmi5launch_find_au_satisfied($value, $aulmsid);
+        //If au satisife dis ever true then we found it, it shouldn't
+        //ever have miore than one value.
+        if($ausatisfied == "true"){
+            //echo "We found it";
+            break;
+        }
+    } 
         // If the 'sessions' in this AU are null we know this hasn't even been attempted.
-        if ($au->sessions == null) {
+        if($au->sessions == null) {
 
             $austatus = "Not attempted";
 
@@ -258,6 +254,7 @@ foreach ($auids as $key => $auid) {
                 $austatus = "viewed";
             } else { // IF it DOES have a moveon value.
 
+//                var_dump($ausatisfied);
                 // If satisifed is returned true.
                 if ($ausatisfied == "true") {
 

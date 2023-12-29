@@ -160,10 +160,6 @@ if (has_capability('mod/cmi5launch:viewgrades', $context)) {
 
     foreach ($users as $user) {
 
-        echo "<br>";
-        echo"USER";
-        var_dump($user);
-        echo "<br>";
         // Here??
         // Call updategrades to ensure all grades are up to date before view.
         $updategrades($user);
@@ -228,10 +224,7 @@ foreach ($auschunked[0] as $au) {
     
     // For each AU, iterate through each user.
     foreach ($users as $user) {
-        echo "<br>";
-        echo"USER";
-        var_dump($user);
-        echo "<br>";
+    
         // Array to hold info for next page, that will be placed into buttons for user to click.
         $infofornextpage = array();
         
@@ -285,7 +278,7 @@ foreach ($auschunked[0] as $au) {
                   
                     /// This is just tp display, and it calculates here so it doesn't effec the
                     // base array stored for au
-                        echo "ptptptptptp";
+         
                     switch($gradetype){
                     /**
                      * ('GRADE_AUS_CMI5' = '0');
@@ -294,12 +287,9 @@ foreach ($auschunked[0] as $au) {
                         *('GRADE_SUM_CMI5', = '3');
                     */
                             case 1:
-                                echo " reporrt 1";
-
                             $userscore = $highestgrade($augrades);
                             break;
                             case 2:
-                                echo " report 2:";
                             //We need to update rawgrade not all of grades, that wipes out the array format it needs
                             $userscore = $averagegrade($augrades);
                             break;

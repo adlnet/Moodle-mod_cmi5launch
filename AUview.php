@@ -155,7 +155,7 @@ if (!$au->sessions == null) {
     get_string('cmi5launchviewlastlaunched', 'cmi5launch'),
     get_string('cmi5launchviewprogress', 'cmi5launch'),
     get_string('cmi5launchviewgradeheader', 'cmi5launch'),
-    get_string('cmi5launchviewlaunchlinkheader', 'cmi5launch'),
+   // get_string('cmi5launchviewlaunchlinkheader', 'cmi5launch'),
     );
 
     // Retrieve session ids.
@@ -189,13 +189,17 @@ if (!$au->sessions == null) {
         $sessionscores[] = $session->score;
 
         // Build launch link to continue session.
+        // MB - 12-22-23 After discussion and CMI5 spec renewal we realized AU sessions
+        // are not meant to be continued, so we are removing this button. This will also
+        // resolve a lot of the testing issues which were only caused by relaunching.
         $newsession = "false";
         $infofornextpage = $sessionid . "," . $newsession;
-
+/*
         $sessioninfo[] = "<button tabindex=\"0\" id='cmi5relaunch_attempt'
         onkeyup=\"key_test('" . $infofornextpage . "')\" onclick=\"mod_cmi5launch_launchexperience('"
         . $infofornextpage . "')\" style='cursor: pointer;'>"
         . get_string('cmi5launchviewlaunchlink', 'cmi5launch') . "</button>";
+*/
 
         // Add to be fed to table.
         $tabledata[] = $sessioninfo;

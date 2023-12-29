@@ -130,7 +130,7 @@ if ($idandstatus[0] == "true") {
     $savesession($sessionid, $location, $launchmethod);
 
 } else {
-    // This is a new session, we want to get the launch url from the sessions.
+    // This is NOT a new session, we want to get the launch url from the sessions.
     $session = $DB->get_record('cmi5launch_sessions',  array('sessionid' => $id));
 
     // Launch url is in old session record.

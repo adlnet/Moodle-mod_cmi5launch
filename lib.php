@@ -10,7 +10,7 @@
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-//
+// 
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -706,6 +706,63 @@ function cmi5launch_validate_package($file) {
 }
 
 /**
+ * Check for AUs and their satisifed status in a block. Recursive to handle nested blocks.
+ *
+ * @package  mod_cmi5launch
+ * @category cmi5
+ * 
+ * @param mixed bool|array - $auinfoin - the info containing a block, au, or true/false au satisfied value
+ * @param string $aulmsid - the lms id of the au we are looking for.
+ * @return mixed - returns an array of aus or au satisfied value.
+ */
+ 
+function cmi5launch_find_au_satisfied($auinfoin, $aulmsid)
+{
+    // Check if auinfoin is a boolean or an array.
+    // It will be an array if an AU was found on recursive call
+    if(is_bool($auinfoin)){
+        //echo"we found it";
+        // Return value to func that called it.
+        return $auinfoin;
+    }
+    // If it's an array it is either a block we still need to break down, or an AU we need to find satisfied value for.
+    // status on.
+    elseif(is_array($auinfoin)){
+       // echo"we are an array";
+        // Check AU's satisifeid value and display accordingly. 
+        foreach ($auinfoin as $key => $auinfo) {
+
+            // If it's a block, we need to keep breaking it down.
+            if($auinfo["type"] == "block" ){
+            
+                // Grab its children, s this is what other blocks or AU's will be nested in.
+                $auchildren = $auinfo["children"];
+                
+                // Now recursively call function again.
+                $ausatisfied = cmi5launch_find_au_satisfied($auchildren, $aulmsid);
+            }
+            // If it's an AU, we need to check if it's the one we are looking for.
+            elseif($auinfo["type"] == "au"){
+                //Search for the correct lms id and take only the AU that matches.
+                if ( $auinfo["lmsId"] == $aulmsid)
+                {
+                    // If it is, retrieve the satisfied value.
+                    $ausatisfied = $auinfo["satisfied"];
+                }
+        
+            }else{
+                // This shouldn't be reachable, but in case add error message.
+                echo "Type from statement does not equal either block or AU.";
+            }  
+        }
+    }
+else{
+    echo"Incorrect value passed to function cmi5launch_find_au_satisfied. Correct values are a boolean or array";
+}  
+    return $ausatisfied;
+}
+
+/**
  * Fetches Statements from the LRS. This is used for completion tracking -
  * we check for a statement matching certain criteria for each learner.
  *
@@ -1087,11 +1144,7 @@ function cmi5launch_update_grades($cmi5launch, $userid = 0, $nullifnone = true)
                 break;
             }
         }
-        echo "<br>";
-        echo" what is 'rades here? ";
-        var_dump($grades);
-    echo "<br>";
-        
+
         // Call grade_update to update gradebook.
 
         return grade_update('mod/cmi5launch', $cmi5launch->course, 'mod', 'cmi5launch', $cmi5launch->id, 0, $grades, $params);

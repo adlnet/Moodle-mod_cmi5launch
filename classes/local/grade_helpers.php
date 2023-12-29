@@ -53,12 +53,9 @@ class grade_helpers
  */
 function cmi5launch_average_grade($scores)
 {
-    // What is scores? 
-    //why is it erasing scores>?
-        echo "<br>";
-        echo " Average rade immedietlaye passed into func is :";
-        var_dump($scores);
-        echo "<br>";
+
+    global $cmi5launch, $USER, $DB;
+
         // If it isn't an array it (array_sum) doesn't work, check if it's a string and if NOT then json decode
         if (!$scores == null && is_array($scores)) {
 
@@ -99,12 +96,6 @@ function cmi5launch_average_grade($scores)
            // Now apply intval.
            $averagegrade = intval($averagegrade);
         // and cast it to int
-
-        //What is average grade is a string??
-        echo "<br>";
-        echo " Average rade before return is :";
-        var_dump($averagegrade);
-        echo "<br>";
     return $averagegrade;
 
 }
@@ -199,13 +190,6 @@ function cmi5launch_highest_grade($scores)
                     // This uses the auid to pull the right record from the aus table.
                     $aurecord = $DB->get_record('cmi5launch_aus', ['id' => $auid]);
 
-                    //
-                    /*
-                    echo "<br>";
-                    echo "Aurecord is :";
-                    var_dump($aurecord);
-                    echo "<br>";
-                    */
                     // When it is null it is because the user has not launched the AU yet.
                     if (!$aurecord == null || false) {
 
@@ -219,14 +203,8 @@ function cmi5launch_highest_grade($scores)
                             foreach ($sessions as $sessionid) {
 
                                 // Using current session id, retriev esession from DB. 
-                            
                                 $session = $DB->get_record('cmi5launch_sessions', ['sessionid' => $sessionid]);
-                            /*
-                                echo "<br>";
-                                echo "what is sSession is before update sessionssss :";
-                                var_dump($session);
-                                echo "<br>";
-                              */
+
                                 // Retrieve new info (if any) from CMI5 player and LRS on session.
                                 $session = $updatesession($sessionid, $cmi5launch->id, $user);
                 
@@ -273,10 +251,6 @@ function cmi5launch_highest_grade($scores)
                     }
                 }
 
-                echo "<br>";
-                echo "Auscores before return is :";
-                var_dump($auscores);
-                echo "<br>";
                 // Update course record.
                 $userscourse->ausgrades = json_encode($auscores);
                 $DB->update_record("cmi5launch_course", $userscourse);
