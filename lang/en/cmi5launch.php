@@ -225,7 +225,7 @@ $string['cmi5launchviewgradeheader'] = 'Grade';
 
 // View settings.
 $string['cmi5launchviewAUname'] = 'Name';
-$string['cmi5launchviewstatus'] = 'Status';
+$string['cmi5launchviewstatus'] = 'AU Satisfied Status';
 $string['cmi5launchviewregistrationheader'] = 'Sessions';
 $string['cmi5launchviewgradeheader'] = 'Grade';
 $string['cmi5launchviewlaunchlink'] = 'view';
@@ -247,6 +247,21 @@ $string['eventactivitylaunched'] = 'Activity launched';
 $string['eventactivitycompleted'] = 'Activity completed';
 
 $string['cmi5launch:addinstance'] = 'Add a new cmi5 (xAPI) activity to a course';
+$string['cmi5launch:view'] = 'View cmi5 (xAPI) activity';
+$string['cmi5launch:viewgrades'] = "Ability to view all of a course's grades. Often assigned to teachers.";
 
 $string['expirecredentials'] = 'Expire credentials';
 $string['checkcompletion'] = 'Check Completion';
+
+// For reports.
+$string['report'] = 'Report';
+$string['attempt'] = 'Attempt';
+$string['started'] = 'Started';
+$string['last'] = 'Finished';
+$string['score'] = 'Score';
+
+$string['autitle'] = 'AU Title';
+$string['attempt'] = 'Attempt';
+$string['started'] = 'Started';
+$string['last'] = 'Finished';
+$string['score'] = 'Score';

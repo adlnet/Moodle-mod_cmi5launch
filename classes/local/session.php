@@ -27,12 +27,11 @@ defined('MOODLE_INTERNAL') || die();
 class session {
     // Properties.
     // id is session id.
-    public $id, $tenantname, $tenantId, $registrationsCoursesAusId, $lmsid, $firstlaunch, $lastlaunch,
-    $progress = [], $auid, $aulaunchurl, $launchurl,
-    $completed_passed, $grade, $registrationid, $lrscode,
+    public $id, $tenantname, $tenantId, $registrationsCoursesAusId, $lmsid,
+    $progress = [], $auid, $aulaunchurl, $launchurl, $grade, $registrationid, $lrscode,
     $createdAt, $updatedAt, $registrationCourseAusId,
     $code, $lastRequestTime, $launchTokenId, $launchMode, $masteryScore,
-    $contextTemplate, $isLaunched, $isInitialized, $initializedAt, $isCompleted,
+    $isLaunched, $isInitialized, $initializedAt, $isCompleted,
     $isPassed, $isFailed, $isTerminated, $isAbandoned, $courseid, $completed, $passed, $inprogress;
 
     // Constructs sessions. Is fed array and where array key matches property, sets the property.
@@ -44,5 +43,10 @@ class session {
         }
 
     }
+
+
+
+
+
 
 }

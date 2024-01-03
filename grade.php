@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Redirect the user based on their capabilities to either a CMI5 activity or to CMI5 reports
+ * Redirect the user based on their capabilities to reporting page.
  * @package   mod_cmi5
  * @category  grade
  * @copyright 2023 M.Bohland
@@ -25,53 +25,72 @@
 require_once("../../config.php");
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require('header.php');
-// MB TODO.
-// Maybe return later? Framework for Gradebook in Moodle integration.
+
+// This page is the go-between from moodle grader (index.php) to our report.php
+// It's never visited itself, but it almost is like an invisible page. So the params it holds or can retrieve
+// such as the userid (not of current user, but userid of who was specifically clicked in grader), or gradeid from that page,
+// can all be retrieved here and passed to report.php
 
 // Course module ID
+// This is what's needed if we only want the full course view, it is always included.
 $id = required_param('id', PARAM_INT);
-// Item number, may be != 0 for activities that allow more than one grade per user.
-$itemnumber = optional_param('itemnumber', 0, PARAM_INT); 
- // Graded user ID (optional).
-$userid = optional_param('userid', 0, PARAM_INT);
-global $cmi5launch, $USER, $mod;
 
-// why is cmi5launch null??? 
+// The following are optional parameters, they are what is needed if we want to zoom in on only ONE user's grades.
+// Item number, may be != 0 for activities that allow more than one grade per user.
+// itemnumber is from the moodle grade_items table, which holds info on the grade item itself such as course, mod type, activity title, etc
+$itemnumber = optional_param('itemnumber', 0, PARAM_INT); 
+// Graded user ID (optional) (not currenlty loged in user).
+$userid = optional_param('userid', 0, PARAM_INT);
+// The itemid is from the moooodle grade_grades table I believe, appears to correspond to a grade column (for like
+// one cmi5launch or other activity part of a course)
+$itemid = optional_param('itemid', 0, PARAM_INT);
+// This is the gradeid, which is the id, in the same grade_grades table. So like a row entry, a particular users info
+$gradeid = optional_param('gradeid', 0, PARAM_INT);
+$contextmodule = context_module::instance($cm->id);
+
+global $cmi5launch, $USER;
 
 // Get the course module.
 if (! $cm = get_coursemodule_from_id('cmi5launch', $cm->id)) {
     throw new \moodle_exception('invalidcoursemodule');
 }
 
-if (! $scorm = $DB->get_record('cmi5launch', array('id' => $cm->instance))) {
-    throw new \moodle_exception('invalidcoursemodule');
-}
-
 if (! $course = $DB->get_record('cmi5launch', array('course' => $cm->course, 'name' => $cm->name))) {
-   echo"<br>";
+
     $returned = $DB->get_record('cmi5launch', array('course' => $cm->course, 'name' => $cm->name));
-    echo "returned is: ";                   
-    var_dump($returned);
-    echo"<br>";
+   
     throw new \moodle_exception('coursemisconf');
 }
 
-//require_login($course, false, $cm);
+// Check the user has the capability to view grades.
+if (has_capability('mod/cmi5launch:viewgrades', $context)) {
+	// This is teacher/manger/etc, they can see all grades, so we need to update all grades before they view.
+   
+    // Get all enrolled users.
+    $users = get_enrolled_users($contextmodule);
 
-//How scorm did it
-/*
-if (has_capability('mod/scorm:viewreport', context_module::instance($cm->id))) {
-    redirect('report.php?id='.$cm->id);
-} else {
-    redirect('view.php?id='.$cm->id);
-}
-*/
-//TODO
-//We are currently using this capability, but we should make one for grading
-if (has_capability('mod/cmi5launch:addinstance', $context)) {
-	// This is teacher/manger/non editing teacher.
-    redirect('report.php?id='.$cm->id);
+    foreach ($users as $user) {
+
+        // Call updategrades to ensure all grades are up to date before view.
+        cmi5launch_update_grades($cm, $user->id);
+    }    
+
+
+   if($userid != 0 || null){
+    
+    redirect('report.php?id=' . $cm->id . '&userid=' . $userid . '&itemnumber=' . $itemnumber . '&itemid=' . $itemid . '&gradeid=' . $gradeid);
+
+    } else {
+        redirect('report.php?id=' . $cm->id . '&itemid=' . $itemid);
+    }
+
+
 } else {
     // This is student or other non-teacher role.
-    redirect('view.php?id='.$cm->id);
+
+    // If this is just the student we only need to worry about updating their grades, because thats all they'll see.
+    // Retrieve/update the users grades for this course.
+    cmi5launch_update_grades($cmi5launch, $USER->id);
+
+    redirect('report.php?id='.$cm->id .'&userid=' . $userid );
 }   

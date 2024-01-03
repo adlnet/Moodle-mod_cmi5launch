@@ -10,7 +10,7 @@
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-//
+// 
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -28,7 +28,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+//defined('MOODLE_INTERNAL') || die();
 
 // Cmi5PHP - required for interacting with the LRS in cmi5launch_get_statements.
 require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/autoload.php");
@@ -38,18 +38,13 @@ require_once("$CFG->dirroot/mod/scorm/datamodels/scormlib.php");
 
 use mod_cmi5launch\local\cmi5_connectors;
 use mod_cmi5launch\local\au_helpers;
-    
-use mod_cmi5launch\local\progress;
-use mod_cmi5launch\local\course;
-use mod_cmi5launch\local\session_helpers;
+use mod_cmi5launch\local\grade_helpers;
 
 global $cmi5launchsettings;
 $cmi5launchsettings = null;
 
 // Moodle Core API.
 
-// TODO- this is where we add  functions for grades we want suchs as FEATURE_GRADE_HAS_GRADE.
-// For now I added those SCORM had, we can whittle this down. -MB.
 /**
  * Returns the information on whether the module supports a feature
  *
@@ -59,24 +54,35 @@ $cmi5launchsettings = null;
  */
 function cmi5launch_supports($feature) {
     switch($feature) {
+        /** True if module supports intro editor */
         case FEATURE_MOD_INTRO:
             return true;
-        case FEATURE_COMPLETION_TRACKS_VIEWS:
-            return true;
-        case FEATURE_COMPLETION_HAS_RULES:
-            return true;
+            //MB - we do not currently support the next two, but leaving in, in case we start to.
+            /** True if module has code to track whether somebody viewed it */
+        //case FEATURE_COMPLETION_TRACKS_VIEWS:
+          //  return true;
+            /** True if module has custom completion rules */
+      // case FEATURE_COMPLETION_HAS_RULES:
+        //    return true;
+/** True if module supports backup/restore of moodle2 format */
         case FEATURE_BACKUP_MOODLE2:
             return true;
+            /** True if module supports groups */
         case FEATURE_GROUPS:
             return true;
+            /** True if module supports groupings */
         case FEATURE_GROUPINGS:
             return true;
+            /** True if module can provide a grade */
         case FEATURE_GRADE_HAS_GRADE:
             return true;
+            /** True if module supports outcomes */
         case FEATURE_GRADE_OUTCOMES:
             return true;
+            /** True if module can show description on course main page */
         case FEATURE_SHOW_DESCRIPTION:
             return true;
+            /** Type of module */
         case FEATURE_MOD_PURPOSE:
             return MOD_PURPOSE_CONTENT;
         default:
@@ -192,14 +198,9 @@ function cmi5launch_build_lrs_settings(stdClass $cmi5launch) {
 
     // Data for cmi5launch_lrs table.
     $cmi5launchlrs = new stdClass();
-    $cmi5launchlrs->lrsendpoint = $cmi5launch->cmi5launchlrsendpoint;
-    $cmi5launchlrs->lrsauthentication = $cmi5launch->cmi5launchlrsauthentication;
     $cmi5launchlrs->customacchp = $cmi5launch->cmi5launchcustomacchp;
     $cmi5launchlrs->useactoremail = $cmi5launch->cmi5launchuseactoremail;
-    $cmi5launchlrs->lrsduration = $cmi5launch->cmi5launchlrsduration;
     $cmi5launchlrs->cmi5launchid = $cmi5launch->instance;
-    $cmi5launchlrs->lrslogin = $cmi5launch->cmi5launchlrslogin;
-    $cmi5launchlrs->lrspass = $cmi5launch->cmi5launchlrspass;
 
     return $cmi5launchlrs;
 }
@@ -568,7 +569,6 @@ function cmi5launch_process_new_package($cmi5launch) {
     $cmid = $cmi5launch->coursemodule;
     $context = context_module::instance($cmid);
 
-
     // Bring in functions from classes cmi5Connector and AU helpers.
     $connectors = new cmi5_connectors;
     $auhelper = new au_helpers;
@@ -576,7 +576,6 @@ function cmi5launch_process_new_package($cmi5launch) {
     // Bring in functions from class cmi5_table_connectors and AU helpers.
     $createcourse = $connectors->cmi5launch_get_create_course();
     $retrieveaus = $auhelper-> get_cmi5launch_retrieve_aus();
-    
     // Reload cmi5 instance.
     $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
 
@@ -591,7 +590,6 @@ function cmi5launch_process_new_package($cmi5launch) {
         0,
         array('subdirs' => 0, 'maxfiles' => 1)
     );
-
     // Get filename of zip that was uploaded.
     $files = $fs->get_area_files($context->id, 'mod_cmi5launch', 'package', 0, '', false);
     if (count($files) < 1) {
@@ -600,7 +598,6 @@ function cmi5launch_process_new_package($cmi5launch) {
 
     $zipfile = reset($files);
     $zipfilename = $zipfile->get_filename();
-
     $packagefile = false;
 
     $packagefile = $fs->get_file($context->id, 'mod_cmi5launch', 'package', 0, '/', $zipfilename);
@@ -608,7 +605,6 @@ function cmi5launch_process_new_package($cmi5launch) {
     // Retrieve user settings to apply to newly created record.
     $settings = cmi5launch_settings($cmi5launch->id);
     $token = $settings['cmi5launchtenanttoken'];
-
     // Create the course and retrieve info for saving to DB.
     $courseresults = $createcourse($context->id, $token, $packagefile);
 
@@ -616,7 +612,6 @@ function cmi5launch_process_new_package($cmi5launch) {
     $record->courseinfo = $courseresults;
 
     $returnedinfo = json_decode($courseresults, true);
-
     // Retrieve the lmsId of course.
     $lmsid = $returnedinfo["lmsId"];
     $record->cmi5activityid = $lmsid;
@@ -633,9 +628,6 @@ function cmi5launch_process_new_package($cmi5launch) {
     $aus = ($retrieveaus($returnedinfo));
 
     $record->aus = (json_encode($aus));
-
-	// Populate player table with new course info.
-    $DB->update_record('cmi5launch', $record, true);
 
     $fs->delete_area_files($context->id, 'mod_cmi5launch', 'content');
 
@@ -711,6 +703,63 @@ function cmi5launch_validate_package($file) {
         }
     }
     return $errors;
+}
+
+/**
+ * Check for AUs and their satisifed status in a block. Recursive to handle nested blocks.
+ *
+ * @package  mod_cmi5launch
+ * @category cmi5
+ * 
+ * @param mixed bool|array - $auinfoin - the info containing a block, au, or true/false au satisfied value
+ * @param string $aulmsid - the lms id of the au we are looking for.
+ * @return mixed - returns an array of aus or au satisfied value.
+ */
+ 
+function cmi5launch_find_au_satisfied($auinfoin, $aulmsid)
+{
+    // Check if auinfoin is a boolean or an array.
+    // It will be an array if an AU was found on recursive call
+    if(is_bool($auinfoin)){
+        //echo"we found it";
+        // Return value to func that called it.
+        return $auinfoin;
+    }
+    // If it's an array it is either a block we still need to break down, or an AU we need to find satisfied value for.
+    // status on.
+    elseif(is_array($auinfoin)){
+       // echo"we are an array";
+        // Check AU's satisifeid value and display accordingly. 
+        foreach ($auinfoin as $key => $auinfo) {
+
+            // If it's a block, we need to keep breaking it down.
+            if($auinfo["type"] == "block" ){
+            
+                // Grab its children, s this is what other blocks or AU's will be nested in.
+                $auchildren = $auinfo["children"];
+                
+                // Now recursively call function again.
+                $ausatisfied = cmi5launch_find_au_satisfied($auchildren, $aulmsid);
+            }
+            // If it's an AU, we need to check if it's the one we are looking for.
+            elseif($auinfo["type"] == "au"){
+                //Search for the correct lms id and take only the AU that matches.
+                if ( $auinfo["lmsId"] == $aulmsid)
+                {
+                    // If it is, retrieve the satisfied value.
+                    $ausatisfied = $auinfo["satisfied"];
+                }
+        
+            }else{
+                // This shouldn't be reachable, but in case add error message.
+                echo "Type from statement does not equal either block or AU.";
+            }  
+        }
+    }
+else{
+    echo"Incorrect value passed to function cmi5launch_find_au_satisfied. Correct values are a boolean or array";
+}  
+    return $ausatisfied;
 }
 
 /**
@@ -888,8 +937,6 @@ function use_global_cmi5_lrs_settings($instance) {
 /*
 
 // Grade functions
-// TODO - this is a copy of how scorm handles grades. I got these from SCORM's lib.php
-// We will need to tweak
 /**
  * Return grade for given user or all users.
  *
@@ -899,448 +946,239 @@ function use_global_cmi5_lrs_settings($instance) {
  * @param int $userid optional user id, 0 means all users
  * @return array array of grades, false if none
  */
-
- //I think maybe THIS is why the grades aren't showing. 
- // This func needs to work to call for report file? 
 function cmi5launch_get_user_grades($cmi5launch, $userid=0) {
+
+    // External functions and classes.
+    $gradehelpers = new grade_helpers;
+
+    $updategrades = $gradehelpers->get_cmi5launch_check_user_grades_for_updates();
+    // Maybe HERE in GET user grades we actually get them, which means checkin for update!
     global $CFG, $DB;
-    //For now do this manually, and later it can read gradetypee wanted
-    $gradetypewanted = "overall";
+    
+    // Hmmm, so is it better old way?
+    $id = required_param('id', PARAM_INT);
+    $contextmodule = context_module::instance($id);
+
     $grades = array();
 
-    // They are pulling mutliple beacue this may be ALL grades! Like x student had this and y student had that.
-    // Because if the userid is empty they want all as opposed to a particulr student.
+    // If userid is empty it means we want all users.
     if (empty($userid)) {
         
-		// We are going to need to make CMI5_tables.
-        // They retrieve the list of users.
-        $users = $DB->get_records_select('cmi5launch_course', "userid=? GROUP BY userid",
-                                            array($cmi5launch->id), "", "userid,null");
+        // If the user id is empty, we will use get_enrolled_users for all this course
+        // then update all their grades.
+        $users = get_enrolled_users($contextmodule);; //returns an array of users
 
-        // AHA! We are  not getting into these for some reaons, lets check users
-        echo "<br>";
-        echo "well what is USERS ";
-        var_dump($users);
-        echo "<br>";
-        // If there is a list of users then they iterate through it and make user objects with the individual users.
+        // If there is a list of users then iterate through it and make grade objects with the individual users and their updated grades.
         if ($users) {
-            //Aha! We are not entering this
+        
             foreach ($users as $user) {
-                $grades[$user->userid] = new stdClass();
-                $grades[$user->userid]->id         = $user->userid;
-                $grades[$user->userid]->userid     = $user->userid;
-                $grades[$user->userid]->rawgrade = cmi5launch_grade_user($cmi5launch, $user->userid, $gradetypewanted);
-             //For debugging
-    
-           
-           
+             
+                // If there is a lis
+                $grades[$user->id] = new stdClass();
+                $grades[$user->id]->id         = $user->id;
+                $grades[$user->id]->userid     = $user->id;
+                $grades[$user->id]->rawgrade =  $updategrades($user);
+             
             }
         } else {
+            // Return false to avoid null values if no users. 
             return false;
         }
-
     } else {
-        $preattempt = $DB->get_records_select('cmi5launch_course', "userid=? AND userid=? GROUP BY userid",
-                                                array($cmi5launch->id, $userid), "", "userid,null");
-       /* if (!$preattempt) {
-            return false; // No attempt yet.
-        }*/
+
+        //Then this is if we have a specific user, so we need to retrieve them
+        $user = $DB->get_record('user', ['id' => $userid]);
+        
+        // Make grade objects with the individual user and their updated grades.
         $grades[$userid] = new stdClass();
         $grades[$userid]->id         = $userid;
         $grades[$userid]->userid     = $userid;
-        $grades[$userid]->rawgrade = cmi5launch_grade_user($cmi5launch, $userid, $gradetypewanted);
-        
-        //But we are entering here, and therefore the problem must be in grade_user
-        //For debugging
-     
+        $grades[$userid]->rawgrade = $updategrades($user);
     }
 
     return $grades;
 }
-// This appears to be the function that is called to grade the user. SPECIFICALLY
-// Im guessing this just retrieves grades rather than updates them 
-// We can ue this to draw grades from our tables? Maybe the AUS? Or do we want course overall?
-// OR do we want to add a apram that lets user pick what they want????]=we=
 
-
-function cmi5launch_grade_user($cmi5launch, $userid, $requestedgrade) {
-
-    // Ensure we dont grade user beyond $scorm->maxattempt settings.
-   /* $lastattempt = scorm_get_last_attempt($scorm->id, $userid);
-    if ($scorm->maxattempt != 0 && $lastattempt >= $scorm->maxattempt) {
-        $lastattempt = $scorm->maxattempt;
-    }*/
-
-    switch ($requestedgrade) {
-        case 'overall':
-            // Let make a func that gets the highest grade in a COURSE.
-            // Sessions go into AUs and AUs into sessions, so ....whatever is in grade should be highest
-            // I wonder if we need a grade class, might make sense
-
-            return cmi5launch_highest_grade($cmi5launch, $userid);
-        break;
-      //  case LASTATTEMPT:
-        //    return scorm_grade_user_attempt($cmi5launch, $userid, scorm_get_last_completed_attempt($scorm->id, $userid));
-        //break;
-       /* case HIGHESTATTEMPT:
-            $maxscore = 0;
-            for ($attempt = 1; $attempt <= $lastattempt; $attempt++) {
-                $attemptscore = scorm_grade_user_attempt($cmi5launch, $userid, $attempt);
-                $maxscore = $attemptscore > $maxscore ? $attemptscore : $maxscore;
-            }
-            return $maxscore;
-
-        break;
-        case AVERAGEATTEMPT:
-            $attemptcount = scorm_get_attempt_count($userid, $scorm, true, true);
-            if (empty($attemptcount)) {
-                return 0;
-            } else {
-                $attemptcount = count($attemptcount);
-            }
-            $lastattempt = scorm_get_last_attempt($scorm->id, $userid);
-            $sumscore = 0;
-            for ($attempt = 1; $attempt <= $lastattempt; $attempt++) {
-                $attemptscore = scorm_grade_user_attempt($scorm, $userid, $attempt);
-                $sumscore += $attemptscore;
-            }
-
-            return round($sumscore / $attemptcount);
-        break;*/ 
-    }
-}
-
-function cmi5launch_highest_grade($cmi5launch, $userid)
-{
-
-    global $cmi5launch, $USER, $DB;
-
-    $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
-
-    $userrecord =$DB->get_record('cmi5launch_course', ['courseid'  => $record->courseid, 'userid'  => $USER->id]);
-
-    // So grade is 0, we need this updated,maybe even in one of our new fancy updates fucns
-    // But for here we need to focus on the fact that this function is meant to get the highest grade,
-    // So lets do that from all our AUs
-    $allscores[] = array();
-      // Lets see what we get here in augrades
-
-      //Lets add an if for when max is null
-    if (!json_decode($userrecord->ausgrades, true) == null) {
-        // Add score to array of scores
-        $highestgrade = (max(json_decode($userrecord->ausgrades, true)) );
-        // Ok intval is not working due to those damn brackeeets,
-
-        // so lets make an if clause that checks for them and removes them if found, that way it can handle both
-        if(str_contains($highestgrade, "[")){
-            $highestgrade = str_replace("[", "", $highestgrade);
-        }
-        // Now lets apply intval
-        $highestgrade = intval($highestgrade);
-        //what is it now
-      
-    }else{
-        $highestgrade = 0;
-    }
-//Here is where in error is thhroewinf
-   // $highestgrade = 0;
-   /* foreach ($augrades as $key => $augrade) {
-        
-        // If a session has more than one score, we only want the highest.
-        if (!$augrade == null && $augrade > $highestgrade) {
-
-            $highestgrade = $augrade;
-        }
-    }*/
-  
-    // Aha! ITs 0 and it shouldnt be!!!
-
-    return $highestgrade;
-
-}
 /**
- * For example, this callback for the assignment module is assignment_update_grades().
- * This callback should update the grade(s) for the supplied user.
- * This may be as simple as retrieving the grades for the user from the activity module's own tables.
- * then calling {$modname}_grade_item_update().
- * Its parameters are:
- * stdClass $modinstance the activity module settings.
- * int $userid A user ID or 0 for all users.
- * bool $nullifnone If a single user is specified, $nullifnone is true and the user has no grade then a grade item with a null rawgrade should be inserted.
  * Update grades in central gradebook.
- *
  * @category grade
- * @param object $cmi5launch
- * @param int $userid specific user only, 0 mean all
- * @param bool $nullifnone
+ * @param object $cmi5launch - mod object
+ * @param int $userid - A user ID or 0 for all users.
+ * @param bool $nullifnone - If a single user is specified, $nullifnone is true and the user has no grade then a grade item with a null rawgrade should be inserted.
  */
-// This can call grade_item_update which helps interact with Moodle gradebook.
-// it can pull from DB and then call grade_item_update.
-// We could also later use this to change how the array is massaged.
-// in case they want highest or lowest.
-// MB
-// According to notes I found this function is called automatically by moodle if it needs the users grades updated.
-// It ca also be called manually when you want to push a new grade to gradebook.
+// This function is called automatically by moodle if it needs the users grades updated.
+// It can also be called manually when you want to push a new grade to gradebook.
 // This function should do whatever is needed to generate the relevant grades to push into gradebook
-// Based on activitydbrecord (whats that?) and optionalllly userid (if proided.,)
-// then call 'myplugin_grade_item_update with the grades to write
+// then call 'myplugin_grade_item_update with the grades to write.
 
 function cmi5launch_update_grades($cmi5launch, $userid = 0, $nullifnone = true)
 {
-    // Bring in functions and classes.
-    $progress = new progress;
-    $aushelpers = new au_helpers;
-    $connectors = new cmi5_connectors;
-    $sessionhelpers = new session_helpers;
-
-    // Functions from other classes.
-    $saveaus = $aushelpers->get_cmi5launch_save_aus();
-    $createaus = $aushelpers->get_cmi5launch_create_aus();
-    $getaus = $aushelpers->get_cmi5launch_retrieve_aus_from_db();
-    $getregistration = $connectors->cmi5launch_get_registration_with_post();
-    $getregistrationinfo = $connectors->cmi5launch_get_registration_with_get();
-    $getprogress = $progress->cmi5launch_get_retrieve_statements();
-    $updatesession = $sessionhelpers->cmi5launch_get_update_session();
-
-    global $CFG, $DB, $USER;
+    global $CFG, $DB;
 
     require_once($CFG->libdir . '/gradelib.php');
     require_once($CFG->libdir . '/completionlib.php');
-
+    $id = required_param('id', PARAM_INT);
+    
     // Reload cmi5 course instance.
     $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
+    $cm = get_coursemodule_from_id('cmi5launch', $id, 0, false, MUST_EXIST);
+    $contextmodule = context_module::instance($cm->id);
+    $users = get_enrolled_users($contextmodule);; //returns an array of users
 
-    // Then we have a record, so we need to retrieve it.
-    $userscourse = $DB->get_record('cmi5launch_course', ['courseid' => $record->courseid, 'userid' => $USER->id]);
-
-    // Retrieve registration id.
-    $registrationid = $userscourse->registrationid;
-
-    // Retrieve AU ids.
-    $auids = (json_decode($userscourse->aus));
-
-    // We need id to get progress.
-    $cmid = $cmi5launch->id;
-
-
-        // Ok, now we need to retrieve the sessions and find the average score.
-        $grade = json_decode($userscourse->ausgrades, true);
-  
-    /// SO grades are an item or arra!!!!
-    // SO scorm makes the graes in this func then passes on
-
-
-
-    //The rawgarde is now coming back as an int, but I wonder if it needs to be somethin 
-    // else besides a rawgrade to show up in boopk
-    if ($grades = cmi5launch_get_user_grades($cmi5launch, $userid)) {
-    
-        cmi5launch_grade_item_update($cmi5launch, $grades);
+    // Retrieve user grades and update gradebook.
+    if ($userid) {
         
+        $grades = cmi5launch_get_user_grades($cmi5launch, $userid);
+        
+        //Grades is coming back nested in array, with keys being the user id so this should work
+        $grades = $grades[$userid];
 
-        // Set complete.
-        ///scorm_set_completion($scorm, $userid, COMPLETION_COMPLETE, $grades);
+        cmi5launch_grade_item_update($cmi5launch, $grades);
+
     } else if ($userid and $nullifnone) {
+        // User has no grades so assign null
         $grade = new stdClass();
         $grade->userid   = $userid;
         $grade->rawgrade = null;
+
         cmi5launch_grade_item_update($cmi5launch, $grade);
-       
-        // Set incomplete.
-       /// scorm_set_completion($scorm, $userid, COMPLETION_INCOMPLETE);
+  
     } else {
+
         cmi5launch_grade_item_update($cmi5launch);
     }
-        // Ok so if this does whatever is needed to generate the relevant grades to push into gradebook
-        // Then is this a good place to calculate grades? 
-    ///////cmi5launch_grade_item_update($userscourse, $grade);
-    }
-    
+}
 
-    /**
-     * Update/create grade item for given cmi5
-     * calls grade_update from moodle gradelib.php
-     * @category grade
-     * @uses GRADE_TYPE_VALUE
-     * @uses GRADE_TYPE_NONE
-     * @param object $cmi5launch object with extra cmidnumber //now cmi5launch
-     * @param mixed $grades optional array/object of grade(s); 'reset' means reset grades in gradebook
-     * @return object grade_item
-     */
-    // MB.
-// Ok, according to the forum I found this is the only place their grade_update should be called.
-// And this func should be called from 'myplugin'_add_instance, 'myplugin'_update_instance and 'myplugin'_update_grades.
-// IT should look at settings in the activity $activitydbrecord to determine grading type, max and min
-// values, etc. Then setupgradeinfo to pass to grade_update, it should also pass
-// on the optional grades value
-
-// Params is the $gradeinfo info in the forum i found and needs
-//$gradeinfo is an array containing: ['itemname' => $activityname, 'idnumber' => $activityidnumber, 'gradetype' => GRADE_TYPE_VALUE, 'grademax' => 100, 'grademin' => 0]
+/**
+ * Update/create grade item for given cmi5 activity
+ * calls grade_update from moodle gradelib.php
+ * @category grade
+ * @uses GRADE_TYPE_VALUE
+ * @uses GRADE_TYPE_NONE
+ * @param object $cmi5launch - mod object
+ * @param mixed $grades optional array/object of grade(s); 'reset' means reset grades in gradebook
+ * @return object grade_item
+ */
+// This is the only place that grade_update should be called.
+// And this function should be called from cmi5launch_add_instance, cmi5launch_update_instance and cmi5launch_update_grades.
+// It should look at settings in the activity $activitydbrecord to determine grading type, max and min
+// values, etc. Then setup gradeinfo to pass to grade_update, it should also pass on the optional grades value.
+// $gradeinfo is an array containing: ['itemname' => $activityname, 'idnumber' => $activityidnumber, 'gradetype' => GRADE_TYPE_VALUE, 'grademax' => 100, 'grademin' => 0]
     function cmi5launch_grade_item_update($cmi5launch, $grades = null)
     {
         global $CFG, $DB, $cmi5launch, $USER;
-        //Note the SCORM version called it's locallib, we may need to get funcs from there as well and place into 
-        //OUR locallib
-        //May be where those constants were kept
-        require_once($CFG->dirroot . '/mod/cmi5launch/locallib.php');
+        global $cmi5launchsettings;
+        
+        // Bring in grade helpers.
+        $gradehelpers = new grade_helpers;
+
+        // Functions from other classes.
+        $highestgrade = $gradehelpers->get_cmi5launch_highest_grade();
+        $averagegrade = $gradehelpers->get_cmi5launch_average_grade();
         $settings = cmi5launch_settings($cmi5launch->id);
-        //gradelib?? We need to see wha this is 
-        //I beleive they are referencing moodle/lib/gradelib
-        //In case they need their base grade_update?
+        
         if (!function_exists('grade_update')) { // Workaround for buggy PHP versions.
             require_once($CFG->libdir . '/gradelib.php');
         }
-// Reload cmi5 course instance.
-$record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
+        // Reload cmi5 course instance.
+        $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
 
-        //so this is getting the scorm id right? Well cmi5 id should work to?
-        //But a cmi5 id isntusually gotten with cmidnumber I don't
-        //yeah the cmi5 launch table has a 'courseid' and just a plain 'id'
-        //I think in this context its 'id' they want?
-        //If not it has to be 'courseid'
+        // Assign course instance info to grade params.
         $params = array('itemname' => $cmi5launch->name);
         if (isset($cmi5launch->id)) {
-            $params['idnumber'] = $cmi5launch->id;//He said make this cmidnumber? But what is that?
-            //I think its just id, or is in another part of code
+            $params['idnumber'] = $cmi5launch->id;
         }
 
-        //Ok this is passing as arrays the grades to be updated and the params to do so
-        //GRADE_TYPE_VALUE  appears to be a moodle constant, so should be found when proggram, runs lovally
-      //  if ($cmi5launch->grademethod == GRADE_AUS_CMI5) {
-            /// Three slashes means I don't think we need. -MB. 
-            ///   $maxgrade = $DB->count_records_select('scorm_scoes', 'scorm = ? AND '.
-            ///                                        $DB->sql_isnotempty('scorm_scoes', 'launch', false, true), array($scorm->id));
-            
-            //That's weird, they should exist
-            //what is cmi5launch properteis
-        // Iterate through grades and grab the max grade.
-       // $overallgrade = 0;
+        // Retrieve the settings for course grading.
+        $gradetype = $cmi5launchsettings["grademethod"];    
+        $maxgrade = $settings['maxgrade'];
 
-        //Grades are an int?
-        /*
-        foreach ($grades as $key => $grade) {
+        // Assign settings to grade item param.
+        $params['grademax'] = $maxgrade;
+        $params['grademin'] = 0;
         
-            echo "<br>";
-            echo "grade D +A LOOP IS : ";
-            $toprint = ($grade);
-            var_dump($toprint);
-            echo "<br>";
-        echo " and its intval is";
-        var_dump(intval($grade));
-        echo "<br>";
-        echo "What does this find? isnumeric? :";
-        var_dump(is_numeric($grade));
-        echo "<br>";
-        //Will trim work?
-        echo "Will trim work :";
-       // var_dump(trim($grade, '[]'));
-        echo "<br>";
-        // OH yess! the brackets were a problem!
-          /*  if (intval(trim($grade, '[]')) >= $overallgrade) {
-                $overallgrade = intval(trim($grade, '[]'));
-                echo"<br>";
-                echo "Overall grade in if loop is is: ";
-                var_dump($overallgrade);
-                echo"<br>";
-     
-            }*/
-//    }
-
-
-            $maxgrade = $settings['maxgrade'];
-            //What is grademax here
-            //Heres whats weird, why is settings not holding our max grade?
-            //what are all of settins?
-       
+        if ($maxgrade) {
+            $params['gradetype'] = $gradetype; //GRADE_TYPE_VALUE;//do we have this constant??
             $params['grademax'] = $maxgrade;
             $params['grademin'] = 0;
-            if ($maxgrade) {
-                $params['gradetype'] = GRADE_TYPE_VALUE;//do we have this constant??
-                $params['grademax'] = $maxgrade;
-                $params['grademin'] = 0;
-            } else {
-                $params['gradetype'] = GRADE_TYPE_NONE;
-            }
-       /*  } else {
-            $params['gradetype'] = GRADE_TYPE_VALUE;
-            $params['grademax'] = $cmi5launch->maxgrade;
-            $params['grademin'] = 0;
+        } else {
+        
+            $params['gradetype'] = $gradetype; // GRADE_TYPE_NONE;
         }
-*/
+
         if ($grades === 'reset') {
             $params['reset'] = true;
             $grades = null;
+        } else{
+
+            // Maybe this is where the problem is. IT is calling highest and average on grades here
+            // when update grade alreayd did that??? 
+
+        // Calculate grade based on grade type, and udate rawgrade (a param of grade item).
+        switch($gradetype){
+
+            /**
+             * ('GRADE_AUS_CMI5' = '0');
+            *('GRADE_HIGHEST_CMI5' = '1');
+            *'GRADE_AVERAGE_CMI5', =  '2');
+            *('GRADE_SUM_CMI5', = '3');
+            */
+            case 1:
+                foreach ($grades as $key => $grade) {
+
+                    //does it need to be strings?
+                    $grades->rawgrade = $highestgrade($grades->rawgrade);
+
+                 //$grades->rawgrade = strval($highestgrade($grades->rawgrade));
+
+                }
+                break;
+                
+            case 2:
+                foreach ($grades as $key => $grade) {
+
+                    $grades->rawgrade = $averagegrade($grades->rawgrade);
+                 $grades->rawgrade = strval($averagegrade($grades->rawgrade));
+
+                }
+                break;
+            }
         }
 
+        // Call grade_update to update gradebook.
 
-       // $grades = $record->grade;
-
-        // Why are grades blank? Why is record not havving grades?
-     /*  echo"<br>";
-        echo "Record full is  are: ";
-        var_dump($record);
-        //So if grades arent gettin set in record...himmmm...thats an issue elsewhere righ?
-        echo "<br>";
-        // LEt's try a little debugging
-        echo "<br>";
-        echo "cmi5launch_grade_item_update called overall are: ";
-        var_dump($overallgrade);
-        echo "<br>";
-
-        //Where  is the 179 coming from? 
-    echo "<br>";
-    echo" record id is: ";
-    var_dump($record->id);
-    echo "<br>"; */
-    // Ok, the abov eis the 179
-    // Then we have a record, so we need to retrieve it.
-    $userscourse = $DB->get_record('cmi5launch_course', ['courseid'  => $record->courseid, 'userid'  => $USER->id]);
-    //Maybe we needd the VERY specific usercourse?
-        //A bool?
-
-        ///what is overall grade?
-       /* echo "<br>";
-        echo "Overall grade is: ";
-        var_dump($overallgrade);
-        echo "<br>";
-        */
-
-        //if grades are SUPPOSED to be an array, even singular??? Does this mean we dont have to worry about brackets above?
-   
-    //The table course has TWO only two courses, Moodle- 1 and test-2. What id is this? How to grab this?
-    /// Lets look at everything in a cmi5launch
-    //echo "<br>";
-    ///echo "CMI% launch is :";
-   //var_dump($cmi5launch);
-   /// echo "<br>";
-    // Ok, look here at this part of cmi5
-    //["course"]=> string(1) "2"
-    //Yeay! cmi5launch->course is what we need as a param!
-    //Now, to get the grades to show
-    // ok and they don't want 'cmi5, here, they want what is in ['modulename] so - cmi5 Launch Link - or not that broke it!
         return grade_update('mod/cmi5launch', $cmi5launch->course, 'mod', 'cmi5launch', $cmi5launch->id, 0, $grades, $params);
-    
-        //From forum: grade_update('mod/cmi5launch', $cmi5launch->course, 'mod', 'cmi5launch', $cmi5launch->id, 0, $grades, $params);
-
-        // Ok what is grade item update retunring?
-
-
-    
     }
 
-
-/**
- * Delete grade item for given scorm
+ /**
+ *  Retrieve the grade setting type (this is because other pages can't see grade int type) 
  *
- * @category grade
- * @param object $scorm object
- * @return object grade_item
+ * @category gradetype - the grade type
+ * @return string gradetypestring - the string version of the grade type
  */
-/*
- function scorm_grade_item_delete($scorm) {
-    global $CFG;
-    require_once($CFG->libdir.'/gradelib.php');
+ function cmi5launch_retrieve_gradetype() {
+    
+    global $cmi5launchsettings;
 
-    return grade_update('mod/scorm', $scorm->course, 'mod', 'scorm', $scorm->id, 0, null, array('deleted' => 1));
+    $gradetypestring = "";
+
+    $gradetype = $cmi5launchsettings["grademethod"];
+
+    switch($gradetype){
+
+    /**
+     * ('GRADE_AUS_CMI5' = '0');
+        *('GRADE_HIGHEST_CMI5' = '1');
+        *'GRADE_AVERAGE_CMI5', =  '2');
+        *('GRADE_SUM_CMI5', = '3');
+        */
+    case 1:
+        $gradetypestring = "Highest";
+        break;
+    case 2:
+        $gradetypestring = "Average";
+        break;
+    }
+
+    return $gradetypestring;
 }
-*/

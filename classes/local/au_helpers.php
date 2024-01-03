@@ -48,6 +48,7 @@ class au_helpers {
     public function cmi5launch_retrieve_aus($returnedinfo) {
         // The results come back as nested array under more then just AUs.
         // We only want the info pertaining to the AU.
+        // MB would making this true stop the nesting? TODO
         $resultchunked = array_chunk($returnedinfo["metadata"]["aus"], 1, );
 
         return $resultchunked;
@@ -96,10 +97,12 @@ class au_helpers {
         // For each AU in array build a new record and save it.
         // Because of so many nested variables this needs to be done manually.
         foreach ($auobjectarray as $auobject) {
+            
             // Make a newrecord to save.
             $newrecord = new \stdClass();
 
             $newrecord->userid = $USER->id;
+            $newrecord->attempt = $auobject->attempt;
             $newrecord->auid = $auobject->id;
             $newrecord->launchmethod = $auobject->launchMethod;
             $newrecord->lmsid = json_decode(json_encode($auobject->lmsId, true) );
@@ -110,7 +113,8 @@ class au_helpers {
             $newrecord->moveon = $auobject->moveOn;
             $newrecord->auindex = $auobject->auIndex;
             $newrecord->parents = json_encode($auobject->parents, true);
-            $newrecord->objectives = $auobject->objectives;
+            //let try to encode
+            $newrecord->objectives = json_encode($auobject->objectives);
             $desc = json_decode(json_encode($auobject->description), true);
             $newrecord->description = $desc[0]['text'];
             $newrecord->activitytype = $auobject->activityType;
@@ -131,9 +135,9 @@ class au_helpers {
     }
 
     /**
-     * Retrieves a list of AU's from DB and makes them AU objects
+     * Retrieves AU info from DB, converts to AU object, and returns it.
      * @param mixed $auid
-     * @return au
+     * @return au|bool
      */
     public function cmi5launch_retrieve_aus_from_db($auid) {
         
@@ -142,13 +146,14 @@ class au_helpers {
         $check = $DB->record_exists( 'cmi5launch_aus', ['id' => $auid], '*', IGNORE_MISSING);
 
         // If check is negative, the record does not exist. It should so throw error.
+        // Moodle will throw the error, but we want to pass this message back ot user. 
         if (!$check) {
 
-            echo "<p>Error attempting to get AU data from DB. Check AU id.</p>";
-            echo "<pre>";
-            var_dump($auid);
-            echo "</pre>";
+            echo "<p>Error attempting to get AU data from DB. Check AU id. AU id is: " . $auid ."</p>";
+
+           return false;
         } else {
+
             $auitem = $DB->get_record('cmi5launch_aus',  array('id' => $auid));
 
             $au = new au($auitem);

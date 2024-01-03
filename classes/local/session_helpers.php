@@ -50,28 +50,50 @@ class session_helpers {
      */
 
      // MB, maybe here? whenever a session is updated check the grades?
-    public function cmi5launch_update_sessions($sessionid, $cmi5id) {
+    public function cmi5launch_update_sessions($sessionid, $cmi5id, $user) {
 
-        global $CFG, $DB;
+        global $CFG, $DB, $cmi5launch, $USER;
 
         $connector = new cmi5_connectors;
+        $progress = new progress;
         $getsessioninfo = $connector->cmi5launch_get_session_info();
+        $getprogress = $progress->cmi5launch_get_retrieve_statements();
 
         // Get the session from DB with session id.
         $session = $this->cmi5launch_retrieve_sessions_from_db($sessionid);
 
+        // Reload cmi5 instance.
+        $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
+
+        // Reload user course instance.
+        // This only gets loged in user!
+        $usersCourse = $DB->get_record('cmi5launch_course', ['courseid'  => $record->courseid, 'userid'  => $user->id]);
+
+        // Get updates from the LRS as well.
+        $session = $getprogress($usersCourse->registrationid, $cmi5launch->id, $session);
+    
+        // Get updates from cmi5player
         // This is sessioninfo from CMI5 player.
         $sessioninfo = $getsessioninfo($sessionid, $cmi5id);
 
         // Update session.
         foreach ($sessioninfo as $key => $value) {
-            // We don't want to overwrite id.
-            if (property_exists($session, $key ) && $key != 'id' ) {
+            
+            // We don't want to overwrite ids.
+            // If the property exists and it's not id or sessionid, set it to lowercase and 
+            // encode value if it is array. (DB needs properties in lowercase, but player returns camelcase.)
+            if (property_exists($session, $key ) && $key != 'id' && $key != 'sessionid') {
+                
                 // If it's an array, encode it so it can be saved to DB.
                 if (is_array($value)) {
                     $value = json_encode($value);
                 }
-                    $session->$key = $value;
+
+                if(is_string($key)){
+                    $key = mb_convert_case($key, MB_CASE_LOWER, "UTF-8");
+                }
+
+                $session->$key = $value;
             }
         }
 
@@ -81,9 +103,8 @@ class session_helpers {
         return $session;
     }
 
-
     /**
-     * Creates a session record in DB
+     * Creates a session record in DB.
      * @param mixed $sessionid - the session id
      * @param mixed $launchurl - the launch url
      * @param mixed $launchmethod - the launch method
@@ -137,4 +158,5 @@ class session_helpers {
         // Return new session object.
         return $session;
     }
+
 }
