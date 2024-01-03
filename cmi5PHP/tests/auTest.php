@@ -2,7 +2,7 @@
 namespace cmi5Test;
 
 use PHPUnit\Framework\TestCase;
-use au;
+use mod_cmi5launch\local\au;
 
 /**
  * Class AuTest.
@@ -12,14 +12,16 @@ use au;
  *
  * @covers \au
  */
-class AusTest extends TestCase
+class auTest extends TestCase
 {
     private $auProperties, $emptyStatement, $mockStatementValues;
 
     protected function setUp(): void
     {
+        // All the properties in an AU object.
         $this->auProperties = array(
             'id',
+            'attempt',
             'url',
             'type',
             'lmsid',
@@ -42,14 +44,15 @@ class AusTest extends TestCase
             'noattempt',
             'completed',
             'passed',
-            'inprogress',
+            'masteryScore', 'inprogress', 'launchMethod', 'lmsId', 'moveOn', 'auIndex', 'activityType' 
         );
 
         $this->emptyStatement = array();
 
-        //Perhaps a good test would be to test the constructor with a statement that has all the properties set.
+        // Perhaps a good test would be to test the constructor with a statement that has all the properties set.
         $this->mockStatementValues = array(
             'id' => 'id',
+            'attempt' => 'attempt',
             'url' => 'url',
             'type' => 'type',
             'lmsid' => 'lmsid',
@@ -73,6 +76,7 @@ class AusTest extends TestCase
             'completed' => 'completed',
             'passed' => 'passed',
             'inprogress' => 'inprogress',
+            'masteryScore' => 'masteryScore', 'launchMethod' => 'launchMethod', 'lmsId' => 'lmsId', 'moveOn' => 'moveOn', 'auIndex' => 'auIndex', 'activityType' => 'activityType' 
         );
     }
 
@@ -86,8 +90,9 @@ class AusTest extends TestCase
     {
         $obj = new au($this->emptyStatement);
 
-        //Is an AU object
-        $this->assertInstanceOf('au', $obj);
+        // Is an AU object?
+        $this->assertInstanceOf(au::class, $obj);
+
         //It is saying AU is not transversable
         //Implementing traversable in AU is breaking the code,
         //Make sure the AU object does not have any 'extra' properties, only the amount passed in
@@ -109,8 +114,9 @@ class AusTest extends TestCase
     {
         $obj = new au($this->mockStatementValues);
 
-        //Is an AU object
-        $this->assertInstanceOf('au', $obj);
+        // Is an AU object?
+        $this->assertInstanceOf(au::class, $obj);
+        
         //It is saying AU is not transversable
         //Implementing traversable in AU is breaking the code,
         //Make sure the AU object does not have any 'extra' properties, only the amount passed in

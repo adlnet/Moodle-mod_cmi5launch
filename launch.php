@@ -98,6 +98,7 @@ if ($idandstatus[0] == "true") {
     // Pass in the au index to retrieve a launchurl and session id.
     $urldecoded = $cmi5launchretrieveurl($cmi5launch->id, $auindex);
 
+
     // Retrieve and store session id in the aus table.
     $sessionid = intval($urldecoded['id']);
 
@@ -123,13 +124,13 @@ if ($idandstatus[0] == "true") {
     // Retrieve the launch url.
     $location = $urldecoded['url'];
     // And launch method.
-    $launchmethod = $urldecoded['launchmethod'];
+    $launchmethod = $urldecoded['launchMethod'];
 
     // Create and save session object to session table.
     $savesession($sessionid, $location, $launchmethod);
 
 } else {
-    // This is a new session, we want to get the launch url from the sessions.
+    // This is NOT a new session, we want to get the launch url from the sessions.
     $session = $DB->get_record('cmi5launch_sessions',  array('sessionid' => $id));
 
     // Launch url is in old session record.

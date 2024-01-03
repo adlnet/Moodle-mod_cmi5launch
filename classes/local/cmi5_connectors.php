@@ -38,7 +38,6 @@ class cmi5_connectors {
     public function cmi5launch_get_create_course() {
         return [$this, 'cmi5launch_create_course'];
     }
-
     public function cmi5launch_get_session_info() {
         return [$this, 'cmi5launch_retrieve_session_info_from_player'];
 
@@ -50,22 +49,21 @@ class cmi5_connectors {
         return [$this, 'cmi5launch_retrieve_registration_with_get'];
     }
 
-    // Function to create a course.
-    // @param $id - tenant id in Moodle.
-    // @param $token - tenant bearer token.
-    // @param $fileName - The filename of the course to be imported, to be added to url POST request.
-    // @return  $result - Response from cmi5 player.
-    public function cmi5launch_create_course($id, $tenanttoken, $fileName) {
-
+    /**
+    * Function to create a course.
+     * @param mixed $id - tenant id in Moodle.
+     * @param mixed $tenanttoken - tenant bearer token.
+     * @param mixed $filename -- The filename of the course to be imported, to be added to url POST request.
+     * @return bool|string - Response from cmi5 player.
+     */
+    public function cmi5launch_create_course($id, $tenanttoken, $filename) {
 
         global $DB, $CFG;
         $settings = cmi5launch_settings($id);
 
-
         // Retrieve and assign params.
         $token = $tenanttoken;
-        $file = $fileName;
-
+        $file = $filename;
 
         // Build URL to import course to.
         $url= $settings['cmi5launchplayerurl'] . "/api/v1/course" ;

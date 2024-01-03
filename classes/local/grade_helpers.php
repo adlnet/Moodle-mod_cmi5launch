@@ -59,24 +59,43 @@ function cmi5launch_average_grade($scores)
         // If it isn't an array it (array_sum) doesn't work, check if it's a string and if NOT then json decode
         if (!$scores == null && is_array($scores)) {
 
+            echo "1";
             // Find the average of the scores
             $averagegrade = (array_sum($scores) / count($scores));
 
             // If string it sometimes has brackets, check for them and remove them if found.
-            if (str_contains($averagegrade, "[")) {
+          /*  if (str_contains($averagegrade, "[")) {
                 $averagegrade = str_replace("[", "", $averagegrade);
             }
+            */
             // Apply intval if string
             $averagegrade = intval($averagegrade);
         
         } elseif  (!$scores == null && !is_array($scores)) {
+            echo "2";
+            
             // If it's an int, it's a single value so average is itself.
             $averagegrade = $scores;
+
+              // If string it sometimes has brackets, check for them and remove them if found.
+          /*   if (str_contains($averagegrade, "[")) {
+                $averagegrade = str_replace("[", "", $averagegrade);
+            }*/
         }
         else {
+            echo "3";
             $averagegrade = 0;
         }
 
+          // Remove [] from userscore if they are there.
+          $toremove = array("[", "]");
+          if ($averagegrade != null && str_contains($averagegrade, "[")) {
+            $averagegrade = str_replace($toremove, "", $averagegrade);
+          }
+
+           // Now apply intval.
+           $averagegrade = intval($averagegrade);
+        // and cast it to int
     return $averagegrade;
 
 }
@@ -187,7 +206,7 @@ function cmi5launch_highest_grade($scores)
                                 $session = $DB->get_record('cmi5launch_sessions', ['sessionid' => $sessionid]);
 
                                 // Retrieve new info (if any) from CMI5 player and LRS on session.
-                                $session = $updatesession($sessionid, $cmi5launch->id);
+                                $session = $updatesession($sessionid, $cmi5launch->id, $user);
                 
                                 // Now if the session is complete, passed, or terminated, we want to update the AU.
                                 // These come in order, so the last one is the current status, so update on each one,

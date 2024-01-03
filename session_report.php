@@ -108,7 +108,7 @@ if (empty($noheader)) {
   <input type="submit" value="Back"/>
 </form>
 <?php
-
+$user = $DB->get_record('user', array('id' => $userid));
 // Create tables to display on page.
 // This is the main table with session info.
 $table = new \flexible_table('mod-cmi5launch-report');
@@ -144,7 +144,7 @@ foreach ($auids as $key => $auid) {
         $au = $getaus($auid);
 
         // This uses the auid to pull the right record from the aus table
-        $au = $DB->get_record('cmi5launch_aus', ['id' => $auid, 'auid' => $cmi5idprevpage]);
+        $au = $DB->get_record('cmi5launch_aus', ['id' => $auid]);
      
         // When it is not null this is our aurecord
         if (!$au == null || false) {
@@ -172,7 +172,7 @@ $austatus = "";
 // There may be more than one session.
 foreach ($sessions as $sessionid) {
     
-    $session = $updatesession($sessionid, $cmi5launch->id);
+    $session = $updatesession($sessionid, $cmi5launch->id, $user);
     // Add score to array for AU.
     $sessionscores[] = $session->score;
 

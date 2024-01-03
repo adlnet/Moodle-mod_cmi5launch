@@ -97,6 +97,7 @@ class au_helpers {
         // For each AU in array build a new record and save it.
         // Because of so many nested variables this needs to be done manually.
         foreach ($auobjectarray as $auobject) {
+            
             // Make a newrecord to save.
             $newrecord = new \stdClass();
 
@@ -134,9 +135,9 @@ class au_helpers {
     }
 
     /**
-     * Retrieves a list of AU's from DB and makes them AU objects
+     * Retrieves AU info from DB, converts to AU object, and returns it.
      * @param mixed $auid
-     * @return au
+     * @return au|bool
      */
     public function cmi5launch_retrieve_aus_from_db($auid) {
         
@@ -145,13 +146,14 @@ class au_helpers {
         $check = $DB->record_exists( 'cmi5launch_aus', ['id' => $auid], '*', IGNORE_MISSING);
 
         // If check is negative, the record does not exist. It should so throw error.
+        // Moodle will throw the error, but we want to pass this message back ot user. 
         if (!$check) {
 
-            echo "<p>Error attempting to get AU data from DB. Check AU id. AU id is: </p>";
-            echo "<pre>";
-            var_dump($auid);
-            echo "</pre>";
+            echo "<p>Error attempting to get AU data from DB. Check AU id. AU id is: " . $auid ."</p>";
+
+           return false;
         } else {
+
             $auitem = $DB->get_record('cmi5launch_aus',  array('id' => $auid));
 
             $au = new au($auitem);
