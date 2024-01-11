@@ -63,30 +63,31 @@ class cmi5_connectors {
 
         // Retrieve and assign params.
         $token = $tenanttoken;
-        $file = $filename;
+        
+        // The body of the request
+        $data = $filename;
 
         // Build URL to import course to.
         $url= $settings['cmi5launchplayerurl'] . "/api/v1/course" ;
 
-        // The body of the request must be made as array first.
-        $data = $file;
-
         // Sends the stream to the specified URL.
         $result = $this->cmi5launch_send_request_to_cmi5_player($data, $url, $token);
 
-
         if ($result === FALSE) {
 
-            if ($CFG->debugdeveloper) {
-              
-                echo "Something went wrong creating the course";
+            // for testing to work, this needs to be commented out.
+            // Because tests dont know if it is CF set or not, come to think of it thouh, maybe this SHOULD always display anyway, to help with any troubleshootin
+         //   if ($CFG->debugdeveloper) {
+            echo "<br>";
+
+                echo "Something went wrong creating the course. CMI5 Player returned " . $result;
 
                 echo "<br>";
               
-            }
+           // }
             } else {
 
-            // Return an array with tenant name and info.
+            // Return an array with course info.
             return $result;
         }
     }
@@ -146,6 +147,12 @@ class cmi5_connectors {
 
         global $CFG;
 
+        /*
+        echo"<br>";
+        echo"what is registration " . $registration;
+        echo"<br>";
+*/
+
         // Build URL for launch URL request.
         $url = $playerUrl . "/api/v1/registration/" . $registration ;
 
@@ -159,7 +166,11 @@ class cmi5_connectors {
         );
         // The options are here placed into a stream to be sent.
         $context  = stream_context_create($options);
-        
+        /*
+        echo"<br>";
+        echo"Url is "  . $url;
+        */
+
         // Sends the stream to the specified URL and stores results.
         // The false is use_include_path, which we dont want in this case, we want to go to the url.
         $result = file_get_contents($url, false, $context);

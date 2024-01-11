@@ -718,6 +718,8 @@ function cmi5launch_validate_package($file) {
  
 function cmi5launch_find_au_satisfied($auinfoin, $aulmsid)
 {
+    $ausatisfied = "";
+    
     // Check if auinfoin is a boolean or an array.
     // It will be an array if an AU was found on recursive call
     if(is_bool($auinfoin)){
@@ -726,12 +728,12 @@ function cmi5launch_find_au_satisfied($auinfoin, $aulmsid)
         return $auinfoin;
     }
     // If it's an array it is either a block we still need to break down, or an AU we need to find satisfied value for.
-    // status on.
+    // status on.$ausatisfied = "";
     elseif(is_array($auinfoin)){
        // echo"we are an array";
         // Check AU's satisifeid value and display accordingly. 
         foreach ($auinfoin as $key => $auinfo) {
-
+            $ausatisfied = "";
             // If it's a block, we need to keep breaking it down.
             if($auinfo["type"] == "block" ){
             

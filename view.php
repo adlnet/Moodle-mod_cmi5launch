@@ -163,6 +163,20 @@ if ($exists == false) {
     // We have a record, so we need to retrieve it.
     $userscourse = $DB->get_record('cmi5launch_course', ['courseid'  => $record->courseid, 'userid'  => $USER->id]);
 
+    // we are havin issues where a record may be faulty!
+    // We need to checkcertaiin fields and repair/pivot!
+
+    /*
+    echo"<br>";
+    echo "First off. What is usercourse?: ";
+    var_dump($userscourse);
+    echo"<br>";
+    */
+    // So usrescourse seems fine except for the registrion which is null, so maybe here we call a different 
+    // get registration, the post one, but not here, right, down where the other is called? Or even check there
+    // cause oif there is no course record we know there is no reg id, BUT apparently there can be a record and no id!
+
+
     // Retrieve registration id.
     $registrationid = $userscourse->registrationid;
 
@@ -190,8 +204,22 @@ $table->head = array(
 // Array to hold Au scores.
 $auscores = array();
 
-// Query CMI5 player for updated registration info.
-$registrationinfofromcmi5 = $getregistrationinfo($registrationid, $cmi5launch->id);
+// We need to verify if there is a registration id. Sometimes errors with player can cause a null id, in that case we want to
+// retrieve a new one. 
+if($registrationid == null){
+    // Retrieve registration id.
+    $registrationid = $getregistration($record->courseid, $cmi5launch->id);
+    // Update course record.
+    $userscourse->registrationid = $registrationid;
+    // Update DB.
+    $DB->update_record("cmi5launch_course", $userscourse);
+}
+
+    // Query CMI5 player for updated registration info.
+    $registrationinfofromcmi5 = $getregistrationinfo($registrationid, $cmi5launch->id);
+
+
+
 // Take only info about AUs out of registrationinfofromcmi5.
 $ausfromcmi5 = array_chunk($registrationinfofromcmi5["metadata"]["moveOn"]["children"], 1, true);
 // Cycle through AU IDs.
@@ -230,7 +258,7 @@ foreach ($auids as $key => $auid) {
         var_dump($aulmsid);
         echo"<br>";
         */
-        // Check for the AUs satisfied status.
+        // Check for the AUs satisfied status. Compare with lmsId to find status for that instance.
         $ausatisfied = cmi5launch_find_au_satisfied($value, $aulmsid);
         //If au satisife dis ever true then we found it, it shouldn't
         //ever have miore than one value.
