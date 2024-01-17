@@ -733,7 +733,7 @@ function cmi5launch_find_au_satisfied($auinfoin, $aulmsid)
        // echo"we are an array";
         // Check AU's satisifeid value and display accordingly. 
         foreach ($auinfoin as $key => $auinfo) {
-            $ausatisfied = "";
+            $ausatisfied = "false";
             // If it's a block, we need to keep breaking it down.
             if($auinfo["type"] == "block" ){
             
@@ -750,6 +750,10 @@ function cmi5launch_find_au_satisfied($auinfoin, $aulmsid)
                 {
                     // If it is, retrieve the satisfied value.
                     $ausatisfied = $auinfo["satisfied"];
+                }else{
+
+                    // If NO ideas match we have a problem, and need to return
+                    $ausatisfied = "No ids match";
                 }
         
             }else{

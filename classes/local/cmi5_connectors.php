@@ -147,12 +147,6 @@ class cmi5_connectors {
 
         global $CFG;
 
-        /*
-        echo"<br>";
-        echo"what is registration " . $registration;
-        echo"<br>";
-*/
-
         // Build URL for launch URL request.
         $url = $playerUrl . "/api/v1/registration/" . $registration ;
 
@@ -166,10 +160,6 @@ class cmi5_connectors {
         );
         // The options are here placed into a stream to be sent.
         $context  = stream_context_create($options);
-        /*
-        echo"<br>";
-        echo"Url is "  . $url;
-        */
 
         // Sends the stream to the specified URL and stores results.
         // The false is use_include_path, which we dont want in this case, we want to go to the url.
@@ -179,8 +169,7 @@ class cmi5_connectors {
 
         // The returned 'registration info' is a large json object.
         // Code is the registration id we want.
-        $registration = $registrationInfo["code"];
-        
+        // $registration = $registrationInfo["code"];
         return $registrationInfo; 
 
         }

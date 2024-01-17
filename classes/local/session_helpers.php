@@ -159,4 +159,11 @@ class session_helpers {
         return $session;
     }
 
+
+    public function cmi5launch_sift_sessions_for_satisified($sessionid)
+    {
+        
+
+
+    }
 }

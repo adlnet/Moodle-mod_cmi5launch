@@ -25,6 +25,9 @@ use mod_cmi5launch\local\progress;
 use mod_cmi5launch\local\course;
 use mod_cmi5launch\local\cmi5_connectors;
 use mod_cmi5launch\local\au_helpers;
+use mod_cmi5launch\local\session_helpers;
+
+
 
 require_once("../../config.php");
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
@@ -163,15 +166,7 @@ if ($exists == false) {
     // We have a record, so we need to retrieve it.
     $userscourse = $DB->get_record('cmi5launch_course', ['courseid'  => $record->courseid, 'userid'  => $USER->id]);
 
-    // we are havin issues where a record may be faulty!
-    // We need to checkcertaiin fields and repair/pivot!
 
-    /*
-    echo"<br>";
-    echo "First off. What is usercourse?: ";
-    var_dump($userscourse);
-    echo"<br>";
-    */
     // So usrescourse seems fine except for the registrion which is null, so maybe here we call a different 
     // get registration, the post one, but not here, right, down where the other is called? Or even check there
     // cause oif there is no course record we know there is no reg id, BUT apparently there can be a record and no id!
@@ -180,6 +175,16 @@ if ($exists == false) {
     // Retrieve registration id.
     $registrationid = $userscourse->registrationid;
 
+    // We need to verify if there is a registration id. Sometimes errors with player can cause a null id, in that case we want to
+// retrieve a new one. 
+if($registrationid == null){
+    // Retrieve registration id.
+    $registrationid = $getregistration($record->courseid, $cmi5launch->id);
+    // Update course record.
+    $userscourse->registrationid = $registrationid;
+    // Update DB.
+    $DB->update_record("cmi5launch_course", $userscourse);
+}
     // Retrieve AU ids.
     $auids = (json_decode($userscourse->aus) );
 }
@@ -204,25 +209,15 @@ $table->head = array(
 // Array to hold Au scores.
 $auscores = array();
 
-// We need to verify if there is a registration id. Sometimes errors with player can cause a null id, in that case we want to
-// retrieve a new one. 
-if($registrationid == null){
-    // Retrieve registration id.
-    $registrationid = $getregistration($record->courseid, $cmi5launch->id);
-    // Update course record.
-    $userscourse->registrationid = $registrationid;
-    // Update DB.
-    $DB->update_record("cmi5launch_course", $userscourse);
-}
 
-    // Query CMI5 player for updated registration info.
-    $registrationinfofromcmi5 = $getregistrationinfo($registrationid, $cmi5launch->id);
-
+// Query CMI5 player for updated registration info.
+$registrationinfofromcmi5 = $getregistrationinfo($registrationid, $cmi5launch->id);
 
 
 // Take only info about AUs out of registrationinfofromcmi5.
 $ausfromcmi5 = array_chunk($registrationinfofromcmi5["metadata"]["moveOn"]["children"], 1, true);
-// Cycle through AU IDs.
+
+// Cycle through AU IDs making AU objects and checkin progress.
 foreach ($auids as $key => $auid) {
 
     // Array to hold scores for AU.
@@ -240,31 +235,83 @@ foreach ($auids as $key => $auid) {
     // Retrieve AU's lmsID.
     $aulmsid = $au->lmsid;
 
+    // To hold if the au is satisfied.
     $ausatisfied = "";
 
-    // Cycle through AUs (or blocks) in registration info.
+    // Cycle through AUs (or blocks) in registration info from player, we are looking for the one
+    // that matches our AU lmsID.
     foreach($ausfromcmi5 as $key => $value){
-/*
-        echo"<br>";
-        echo "Are we entering here?";
-        echo"<br>";
-        echo " and what is value?: ";
-        var_dump($value);
-        echo"<br>";
-        echo " and what is ausfromcmi5?: ";
-        var_dump($ausfromcmi5);
-        echo"<br>";
-        echo " and what is aulmsid?: ";
-        var_dump($aulmsid);
-        echo"<br>";
-        */
+
         // Check for the AUs satisfied status. Compare with lmsId to find status for that instance.
         $ausatisfied = cmi5launch_find_au_satisfied($value, $aulmsid);
-        //If au satisife dis ever true then we found it, it shouldn't
-        //ever have miore than one value.
+        // If au satisfied  is ever true then we found it, once satisified it doesn't matter if others have failed or were also satisified.
         if($ausatisfied == "true"){
-            //echo "We found it";
             break;
+    
+        }
+        // This elseif was built as a failsafe. Very rarely there may be an instance where the player issues a duplicate lms id or reegistration number.
+        // For example, this can happen if the server crashes while a course is being made or updated. However, under normal circumstances, the AU LMSID
+        // should always match at least one of the AUs returned by player. 
+        elseif($ausatisfied = "No ids match"){ 
+            
+            // If there are sessions for this AU.
+            if ($au->sessions != null) {
+
+            // Retrieve session ids for this AU from DB.
+            $sessions = json_decode($au->sessions, true);
+            $session_helpers = new session_helpers;
+            $getsessioninfo = $session_helpers->cmi5launch_get_retrieve_sessions_from_db();
+    
+            // Retrieve what this AU needs to moveon. We will search through the session data to see if it is fulfilled
+            $aumoveon = $au->moveon;
+
+            // Hold if completed or passed is found.
+            $completedfound = false;
+            $passedfound = false;
+
+
+                //Cycle through them looking to see if any were passed and/or completed.
+                foreach ($sessions as $key => $value) {
+  
+                    $au_session = $getsessioninfo($value);
+
+                    if ($au_session->iscompleted == "1") {
+                        $completedfound = true;
+                    }
+                    if ($au_session->ispassed == "1") {
+                        $passedfound = true;
+                    }
+              
+                    // See if the pass and completed fulfill move on value for AU.
+                    switch ($aumoveon) {
+                        case "Completed":
+                            if ($completedfound == true) {
+                                $ausatisfied = "true";
+                            };
+                            break;
+                        case "Passed":
+                            if ($passedfound == true) {
+                                $ausatisfied = "true";
+                            };
+                            break;
+                        case "CompletedOrPassed":
+                            if ($completedfound == true || $passedfound == true) {
+                                $ausatisfied = "true";
+                            };
+                            break;
+                        case "CompletedAndPassed":
+                            if ($completedfound == true && $passedfound == true) {
+                                $ausatisfied = "true";
+                            };
+                            break;
+                    }
+                    
+                    //If even one AU satisifed is met, then the AU is satisfied overall. Later or earlier sessions don't matter. 
+                    if($ausatisfied == "true"){
+                        break;
+                    }
+                }
+            }
         }
     } 
         // If the 'sessions' in this AU are null we know this hasn't even been attempted.
@@ -280,9 +327,9 @@ foreach ($auids as $key => $auid) {
             // If it's been attempted but no moveon value.
             if ($aumoveon == "NotApplicable") {
                 $austatus = "viewed";
-            } else { // IF it DOES have a moveon value.
+            } 
+            else { // IF it DOES have a moveon value.
 
-//                var_dump($ausatisfied);
                 // If satisifed is returned true.
                 if ($ausatisfied == "true") {
 
