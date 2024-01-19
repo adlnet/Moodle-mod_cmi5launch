@@ -61,17 +61,17 @@ class cmi5_connectors {
         global $DB, $CFG;
         $settings = cmi5launch_settings($id);
 
-        // Retrieve and assign params.
-        $token = $tenanttoken;
-        
-        // The body of the request
-        $data = $filename;
-
         // Build URL to import course to.
         $url= $settings['cmi5launchplayerurl'] . "/api/v1/course" ;
 
+        /*
+        echo"<br>";
+        echo "what is url here?";
+        var_dump($url);
+        echo"<br>";
+        */
         // Sends the stream to the specified URL.
-        $result = $this->cmi5launch_send_request_to_cmi5_player($data, $url, $token);
+        $result = $this->cmi5launch_send_request_to_cmi5_player($filename, $url, $tenanttoken);
 
         if ($result === FALSE) {
 
@@ -100,29 +100,26 @@ class cmi5_connectors {
      * @param $newtenantname - the name the new tenant will be, retreived from Tenant Name textbox.
      */
 
-    public function cmi5launch_create_tenant($urltosend, $user, $pass, $newtenantname){
+    public function cmi5launch_create_tenant($urltosend, $username, $password, $newtenantname){
 
         global $CFG;
-        //retrieve and assign params
-        $url = $urltosend;
-        $username = $user;
-        $password = $pass;
-        $tenant = $newtenantname;
     
         // The body of the request must be made as array first.
         $data = array(
-            'code' => $tenant);
+            'code' => $newtenantname);
 
         // Sends the stream to the specified URL 
-        $result = $this->cmi5launch_send_request_to_cmi5_player($data, $url, $username, $password);
+        $result = $this->cmi5launch_send_request_to_cmi5_player($data, $urltosend, $username, $password);
 
         if ($result === FALSE){
-            if ($CFG->debugdeveloper)  {
-                    echo "Something went wrong creating the tenant";
-                    echo "<br>";
-                  
+
+            echo "<br>";
+
+            echo "Something went wrong creating the tenant. CMI5 Player returned " . $result;
+
+            echo "<br>";
                 }
-        }
+        
 
         // Decode returned response into array.
         $returnedinfo = json_decode($result, true);

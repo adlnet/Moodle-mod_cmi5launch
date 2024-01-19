@@ -66,11 +66,32 @@ class cmi5ConnectorsTest extends TestCase
             ->onlyMethods(array('cmi5launch_send_request_to_cmi5_player'))
             ->getMock();
 
+          //$setting =  $this->getMockBuilder(\stdclass::class)->addMethods(array('cmi5launch_settings'))->getMock();
+      //  $setting = $this->getFunctionMod(_mod_cmi5launch\local__, 'cmi5launch_settings');
+        //    $setting = $this->getMockBuilder(\stdclass::class)
+         //   ->addMethods(array('cmi5launch_settings'))
+         //   ->getMock();
+
+           // $setting = $this->createMock(cmi5launch__settings::class)
+            //->addMethods(array('cmi5launch_settings'))
+            //->getMock();
+
+// mod_cmi5launch\local\cmi5launch_settings()
+// Can I mock lib? Then stuff like settings could be mocked? 
+
+        
         // We will have the mock return a basic string, as it's not under test
         // the string just needs to be returned as is. We do expect create_course to only call this once.
         $csc->expects($this->once())
         ->method('cmi5launch_send_request_to_cmi5_player')
-        ->willReturn('Request sent to player')
+        // IT will call '/api/v1/course' nd not a whole url because that is accessed through "Settings" not reachable under test conditions, so it
+        // will only use the second part of concantation
+        ->with('testfilename', '/api/v1/course', 'testtoken')
+        ->willReturn('Request sent to player');
+        
+    //    $setting->expects($this->any())
+    //   ->method('cmi5launch_settings')
+    //    ->willReturn(array('cmi5launchplayerurl' => 'http://localhost:8000/launch.php'))
        // ->with('Request sent to player')
     ;
 
@@ -85,6 +106,7 @@ class cmi5ConnectorsTest extends TestCase
         
 
     }
+    
   public function testcmi5launch_create_course_fail()
   {
              // global $auidForTest;
@@ -106,6 +128,7 @@ class cmi5ConnectorsTest extends TestCase
         // method under failing conditions. We do expect create_course to only call this once.
         $csc->expects($this->once())
         ->method('cmi5launch_send_request_to_cmi5_player')
+        ->with('testfilename', '/api/v1/course', 'testtoken')
         ->willReturn(FALSE)
        // ->with('Request sent to player')
     ;
@@ -117,19 +140,8 @@ class cmi5ConnectorsTest extends TestCase
         // Result should be debug echo string and false
         $this->assertNotTrue($result, "Expected retrieved object to be false");
          //And it should output this error message
-
          $this->expectOutputString("<br>Something went wrong creating the course. CMI5 Player returned ". $result . "<br>");
  
-
-        // And if it fails it should fail gracefully
-      //  $badid = 0;
-      //  $returnedAu = $helper->cmi5launch_retrieve_aus_from_db($badid);
-        
-        // And the return should be a false value
-       // $this->assertNotTrue($returnedAu, "Expected retrieved object to be false");
-        //And it should output this error message
-      //  $this->expectOutputString("<p>Error attempting to get AU data from DB. Check AU id. AU id is: " . $badid . "</p>");
-
 
   }
 
@@ -137,17 +149,22 @@ class cmi5ConnectorsTest extends TestCase
   // cmi5launch_create_tenant, so to test it we want to make sure it calls the other func and retutrns what it does
   // or throws the specified error
   // (This is another place I have the error only if debug and wonder if it should be different. We always want that to show riht?) 
-  public function testcmi5launch_create_tenant()
+  public function testcmi5launch_create_tenant_pass()
   {
 
    // global $auidForTest;
-   global $auidForTest;
-   global $DB, $CFG;
+   global $CFG;
 
-   $id = 0;
-   $tenanttoken = "testtoken";
-   $filename = "testfilename";
+   $urltosend = "playerwebaddress";
+   $username = "testname";
+   $password = "testpassword";
+    $newtenantname = "testtenantname";
 
+    $returnvalue = array(
+      "code" => "testtenantname",
+      "id" => 9
+    );
+  
    // Mock a cmi5 connector object but only stub ONE method, as we want to test the other
    // Create a mock of the send_request class as we don't actually want
    // to create a new course in the player.
@@ -159,19 +176,67 @@ class cmi5ConnectorsTest extends TestCase
    // the string just needs to be returned as is. We do expect create_course to only call this once.
    $csc->expects($this->once())
    ->method('cmi5launch_send_request_to_cmi5_player')
-   ->willReturn('Request sent to player')
+   ->with(array ('code' => 'testtenantname'), 'playerwebaddress', 'testname', 'testpassword')
+   // IRL it returns something that needs to be json decoded, so lets pass somethin that is encoded>
+   ->willReturn('{
+    "code": "testtenantname",
+    "id": 9
+    }'     )
   // ->with('Request sent to player')
 ;
 
 // I think I need to say expect to be called with these, 
 // because for some reason it says paraaam 0 is not matching?
    //Call the method under test. 
-   $result =$csc->cmi5launch_create_course($id, $tenanttoken, $filename);
+   $result =$csc->cmi5launch_create_tenant($urltosend, $username, $password, $newtenantname);
 
    // And the return should be a string (the original method returns what the player sends back or FALSE)
-    $this->assertIsString($result);
-    $this->assertEquals('Request sent to player', $result);
+    $this->assertIsArray($result);
+    $this->assertEquals( $returnvalue, $result);
   }
 
+  public function testcmi5launch_create_tenant_fail()
+  {
+    
+    // global $auidForTest;
+    global $CFG;
 
+    $urltosend = "playerwebaddress";
+    $username = "testname";
+    $password = "testpassword";
+     $newtenantname = "testtenantname";
+ 
+     $returnvalue = array(
+       "code" => "testtenantname",
+       "id" => 9
+     );
+   
+    // Mock a cmi5 connector object but only stub ONE method, as we want to test the other
+    // Create a mock of the send_request class as we don't actually want
+    // to create a new course in the player.
+    $csc = $this->getMockBuilder('mod_cmi5launch\local\cmi5_connectors')
+        ->onlyMethods(array('cmi5launch_send_request_to_cmi5_player'))
+        ->getMock();
+
+        // This time we will have ti 'fail' so return a fail response from player
+    $csc->expects($this->once())
+    ->method('cmi5launch_send_request_to_cmi5_player')
+    ->with(array ('code' => 'testtenantname'), 'playerwebaddress', 'testname', 'testpassword')
+    // IRL it returns something that needs to be json decoded, so lets pass somethin that is encoded>
+    ->willReturn(false)
+   // ->with('Request sent to player')
+ ;
+
+// I think I need to say expect to be called with these, 
+// because for some reason it says paraaam 0 is not matching?
+   //Call the method under test. 
+   $result =$csc->cmi5launch_create_tenant($urltosend, $username, $password, $newtenantname);
+
+        // Result should be debug echo string and false
+        $this->assertNotTrue($result, "Expected retrieved object to be false");
+         //And it should output this error message
+         $this->expectOutputString("<br>Something went wrong creating the tenant. CMI5 Player returned ". $result . "<br>");
+ 
+
+  }
 }
