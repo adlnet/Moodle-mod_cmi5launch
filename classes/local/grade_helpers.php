@@ -112,6 +112,12 @@ function cmi5launch_highest_grade($scores)
     // Highest equals 0 to start
     $highestgrade = 0;
 
+    // First check if scores is a string, if a string we need it to be array
+    if(is_string($scores)){
+        $scores = json_decode($scores, true);
+    
+    }
+
     //So if it is an array it doesn't work, can we check its a string and if NOT then json decode
     //Is this the problme
     if (!$scores == null && is_array($scores)) {
@@ -126,11 +132,12 @@ function cmi5launch_highest_grade($scores)
                 $highestgrade = $value;
             }
         }
+            
 
     } elseif ($scores > $highestgrade && !is_array($scores)){ 
         
         $highestgrade = $scores; 
-
+     
     } else {
         $highestgrade = 0;
         }

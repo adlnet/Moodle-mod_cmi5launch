@@ -261,8 +261,7 @@ foreach ($auschunked[0] as $au) {
             //These are the AUS we want to send on if clicked, the more specific ids (THIS users AU ids).
             $currentauids = $userrecord->aus;
             $infofornextpage[] = $currentauids;
-                
-    
+
 // Maybe the problem is the na? maybe it needs to be 0 in cse teacher views before students? 
                 $userscore = "";
             if (!$usergrades == null) {
