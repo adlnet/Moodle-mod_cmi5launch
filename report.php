@@ -227,9 +227,10 @@ foreach ($auschunked[0] as $au) {
     
         // Array to hold info for next page, that will be placed into buttons for user to click.
         $infofornextpage = array();
-        
+  
         //Retrieve the current au id, this is always unique and will help with retrieving the 
         // student grades. It is the uniquie id cmi5 spec id.
+        $aulmsid = $au[0]['lmsId'];
         $infofornextpage[] = $au[0]['id'];
 
         // Grab the current title of the AU for the row header, also to be sent to next page.
@@ -241,12 +242,6 @@ foreach ($auschunked[0] as $au) {
 
         // Retrieve users specific info for this course.
         $userrecord = $DB->get_record('cmi5launch_course', ['courseid' => $record->courseid, 'userid' => $user->id]);
-
-      
-
-      
-        // Retrieve/update the users grades for this course.
-       // $updategrades($cmi5launch, $user->id);
 
         // Userrecord may be null if user has not participated in course yet.
         if ($userrecord == null) {
@@ -262,22 +257,24 @@ foreach ($auschunked[0] as $au) {
             $currentauids = $userrecord->aus;
             $infofornextpage[] = $currentauids;
 
-// Maybe the problem is the na? maybe it needs to be 0 in cse teacher views before students? 
-                $userscore = "";
+            $userscore = "";
+            
             if (!$usergrades == null) {
                
                 // Retrieve grade type from settings.
                 $gradetype = $cmi5launchsettings["grademethod"];
       
-                // Now compare the usergrades array keys to name of current autitle, if
+                // Now compare the usergrades array keys to lmsid of current au, if
                 // it matches then we want to display, that's what userscore is.
-                if (array_key_exists($currenttitle, $usergrades)) {
-                
-                    $augrades = $usergrades[$currenttitle];
-                  
-                    /// This is just tp display, and it calculates here so it doesn't effec the
+                if(array_key_exists($aulmsid, $usergrades)){
+            
+                    // If it is, we want it's info which should be title => grade(s).
+                    $auinfo = array();
+                    $auinfo = $usergrades[$aulmsid];
+                    $augrades = $auinfo[$currenttitle];
+                 
+                    /// This is just tp display, and it calculates here so it doesn't effect the
                     // base array stored for au
-         
                     switch($gradetype){
                     /**
                      * ('GRADE_AUS_CMI5' = '0');

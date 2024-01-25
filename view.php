@@ -385,7 +385,7 @@ foreach ($auids as $key => $auid) {
         $tabledata[] = $auinfo;
 
         // Update AU scores.
-        $auscores[($au->title)] = ($au->scores);
+        $auscores[$au->lmsid] = array ($au->title => $au->scores);
         
         // Update the AU in DB.
         $DB->update_record("cmi5launch_aus", $au);

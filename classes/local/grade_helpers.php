@@ -250,8 +250,12 @@ function cmi5launch_highest_grade($scores)
                                 echo "Gradetype not found.";
                             }
                        
+                            // Maybe here!
+                             // Well now how to make this work retroactively
+                            $auscores[$aurecord->lmsid] = array ($aurecord->title => $aurecord->scores);
+        
                             // Save Au title and their scores to AU
-                            $auscores[($aurecord->title)] = ($aurecord->scores);
+                           // $auscores[($aurecord->title)] = ($aurecord->scores);
                             // Save updates to DB.
                             $aurecord = $DB->update_record('cmi5launch_aus', $aurecord);
                         } 
