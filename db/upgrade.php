@@ -40,6 +40,17 @@ defined('MOODLE_INTERNAL') || die();
 function xmldb_cmi5launch_upgrade($oldversion) {
     global $DB;
     $dbman = $DB->get_manager();
+    if ($oldversion < 2024012516) {
+
+       // Changing type of field ausgrades on table cmi5launch_course to text.
+       $table = new xmldb_table('cmi5launch_course');
+       $field = new xmldb_field('ausgrades', XMLDB_TYPE_TEXT, 4000, null, null, null, null, 'aus');
+
+       // Launch change of type for field ausgrades.
+       $dbman->change_field_type($table, $field);
+
+       // Cmi5launch savepoint reached.
+    }
     if ($oldversion < 2024010212) {
 
         // Changing type of field masteryscore on table cmi5launch_sessions to int.
