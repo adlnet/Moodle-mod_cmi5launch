@@ -231,8 +231,8 @@ foreach ($auschunked[0] as $au) {
         //Retrieve the current au id, this is always unique and will help with retrieving the 
         // student grades. It is the uniquie id cmi5 spec id.
         $aulmsid = $au[0]['lmsId'];
-        $infofornextpage[] = $au[0]['id'];
-
+       // $infofornextpage[] = $au[0]['id'];
+        $infofornextpage[] = $aulmsid;
         // Grab the current title of the AU for the row header, also to be sent to next page.
         $currenttitle = $au[0]['title'][0]['text'];
         $infofornextpage[] = $currenttitle;
@@ -273,6 +273,13 @@ foreach ($auschunked[0] as $au) {
                     $auinfo = $usergrades[$aulmsid];
                     $augrades = $auinfo[$currenttitle];
                  
+                       //These are the AUS we want to send on if clicked, the more specific ids (THIS users AU ids).
+           // $currentauids = $userrecord->aus;
+            // $infofornextpage[] = $currentauids;
+            // I think switching this here will fix the issue
+               //These are the AUS we want to send on if clicked, the more specific ids (THIS users AU ids).
+           // $currentauids = $userrecord->aus;
+         //   $infofornextpage[] = $currentauids;
                     /// This is just tp display, and it calculates here so it doesn't effect the
                     // base array stored for au
                     switch($gradetype){
