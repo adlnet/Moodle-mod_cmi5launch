@@ -43,7 +43,7 @@
         <FIELD NAME="registrationid" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" COMMENT="Course registration ID returned by CMI5 player. We want to use this for LRS instead"/>
         <FIELD NAME="returnurl" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Tenants return url, where it will go after closing course from launch url"/>
         <FIELD NAME="aus" TYPE="text" LENGTH="4000" NOTNULL="false" SEQUENCE="false" COMMENT="The AUs of the course, their DB ids, saved as array"/>              
-        <FIELD NAME="ausgrades" TYPE="char" LENGTH="1000" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="All the aus and their grades (their overall grades?)"/>
+        <FIELD NAME="ausgrades" TYPE="text" LENGTH="4000" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="All the aus and their grades (their overall grades?)"/>
         <FIELD NAME="grade" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="The overall grade for the course, the average of all it's aus"/>
      </FIELDS>
       <KEYS>

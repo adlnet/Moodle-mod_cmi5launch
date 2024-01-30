@@ -48,6 +48,10 @@ class cmi5_connectors {
     public function cmi5launch_get_registration_with_get() {
         return [$this, 'cmi5launch_retrieve_registration_with_get'];
     }
+    public function cmi5launch_get_send_request_to_cmi5_player_post() {
+        return [$this, 'cmi5launch_send_request_to_cmi5_player_post'];
+
+    }
 
     /**
     * Function to create a course.
@@ -64,14 +68,9 @@ class cmi5_connectors {
         // Build URL to import course to.
         $url= $settings['cmi5launchplayerurl'] . "/api/v1/course" ;
 
-        /*
-        echo"<br>";
-        echo "what is url here?";
-        var_dump($url);
-        echo"<br>";
-        */
+        $databody = $filename->get_content();
         // Sends the stream to the specified URL.
-        $result = $this->cmi5launch_send_request_to_cmi5_player($filename, $url, $tenanttoken);
+        $result = $this->cmi5launch_send_request_to_cmi5_player_post($databody, $url, $tenanttoken);
 
         if ($result === FALSE) {
 
@@ -109,7 +108,7 @@ class cmi5_connectors {
             'code' => $newtenantname);
 
         // Sends the stream to the specified URL 
-        $result = $this->cmi5launch_send_request_to_cmi5_player($data, $urltosend, $username, $password);
+        $result = $this->cmi5launch_send_request_to_cmi5_player_post($data, $urltosend, $username, $password);
 
         if ($result === FALSE){
 
@@ -348,14 +347,109 @@ class cmi5_connectors {
          * Function to construct, send an URL, and save result.
          * @param $databody - the data that will be used to construct the body of request as JSON.
          * @param $url - The URL the request will be sent to.
+         * @param ...$tokenorpassword is a variable length param. If one is passed, it is $token, if two it is $username and $password.
+         * @return - $result is the response from cmi5 player.
+         */
+        public function cmi5launch_send_request_to_cmi5_player_post($databody, $url, ...$tokenorpassword) {
+            
+            // so func num args is a thing, this may be the way to do it 
+           // $data = $databody;
+          //  $tenantinformation = $tokenorpassword;
+
+            #what is number of args?
+            echo"<br>";
+            echo "what is number of args? . " . func_num_args();
+
+            //If number of args is greater than one it is for retrieving tenant info and args are username and password
+            if(func_num_args() == 4 ){
+            
+                echo"<br>";
+                echo " IT worked!";
+                echo"<br>";
+                
+                $username = $tokenorpassword[0];
+                $password = $tokenorpassword[1];
+
+                // Use key 'http' even if you send the request to https://...
+                // There can be multiple headers but as an array under the ONE header
+                // content(body) must be JSON encoded here, as that is what CMI5 player accepts
+                $options = array(
+                    'http' => array(
+                        'method'  => 'POST',
+                        'header' => array('Authorization: Basic '. base64_encode("$username:$password"),  
+                            "Content-Type: application/json\r\n" .
+                            "Accept: application/json\r\n"),
+                        'content' => json_encode($databody)
+                    )
+                );
+                // The options are here placed into a stream to be sent.
+                $context  = stream_context_create($options);
+            
+                // Sends the stream to the specified URL and stores results.
+                // The false is use_include_path, which we dont want in this case, we want to go to the url.
+                $result = file_get_contents( $url, false, $context );
+
+                echo"<br>";
+                echo "result is " . $result;
+                echo"<br>";
+                // Return response
+                return $result;
+            }
+            
+            // Else the args are what we need for posting a course.
+            // heres where we need to split further, or send different ars
+            //cause THIS one needs data extracted and the rest dont
+            //can whoever calls this just pass the data with et content already called? 
+          	else{
+
+				// First arg will be token.
+                $token = $tokenorpassword[0];
+              //  $file_contents = $databody->get_content();
+              // YEs it works unpaicn it in earleir func, now others can go through here!!!!
+
+                // Use key 'http' even if you send the request to https://...
+                // There can be multiple headers but as an array under the ONE header
+                // content(body) must be JSON encoded here, as that is what CMI5 player accepts
+                // JSON_UNESCAPED_SLASHES used so http addresses are displayed correctly
+                $options = array(
+                    'http' => array(
+                        'method'  => 'POST',
+                        'ignore_errors' => true,
+                        'header' => array("Authorization: Bearer ". $token,  
+                            "Content-Type: application/zip\r\n"), 
+                        'content' => $databody
+                    )
+                );
+
+                //  The options are placed into a stream to be sent.
+                 $context  = stream_context_create(($options));
+    
+                //  Sends the stream to the specified URL and stores results.
+                //  The false is use_include_path, which we dont want in this case, we want to go to the url.
+                $result = file_get_contents( $url, false, $context );
+
+      	        return $result;
+            }
+    }
+
+
+
+        /**
+         * Function to construct, send an URL, and save result.
+         * @param $databody - the data that will be used to construct the body of request as JSON.
+         * @param $url - The URL the request will be sent to.
          * @param ...$tenantinfo is a variable length param. If one is passed, it is $token, if two it is $username and $password.
          * @return - $result is the response from cmi5 player.
          */
         public function cmi5launch_send_request_to_cmi5_player($databody, $url, ...$tenantinfo) {
             
+            // so func num args is a thing, this may be the way to do it 
             $data = $databody;
             $tenantinformation = $tenantinfo;
-
+#what is number of args?
+echo"<br>";
+echo "what is number of args? . " . func_num_args();
+echo"<br>";
             //If number of args is greater than one it is for retrieving tenant info and args are username and password
             if(count($tenantinformation) > 1 ){
             

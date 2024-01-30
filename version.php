@@ -28,6 +28,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+// Until workaround leave old version but current should be 2024012516
 $plugin->version   = 2024012516;      // The current module version (Date: YYYYMMDDXX).
 
 $plugin->requires  = 2015111000;      // Requires Moodle 3.0 version.
