@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * launches the experience with the requested registration
+ * Launches the experience with the requested registration
  *
  * @copyright  2023 Megan Bohland
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -33,6 +33,7 @@ require_once('header.php');
 
 global $CFG, $cmi5launch, $USER, $DB;
 
+// MB - currently not utilizing events, but may in future.
 /*
 // Trigger Activity launched event.
 $event = \mod_cmi5launch\event\activity_launched::create(array(
@@ -83,60 +84,49 @@ if (empty($registrationid)) {
     }
 }
 
-// To hold launch url or whether launch url is new.
+// To hold launch url.
 $location = "";
 
-// If true, this is a NEW launch.
-if ($idandstatus[0] == "true") {
+// Retrieve AUs.
+$au = $retrieveaus($id);
 
-    // Retrieve AUs.
-    $au = $retrieveaus($id);
+// Retrieve the au index.
+$auindex = $au->auindex;
 
-    // Retrieve the au index.
-    $auindex = $au->auindex;
+// Pass in the au index to retrieve a launchurl and session id.
+$urldecoded = $cmi5launchretrieveurl($cmi5launch->id, $auindex);
 
-    // Pass in the au index to retrieve a launchurl and session id.
-    $urldecoded = $cmi5launchretrieveurl($cmi5launch->id, $auindex);
+// Retrieve and store session id in the aus table.
+$sessionid = intval($urldecoded['id']);
 
-
-    // Retrieve and store session id in the aus table.
-    $sessionid = intval($urldecoded['id']);
-
-    // Check if there are previous sessions.
-    if (!$au->sessions == null) {
-        // We don't want to overwrite so retrieve the sessions before changing them.
-        $sessionlist = json_decode($au->sessions);
-        // Now add the new session number.
-        $sessionlist[] = $sessionid;
-
-    } else {
-        // If it is null just start fresh.
-        $sessionlist = array();
-        $sessionlist[] = $sessionid;
-    }
-
-    // Save sessions.
-    $au->sessions = json_encode($sessionlist);
-
-    // The record needs to updated in DB.
-    $updated = $DB->update_record('cmi5launch_aus', $au, true);
-
-    // Retrieve the launch url.
-    $location = $urldecoded['url'];
-    // And launch method.
-    $launchmethod = $urldecoded['launchMethod'];
-
-    // Create and save session object to session table.
-    $savesession($sessionid, $location, $launchmethod);
+// Check if there are previous sessions.
+if (!$au->sessions == null) {
+    // We don't want to overwrite so retrieve the sessions before changing them.
+    $sessionlist = json_decode($au->sessions);
+    // Now add the new session number.
+    $sessionlist[] = $sessionid;
 
 } else {
-    // This is NOT a new session, we want to get the launch url from the sessions.
-    $session = $DB->get_record('cmi5launch_sessions',  array('sessionid' => $id));
-
-    // Launch url is in old session record.
-    $location = $session->launchurl;
+    // If it is null just start fresh.
+    $sessionlist = array();
+    $sessionlist[] = $sessionid;
 }
-// last thing check for updates
+
+// Save sessions.
+$au->sessions = json_encode($sessionlist);
+
+// The record needs to updated in DB.
+$updated = $DB->update_record('cmi5launch_aus', $au, true);
+
+// Retrieve the launch url.
+$location = $urldecoded['url'];
+// And launch method.
+$launchmethod = $urldecoded['launchMethod'];
+
+// Create and save session object to session table.
+$savesession($sessionid, $location, $launchmethod);
+
+// Last thing check for updates
 cmi5launch_update_grades($cmi5launch, $USER->id);
 
 header("Location: ". $location);

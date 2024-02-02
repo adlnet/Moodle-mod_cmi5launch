@@ -34,6 +34,7 @@ define('CMI5LAUNCH_REPORT_ATTEMPTS_ALL_STUDENTS', 0);
 define('CMI5LAUNCH_REPORT_ATTEMPTS_STUDENTS_WITH', 1);
 define('CMI5LAUNCH_REPORT_ATTEMPTS_STUDENTS_WITH_NO', 2);
 
+global $cmi5launch, $cmi5launchsettings,$USER, $DB;
 // Reload course information.
 $cm = get_coursemodule_from_id('cmi5launch', $id, 0, false, MUST_EXIST);
 $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
@@ -79,7 +80,8 @@ $updategrades = $gradehelpers->get_cmi5launch_check_user_grades_for_updates();
 $highestgrade = $gradehelpers->get_cmi5launch_highest_grade();
 $averagegrade = $gradehelpers->get_cmi5launch_average_grade();
 
-global $cmi5launch, $cmi5launchsettings;
+
+$cmi5launchsettings = cmi5launch_settings($cmi5launch->id);
 
 // Activate the secondary nav tab.
 navigation_node::override_active_url(new moodle_url('/mod/cmi5launch/report.php', ['id' => $id]));
@@ -152,15 +154,13 @@ $headers[] = get_string('autitle', 'cmi5launch');
 // The table is always the same, but the amount of users shown varies.
 // If user has capability, they can see all users.
 if (has_capability('mod/cmi5launch:viewgrades', $context)) {
-    // This is a teacher, show all users.
-
+    
     // Get enrolled users for this course. 
     $users = get_enrolled_users($contextmodule);
 
 
     foreach ($users as $user) {
 
-        // Here??
         // Call updategrades to ensure all grades are up to date before view.
         $updategrades($user);
 
@@ -171,10 +171,10 @@ if (has_capability('mod/cmi5launch:viewgrades', $context)) {
         // Backbutton goes to grader.
         $backurl = $CFG->wwwroot . '/grade/report/grader/index.php' . '?id=' .$cmi5launch->course;
         }
-} else { 
+} else {
+
     // If the user does not have the correct capability then we are looking at a specific user, 
     // who is not a teacher and needs to see only their grades.
-    global $USER, $DB;
     // Retrieve that user from DB.
     $user = $DB->get_record('user', array('id' => $USER->id));
     
@@ -231,7 +231,6 @@ foreach ($auschunked[0] as $au) {
         //Retrieve the current au id, this is always unique and will help with retrieving the 
         // student grades. It is the uniquie id cmi5 spec id.
         $aulmsid = $au[0]['lmsId'];
-       // $infofornextpage[] = $au[0]['id'];
         $infofornextpage[] = $aulmsid;
         // Grab the current title of the AU for the row header, also to be sent to next page.
         $currenttitle = $au[0]['title'][0]['text'];
@@ -242,8 +241,11 @@ foreach ($auschunked[0] as $au) {
 
         // Retrieve users specific info for this course.
         $userrecord = $DB->get_record('cmi5launch_course', ['courseid' => $record->courseid, 'userid' => $user->id]);
+       
+        // Retrieve grade type from settings.
+        $gradetype = $cmi5launchsettings["grademethod"];
 
-        // Userrecord may be null if user has not participated in course yet.
+        // User record may be null if user has not participated in course yet.
         if ($userrecord == null) {
             
             $userscore = " ";
@@ -260,10 +262,7 @@ foreach ($auschunked[0] as $au) {
             $userscore = "";
             
             if (!$usergrades == null) {
-               
-                // Retrieve grade type from settings.
-                $gradetype = $cmi5launchsettings["grademethod"];
-      
+
                 // Now compare the usergrades array keys to lmsid of current au, if
                 // it matches then we want to display, that's what userscore is.
                 if(array_key_exists($aulmsid, $usergrades)){
@@ -273,15 +272,8 @@ foreach ($auschunked[0] as $au) {
                     $auinfo = $usergrades[$aulmsid];
                     $augrades = $auinfo[$currenttitle];
                  
-                       //These are the AUS we want to send on if clicked, the more specific ids (THIS users AU ids).
-           // $currentauids = $userrecord->aus;
-            // $infofornextpage[] = $currentauids;
-            // I think switching this here will fix the issue
-               //These are the AUS we want to send on if clicked, the more specific ids (THIS users AU ids).
-           // $currentauids = $userrecord->aus;
-         //   $infofornextpage[] = $currentauids;
-                    /// This is just tp display, and it calculates here so it doesn't effect the
-                    // base array stored for au
+
+                    /// This is just to display, and it calculates here so it doesn't effect the base array stored for AU.
                     switch($gradetype){
                     /**
                      * ('GRADE_AUS_CMI5' = '0');
@@ -290,15 +282,14 @@ foreach ($auschunked[0] as $au) {
                         *('GRADE_SUM_CMI5', = '3');
                     */
                             case 1:
-                            $userscore = $highestgrade($augrades);
+                            $userscore = strval($highestgrade($augrades));
                             break;
                             case 2:
                             //We need to update rawgrade not all of grades, that wipes out the array format it needs
-                            $userscore = $averagegrade($augrades);
+                            $userscore = strval($averagegrade($augrades));
                             break;
                     }
-         
-            
+
                     // Remove [] from userscore if they are there.
                     $toremove = array("[", "]");
                     if ($userscore != null && str_contains($userscore, "[")) {
@@ -313,11 +304,6 @@ foreach ($auschunked[0] as $au) {
         }
         // Add the userid to info for next page.
         $infofornextpage[] = $user->id;
-
-         // Retrieve grade type from settings.
-         $gradetype = $cmi5launchsettings["grademethod"];
-        //Add the gradetype to info for next page.
-        $infofornextpage[] = $gradetype;
 
         // Convert their grade to string to be passed into html button.
         $userscoreasstring = strval($userscore);

@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- *  A class to help with grading functions such as LRS querying and grade calculation
+ *  A class to help with grading functions such as LRS querying and grade calculation.
  *
  * @copyright  2023 Megan Bohland
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -25,8 +25,6 @@ namespace mod_cmi5launch\local;
 
 defined('MOODLE_INTERNAL') || die();
 
-use mod_cmi5launch\local\au_helpers;
-use mod_cmi5launch\local\progress;
 use mod_cmi5launch\local\session_helpers;
 
 class grade_helpers
@@ -47,57 +45,36 @@ class grade_helpers
     }
 
 /**
- * Takes in an array of scores and returns the average grade
+ * Takes in an array of scores and returns the average grade.
  * @param mixed $scores
  * @return int
  */
 function cmi5launch_average_grade($scores)
 {
-
     global $cmi5launch, $USER, $DB;
 
-        // If it isn't an array it (array_sum) doesn't work, check if it's a string and if NOT then json decode
-        if (!$scores == null && is_array($scores)) {
+    // If it comes in as string, convert to array
+    if (is_string($scores)) {
+        $scores = json_decode($scores, true);
+    }
+    // If it isn't an array it (array_sum) doesn't work.
+    if (!$scores == null && is_array($scores)) {
 
-            echo "1";
-            // Find the average of the scores
-            $averagegrade = (array_sum($scores) / count($scores));
+        // Find the average of the scores
+        $averagegrade = (array_sum($scores) / count($scores));
+    
+    } elseif (!$scores == null && !is_array($scores)) {
 
-            // If string it sometimes has brackets, check for them and remove them if found.
-          /*  if (str_contains($averagegrade, "[")) {
-                $averagegrade = str_replace("[", "", $averagegrade);
-            }
-            */
-            // Apply intval if string
-            $averagegrade = intval($averagegrade);
-        
-        } elseif  (!$scores == null && !is_array($scores)) {
-            echo "2";
-            
-            // If it's an int, it's a single value so average is itself.
-            $averagegrade = $scores;
+        // If it's an int, it's a single value so average is itself.
+        $averagegrade = $scores;
+    } else {
+        $averagegrade = 0;
+    }
 
-              // If string it sometimes has brackets, check for them and remove them if found.
-          /*   if (str_contains($averagegrade, "[")) {
-                $averagegrade = str_replace("[", "", $averagegrade);
-            }*/
-        }
-        else {
-            echo "3";
-            $averagegrade = 0;
-        }
+    // Now apply intval.
+    $averagegrade = intval($averagegrade);
 
-          // Remove [] from userscore if they are there.
-          $toremove = array("[", "]");
-          if ($averagegrade != null && str_contains($averagegrade, "[")) {
-            $averagegrade = str_replace($toremove, "", $averagegrade);
-          }
-
-           // Now apply intval.
-           $averagegrade = intval($averagegrade);
-        // and cast it to int
     return $averagegrade;
-
 }
 
 /**
@@ -108,49 +85,29 @@ function cmi5launch_average_grade($scores)
 function cmi5launch_highest_grade($scores)
 {
     global $cmi5launch, $USER, $DB;
-        
+
     // Highest equals 0 to start
     $highestgrade = 0;
 
     // First check if scores is a string, if a string we need it to be array
     if(is_string($scores)){
         $scores = json_decode($scores, true);
-    
     }
 
-    //So if it is an array it doesn't work, can we check its a string and if NOT then json decode
-    //Is this the problme
     if (!$scores == null && is_array($scores)) {
 
-        // MB- This is ridiculous, but I have to write my own MAX func to get around the php/moodle error until it is resolved.
-        // Highest equals 0 to start
-        $highestgrade = 0;
-        
-        foreach($scores as $key => $value){
-            
-            if($value > $highestgrade){
-                $highestgrade = $value;
-            }
-        }
-            
+    // Find the highest grade.
+    $highestgrade = max($scores);
 
-    } elseif ($scores > $highestgrade && !is_array($scores)){ 
-        
-        $highestgrade = $scores; 
-     
-    } else {
-        $highestgrade = 0;
-        }
+    } elseif ($scores > $highestgrade && !is_array($scores)) {
 
-    // Sometimes there will be brackets, check for them and remove them if found.  
-   if (str_contains($highestgrade, "[")) {
-            $highestgrade = str_replace("[", "", $highestgrade);
-        }
-        // Now apply intval.
-        $highestgrade = intval($highestgrade);
+        // If it's an int, it's a single value so highest is itself.
+        $highestgrade = $scores;
+    }
+    // Now apply intval.
+    $highestgrade = intval($highestgrade);
 
     return $highestgrade;
-
 }
 
     /**
@@ -161,14 +118,15 @@ function cmi5launch_highest_grade($scores)
      */
     public function cmi5launch_check_user_grades_for_updates($user)
     {
+        global $cmi5launch, $USER, $DB;
+    
+        $cmi5launchsettings = cmi5launch_settings($cmi5launch->id);
 
         // Bring in functions and classes.
         $sessionhelper = new session_helpers;
 
         // Functions from other classes.
         $updatesession = $sessionhelper->cmi5launch_get_update_session();
-
-        global $cmi5launch, $USER, $DB;
 
         // Check if record already exists.
         $exists = $DB->record_exists('cmi5launch_course', ['courseid' => $cmi5launch->courseid, 'userid' => $user->id]);
@@ -187,6 +145,7 @@ function cmi5launch_highest_grade($scores)
                 
                 // Array to hold Au scores.
                 $auscores = array();
+                $overallgrade = array();
 
                 // Go through each Au, each Au will be responsible for updating its own session.
                 foreach ($auids as $key => $auid) {
@@ -209,7 +168,7 @@ function cmi5launch_highest_grade($scores)
                             // Iterate through each session.
                             foreach ($sessions as $sessionid) {
 
-                                // Using current session id, retriev esession from DB. 
+                                // Using current session id, retrieve session from DB. 
                                 $session = $DB->get_record('cmi5launch_sessions', ['sessionid' => $sessionid]);
 
                                 // Retrieve new info (if any) from CMI5 player and LRS on session.
@@ -231,31 +190,39 @@ function cmi5launch_highest_grade($scores)
                                     $aurecord->terminated = 1;
                                 }
 
-                                //Add the session grade to array
+                                // Add the session grade to array.
                                 $sessiongrades[] = $session->score;
                             }
                             // Save the session scores to AU, it is ok to overwrite.
                             $aurecord->scores = json_encode($sessiongrades, JSON_NUMERIC_CHECK);
 
                             // Determine gradetype and use it to save overall grade to AU.
-                            $gradetype = cmi5launch_retrieve_gradetype();
-                            switch($gradetype){
-                                case "Highest":
+                            $gradetype = $cmi5launchsettings["grademethod"];
+
+                            switch ($gradetype) {
+                                /**
+                                 * ('GRADE_AUS_CMI5' = '0');
+                                 *('GRADE_HIGHEST_CMI5' = '1');
+                                *'GRADE_AVERAGE_CMI5', =  '2');
+                                *('GRADE_SUM_CMI5', = '3');
+                                */
+                                case 1:
                                     $aurecord->grade = $this->cmi5launch_highest_grade($sessiongrades);
                                     break;
-                                case "Average":
+                                case 2:
                                     $aurecord->grade = $this->cmi5launch_average_grade($sessiongrades);
                                     break;
                                 default:
                                 echo "Gradetype not found.";
                             }
                        
-                            // Maybe here!
-                             // Well now how to make this work retroactively
+                            // Save AU scores to corresponding title.
                             $auscores[$aurecord->lmsid] = array ($aurecord->title => $aurecord->scores);
         
+                            // Save an overall grade to array to be passed out to grade_update.
+                            $overallgrade[] = $aurecord->grade;
+
                             // Save Au title and their scores to AU
-                           // $auscores[($aurecord->title)] = ($aurecord->scores);
                             // Save updates to DB.
                             $aurecord = $DB->update_record('cmi5launch_aus', $aurecord);
                         } 
@@ -265,14 +232,14 @@ function cmi5launch_highest_grade($scores)
                 // Update course record.
                 $userscourse->ausgrades = json_encode($auscores);
                 $DB->update_record("cmi5launch_course", $userscourse);
-
             } 
+     
             // Return scores.
-            return $sessiongrades;
+            return $overallgrade;
         
         } else {
  
-            // Do nothing, there is no record for this user in this course
+            // Do nothing, there is no record for this user in this course.
             return false;
 
         }

@@ -26,29 +26,32 @@ require_once("../../config.php");
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require('header.php');
 
-// This page is the go-between from moodle grader (index.php) to our report.php
-// It's never visited itself, but it almost is like an invisible page. So the params it holds or can retrieve
-// such as the userid (not of current user, but userid of who was specifically clicked in grader), or gradeid from that page,
-// can all be retrieved here and passed to report.php
+// This page is the go-between from moodle grader (index.php) to our report.php.
+// It's never visited itself, but is almost like an invisible page. So the params it holds or can retrieve, suchas gradeid, userid, etc.
+// can all be retrieved here and passed to report.php.
 
 // Course module ID
 // This is what's needed if we only want the full course view, it is always included.
 $id = required_param('id', PARAM_INT);
 
 // The following are optional parameters, they are what is needed if we want to zoom in on only ONE user's grades.
+
 // Item number, may be != 0 for activities that allow more than one grade per user.
-// itemnumber is from the moodle grade_items table, which holds info on the grade item itself such as course, mod type, activity title, etc
+// itemnumber is from the moodle grade_items table, which holds info on the grade item itself such as course, mod type, activity title, etc.
 $itemnumber = optional_param('itemnumber', 0, PARAM_INT); 
-// Graded user ID (optional) (not currenlty loged in user).
+
+// Graded user ID (optional) (not the currently logged in user).
 $userid = optional_param('userid', 0, PARAM_INT);
-// The itemid is from the moooodle grade_grades table I believe, appears to correspond to a grade column (for like
-// one cmi5launch or other activity part of a course)
+
+// The itemid is from the Moodle grade_grades table, it corresponds to a grade column.
 $itemid = optional_param('itemid', 0, PARAM_INT);
-// This is the gradeid, which is the id, in the same grade_grades table. So like a row entry, a particular users info
+
+// This gradeid, which is also from the grade_grades table. It corresponds to a row entry, ie. a particular users info.
 $gradeid = optional_param('gradeid', 0, PARAM_INT);
 $contextmodule = context_module::instance($cm->id);
 
 global $cmi5launch, $USER;
+
 
 // Get the course module.
 if (! $cm = get_coursemodule_from_id('cmi5launch', $cm->id)) {
@@ -64,8 +67,8 @@ if (! $course = $DB->get_record('cmi5launch', array('course' => $cm->course, 'na
 
 // Check the user has the capability to view grades.
 if (has_capability('mod/cmi5launch:viewgrades', $context)) {
-	// This is teacher/manger/etc, they can see all grades, so we need to update all grades before they view.
-   
+
+	// This is a teacher/manager/etc, they can see all grades, so we need to update all grades before they view.
     // Get all enrolled users.
     $users = get_enrolled_users($contextmodule);
 
@@ -76,6 +79,7 @@ if (has_capability('mod/cmi5launch:viewgrades', $context)) {
     }    
 
 
+    // If the logged in user has an id pass that along, as they may have grades to view as well.
    if($userid != 0 || null){
     
     redirect('report.php?id=' . $cm->id . '&userid=' . $userid . '&itemnumber=' . $itemnumber . '&itemid=' . $itemid . '&gradeid=' . $gradeid);

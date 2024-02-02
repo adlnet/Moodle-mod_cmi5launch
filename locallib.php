@@ -557,10 +557,10 @@ function cmi5_get_updatefreq_array() {
  * @return array an array of what grade options
  */
 function cmi5_get_grade_method_array() {
-    return array (GRADE_AUS_CMI5 => get_string('GRADE_CMI5_AUS', 'cmi5launch'),
+    return array (
                   GRADE_HIGHEST_CMI5 => get_string('GRADE_HIGHEST_CMI5', 'cmi5launch'),
                   GRADE_AVERAGE_CMI5 => get_string('GRADE_AVERAGE_CMI5', 'cmi5launch'),
-                  GRADE_SUM_CMI5 => get_string('GRADE_SUM_CMI5', 'cmi5launch'));
+    );
 }
 
 

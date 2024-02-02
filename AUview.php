@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Prints an AUs session information annd allows retrieval of session or start of new one.
+ * Prints an AUs session information annd allows start of new one.
  * @copyright  2023 Megan Bohland
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -87,23 +87,6 @@ echo $OUTPUT->header();
             $('#launchform_registration').val(registration);
             // Post it.
             $('#launchform').submit();
-
-            //Add some new content.
-            if (!$('#cmi5launch_status').length) {
-                var message = "<?php echo get_string('cmi5launch_progress', 'cmi5launch'); ?>";
-                $('#region-main .card-body').append('\
-                <div id="cmi5launch_status"> \
-                    <span id="cmi5launch_completioncheck"></span> \
-                    <p id="cmi5launch_attemptprogress">' + message + '</p> \
-                    <p id="cmi5launch_exit"> \
-                        <a href="complete.php?id=<?php echo $id ?>&n=<?php echo $n ?>" title="Return to course"> \
-                            Return to course \
-                        </a> \
-                    </p> \
-                </div>\
-            ');
-            }
-            $('#cmi5launch_completioncheck').load('completion_check.php?id=<?php echo $id ?>&n=<?php echo $n ?>');
         }
 
         // TODO: there may be a better way to check completion. Out of scope for current project.
@@ -155,7 +138,6 @@ if (!$au->sessions == null) {
     get_string('cmi5launchviewlastlaunched', 'cmi5launch'),
     get_string('cmi5launchviewprogress', 'cmi5launch'),
     get_string('cmi5launchviewgradeheader', 'cmi5launch'),
-   // get_string('cmi5launchviewlaunchlinkheader', 'cmi5launch'),
     );
 
     // Retrieve session ids.
@@ -187,19 +169,6 @@ if (!$au->sessions == null) {
         $sessioninfo[] = $session->score;
         // Add score to array for AU.
         $sessionscores[] = $session->score;
-
-        // Build launch link to continue session.
-        // MB - 12-22-23 After discussion and CMI5 spec renewal we realized AU sessions
-        // are not meant to be continued, so we are removing this button. This will also
-        // resolve a lot of the testing issues which were only caused by relaunching.
-        $newsession = "false";
-        $infofornextpage = $sessionid . "," . $newsession;
-/*
-        $sessioninfo[] = "<button tabindex=\"0\" id='cmi5relaunch_attempt'
-        onkeyup=\"key_test('" . $infofornextpage . "')\" onclick=\"mod_cmi5launch_launchexperience('"
-        . $infofornextpage . "')\" style='cursor: pointer;'>"
-        . get_string('cmi5launchviewlaunchlink', 'cmi5launch') . "</button>";
-*/
 
         // Add to be fed to table.
         $tabledata[] = $sessioninfo;

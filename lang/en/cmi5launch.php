@@ -154,19 +154,15 @@ $string['gradeforattempt'] = 'Grade for attempt';
 $string['GRADE_HIGHEST_CMI5'] = 'Highest grade';
 $string['grademethod'] = 'Grading method';
 // TODO - Is this accurate? Does it define for only ONE attempt?  
-$string['grademethod_help'] = 'The grading method defines how the grade for a single attempt of the activity is determined.
+$string['grademethod_help'] = 'The grading method defines how the grade for a single attempt of the activity is determined.';
 
-There are 4 grading methods:
+//There are 4 grading methods:
 
-* Learning objects - The number of completed/passed learning objects
-* Highest grade - The highest score obtained in all passed learning objects
-* Average grade - The mean of all the scores
-* Sum grade - The sum of all the scores';
+//* Highest grade - The highest score obtained in all passed learning objects
+//* Average grade - The mean of all the scores
 $string['grademethoddesc'] = 'The grading method defines how the grade for a single attempt of the activity is determined.';
 $string['gradereported'] = 'Grade reported';
 $string['gradesettings'] = 'Grade settings';
-$string['GRADE_CMI5_AUS'] = 'Learning objects';
-$string['GRADE_SUM_CMI5'] = 'Sum grade';
 
 // Start Activity Settings.
 $string['cmi5launchname'] = 'Launch link name';
