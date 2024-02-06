@@ -48,8 +48,6 @@ class session_helpers {
      * @param mixed $cmi5id - cmi5 instance id
      * @return session
      */
-
-     // MB, maybe here? whenever a session is updated check the grades?
     public function cmi5launch_update_sessions($sessionid, $cmi5id, $user) {
 
         global $CFG, $DB, $cmi5launch, $USER;
@@ -66,13 +64,12 @@ class session_helpers {
         $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
 
         // Reload user course instance.
-        // This only gets loged in user!
         $usersCourse = $DB->get_record('cmi5launch_course', ['courseid'  => $record->courseid, 'userid'  => $user->id]);
 
         // Get updates from the LRS as well.
-        $session = $getprogress($usersCourse->registrationid, $cmi5launch->id, $session);
+        $session = $getprogress($usersCourse->registrationid, $session);
     
-        // Get updates from cmi5player
+        // Get updates from cmi5player.
         // This is sessioninfo from CMI5 player.
         $sessioninfo = $getsessioninfo($sessionid, $cmi5id);
 
@@ -159,11 +156,4 @@ class session_helpers {
         return $session;
     }
 
-
-    public function cmi5launch_sift_sessions_for_satisified($sessionid)
-    {
-        
-
-
-    }
 }

@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * //Class to hold ways to communicate with CMI5 player through its API's -MB
+ * Class to hold ways to communicate with CMI5 player through its API's.
  *
  * @copyright  2023 Megan Bohland
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -68,34 +68,36 @@ class cmi5_connectors {
         // Build URL to import course to.
         $url= $settings['cmi5launchplayerurl'] . "/api/v1/course" ;
 
+        // To determine the headers. 
+        $filetype = "zip";
+
         $databody = $filename->get_content();
         // Sends the stream to the specified URL.
-        $result = $this->cmi5launch_send_request_to_cmi5_player_post($databody, $url, $tenanttoken);
+        $result = $this->cmi5launch_send_request_to_cmi5_player_post($databody, $url, $filetype, $tenanttoken);
 
-        if ($result === FALSE) {
+        // Decode result because if it is not 200 then something went wrong
+        $resulttest = json_decode($result, true);
 
-            // for testing to work, this needs to be commented out.
-            // Because tests dont know if it is CF set or not, come to think of it thouh, maybe this SHOULD always display anyway, to help with any troubleshootin
-         //   if ($CFG->debugdeveloper) {
+
+        if ($resulttest === FALSE || array_key_exists("statusCode", $resulttest) && $resulttest["statusCode"] != 200) {
+
             echo "<br>";
 
-                echo "Something went wrong creating the course. CMI5 Player returned " . $result;
+            echo "Something went wrong creating the course. CMI5 Player returned " . var_dump($result);
 
-                echo "<br>";
+            echo "<br>";
               
-           // }
-            } else {
-
-            // Return an array with course info.
-            return $result;
         }
+
+        // Return an array with course info.
+        return $result;
     }
 
     /**
      * Function to create a tenant.
      * @param $urltosend - URL retrieved from user in URL textbox.
-     * @param $user - username.
-     * @param $pass - password.
+     * @param $username - username.
+     * @param $password - password.
      * @param $newtenantname - the name the new tenant will be, retreived from Tenant Name textbox.
      */
 
@@ -107,8 +109,14 @@ class cmi5_connectors {
         $data = array(
             'code' => $newtenantname);
 
+        // To determine the headers. 
+        $filetype = "json";
+        
+        // Data needs to be JSON encoded.
+        $data = json_encode($data);
+
         // Sends the stream to the specified URL 
-        $result = $this->cmi5launch_send_request_to_cmi5_player_post($data, $urltosend, $username, $password);
+        $result = $this->cmi5launch_send_request_to_cmi5_player_post($data, $urltosend, $filetype, $username, $password);
 
         if ($result === FALSE){
 
@@ -118,7 +126,6 @@ class cmi5_connectors {
 
             echo "<br>";
                 }
-        
 
         // Decode returned response into array.
         $returnedinfo = json_decode($result, true);
@@ -129,7 +136,7 @@ class cmi5_connectors {
 
     /** 
      * Function to retrieve registration from cmi5 player. 
-     * This way uses the registration id.
+     * This way uses the registration id and GET request.
      * Registration  is "code" in returned json body.
      * @param $registration - registration UUID
      * @param $id - launch id
@@ -146,33 +153,23 @@ class cmi5_connectors {
         // Build URL for launch URL request.
         $url = $playerUrl . "/api/v1/registration/" . $registration ;
 
-        $options = array(
-            'http' => array(
-                'method'  => 'GET',
-                'header' => array('Authorization: Bearer ' . $token,  
-                    "Content-Type: application/json\r\n" .
-                    "Accept: application/json\r\n")
-            )
-        );
-        // The options are here placed into a stream to be sent.
-        $context  = stream_context_create($options);
-
-        // Sends the stream to the specified URL and stores results.
-        // The false is use_include_path, which we dont want in this case, we want to go to the url.
-        $result = file_get_contents($url, false, $context);
-
-        $registrationInfo = json_decode($result, true);
-
-        // The returned 'registration info' is a large json object.
-        // Code is the registration id we want.
-        // $registration = $registrationInfo["code"];
-        return $registrationInfo; 
-
+        // Sends the stream to the specified URL 
+        $result = $this->cmi5launch_send_request_to_cmi5_player_get($token, $url);
+        
+        if ($result === FALSE) {
+            echo "<br>";
+            echo "Something went wrong retrieving registration id. CMI5 Player returned " . $result;
+            echo "<br>";
         }
+
+
+        return $result; 
+
+    }
     
 
     /** 
-     * Function to retreive registration from cmi5 player.
+     * Function to retrieve registration from cmi5 player.
      * This way uses the course id and actor name.
      * As this is a POST request it returns a new code everytime it is called.
      * Registration  is "code" in returned json body.
@@ -205,23 +202,21 @@ class cmi5_connectors {
             )
         );
         
-        $options = array(
-            'http' => array(
-                'method'  => 'POST',
-                'header' => array('Authorization: Bearer ' . $token,  
-                "Content-Type: application/json\r\n" .
-                "Accept: application/json\r\n"),
-                'content' => json_encode($data)
-            )
-        );
+        // Data needs to be JSON encoded.
+        $data = json_encode($data);
+        // To determine the headers. 
+        $filetype = "json";
+
+        // Sends the stream to the specified URL 
+        $result = $this->cmi5launch_send_request_to_cmi5_player_post($data, $url, $filetype, $token);
 
 
-        // The options are here placed into a stream to be sent.
-        $context  = stream_context_create($options);
-        
-        // Sends the stream to the specified URL and stores results.
-        // The false is use_include_path, which we dont want in this case, we want to go to the url.
-        $result = file_get_contents($url, false, $context);
+        // Catch errors
+        if ($result === FALSE) {
+            echo "<br>";
+            echo "Something went wrong retrieving registration id. CMI5 Player returned " . $result;
+            echo "<br>";
+        }
 
         $registrationInfo = json_decode($result, true);
         
@@ -234,50 +229,46 @@ class cmi5_connectors {
 
     /**
      * Function to retrieve a token from cmi5 player.
-     * @param $urltosend - URL to send request to
-     * @param $user - username
-     * @param $pass - password
+     * @param $url - URL to send request to
+     * @param $username - username
+     * @param $password - password
      * @param $audience - the name the of the audience using the token,
      * @param #tenantid - the id of the tenant
      */
-    public function cmi5launch_retrieve_token($urltosend, $user, $pass, $audience, $tenantid)
+    public function cmi5launch_retrieve_token($url, $username, $password, $audience, $tenantid)
     {
 
         global $CFG;
 
-        // Retrieve and assign params.
-        $url = $urltosend;
-        $username = $user;
-        $password = $pass;
-        $tokenUser = $audience;
-        $id = $tenantid;
-
-
         // The body of the request must be made as array first.
         $data = array(
-            'tenantId' => $id,
-            'audience' => $tokenUser
+            'tenantId' => $tenantid,
+            'audience' => $audience
         );
+        $filetype = "json";
+       
+        // Data needs to be JSON encoded.
+        $data = json_encode($data);
 
         // Sends the stream to the specified URL.
-        $token = $this->cmi5launch_send_request_to_cmi5_player($data, $url, $username, $password);
+        $result = $this->cmi5launch_send_request_to_cmi5_player_post($data, $url, $filetype, $username, $password);
         
-        if ($token === FALSE) {
+        if ($result === FALSE) {
 
-            if ($CFG->debugdeveloper) {
-                echo "Something went wrong retrieving the bearer token";
-                echo "<br>";
-            } else {
-                return $token;
-            }
+            echo "<br>";
+            echo "Something went wrong retrieving the bearer token. CMI5 Player returned " . $result;
+            echo "<br>";
+
+        } else {
+            return $result;
         }
     }
+    
 
     /**
      * Function to retrieve a launch URL for an AU.
      * @param $id - courses's ID in MOODLE to retrieve corect record.
      * @param $auindex -AU's index to send to request for launch url.
-     * @return $urldecoded - The launch URL returned from cmi5 player.
      */
     public function cmi5launch_retrieve_url($id, $auindex) {
 
@@ -312,210 +303,149 @@ class cmi5_connectors {
             'returnUrl' => $returnurl,
             'reg' => $registrationid
         );
+        
+        // To determine the headers. 
+        $filetype = "json";
 
-		// Use key 'http' even if you send the request to https://...
-        // There can be multiple headers but as an array under the ONE header.
-        // Content(body) must be JSON encoded here, as that is what CMI5 player accepts.
-        // JSON_UNESCAPED_SLASHES used so http addresses are displayed correctly.
-     	   $options = array(
-            'http' => array(
-                'method'  => 'POST',
-                'ignore_errors' => true,
-                'header' => array("Authorization: Bearer ". $token,  
-                    "Content-Type: application/json\r\n" .
-                    "Accept: application/json\r\n"),
-                'content' => json_encode($data, JSON_UNESCAPED_SLASHES)
+        // Data needs to be JSON encoded.
+        $data = json_encode($data);
+        // Sends the stream to the specified URL 
+        $result = $this->cmi5launch_send_request_to_cmi5_player_post($data, $url, $filetype, $token);
 
-            )	
-        );
-
-        // The options are here placed into a stream to be sent.
-        $context  = stream_context_create(($options));
-
-        // Sends the stream to the specified URL and stores results.
-        // The false is use_include_path, which we dont want in this case, we want to go to the url.
-
-        $launchresponse = file_get_contents( $url, false, $context ); 
-
+        // Catch errors
+        if ($result === FALSE) {
+            echo "<br>";
+            echo "Something went wrong retrieving launch url. CMI5 Player returned " . $result;
+            echo "<br>";
+        }
+    
         // Only return the URL.
-        $urlDecoded = json_decode($launchresponse, true);
+        $urlDecoded = json_decode($result, true);
 
         return $urlDecoded;
     }
 
-        /**
-         * Function to construct, send an URL, and save result.
-         * @param $databody - the data that will be used to construct the body of request as JSON.
-         * @param $url - The URL the request will be sent to.
-         * @param ...$tokenorpassword is a variable length param. If one is passed, it is $token, if two it is $username and $password.
-         * @return - $result is the response from cmi5 player.
-         */
-        public function cmi5launch_send_request_to_cmi5_player_post($databody, $url, ...$tokenorpassword) {
-            
-            // so func num args is a thing, this may be the way to do it 
-           // $data = $databody;
-          //  $tenantinformation = $tokenorpassword;
+    /**
+     * Function to construct, send an URL, and save result.
+     * @param $databody - the data that will be used to construct the body of request as JSON.
+     * @param $url - The URL the request will be sent to.
+     * @param ...$tokenorpassword is a variable length param. If one is passed, it is $token, if two it is $username and $password.
+     * @return - $result is the response from cmi5 player.
+     */
+        // If I add an arg to take type, that will solve the issue where some are zip or json
+    public function cmi5launch_send_request_to_cmi5_player_post($databody, $url, $filetype, ...$tokenorpassword) {
+        
+        // Determine content type to be used in header.
+        // It is also the same as accepted type.
+        $contenttype = $filetype;
+        if($contenttype == "zip"){
+            $contenttype = "application/zip\r\n";
+        } elseif ("json") {
+            $contenttype = "application/json\r\n";
+        }
 
-            #what is number of args?
-            echo"<br>";
-            echo "what is number of args? . " . func_num_args();
+        //If number of args is greater than one it is for retrieving tenant info and args are username and password
+        if(count($tokenorpassword) == 2 ){
+            echo " Wait is this the prob? Are we in the right thing?";
+            $username = $tokenorpassword[0];
+            $password = $tokenorpassword[1];
 
-            //If number of args is greater than one it is for retrieving tenant info and args are username and password
-            if(func_num_args() == 4 ){
-            
-                echo"<br>";
-                echo " IT worked!";
-                echo"<br>";
-                
-                $username = $tokenorpassword[0];
-                $password = $tokenorpassword[1];
+            // Use key 'http' even if you send the request to https://...
+            // There can be multiple headers but as an array under the ONE header
+            // content(body) must be JSON encoded here, as that is what CMI5 player accepts
+            $options = array(
+                'http' => array(
+                    'method'  => 'POST',
+                    'header' => array('Authorization: Basic '. base64_encode("$username:$password"),  
+                        "Content-Type: " .$contenttype .
+                        "Accept: " . $contenttype),
+                    'content' => ($databody)
+                )
+            );
 
-                // Use key 'http' even if you send the request to https://...
-                // There can be multiple headers but as an array under the ONE header
-                // content(body) must be JSON encoded here, as that is what CMI5 player accepts
-                $options = array(
-                    'http' => array(
-                        'method'  => 'POST',
-                        'header' => array('Authorization: Basic '. base64_encode("$username:$password"),  
-                            "Content-Type: application/json\r\n" .
-                            "Accept: application/json\r\n"),
-                        'content' => json_encode($databody)
-                    )
-                );
-                // The options are here placed into a stream to be sent.
-                $context  = stream_context_create($options);
-            
-                // Sends the stream to the specified URL and stores results.
-                // The false is use_include_path, which we dont want in this case, we want to go to the url.
-                $result = file_get_contents( $url, false, $context );
+            // The options are here placed into a stream to be sent.
+            $context  = stream_context_create($options);
+        
+            // Sends the stream to the specified URL and stores results.
+            // The false is use_include_path, which we dont want in this case, we want to go to the url.
+            $result = file_get_contents( $url, false, $context );
+        }
+        
+        // Else the args are what we need for posting a course.
+        else{
+          //  echo " So what about this???";
 
-                echo"<br>";
-                echo "result is " . $result;
-                echo"<br>";
-                // Return response
-                return $result;
-            }
-            
-            // Else the args are what we need for posting a course.
-            // heres where we need to split further, or send different ars
-            //cause THIS one needs data extracted and the rest dont
-            //can whoever calls this just pass the data with et content already called? 
-          	else{
+            // First arg will be token.
+            $token = $tokenorpassword[0];
 
-				// First arg will be token.
-                $token = $tokenorpassword[0];
-              //  $file_contents = $databody->get_content();
-              // YEs it works unpaicn it in earleir func, now others can go through here!!!!
+            // Use key 'http' even if you send the request to https://...
+            // There can be multiple headers but as an array under the ONE header
+            // content(body) must be JSON encoded here, as that is what CMI5 player accepts
+            // JSON_UNESCAPED_SLASHES used so http addresses are displayed correctly
+            $options = array(
+                'http' => array(
+                    'method'  => 'POST',
+                    'ignore_errors' => true,
+                    'header' => array("Authorization: Bearer ". $token,  
+                        "Content-Type: " .$contenttype .
+                        "Accept: " . $contenttype),
+                    'content' => ($databody)
+                )
+            );
 
-                // Use key 'http' even if you send the request to https://...
-                // There can be multiple headers but as an array under the ONE header
-                // content(body) must be JSON encoded here, as that is what CMI5 player accepts
-                // JSON_UNESCAPED_SLASHES used so http addresses are displayed correctly
-                $options = array(
-                    'http' => array(
-                        'method'  => 'POST',
-                        'ignore_errors' => true,
-                        'header' => array("Authorization: Bearer ". $token,  
-                            "Content-Type: application/zip\r\n"), 
-                        'content' => $databody
-                    )
-                );
+            // The options are placed into a stream to be sent.
+            $context  = stream_context_create(($options));
 
-                //  The options are placed into a stream to be sent.
-                 $context  = stream_context_create(($options));
+            // Sends the stream to the specified URL and stores results.
+            // The false is use_include_path, which we dont want in this case, we want to go to the url.
+            $result = file_get_contents( $url, false, $context );
     
-                //  Sends the stream to the specified URL and stores results.
-                //  The false is use_include_path, which we dont want in this case, we want to go to the url.
-                $result = file_get_contents( $url, false, $context );
+        }
 
-      	        return $result;
-            }
-    }
+        // Return response
+        return $result;
+}
+    /**
+     * Function to construct, send an URL, and save result.
+     * @param $databody - the data that will be used to construct the body of request as JSON.
+     * @param $url - The URL the request will be sent to.
+     * @param ...$tokenorpassword is a variable length param. If one is passed, it is $token, if two it is $username and $password.
+     * @return - $result is the response from cmi5 player.
+     */
+        // If I add an arg to take type, that will solve the issue where some are zip or json
+    public function cmi5launch_send_request_to_cmi5_player_get($token, $url)
+    {
+        // use key 'http' even if you send the request to https://...
+        // There can be multiple headers but as an array under the ONE header
+        // content(body) must be JSON encoded here, as that is what CMI5 player accepts
+        // JSON_UNESCAPED_SLASHES used so http addresses are displayed correctly
+        $options = array(
+            'http' => array(
+                'method'  => 'GET',
+                'ignore_errors' => true,
+                'header' => array("Authorization: Bearer ". $token,  
+                    "Content-Type: application/json\r\n" .
+                    "Accept: application/json\r\n")
+            )	
+        );
 
+        
+        // The options are here placed into a stream to be sent
+        $context  = stream_context_create(($options));
 
+        // Sends the stream to the specified URL and stores results (the false is use_include_path, which we dont want in this case, we want to go to the url)
+        $launchresponse = file_get_contents( $url, false, $context );
 
-        /**
-         * Function to construct, send an URL, and save result.
-         * @param $databody - the data that will be used to construct the body of request as JSON.
-         * @param $url - The URL the request will be sent to.
-         * @param ...$tenantinfo is a variable length param. If one is passed, it is $token, if two it is $username and $password.
-         * @return - $result is the response from cmi5 player.
-         */
-        public function cmi5launch_send_request_to_cmi5_player($databody, $url, ...$tenantinfo) {
+		$sessionDecoded = json_decode($launchresponse, true);
             
-            // so func num args is a thing, this may be the way to do it 
-            $data = $databody;
-            $tenantinformation = $tenantinfo;
-#what is number of args?
-echo"<br>";
-echo "what is number of args? . " . func_num_args();
-echo"<br>";
-            //If number of args is greater than one it is for retrieving tenant info and args are username and password
-            if(count($tenantinformation) > 1 ){
-            
-                $username = $tenantinformation[0];
-                $password = $tenantinformation[1];
-
-                // Use key 'http' even if you send the request to https://...
-                // There can be multiple headers but as an array under the ONE header
-                // content(body) must be JSON encoded here, as that is what CMI5 player accepts
-                $options = array(
-                    'http' => array(
-                        'method'  => 'POST',
-                        'header' => array('Authorization: Basic '. base64_encode("$username:$password"),  
-                            "Content-Type: application/json\r\n" .
-                            "Accept: application/json\r\n"),
-                        'content' => json_encode($data)
-                    )
-                );
-                // The options are here placed into a stream to be sent.
-                $context  = stream_context_create($options);
-            
-                // Sends the stream to the specified URL and stores results.
-                // The false is use_include_path, which we dont want in this case, we want to go to the url.
-                    $result = file_get_contents( $url, false, $context );
-
-                // Return response
-                return $result;
-            }
-            
-            // Else the args are what we need for posting a course.
-          	else{
-
-				// First arg will be token.
-                $token = $tenantinformation[0];
-                $file_contents = $data->get_content();
-
-                // Use key 'http' even if you send the request to https://...
-                // There can be multiple headers but as an array under the ONE header
-                // content(body) must be JSON encoded here, as that is what CMI5 player accepts
-                // JSON_UNESCAPED_SLASHES used so http addresses are displayed correctly
-                $options = array(
-                    'http' => array(
-                        'method'  => 'POST',
-                        'ignore_errors' => true,
-                        'header' => array("Authorization: Bearer ". $token,  
-                            "Content-Type: application/zip\r\n"), 
-                        'content' => $file_contents
-                    )
-                );
-
-                //  The options are placed into a stream to be sent.
-                 $context  = stream_context_create(($options));
-    
-                //  Sends the stream to the specified URL and stores results.
-                //  The false is use_include_path, which we dont want in this case, we want to go to the url.
-                $result = file_get_contents( $url, false, $context );
-
-      	        return $result;
-            }
+        return $sessionDecoded;
     }
 
     /**
     * Retrieve session info from cmi5player
     * @param mixed $sessionid - the session id to retrieve
      * @param mixed $id - cmi5 id
-     * @return mixed
+     * @return mixed $sessionDecoded - the session info from cmi5 player.
      */
 
     public function cmi5launch_retrieve_session_info_from_player($sessionid, $id){
@@ -529,29 +459,16 @@ echo"<br>";
         // Build URL for launch URL request.
 	    $url = $playerUrl . "/api/v1/session/" . $sessionid;
 
-		// use key 'http' even if you send the request to https://...
-        // There can be multiple headers but as an array under the ONE header
-        // content(body) must be JSON encoded here, as that is what CMI5 player accepts
-        // JSON_UNESCAPED_SLASHES used so http addresses are displayed correctly
-     	   $options = array(
-            'http' => array(
-                'method'  => 'GET',
-                'ignore_errors' => true,
-                'header' => array("Authorization: Bearer ". $token,  
-                    "Content-Type: application/json\r\n" .
-                    "Accept: application/json\r\n")
-            )	
-        );
+        // Sends the stream to the specified URL 
+        $result = $this->cmi5launch_send_request_to_cmi5_player_get($token, $url);
+        
+        if ($result === FALSE) {
+            echo "<br>";
+            echo "Something went wrong retrieving session info. CMI5 Player returned " . $result;
+            echo "<br>";
+        }
 
-        // The options are here placed into a stream to be sent
-        $context  = stream_context_create(($options));
-
-        // Sends the stream to the specified URL and stores results (the false is use_include_path, which we dont want in this case, we want to go to the url)
-        $launchresponse = file_get_contents( $url, false, $context );
-
-		$sessionDecoded = json_decode($launchresponse, true);
-
-        return $sessionDecoded;
+        return $result;
     }
 
 }

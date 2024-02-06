@@ -49,7 +49,8 @@ function xmldb_cmi5launch_upgrade($oldversion) {
        // Launch change of type for field ausgrades.
        $dbman->change_field_type($table, $field);
 
-       // Cmi5launch savepoint reached.
+        // Cmi5launch savepoint reached.
+        upgrade_mod_savepoint(true, 2024012516, 'cmi5launch');
     }
     if ($oldversion < 2024010212) {
 
@@ -69,34 +70,16 @@ function xmldb_cmi5launch_upgrade($oldversion) {
         // I need to remove 7 unused columns from the cmi5launch_aus table.
         // Define field auid to be dropped from cmi5launch_aus.
         $table = new xmldb_table('cmi5launch_aus');
-        
-        /*
-        
-             // drop index and add new one
-             $indexOld = new xmldb_index('courseid', XMLDB_INDEX_NOTUNIQUE, ['courseid']);
-             $indexNew = new xmldb_index('id', XMLDB_INDEX_NOTUNIQUE, ['courseid']);
-                    
-             // Conditionally launch drop index courseid.
-             if ($dbman->index_exists($table, $indexOld)) {
-                 $dbman->drop_index($table, $indexOld);
-             }
-     
-             // Conditionally launch add index courseid.
-             if (!$dbman->index_exists($table, $indexNew)) {
-                 $dbman->add_index($table, $indexNew);
-             }
-     
-        */
+
         
         $fieldauid = new xmldb_field('auid');
-        //$fieldcourseid = new xmldb_field('courseid');
         $fielduserid = new xmldb_field('userid');
         $fieldtenantname = new xmldb_field('tenantname');
         $fieldcurrentgrade = new xmldb_field('currentgrade');
         $fieldregistrationid = new xmldb_field('registrationid');
         $fieldreturnurl = new xmldb_field('returnurl');
 
-        $arraytoremove = array($fieldauid, /*$fieldcourseid*/ $fielduserid, $fieldtenantname, $fieldcurrentgrade, $fieldregistrationid, $fieldreturnurl);
+        $arraytoremove = array($fieldauid, $fielduserid, $fieldtenantname, $fieldcurrentgrade, $fieldregistrationid, $fieldreturnurl);
        
         // Now cycle through array and remove fields.
         foreach ($arraytoremove as $field) {
@@ -106,12 +89,9 @@ function xmldb_cmi5launch_upgrade($oldversion) {
             }
         }
 
-   
-        
         // Cmi5launch savepoint reached.
         upgrade_mod_savepoint(true, 2023121209, 'cmi5launch');
     }
-
 
     if ($oldversion < 2023112117) {
 
@@ -148,7 +128,6 @@ function xmldb_cmi5launch_upgrade($oldversion) {
         // Launch change of type for field objectives.
         $dbman->change_field_type($table, $objectives);
 
-
         // Launch change of type for field description.
         $dbman->change_field_type($table, $description);
 
@@ -159,7 +138,6 @@ function xmldb_cmi5launch_upgrade($oldversion) {
 
     if ($oldversion < 2023101217) {
 
-    
         // Define table cmi5launch to be created.
         $table = new xmldb_table('cmi5launch');
 
@@ -293,7 +271,6 @@ function xmldb_cmi5launch_upgrade($oldversion) {
       if (!$dbman->table_exists($table)) {
           $dbman->create_table($table);
       }
-
 
           // Define table cmi5launch_sessions to be created.
           $table = new xmldb_table('cmi5launch_sessions');

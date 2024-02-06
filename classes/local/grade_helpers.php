@@ -111,7 +111,7 @@ function cmi5launch_highest_grade($scores)
 }
 
     /**
-     * Parses and retrieves AUs and their sessions from the returned info from CMI5 player and LRS.
+     * Parses and retrieves AUs and their sessions from the returned info from CMI5 player and LRS and updates them.
      * 
      * @param array $user - the user whose grades are being updated
      * @return array

@@ -24,228 +24,223 @@ namespace mod_cmi5launch\local;
 
 defined('MOODLE_INTERNAL') || die();
 
-        class progress
-        {
+class progress
+{
 
-            public function cmi5launch_get_retrieve_statements()
-            {
-                return [$this, 'cmi5launch_retrieve_statements'];
-            }
+    public function cmi5launch_get_retrieve_statements()
+    {
+        return [$this, 'cmi5launch_retrieve_statements'];
+    }
 
-            public function cmi5launch_get_request_completion_info()
-            {
-                return [$this, 'cmi5launch_request_completion_info'];
-            }
+    public function cmi5launch_get_request_completion_info()
+    {
+        return [$this, 'cmi5launch_request_completion_info'];
+    }
 
-            public function cmi5launch_get_request_statements_from_lrs()
-            {
-                return [$this, 'cmi5launch_request_statements_from_lrs'];
-            }
+    public function cmi5launch_get_request_statements_from_lrs()
+    {
+        return [$this, 'cmi5launch_request_statements_from_lrs'];
+    }
 
-            /**
-             * Send request to LRS and receive statements
-             * @param mixed $regId - registration id
-             * @param mixed $session - a session object 
-             * @return array
-             */
-            public function cmi5launch_request_statements_from_lrs($registrationid, $session /*$id*/)
-            {
+    /**
+     * Send request to LRS and receive statements
+     * @param mixed $regId - registration id
+     * @param mixed $session - a session object 
+     * @return array
+     */
+    public function cmi5launch_request_statements_from_lrs($registrationid, $session /*$id*/)
+    {
 
-                // Array to hold result.
-                $result = array();
+        // Array to hold result.
+        $result = array();
 
-                // When searching by reg id, which is the option available to Moodle, many results are returned, so iterating through them is necessary.
-                $data = array(
-                    'registration' => $registrationid,
-                    'since' => $session->createdat
-                );
+        // When searching by reg id, which is the option available to Moodle, many results are returned, so iterating through them is necessary.
+        $data = array(
+            'registration' => $registrationid,
+            'since' => $session->createdat
+        );
 
+        $statements = $this->cmi5launch_send_request_to_lrs($data, $session->id);
 
-                $statements = $this->cmi5launch_send_request_to_lrs($data, $session->id);
+        // The results come back as nested array under more then statements. We only want statements, and we want them unique.
+        $statement = array_chunk($statements["statements"], 1);
 
+        $length = count($statement);
 
-                // The results come back as nested array under more then statements. We only want statements, and we want them unique.
-                $statement = array_chunk($statements["statements"], 1);
+        for ($i = 0; $i < $length; $i++) {
 
-                $length = count($statement);
+            // This separates the larger statement into the separate sessions and verbs.
+            $current = ($statement[$i]);
+            array_push($result, array($registrationid => $current));
+        }
 
-                for ($i = 0; $i < $length; $i++) {
+        return $result;
+    }
 
-                    // This separates the larger statement into the separate sessions and verbs.
-                    $current = ($statement[$i]);
-                    array_push($result, array($registrationid => $current));
-                }
+    /**
+     * Builds and sends requests to LRS
+     * @param mixed $data
+     * @param mixed $id
+     * @return mixed
+     */
+    public function cmi5launch_send_request_to_lrs($data, $id)
+    {
+        $settings = cmi5launch_settings($id);
 
-                return $result;
-            }
+        // Url to request statements from.
+        $url = $settings['cmi5launchlrsendpoint'] . "statements";
+        // Build query with data above.
+        $url = $url . '?' . http_build_query($data, "", '&', PHP_QUERY_RFC1738);
 
+        // LRS username and password.
+        $user = $settings['cmi5launchlrslogin'];
+        $pass = $settings['cmi5launchlrspass'];
 
-            /**
-             * Builds and sends requests to LRS
-             * @param mixed $data
-             * @param mixed $id
-             * @return mixed
-             */
-            public function cmi5launch_send_request_to_lrs($data, $id)
-            {
-                $settings = cmi5launch_settings($id);
+        // Use key 'http' even if you send the request to https://...
+        // There can be multiple headers but as an array under the ONE header.
+        // Content(body) must be JSON encoded here, as that is what CMI5 player accepts.
+        $options = array(
+            'http' => array(
+                'method' => 'GET',
+                'header' => array(
+                    'Authorization: Basic ' . base64_encode("$user:$pass"),
+                    "Content-Type: application/json\r\n" .
+                    "X-Experience-API-Version:1.0.3",
+                )
+            )
+        );
+        // The options are here placed into a stream to be sent.
+        $context = stream_context_create($options);
 
-                // Url to request statements from.
-                $url = $settings['cmi5launchlrsendpoint'] . "statements";
-                // Build query with data above.
-                $url = $url . '?' . http_build_query($data, "", '&', PHP_QUERY_RFC1738);
+        // Sends the stream to the specified URL and stores results.
+        // The false is use_include_path, which we dont want in this case, we want to go to the url.
+        $result = file_get_contents($url, false, $context);
 
-                // LRS username and password.
-                $user = $settings['cmi5launchlrslogin'];
-                $pass = $settings['cmi5launchlrspass'];
-
-                // Use key 'http' even if you send the request to https://...
-                // There can be multiple headers but as an array under the ONE header.
-                // Content(body) must be JSON encoded here, as that is what CMI5 player accepts.
-                $options = array(
-                    'http' => array(
-                        'method' => 'GET',
-                        'header' => array(
-                            'Authorization: Basic ' . base64_encode("$user:$pass"),
-                            "Content-Type: application/json\r\n" .
-                            "X-Experience-API-Version:1.0.3",
-                        )
-                    )
-                );
-                // The options are here placed into a stream to be sent.
-                $context = stream_context_create($options);
-
-                // Sends the stream to the specified URL and stores results.
-                // The false is use_include_path, which we dont want in this case, we want to go to the url.
-                $result = file_get_contents($url, false, $context);
-
-                $resultDecoded = json_decode($result, true);
+        $resultDecoded = json_decode($result, true);
 
 
-                return $resultDecoded;
-            }
+        return $resultDecoded;
+    }
 
-            /**
-             * Returns an actor (name) retrieved from collected LRS data based on registration id
-             * @param mixed $resultarray - data retrieved from LRS, usually an array
-             * @param mixed $i - the registration id
-             * @return mixed - actor
-             */
-            public function cmi5launch_retrieve_actor($resultarray, $registrationid)
-            {
+    /**
+     * Returns an actor (name) retrieved from collected LRS data based on registration id
+     * @param mixed $resultarray - data retrieved from LRS, usually an array
+     * @param mixed $i - the registration id
+     * @return mixed - actor
+     */
+    public function cmi5launch_retrieve_actor($resultarray, $registrationid)
+    {
 
-                $actor = $resultarray[$registrationid][0]["actor"]["account"]["name"];
-                return $actor;
-            }
+        $actor = $resultarray[$registrationid][0]["actor"]["account"]["name"];
+        return $actor;
+    }
 
-            /**
-             * Returns a verb retrieved from collected LRS data based on registration id
-             * @param mixed $resultarray - data retrieved from LRS, usually an array
-             * @param mixed $registrationid - the registration id
-             * @return mixed - verb
-             */
-            public function cmi5launch_retrieve_verbs($resultarray, $registrationid)
-            {
-                // Some verbs do not have an easy to display 'language' option, we need to check if 'display' is present.	
-                $verbInfo = $resultarray[$registrationid][0]["verb"];
-                $display = array_key_exists("display", $verbInfo);
+    /**
+     * Returns a verb retrieved from collected LRS data based on registration id
+     * @param mixed $resultarray - data retrieved from LRS, usually an array
+     * @param mixed $registrationid - the registration id
+     * @return mixed - verb
+     */
+    public function cmi5launch_retrieve_verbs($resultarray, $registrationid)
+    {
+        // Some verbs do not have an easy to display 'language' option, we need to check if 'display' is present.	
+        $verbInfo = $resultarray[$registrationid][0]["verb"];
+        $display = array_key_exists("display", $verbInfo);
 
-                //If it is null then there is no display, so go by verb id.
-                if (!$display) {
-                    // Retrieve id.
-                    $verbId = $resultarray[$registrationid][0]["verb"]["id"];
+        //If it is null then there is no display, so go by verb id.
+        if (!$display) {
+            // Retrieve id.
+            $verbId = $resultarray[$registrationid][0]["verb"]["id"];
 
-                    // Splits id in two on 'verbs/', we want the end which is the actual verb
-                    $split = explode('verbs/', $verbId);
-                    $verb = $split[1];
+            // Splits id in two on 'verbs/', we want the end which is the actual verb
+            $split = explode('verbs/', $verbId);
+            $verb = $split[1];
 
-                } else {
-                    // If it is not null then there is a language easy to read version of verb display, such as 'en' or 'en-us'.
-                    $verbLang = $resultarray[$registrationid][0]["verb"]["display"];
-                    // Retrieve the language.
-                    $lang = array_key_first($verbLang);
-                    // Use it to retrieve verb.
-                    $verb = [$verbLang][0][$lang];
-                }
-                return $verb;
-            }
+        } else {
+            // If it is not null then there is a language easy to read version of verb display, such as 'en' or 'en-us'.
+            $verbLang = $resultarray[$registrationid][0]["verb"]["display"];
+            // Retrieve the language.
+            $lang = array_key_first($verbLang);
+            // Use it to retrieve verb.
+            $verb = [$verbLang][0][$lang];
+        }
+        return $verb;
+    }
 
-            /**
-             * Returns a name (the au title) retrieved from collected LRS data based on registration id
-             * Statements are returned in an array, with the registration id as the key.
-             * Often they are nested, and sometimes in differnt order, so to avoid errors we need to check for each piece as a key.
-             * Then if found, use that key to navigate.
-             * @param mixed $resultarray - data retrieved from LRS, usually an array
-             * @param mixed $registrationid - the registration id
-             * @return mixed - object name
-             */
-            public function cmi5launch_retrieve_object_name($resultarray, $registrationid)
-            {
+    /**
+     * Returns a name (the au title) retrieved from collected LRS data based on registration id
+     * Statements are returned in an array, with the registration id as the key.
+     * Often they are nested, and sometimes in differnt order, so to avoid errors we need to check for each piece as a key.
+     * Then if found, use that key to navigate.
+     * @param mixed $resultarray - data retrieved from LRS, usually an array
+     * @param mixed $registrationid - the registration id
+     * @return mixed - object name
+     */
+    public function cmi5launch_retrieve_object_name($resultarray, $registrationid)
+    {
+        global $CFG;
 
-                global $CFG;
+        // First find the object, it should always be second level of statement (so third level array).
+        if (array_key_exists("object", $resultarray[$registrationid][0])) {
 
-                // First find the object, it should always be second level of statement (so third level array).
-                if (array_key_exists("object", $resultarray[$registrationid][0])) {
+            if (array_key_exists("definition", $resultarray[$registrationid][0]["object"])) {
 
-                    if (array_key_exists("definition", $resultarray[$registrationid][0]["object"])) {
+                // If 'definition' exists, check if 'name' does.
+                if (array_key_exists("name", $resultarray[$registrationid][0]["object"]["definition"])) {
 
-                        // If 'definition' exists, check if 'name' does.
-                        if (array_key_exists("name", $resultarray[$registrationid][0]["object"]["definition"])) {
+                    // Retrieve the name.
+                    $objectarray = $resultarray[$registrationid][0]["object"]["definition"]["name"];
 
-                            // Retrieve the name.
-                            $objectarray = $resultarray[$registrationid][0]["object"]["definition"]["name"];
-
-                            // There may be more than one languages string to choose from. First we want to
-                            // select the language that matches the language of the course, then if not available, the first key.
-                            // System language setting.
-                            $language = $CFG->lang;
-                            if (array_key_exists($language, $objectarray)) {
-                                $object = $objectarray[$language];
-                            } else {
-                                $defaultlanguage = array_key_first($objectarray);
-                                $object = $objectarray[$defaultlanguage];
-                            }
-                            return $object;
-                        }
-
-                    } else if (array_key_exists("id", $resultarray[$registrationid][0]["object"])) {
-
-                        // If name is missing check for id.
-                        // Retrieve id.
-                        $object = $resultarray[$registrationid][0]["object"]["id"];
-                        return $object;
-
+                    // There may be more than one languages string to choose from. First we want to
+                    // select the language that matches the language of the course, then if not available, the first key.
+                    // System language setting.
+                    $language = $CFG->lang;
+                    if (array_key_exists($language, $objectarray)) {
+                        $object = $objectarray[$language];
                     } else {
-
-                        // If both name and id are missing throw error.
-                        $this->cmi5launch_statement_retrieval_error("Object name and id ");
+                        $defaultlanguage = array_key_first($objectarray);
+                        $object = $objectarray[$defaultlanguage];
                     }
-
-                } else {
-
-                    $this->cmi5launch_statement_retrieval_error("Object ");
+                    return $object;
                 }
+
+            } else if (array_key_exists("id", $resultarray[$registrationid][0]["object"])) {
+
+                // If name is missing check for id.
+                // Retrieve id.
+                $object = $resultarray[$registrationid][0]["object"]["id"];
+                return $object;
+
+            } else {
+
+                // If both name and id are missing throw error.
+                $this->cmi5launch_statement_retrieval_error("Object name and id ");
             }
 
-/**
- * Summary of cmi5launch_statement_retrieval_error
- *  Error message for statment retrieval to mark if something is missing
- * @param mixed $missingitem - the missing item(s)
- * @return void
- */
-public function cmi5launch_statement_retrieval_error($missingitem) {
+        } else {
 
-                global $CFG;
+            $this->cmi5launch_statement_retrieval_error("Object ");
+        }
+    }
 
-                // If admin debugging is enabled.
-                if ($CFG->debugdeveloper) {
+    /**
+     *  Error message for statment retrieval to mark if something is missing
+     * @param mixed $missingitem - the missing item(s)
+     * @return void
+     */
+    public function cmi5launch_statement_retrieval_error($missingitem) {
 
-                    // Print that it is missing.
-                    echo "<br>";
-                    echo $missingitem . "is missing from this statement.";
-                    echo "<br>";
-                }
-}
+                    global $CFG;
+
+                    // If admin debugging is enabled.
+                    if ($CFG->debugdeveloper) {
+
+                        // Print that it is missing.
+                        echo "<br>";
+                        echo $missingitem . "is missing from this statement.";
+                        echo "<br>";
+                    }
+    }
 
     /**
      * Returns a timestamp retrieved from collected LRS data based on registration id
@@ -255,8 +250,6 @@ public function cmi5launch_statement_retrieval_error($missingitem) {
      */
     public function cmi5launch_retrieve_timestamp($resultarray, $registrationid)
     {
-
-
         //Verify this statement has a 'timestamp' param
         if (array_key_exists("timestamp", $resultarray[$registrationid][0])) {
 
@@ -331,12 +324,11 @@ public function cmi5launch_statement_retrieval_error($missingitem) {
 
         /**
          * Retrieves xAPI statements from LRS
-         * @param mixed $registrationid
-         * @param mixed $id
-         * @param mixed $session
+         * @param mixed $registrationid - the registration id.
+         * @param mixed $session - session item to be updated.
          * @return array<string>
          */
-        public function cmi5launch_retrieve_statements($registrationid, $id, $session)
+        public function cmi5launch_retrieve_statements($registrationid, $session)
         {
             // Array to hold verbs and be returned.
             $progressupdate = array();

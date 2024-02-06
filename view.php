@@ -20,14 +20,11 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
 use mod_cmi5launch\local\progress;
 use mod_cmi5launch\local\course;
 use mod_cmi5launch\local\cmi5_connectors;
 use mod_cmi5launch\local\au_helpers;
 use mod_cmi5launch\local\session_helpers;
-
-
 
 require_once("../../config.php");
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
@@ -145,8 +142,9 @@ if ($exists == false) {
     $returnurl = $CFG->wwwroot .'/mod/cmi5launch/view.php'. '?id=' .$cm->id;
     $userscourse->returnurl = $returnurl;
 
+
     // Assign new record a registration id.
-    $registrationid = $getregistration($record->courseid, $cmi5launch->id);
+    $registrationid = $getregistration($userscourse->courseid, $cmi5launch->id);
     $userscourse->registrationid = $registrationid;
 
     // Retrieve AU ids for this user/course.
@@ -166,25 +164,19 @@ if ($exists == false) {
     // We have a record, so we need to retrieve it.
     $userscourse = $DB->get_record('cmi5launch_course', ['courseid'  => $record->courseid, 'userid'  => $USER->id]);
 
-
-    // So usrescourse seems fine except for the registrion which is null, so maybe here we call a different 
-    // get registration, the post one, but not here, right, down where the other is called? Or even check there
-    // cause oif there is no course record we know there is no reg id, BUT apparently there can be a record and no id!
-
-
     // Retrieve registration id.
     $registrationid = $userscourse->registrationid;
 
     // We need to verify if there is a registration id. Sometimes errors with player can cause a null id, in that case we want to
-// retrieve a new one. 
-if($registrationid == null){
-    // Retrieve registration id.
-    $registrationid = $getregistration($record->courseid, $cmi5launch->id);
-    // Update course record.
-    $userscourse->registrationid = $registrationid;
-    // Update DB.
-    $DB->update_record("cmi5launch_course", $userscourse);
-}
+    // retrieve a new one. 
+    if($registrationid == null){
+        // Retrieve registration id.
+        $registrationid = $getregistration($record->courseid, $cmi5launch->id);
+        // Update course record.
+        $userscourse->registrationid = $registrationid;
+        // Update DB.
+        $DB->update_record("cmi5launch_course", $userscourse);
+    }
     // Retrieve AU ids.
     $auids = (json_decode($userscourse->aus) );
 }
@@ -209,15 +201,13 @@ $table->head = array(
 // Array to hold Au scores.
 $auscores = array();
 
-
 // Query CMI5 player for updated registration info.
 $registrationinfofromcmi5 = $getregistrationinfo($registrationid, $cmi5launch->id);
-
 
 // Take only info about AUs out of registrationinfofromcmi5.
 $ausfromcmi5 = array_chunk($registrationinfofromcmi5["metadata"]["moveOn"]["children"], 1, true);
 
-// Cycle through AU IDs making AU objects and checkin progress.
+// Cycle through AU IDs making AU objects and checking progress.
 foreach ($auids as $key => $auid) {
 
     // Array to hold scores for AU.
@@ -244,12 +234,12 @@ foreach ($auids as $key => $auid) {
 
         // Check for the AUs satisfied status. Compare with lmsId to find status for that instance.
         $ausatisfied = cmi5launch_find_au_satisfied($value, $aulmsid);
-        // If au satisfied  is ever true then we found it, once satisified it doesn't matter if others have failed or were also satisified.
+        // If au satisfied is ever true then we found it, once satisified it doesn't matter if others have failed or were also satisified.
         if($ausatisfied == "true"){
             break;
-    
         }
-        // This elseif was built as a failsafe. Very rarely there may be an instance where the player issues a duplicate lms id or reegistration number.
+
+        // This elseif was built as a failsafe. Very rarely there may be an instance where the player issues a duplicate lms id or registration number.
         // For example, this can happen if the server crashes while a course is being made or updated. However, under normal circumstances, the AU LMSID
         // should always match at least one of the AUs returned by player. 
         elseif($ausatisfied = "No ids match"){ 
@@ -257,18 +247,17 @@ foreach ($auids as $key => $auid) {
             // If there are sessions for this AU.
             if ($au->sessions != null) {
 
-            // Retrieve session ids for this AU from DB.
-            $sessions = json_decode($au->sessions, true);
-            $session_helpers = new session_helpers;
-            $getsessioninfo = $session_helpers->cmi5launch_get_retrieve_sessions_from_db();
-    
-            // Retrieve what this AU needs to moveon. We will search through the session data to see if it is fulfilled
-            $aumoveon = $au->moveon;
+                // Retrieve session ids for this AU from DB.
+                $sessions = json_decode($au->sessions, true);
+                $session_helpers = new session_helpers;
+                $getsessioninfo = $session_helpers->cmi5launch_get_retrieve_sessions_from_db();
+        
+                // Retrieve what this AU needs to moveon. We will search through the session data to see if it is fulfilled
+                $aumoveon = $au->moveon;
 
-            // Hold if completed or passed is found.
-            $completedfound = false;
-            $passedfound = false;
-
+                // Hold if completed or passed is found.
+                $completedfound = false;
+                $passedfound = false;
 
                 //Cycle through them looking to see if any were passed and/or completed.
                 foreach ($sessions as $key => $value) {
