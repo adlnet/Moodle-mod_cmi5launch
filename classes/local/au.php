@@ -25,7 +25,7 @@ class au {
 
     // Lowercase values are for saving to DB
     public $id, $attempt, $url, $type, $lmsid, $grade, $scores, $title, $moveon, $auindex, $parents, $objectives, $description, $activitytype,
-    $launchmethod, $masteryscore, $satisfied, $launchurl, $sessionid, $sessions, $progress, $noattempt, $completed, $passed, $inprogress;
+    $launchmethod, $masteryscore, $satisfied, $launchurl, $sessions, $progress, $noattempt, $completed, $passed, $inprogress;
 
     // Uppercase values because that's how they come from player.
     public $launchMethod, $lmsId, $moveOn, $auIndex, $activityType, $masteryScore; 

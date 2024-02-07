@@ -28,7 +28,7 @@ class session {
     // Properties.
     // id is session id.
     public $id, $tenantname, $tenantId, $registrationsCoursesAusId, $lmsid,
-    $progress = [], $auid, $aulaunchurl, $launchurl, $grade, $registrationid, $lrscode,
+    $progress = [], $aulaunchurl, $launchurl, $grade,
     $createdAt, $updatedAt, $registrationCourseAusId,
     $code, $lastRequestTime, $launchTokenId, $launchMode, $masteryScore,
     $isLaunched, $isInitialized, $initializedAt, $isCompleted,
@@ -43,10 +43,5 @@ class session {
         }
 
     }
-
-
-
-
-
 
 }

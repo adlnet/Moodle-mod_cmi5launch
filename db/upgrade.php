@@ -40,6 +40,37 @@ defined('MOODLE_INTERNAL') || die();
 function xmldb_cmi5launch_upgrade($oldversion) {
     global $DB;
     $dbman = $DB->get_manager();
+
+    if ($oldversion < 2024020717) {
+
+        // Define field registrationcourseausid to be dropped from cmi5launch_sessions.
+        $table1 = new xmldb_table('cmi5launch_sessions');
+        
+        $fieldstoremove = array($fieldregcourse = new xmldb_field('registrationcourseausid'), $fieldregid = new xmldb_field('registrationid'), $fieldlrscode = new xmldb_field('lrscode'),
+        $fieldauid = new xmldb_field('auid'));
+
+        // Define field registrationcourseausid to be dropped from cmi5launch_sessions.
+        $table2 = new xmldb_table('cmi5launch_aus');
+        // This is an accidental duplicate field that does nothing, delete it.
+        $fieldsessionid = new xmldb_field('sessionid');
+
+        // Now cycle through array and remove fields.
+        foreach ($fieldstoremove as $field) {
+            // Conditionally launch drop field registrationcourseausid.
+            if ($dbman->field_exists($table1, $field)) {
+                $dbman->drop_field($table1, $field);
+            }
+        }
+    
+        // Conditionally launch drop field registrationid.
+        if ($dbman->field_exists($table2, $fieldsessionid)) {
+            $dbman->drop_field($table2, $fieldsessionid);
+        }
+        // Cmi5launch savepoint reached.
+        upgrade_mod_savepoint(true, 2024020717, 'cmi5launch');
+    }
+
+
     if ($oldversion < 2024012516) {
 
        // Changing type of field ausgrades on table cmi5launch_course to text.

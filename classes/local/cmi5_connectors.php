@@ -75,22 +75,13 @@ class cmi5_connectors {
         // Sends the stream to the specified URL.
         $result = $this->cmi5launch_send_request_to_cmi5_player_post($databody, $url, $filetype, $tenanttoken);
 
-        // Decode result because if it is not 200 then something went wrong
-        $resulttest = json_decode($result, true);
-
-
-        if ($resulttest === FALSE || array_key_exists("statusCode", $resulttest) && $resulttest["statusCode"] != 200) {
-
-            echo "<br>";
-
-            echo "Something went wrong creating the course. CMI5 Player returned " . var_dump($result);
-
-            echo "<br>";
-              
+        // Check result and display message if not 200.
+        $resulttest = $this->cmi5launch_connectors_error_message($result, "creating the course");
+   
+        if ($resulttest == true){
+            // Return an array with course info.
+            return $result;
         }
-
-        // Return an array with course info.
-        return $result;
     }
 
     /**
@@ -111,27 +102,25 @@ class cmi5_connectors {
 
         // To determine the headers. 
         $filetype = "json";
-        
+
         // Data needs to be JSON encoded.
         $data = json_encode($data);
 
         // Sends the stream to the specified URL 
         $result = $this->cmi5launch_send_request_to_cmi5_player_post($data, $urltosend, $filetype, $username, $password);
 
-        if ($result === FALSE){
+        // Check result and display message if not 200.
+        $resulttest = $this->cmi5launch_connectors_error_message($result, "creating the tenant");
 
-            echo "<br>";
+        if ($resulttest == true){
+            
+            // Decode returned response into array.
+            $returnedinfo = json_decode($result, true);
 
-            echo "Something went wrong creating the tenant. CMI5 Player returned " . $result;
-
-            echo "<br>";
-                }
-
-        // Decode returned response into array.
-        $returnedinfo = json_decode($result, true);
-
-        // Return an array with tenant name and info.
-        return $returnedinfo;
+            // Return an array with tenant name and info.
+            return $returnedinfo;
+        }
+        ;
     }
 
     /** 
@@ -156,15 +145,13 @@ class cmi5_connectors {
         // Sends the stream to the specified URL 
         $result = $this->cmi5launch_send_request_to_cmi5_player_get($token, $url);
         
-        if ($result === FALSE) {
-            echo "<br>";
-            echo "Something went wrong retrieving registration id. CMI5 Player returned " . $result;
-            echo "<br>";
+        // Check result and display message if not 200.
+        $resulttest = $this->cmi5launch_connectors_error_message($result, "retrieving the registration");
+
+        if($resulttest == true){
+            
+            return $result; 
         }
-
-
-        return $result; 
-
     }
     
 
@@ -210,21 +197,20 @@ class cmi5_connectors {
         // Sends the stream to the specified URL 
         $result = $this->cmi5launch_send_request_to_cmi5_player_post($data, $url, $filetype, $token);
 
+        // Check result and display message if not 200.
+        $resulttest = $this->cmi5launch_connectors_error_message($result, "retrieving the registration");
 
         // Catch errors
-        if ($result === FALSE) {
-            echo "<br>";
-            echo "Something went wrong retrieving registration id. CMI5 Player returned " . $result;
-            echo "<br>";
-        }
+        if ($resulttest == true) {
 
-        $registrationInfo = json_decode($result, true);
-        
-        // The returned 'registration info' is a large json object.
-        // Code is the registration id we want.
-        $registration = $registrationInfo["code"];
-        
-        return $registration;
+            $registrationInfo = json_decode($result, true);
+
+            // The returned 'registration info' is a large json object.
+            // Code is the registration id we want.
+            $registration = $registrationInfo["code"];
+
+            return $registration;
+        }
     }
 
     /**
@@ -252,14 +238,12 @@ class cmi5_connectors {
 
         // Sends the stream to the specified URL.
         $result = $this->cmi5launch_send_request_to_cmi5_player_post($data, $url, $filetype, $username, $password);
-        
-        if ($result === FALSE) {
 
-            echo "<br>";
-            echo "Something went wrong retrieving the bearer token. CMI5 Player returned " . $result;
-            echo "<br>";
+        // Check result and display message if not 200.
+        $resulttest = $this->cmi5launch_connectors_error_message($result, "retrieving the registration");
 
-        } else {
+        if ($resulttest == true) {
+
             return $result;
         }
     }
@@ -312,27 +296,27 @@ class cmi5_connectors {
         // Sends the stream to the specified URL 
         $result = $this->cmi5launch_send_request_to_cmi5_player_post($data, $url, $filetype, $token);
 
-        // Catch errors
-        if ($result === FALSE) {
-            echo "<br>";
-            echo "Something went wrong retrieving launch url. CMI5 Player returned " . $result;
-            echo "<br>";
-        }
-    
-        // Only return the URL.
-        $urlDecoded = json_decode($result, true);
+        // Check result and display message if not 200.
+        $resulttest = $this->cmi5launch_connectors_error_message($result, "retrieving launch url");
 
-        return $urlDecoded;
+        // Catch errors
+        if ($resulttest == true) {
+
+            // Only return the URL.
+            $urlDecoded = json_decode($result, true);
+
+            return $urlDecoded;
+        }
     }
 
     /**
-     * Function to construct, send an URL, and save result.
+     * Function to construct, send an URL, and save result as POST message to player.
      * @param $databody - the data that will be used to construct the body of request as JSON.
      * @param $url - The URL the request will be sent to.
+     * @param $filetype - The type of file being sent, either zip or json.
      * @param ...$tokenorpassword is a variable length param. If one is passed, it is $token, if two it is $username and $password.
      * @return - $result is the response from cmi5 player.
      */
-        // If I add an arg to take type, that will solve the issue where some are zip or json
     public function cmi5launch_send_request_to_cmi5_player_post($databody, $url, $filetype, ...$tokenorpassword) {
         
         // Determine content type to be used in header.
@@ -344,9 +328,9 @@ class cmi5_connectors {
             $contenttype = "application/json\r\n";
         }
 
-        //If number of args is greater than one it is for retrieving tenant info and args are username and password
+        // If number of args is greater than one it is for retrieving tenant info and args are username and password
         if(count($tokenorpassword) == 2 ){
-            echo " Wait is this the prob? Are we in the right thing?";
+
             $username = $tokenorpassword[0];
             $password = $tokenorpassword[1];
 
@@ -373,7 +357,6 @@ class cmi5_connectors {
         
         // Else the args are what we need for posting a course.
         else{
-          //  echo " So what about this???";
 
             // First arg will be token.
             $token = $tokenorpassword[0];
@@ -405,14 +388,13 @@ class cmi5_connectors {
         // Return response
         return $result;
 }
+   
     /**
-     * Function to construct, send an URL, and save result.
-     * @param $databody - the data that will be used to construct the body of request as JSON.
+     * Function to construct and send GET request to CMI5 player. 
+     * @param $token - the token that will be used to authenticate the request.
      * @param $url - The URL the request will be sent to.
-     * @param ...$tokenorpassword is a variable length param. If one is passed, it is $token, if two it is $username and $password.
-     * @return - $result is the response from cmi5 player.
+     * @return - $sessionDecoded is the response from cmi5 player.
      */
-        // If I add an arg to take type, that will solve the issue where some are zip or json
     public function cmi5launch_send_request_to_cmi5_player_get($token, $url)
     {
         // use key 'http' even if you send the request to https://...
@@ -447,8 +429,8 @@ class cmi5_connectors {
      * @param mixed $id - cmi5 id
      * @return mixed $sessionDecoded - the session info from cmi5 player.
      */
-
     public function cmi5launch_retrieve_session_info_from_player($sessionid, $id){
+        
         global $DB;
 
 		$settings = cmi5launch_settings($id);
@@ -462,13 +444,50 @@ class cmi5_connectors {
         // Sends the stream to the specified URL 
         $result = $this->cmi5launch_send_request_to_cmi5_player_get($token, $url);
         
-        if ($result === FALSE) {
-            echo "<br>";
-            echo "Something went wrong retrieving session info. CMI5 Player returned " . $result;
-            echo "<br>";
+        
+        // Check result and display message if not 200.
+        $resulttest = $this->cmi5launch_connectors_error_message($result, "retrieving session info");
+
+        if ($resulttest == true) {
+
+           return $result;
+        }
+    }
+
+
+    // An error message catcher
+    /**
+     * Function to test returns from cmi5 player and display error message if found to be false
+     * // or not 200.
+     * @param mixed $resulttotest - 
+     * @param string $type
+     * @return bool
+     */
+    public function cmi5launch_connectors_error_message($resulttotest, $type) {
+
+        // Decode result because if it is not 200 then something went wrong
+        //If it's a string, decode it.
+        if(is_string($resulttotest)){
+            $resulttest = json_decode($resulttotest, true);
+        }
+        else{
+            $resulttest = $resulttotest;
         }
 
-        return $result;
+        if ($resulttest === FALSE || array_key_exists("statusCode", $resulttest) && $resulttest["statusCode"] != 200) {
+
+            echo "<br>";
+
+            echo "Something went wrong " . $type . ". CMI5 Player returned " . var_dump($resulttotest);
+
+            echo "<br>";
+
+            return false; 
+        }
+        else{
+            // No errors, continue.
+            return true;
+        }
     }
 
 }
