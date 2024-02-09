@@ -64,7 +64,7 @@ class session_helpers {
         $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
 
         // Reload user course instance.
-        $usersCourse = $DB->get_record('cmi5launch_course', ['courseid'  => $record->courseid, 'userid'  => $user->id]);
+        $usersCourse = $DB->get_record('cmi5launch_usercourse', ['courseid'  => $record->courseid, 'userid'  => $user->id]);
 
         // Get updates from the LRS as well.
         $session = $getprogress($usersCourse->registrationid, $session);

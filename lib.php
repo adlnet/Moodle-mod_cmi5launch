@@ -138,7 +138,7 @@ function cmi5launch_update_instance(stdClass $cmi5launch, mod_cmi5launch_mod_for
     $cmi5launch->timemodified = time();
     $cmi5launch->id = $cmi5launch->instance;
 
-    $cmi5launchlrs = cmi5launch_build_lrs_settings($cmi5launch);
+   // $cmi5launchlrs = cmi5launch_build_lrs_settings($cmi5launch);
 
     // We removed this part of lrs box -MB
     /*
@@ -874,7 +874,7 @@ function cmi5launch_getactor($instance) {
     }
 
     $expresult = array();
-    $activitysettings = $DB->get_record(
+   /* $activitysettings = $DB->get_record(
         'cmi5launch_lrs',
         array('cmi5launchid' => $instance),
         $fields = '*',
@@ -890,12 +890,13 @@ function cmi5launch_getactor($instance) {
         $expresult['cmi5launchcustomacchp'] = $activitysettings->customacchp;
         $expresult['cmi5launchuseactoremail'] = $activitysettings->useactoremail;
         $expresult['cmi5launchlrsduration'] = $activitysettings->lrsduration;
-    } else { // Use global lrs settings.
+    } else { */
+        // Use global lrs settings.
         $result = $DB->get_records('config_plugins', array('plugin' => 'cmi5launch'));
         foreach ($result as $value) {
             $expresult[$value->name] = $value->value;
         }
-    }
+   // }
 
     $expresult['cmi5launchlrsversion'] = '1.0.0';
 

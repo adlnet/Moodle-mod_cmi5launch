@@ -129,13 +129,13 @@ function cmi5launch_highest_grade($scores)
         $updatesession = $sessionhelper->cmi5launch_get_update_session();
 
         // Check if record already exists.
-        $exists = $DB->record_exists('cmi5launch_course', ['courseid' => $cmi5launch->courseid, 'userid' => $user->id]);
+        $exists = $DB->record_exists('cmi5launch_usercourse', ['courseid' => $cmi5launch->courseid, 'userid' => $user->id]);
         
         // If it exists, we want to update it.
         if (!$exists == false) {
 
             // Retrieve the record.
-            $userscourse = $DB->get_record('cmi5launch_course', ['courseid' => $cmi5launch->courseid, 'userid' => $user->id]);
+            $userscourse = $DB->get_record('cmi5launch_usercourse', ['courseid' => $cmi5launch->courseid, 'userid' => $user->id]);
 
             // User record may be null if user has not participated in course yet.
             if (!$userscourse == null) {
@@ -231,7 +231,7 @@ function cmi5launch_highest_grade($scores)
 
                 // Update course record.
                 $userscourse->ausgrades = json_encode($auscores);
-                $DB->update_record("cmi5launch_course", $userscourse);
+                $DB->update_record("cmi5launch_usercourse", $userscourse);
             } 
      
             // Return scores.

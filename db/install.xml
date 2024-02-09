@@ -4,27 +4,26 @@
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
   <TABLES>
-    <TABLE NAME="cmi5launch" COMMENT="Settings for an individual course">
+    <TABLE NAME="cmi5launch" COMMENT="Settings for an individual CMI5 activity">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" COMMENT="Main ID assigned by Moodle"/>
         <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Course cmi5launch activity belongs to"/>
-        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Name field for moodle instances"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Name of course"/>
         <FIELD NAME="intro" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="General introduction of the cmi5launch activity"/>
         <FIELD NAME="introformat" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Format of the intro field (MOODLE, HTML, MARKDOWN...)"/>
         <FIELD NAME="cmi5launchurl" TYPE="char" LENGTH="1333" NOTNULL="true" SEQUENCE="false" COMMENT="Launch URL"/>
         <FIELD NAME="cmi5activityid" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="The LMS id"/>
-        <FIELD NAME="registrationid" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" COMMENT="Course registration ID returned by CMI5 player. We want to use this for LRS instead"/>
-        <FIELD NAME="returnurl" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Tenants return url, where it will go after closing course from launch url"/>
+        <FIELD NAME="registrationid" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" COMMENT="Course registration ID returned by CMI5 player. We want to use this to connect to LRS."/>
+        <FIELD NAME="returnurl" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Tenants return URL, where it will go after closing course from launch URL"/>
         <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="This is the course id returned by CMI5 Player"/>
         <FIELD NAME="cmi5verbid" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Unique verb id"/>
         <FIELD NAME="cmi5expiry" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="365" SEQUENCE="false" COMMENT="Number of days to expire completion after"/>
         <FIELD NAME="overridedefaults" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false" COMMENT="Determines if the activity is inheriting the global defaults or has overriden them at the activity level."/>
-        <FIELD NAME="cmi5multipleregs" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Allow multiple registrations?"/>
-        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="cmi5multipleregs" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Allow multiple registrations (not recommended)"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The time the course was created"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Last time the course was modified"/>
         <FIELD NAME="courseinfo" TYPE="text" LENGTH="4000" NOTNULL="false" SEQUENCE="false" COMMENT="The full string of course info"/>              
         <FIELD NAME="aus" TYPE="text" LENGTH="4000" NOTNULL="false" SEQUENCE="false" COMMENT="The AUs of the course, saved as array"/>              
-        <FIELD NAME="grade" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="The overall grade for the course"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
@@ -33,7 +32,7 @@
         <INDEX NAME="course" UNIQUE="false" FIELDS="course"/>
       </INDEXES>  
     </TABLE>
-      <TABLE NAME="cmi5launch_course" COMMENT="A users course information such as progress, etc">
+      <TABLE NAME="cmi5launch_usercourse" COMMENT="A users course information such as progress, etc">
         <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" COMMENT="Main id for tracking."/>
         <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Course id, assigned by CMI5 player"/>
@@ -53,30 +52,6 @@
         <INDEX NAME="courseid" UNIQUE="false" FIELDS="courseid"/>
       </INDEXES>
       </TABLE>
-    <TABLE NAME="cmi5launch_lrs" COMMENT="Store LRS settings">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" COMMENT"Main id  for tracking"/>
-        <FIELD NAME="cmi5launchid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Index to join cmi5launch activity id"/>
-        <FIELD NAME="lrsendpoint" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="LRS Endpoint (URL)"/>
-        <FIELD NAME="lrsauthentication" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="LRS authentication type"/>
-        <FIELD NAME="lrslogin" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="LRS login (username)"/>
-        <FIELD NAME="lrspass" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="LRS password"/>
-        <FIELD NAME="customacchp" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="useactoremail" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
-        <FIELD NAME="lrsduration" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Duration activity will remain active for."/>
-        <FIELD NAME="tenantname" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="The name of the user for the cmi5 player"/>
-        <FIELD NAME="tenantpass" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="the password of the tenant user of the cmi5 Player"/>
-        <FIELD NAME="tenanttoken" TYPE="char" LENGTH="350" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="playerport" TYPE="int" LENGTH="5" NOTNULL="false" DEFAULT="66398" SEQUENCE="false" COMMENT="The port to use to access the cmi5 player"/>
-        <FIELD NAME="playerurl" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="The URL or IP address of the cmi5 player"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-      </KEYS>
-      <INDEXES>
-        <INDEX NAME="cmi5launchid" UNIQUE="false" FIELDS="cmi5launchid" COMMENT="ID used to join cmi5launch activity with the LRS settings."/>
-      </INDEXES>
-    </TABLE>
     <TABLE NAME="cmi5launch_player" COMMENT="Store variables for API communication with CMI5 player.">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The id of returned course IN MOODLE (this id matches with field id in cmi5launch table. Moodle assigns id'ssequentially. CMI5 ALSO will assign course ids. These are separate. "/>

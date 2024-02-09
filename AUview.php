@@ -118,7 +118,7 @@ $sessionscores = array();
 $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
 
 // Reload user course instance.
-$userscourse = $DB->get_record('cmi5launch_course', ['courseid'  => $record->courseid, 'userid'  => $USER->id]);
+$userscourse = $DB->get_record('cmi5launch_usercourse', ['courseid'  => $record->courseid, 'userid'  => $USER->id]);
 
 // Retrieve the registration id.
 $regid = $userscourse->registrationid;

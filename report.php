@@ -240,7 +240,7 @@ foreach ($auschunked[0] as $au) {
         $username = $user->username;
 
         // Retrieve users specific info for this course.
-        $userrecord = $DB->get_record('cmi5launch_course', ['courseid' => $record->courseid, 'userid' => $user->id]);
+        $userrecord = $DB->get_record('cmi5launch_usercourse', ['courseid' => $record->courseid, 'userid' => $user->id]);
        
         // Retrieve grade type from settings.
         $gradetype = $cmi5launchsettings["grademethod"];

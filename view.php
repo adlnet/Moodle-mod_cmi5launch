@@ -127,7 +127,7 @@ $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
 cmi5launch_update_grades($cmi5launch, $USER->id);
 
 // Check if a course record exists for this user yet.
-$exists = $DB->record_exists('cmi5launch_course', ['courseid'  => $record->courseid, 'userid'  => $USER->id]);
+$exists = $DB->record_exists('cmi5launch_usercourse', ['courseid'  => $record->courseid, 'userid'  => $USER->id]);
 
 // If it does not exist, create it.
 if ($exists == false) {
@@ -154,7 +154,7 @@ if ($exists == false) {
     $userscourse->aus = (json_encode($auids));
 
     // Save new record to DB.
-    $newid = $DB->insert_record('cmi5launch_course', $userscourse);
+    $newid = $DB->insert_record('cmi5launch_usercourse', $userscourse);
   
     // Now assign id created by DB.
     $userscourse->id = $newid;
@@ -162,7 +162,7 @@ if ($exists == false) {
 } else { // Record exists.
 
     // We have a record, so we need to retrieve it.
-    $userscourse = $DB->get_record('cmi5launch_course', ['courseid'  => $record->courseid, 'userid'  => $USER->id]);
+    $userscourse = $DB->get_record('cmi5launch_usercourse', ['courseid'  => $record->courseid, 'userid'  => $USER->id]);
 
     // Retrieve registration id.
     $registrationid = $userscourse->registrationid;
@@ -175,7 +175,7 @@ if ($exists == false) {
         // Update course record.
         $userscourse->registrationid = $registrationid;
         // Update DB.
-        $DB->update_record("cmi5launch_course", $userscourse);
+        $DB->update_record("cmi5launch_usercourse", $userscourse);
     }
     // Retrieve AU ids.
     $auids = (json_decode($userscourse->aus) );
@@ -384,7 +384,7 @@ foreach ($auids as $key => $auid) {
 $userscourse->ausgrades = json_encode($auscores);
 
 // Lastly, update our course table.
-$updated = $DB->update_record("cmi5launch_course", $userscourse);
+$updated = $DB->update_record("cmi5launch_usercourse", $userscourse);
 
 // This feeds the table.
 $table->data = $tabledata;

@@ -29,7 +29,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 // Until workaround leave old version but current should be 2024012516
-$plugin->version   = 2024020717;      // The current module version (Date: YYYYMMDDXX).
+$plugin->version   = 2024020915;      // The current module version (Date: YYYYMMDDXX).
 
 $plugin->requires  = 2015111000;      // Requires Moodle 3.0 version.
 $plugin->cron      = 0;               // Period for cron to check this module (secs).

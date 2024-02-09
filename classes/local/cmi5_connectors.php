@@ -263,7 +263,7 @@ class cmi5_connectors {
 
 		$settings = cmi5launch_settings($id);
      
-        $userscourse = $DB->get_record('cmi5launch_course', ['courseid'  => $record->courseid, 'userid'  => $USER->id]);
+        $userscourse = $DB->get_record('cmi5launch_usercourse', ['courseid'  => $record->courseid, 'userid'  => $USER->id]);
 
 		$registrationid = $userscourse->registrationid;
 		

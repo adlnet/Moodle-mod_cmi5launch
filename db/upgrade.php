@@ -41,31 +41,72 @@ function xmldb_cmi5launch_upgrade($oldversion) {
     global $DB;
     $dbman = $DB->get_manager();
 
+    if ($oldversion < 2024020915) {
+
+            // Define field grade to be dropped from cmi5launch.
+            $table = new xmldb_table('cmi5launch');
+            $field = new xmldb_field('grade');
+    
+            // Conditionally launch drop field grade.
+            if ($dbman->field_exists($table, $field)) {
+                $dbman->drop_field($table, $field);
+            }
+    
+        // Cmi5launch savepoint reached.
+        upgrade_mod_savepoint(true, 2024020915, 'cmi5launch');
+
+    }
+    if ($oldversion < 2024020816) {
+
+        // Conditionally rename table if it exists.
+        if ($dbman->table_exists('cmi5launch_course')) {
+             // Define table cmi5launch_lrs to be renamed to NEWNAMEGOESHERE.
+             $table = new xmldb_table('cmi5launch_course');
+
+             // Launch rename table for cmi5launch_lrs.
+             $dbman->rename_table($table, 'cmi5launch_usercourse');
+        }
+
+        // Cmi5launch savepoint reached.
+        upgrade_mod_savepoint(true, 2024020816, 'cmi5launch');
+    }
     if ($oldversion < 2024020717) {
 
+        // This table is not used, dropping from future versions.
+        $tablelrs = new xmldb_table('cmi5launch_lrs');
+
+        // Rname this table for more clarity.
+      //  $tableusercourse = new xmldb_table('cmi5launch_usercourse');
+
         // Define field registrationcourseausid to be dropped from cmi5launch_sessions.
-        $table1 = new xmldb_table('cmi5launch_sessions');
+        $tablesessions = new xmldb_table('cmi5launch_sessions');
         
         $fieldstoremove = array($fieldregcourse = new xmldb_field('registrationcourseausid'), $fieldregid = new xmldb_field('registrationid'), $fieldlrscode = new xmldb_field('lrscode'),
         $fieldauid = new xmldb_field('auid'));
 
         // Define field registrationcourseausid to be dropped from cmi5launch_sessions.
-        $table2 = new xmldb_table('cmi5launch_aus');
+        $tableaus = new xmldb_table('cmi5launch_aus');
         // This is an accidental duplicate field that does nothing, delete it.
         $fieldsessionid = new xmldb_field('sessionid');
 
         // Now cycle through array and remove fields.
         foreach ($fieldstoremove as $field) {
             // Conditionally launch drop field registrationcourseausid.
-            if ($dbman->field_exists($table1, $field)) {
-                $dbman->drop_field($table1, $field);
+            if ($dbman->field_exists($tablesessions, $field)) {
+                $dbman->drop_field($tablesessions, $field);
             }
         }
     
         // Conditionally launch drop field registrationid.
-        if ($dbman->field_exists($table2, $fieldsessionid)) {
-            $dbman->drop_field($table2, $fieldsessionid);
+        if ($dbman->field_exists($tableaus, $fieldsessionid)) {
+            $dbman->drop_field($tableaus, $fieldsessionid);
         }
+
+        // Conditionally drop table if exists.
+        if ($dbman->table_exists($tablelrs)) {
+            $dbman->drop_table($tablelrs);
+        }
+        
         // Cmi5launch savepoint reached.
         upgrade_mod_savepoint(true, 2024020717, 'cmi5launch');
     }

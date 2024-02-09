@@ -67,7 +67,7 @@ $id = array_shift($idandstatus);
 $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
 
 // Retrieve user's course record.
-$userscourse = $DB->get_record('cmi5launch_course', ['courseid'  => $record->courseid, 'userid'  => $USER->id]);
+$userscourse = $DB->get_record('cmi5launch_usercourse', ['courseid'  => $record->courseid, 'userid'  => $USER->id]);
 
 // Retrieve registration id.
 $registrationid = $userscourse->registrationid;
