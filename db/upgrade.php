@@ -41,6 +41,42 @@ function xmldb_cmi5launch_upgrade($oldversion) {
     global $DB;
     $dbman = $DB->get_manager();
 
+    if ($oldversion < 202402XXXX) {
+
+        // Define field grade to be dropped from cmi5launch.
+        $tablecmi5launch = new xmldb_table('cmi5launch');
+        $field1 = new xmldb_field('cmi5launchurl');
+
+        // Define field grade to be dropped from cmi5launch.
+        $tableusercourse = new xmldb_table('cmi5launch_usercourse');
+        $field2 = new xmldb_field('cmi5launchurl');
+
+        //Define fields to be dropped from table cmi5launch_player. 
+        $tableplayer = new xmldb_table('cmi5launch_player');
+        $fieldstoremove = array (new xmldb_field('courseinfo'), new xmldb_field('firstlaunched'), new xmldb_field('lastlaunched') );
+
+        // Now cycle through array and remove fields.
+        foreach ($fieldstoremove as $field) {
+        // Conditionally launch drop field registrationcourseausid.
+        if ($dbman->field_exists($tableplayer, $field)) {
+            $dbman->drop_field($tableplayer, $field);
+        }
+    }
+        // Conditionally launch drop field grade.
+        if ($dbman->field_exists($tablecmi5launch, $field1)) {
+            $dbman->drop_field($tablecmi5launch, $field1);
+        }
+
+        // Conditionally launch drop field grade.
+        if ($dbman->field_exists($tableusercourse, $field2)) {
+            $dbman->drop_field($tableusercourse, $field2);
+        }
+        
+
+    // Cmi5launch savepoint reached.
+    upgrade_mod_savepoint(true, 202402XXXX, 'cmi5launch');
+
+}
     if ($oldversion < 2024020915) {
 
             // Define field grade to be dropped from cmi5launch.
