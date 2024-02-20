@@ -24,6 +24,8 @@
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once('header.php');
 
+require_login($course, false, $cm);
+
 $completion = new completion_info($course);
 
 $possibleresult = COMPLETION_COMPLETE;

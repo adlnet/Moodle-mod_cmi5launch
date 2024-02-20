@@ -27,7 +27,7 @@ defined('MOODLE_INTERNAL') || die;
 require_once($CFG->dirroot.'/mod/cmi5launch/backup/moodle2/backup_cmi5launch_stepslib.php');    // Because it exists (must).
 require_once($CFG->dirroot.'/mod/cmi5launch/backup/moodle2/backup_cmi5launch_settingslib.php'); // Because it exists (optional).
 
-class backup_cmi5launch_activity_task extends backup_activity_task {
+class backup_tincan_activity_task extends backup_activity_task {
 
     /**
      * Define (add) particular settings this activity can have.

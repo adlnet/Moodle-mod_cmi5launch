@@ -48,20 +48,19 @@ class au_helpers {
     public function cmi5launch_retrieve_aus($returnedinfo) {
         // The results come back as nested array under more then just AUs.
         // We only want the info pertaining to the AU.
-        // MB would making this true stop the nesting? TODO
         $resultchunked = array_chunk($returnedinfo["metadata"]["aus"], 1, );
 
         return $resultchunked;
     }
 
     /**
-     * So it should be fed an array of statements that then assigns the values to 
+     * So it should be fed an array of statements that then assigns the values to
      * several aus, and then returns them as au objects.
      * @param mixed $austatements
      * @return array<au>
      */
     public function cmi5launch_create_aus($austatements) {
-        
+
         // Needs to return our new AU objects.
         $newaus = array();
 
@@ -97,7 +96,7 @@ class au_helpers {
         // For each AU in array build a new record and save it.
         // Because of so many nested variables this needs to be done manually.
         foreach ($auobjectarray as $auobject) {
-            
+
             // Make a newrecord to save.
             $newrecord = new \stdClass();
 
@@ -113,7 +112,6 @@ class au_helpers {
             $newrecord->moveon = $auobject->moveOn;
             $newrecord->auindex = $auobject->auIndex;
             $newrecord->parents = json_encode($auobject->parents, true);
-            //let try to encode
             $newrecord->objectives = json_encode($auobject->objectives);
             $desc = json_decode(json_encode($auobject->description), true);
             $newrecord->description = $desc[0]['text'];
@@ -140,18 +138,18 @@ class au_helpers {
      * @return au|bool
      */
     public function cmi5launch_retrieve_aus_from_db($auid) {
-        
+
         global $DB;
 
         $check = $DB->record_exists( 'cmi5launch_aus', ['id' => $auid], '*', IGNORE_MISSING);
 
         // If check is negative, the record does not exist. It should so throw error.
-        // Moodle will throw the error, but we want to pass this message back ot user. 
+        // Moodle will throw the error, but we want to pass this message back ot user.
         if (!$check) {
 
             echo "<p>Error attempting to get AU data from DB. Check AU id. AU id is: " . $auid ."</p>";
 
-           return false;
+            return false;
         } else {
 
             $auitem = $DB->get_record('cmi5launch_aus',  array('id' => $auid));

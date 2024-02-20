@@ -70,6 +70,7 @@ echo $OUTPUT->header();
 <?php
 
 // TODO: Put all the php inserted data as parameters on the functions and put the functions in a separate JS file.
+
 ?>
 
     <script>
@@ -145,7 +146,7 @@ if (!$au->sessions == null) {
 
     // Iterate through each session by id.
     foreach ($sessionids as $key => $sessionid) {
-        
+
         // Get the session from DB with session id.
         $session = $retrievesession($sessionid);
 
@@ -188,13 +189,12 @@ $newsession = "true";
 $infofornextpage = $auid . "," . $newsession;
 
 // New attempt button.
-echo "<p tabindex=\"0\"
-          onkeyup=\"key_test('" . $infofornextpage . "')\"
-          id='cmi5launch_newattempt'><button onclick=\"mod_cmi5launch_launchexperience('"
-          . $infofornextpage
-          . "')\" style=\"cursor: pointer;\">"
-          . get_string('cmi5launch_attempt', 'cmi5launch')
-          . "</button></p>";
+echo "<p tabindex=\"0\"onkeyup=\"key_test('"
+    . $infofornextpage . "')\"id='cmi5launch_newattempt'><button onclick=\"mod_cmi5launch_launchexperience('"
+    . $infofornextpage
+    . "')\" style=\"cursor: pointer;\">"
+    . get_string('cmi5launch_attempt', 'cmi5launch')
+    . "</button></p>";
 
 // Add a form to be posted based on the attempt selected.
 ?>

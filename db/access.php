@@ -53,7 +53,7 @@ $capabilities = array(
         'archetypes' => array(
             'guest' => CAP_ALLOW,
             'user' => CAP_ALLOW,
-        )
+        ),
     ),
 
     'mod/cmi5launch:viewgrades' => array(
@@ -62,7 +62,7 @@ $capabilities = array(
         'archetypes' => array(
             'coursecreator' => CAP_ALLOW,
             'teacher' => CAP_ALLOW,
-        )
+        ),
     ),
 
     'mod/cmi5launch:addinstance' => array(
@@ -71,9 +71,9 @@ $capabilities = array(
         'contextlevel' => CONTEXT_COURSE,
         'archetypes' => array(
             'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW
+            'manager' => CAP_ALLOW,
         ),
-        'clonepermissionsfrom' => 'moodle/course:manageactivities'
+        'clonepermissionsfrom' => 'moodle/course:manageactivities',
     ),
 );
 

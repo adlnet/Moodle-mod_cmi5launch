@@ -28,18 +28,10 @@
 defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->dirroot/mod/cmi5launch/lib.php");
 
-//Classes for connecting to CMI5 player
-use mod_cmi5launch\au;
-use mod_cmi5launch\local\progress;
-use mod_cmi5launch\local\course;
+// Class for connecting to CMI5 player.
 use mod_cmi5launch\local\cmi5_connectors;
-use mod_cmi5launch\local\au_helpers;
-use mod_cmi5launch\local\session_helpers;
 
-
-//Grade stuff from SCORM
-
-//Move these to top where they belong if they are what we need
+// Grade stuff.
 define('GRADE_AUS_CMI5', '0');
 define('GRADE_HIGHEST_CMI5', '1');
 define('GRADE_AVERAGE_CMI5', '2');
@@ -84,13 +76,13 @@ function cmi5_launched_statement($registrationid) {
     $parentdefinition = array();
     if (isset($course->summary) && $course->summary !== "") {
         $parentdefinition["description"] = array(
-            "en-US" => $course->summary
+            "en-US" => $course->summary,
         );
     }
 
     if (isset($course->fullname) && $course->fullname !== "") {
         $parentdefinition["name"] = array(
-            "en-US" => $course->fullname
+            "en-US" => $course->fullname,
         );
     }
 
@@ -101,13 +93,13 @@ function cmi5_launched_statement($registrationid) {
             'verb' => array(
                 'id' => 'http://adlnet.gov/expapi/verbs/launched',
                 'display' => array(
-                    'en-US' => 'launched'
-                )
+                    'en-US' => 'launched',
+                ),
             ),
 
             'object' => array(
                 'id' => $cmi5launch->cmi5activityid,
-                'objectType' => "Activity"
+                'objectType' => "Activity",
             ),
 
             "context" => array(
@@ -117,28 +109,28 @@ function cmi5_launched_statement($registrationid) {
                         array(
                             "id" => $CFG->wwwroot.'/course/view.php?id='. $course->id,
                             "objectType" => "Activity",
-                            "definition" => $parentdefinition
-                        )
+                            "definition" => $parentdefinition,
+                        ),
                     ),
                     "grouping"  => array(
                         array(
                             "id" => $CFG->wwwroot,
-                            "objectType" => "Activity"
-                        )
+                            "objectType" => "Activity",
+                        ),
                     ),
                     "category"  => array(
                         array(
                             "id" => "https://moodle.org",
                             "objectType" => "Activity",
                             "definition" => array (
-                                "type" => "http://id.cmi5api.com/activitytype/source"
-                            )
-                        )
-                    )
+                                "type" => "http://id.cmi5api.com/activitytype/source",
+                            ),
+                        ),
+                    ),
                 ),
-                "language" => cmi5launch_get_moodle_langauge()
+                "language" => cmi5launch_get_moodle_langauge(),
             ),
-            "timestamp" => date(DATE_ATOM)
+            "timestamp" => date(DATE_ATOM),
         )
     );
 
@@ -154,7 +146,8 @@ function cmi5_launched_statement($registrationid) {
  * @param string/UUID $registrationid The cmi5 Registration UUID associated with the launch.
  * @return string launch link including querystring.
  */
-function cmi5launch_get_launch_url($registrationuuid, $auID) {
+function cmi5launch_get_launch_url($registrationuuid, $auid) {
+
     global $cmi5launch, $CFG, $DB;
     $cmi5launchsettings = cmi5launch_settings($cmi5launch->id);
     $expiry = new DateTime('NOW');
@@ -162,7 +155,7 @@ function cmi5launch_get_launch_url($registrationuuid, $auID) {
     $expiry->add(new DateInterval('PT'.$xapiduration.'M'));
 
     $url = trim($cmi5launchsettings['cmi5launchlrsendpoint']);
-    
+
     // Call the function to get the credentials from the LRS.
     $basiclogin = trim($cmi5launchsettings['cmi5launchlrslogin']);
     $basicpass = trim($cmi5launchsettings['cmi5launchlrspass']);
@@ -195,15 +188,12 @@ function cmi5launch_get_launch_url($registrationuuid, $auID) {
             $basicauth = base64_encode($basiclogin.":".$basicpass);
             break;
     }
-//to bring in functions from class cmi5Connector
-$connectors = new cmi5_connectors;
-//Get retrieve URL function
-$cmi5launch_retrieve_url = $connectors->cmi5launch_get_retrieve_url();
-//See here we are passing the auid. If we have session ids will we pass those instead
-//or is that a whole new func, I think it may be
-//$rtnstring = $cmi5launch_retrieve_url($cmi5launch->id, $auID); 
+    // Bring in functions from class cmi5Connector.
+    $connectors = new cmi5_connectors;
+    // Get retrieve URL function.
+    $cmi5launchretrieveurl = $connectors->cmi5launch_get_retrieve_url();
 
-//return $rtnstring;
+    // return $rtnstring;
 }
 
 /**
@@ -226,13 +216,13 @@ function cmi5launch_get_creds_learninglocker($basiclogin, $basicpass, $url, $exp
         'historical' => false,
         'actors' => array(
             "objectType" => 'Person',
-            "name" => array($actor->getName())
+            "name" => array($actor->getName()),
         ),
         'auth' => $actor,
         'activity' => array(
             $cmi5launch->cmi5activityid,
         ),
-        'registration' => $registrationuuid
+        'registration' => $registrationuuid,
     );
 
     if (null !== $actor->getMbox()) {
@@ -287,7 +277,7 @@ function cmi5launch_get_creds_learninglocker($basiclogin, $basicpass, $url, $exp
 
     return array(
         'contents' => $ret,
-        'metadata' => $meta
+        'metadata' => $meta,
     );
 }
 
@@ -331,7 +321,7 @@ function cmi5launch_get_global_parameters_and_save_state($data, $key, $etag) {
         cmi5launch_myjson_encode($data),
         array(
             'etag' => $etag,
-            'contentType' => 'application/json'
+            'contentType' => 'application/json',
         )
     );
 }
@@ -361,7 +351,7 @@ function cmi5launch_get_global_parameters_and_save_agentprofile($data, $key) {
     $getresponse = $lrs->retrieveAgentProfile(cmi5launch_getactor($cmi5launch->id), $key);
 
     $opts = array(
-        'contentType' => 'application/json'
+        'contentType' => 'application/json',
     );
     if ($getresponse->success) {
         $opts['etag'] = $getresponse->content->getEtag();
@@ -394,7 +384,6 @@ function cmi5launch_get_global_parameters_and_get_state($key) {
         $cmi5launchsettings['cmi5launchlrspass']
     );
 
- 
     return $lrs->retrieveState(
         new \cmi5\Activity(array("id" => trim($cmi5launch->cmi5activityid))),
         cmi5launch_getactor($cmi5launch->id),
@@ -452,15 +441,15 @@ function cmi5launch_get_creds_watershed($login, $pass, $endpoint, $expiry) {
         [
             "content" => json_encode([
                 "expireSeconds" => $expiry,
-                "scope" => "xapi:all"
-            ])
+                "scope" => "xapi:all",
+            ]),
         ]
     );
 
     if ($createsessionresponse["status"] === 200) {
         return [
             "key" => $createsessionresponse["content"]->key,
-            "secret" => $createsessionresponse["content"]->secret
+            "secret" => $createsessionresponse["content"]->secret,
         ];
     } else {
         $reason = get_string('apCreationFailed', 'cmi5launch')
@@ -497,7 +486,7 @@ function cmi5launch_send_api_request($auth, $method, $url) {
         // but we need to handle the "error" status codes ourselves in some cases.
         'ignore_errors' => true,
         'method' => $method,
-        'header' => array()
+        'header' => array(),
     );
 
     array_push($http['header'], 'Authorization: ' . $auth);
@@ -511,14 +500,14 @@ function cmi5launch_send_api_request($auth, $method, $url) {
     $context = stream_context_create(array( 'http' => $http ));
 
     $fp = fopen($url, 'rb', false, $context);
-    
+
     $content = "";
-    
+
     if (! $fp) {
         return array (
             "metadata" => null,
             "content" => $content,
-            "status" => 0
+            "status" => 0,
         );
     }
     $metadata = stream_get_meta_data($fp);
@@ -534,11 +523,9 @@ function cmi5launch_send_api_request($auth, $method, $url) {
     return array (
         "metadata" => $metadata,
         "content" => $content,
-        "status" => $responsecode
+        "status" => $responsecode,
     );
 }
-
-
 
 /**
  * Returns an array of the array of update frequency options
@@ -562,8 +549,6 @@ function cmi5_get_grade_method_array() {
                   GRADE_AVERAGE_CMI5 => get_string('GRADE_AVERAGE_CMI5', 'cmi5launch'),
     );
 }
-
-
 
 /**
  * Returns an array of the array of attempt options
@@ -603,4 +588,3 @@ function cmi5_get_forceattempt_array() {
                  CMI5_FORCEATTEMPT_ONCOMPLETE => get_string('forceattemptoncomplete', 'cmi5launch'),
                  CMI5_FORCEATTEMPT_ALWAYS => get_string('forceattemptalways', 'cmi5launch'));
 }
-

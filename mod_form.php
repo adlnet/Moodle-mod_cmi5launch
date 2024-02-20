@@ -106,7 +106,7 @@ class mod_cmi5launch_mod_form extends moodleform_mod {
 
         // Start advanced settings.
         $mform->addElement('header', 'lrsheading', get_string('lrsheading', 'cmi5launch'));
-                    
+
         // Actor account homePage.
         $mform->addElement(
             'text',
@@ -163,8 +163,8 @@ class mod_cmi5launch_mod_form extends moodleform_mod {
         $mform->addGroupRule(
             'completionverbgroup', array(
                 'cmi5verbid' => array(
-                    array(get_string('maximumchars', '', 255), 'maxlength', 255, 'client')
-                )
+                    array(get_string('maximumchars', '', 255), 'maxlength', 255, 'client'),
+                ),
             )
         );
 
@@ -193,8 +193,8 @@ class mod_cmi5launch_mod_form extends moodleform_mod {
         $mform->addGroupRule(
             'completionexpirygroup', array(
                 'cmi5expiry' => array(
-                    array(get_string('maximumchars', '', 10), 'maxlength', 10, 'client')
-                )
+                    array(get_string('maximumchars', '', 10), 'maxlength', 10, 'client'),
+                ),
             )
         );
 

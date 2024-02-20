@@ -29,6 +29,7 @@ use mod_cmi5launch\local\session_helpers;
 require_once("../../config.php");
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require('header.php');
+require_login($course, false, $cm);
 
 // Bring in functions and classes.
 $progress = new progress;
@@ -149,13 +150,13 @@ if ($exists == false) {
 
     // Retrieve AU ids for this user/course.
     $aus = json_decode($record->aus);
-    //
+
     $auids = $saveaus($createaus($aus));
     $userscourse->aus = (json_encode($auids));
 
     // Save new record to DB.
     $newid = $DB->insert_record('cmi5launch_usercourse', $userscourse);
-  
+
     // Now assign id created by DB.
     $userscourse->id = $newid;
 
@@ -168,8 +169,8 @@ if ($exists == false) {
     $registrationid = $userscourse->registrationid;
 
     // We need to verify if there is a registration id. Sometimes errors with player can cause a null id, in that case we want to
-    // retrieve a new one. 
-    if($registrationid == null){
+    // retrieve a new one.
+    if ($registrationid == null) {
         // Retrieve registration id.
         $registrationid = $getregistration($record->courseid, $cmi5launch->id);
         // Update course record.
@@ -230,47 +231,48 @@ foreach ($auids as $key => $auid) {
 
     // Cycle through AUs (or blocks) in registration info from player, we are looking for the one
     // that matches our AU lmsID.
-    foreach($ausfromcmi5 as $key => $value){
+    foreach ($ausfromcmi5 as $key => $value) {
 
         // Check for the AUs satisfied status. Compare with lmsId to find status for that instance.
         $ausatisfied = cmi5launch_find_au_satisfied($value, $aulmsid);
-        // If au satisfied is ever true then we found it, once satisified it doesn't matter if others have failed or were also satisified.
-        if($ausatisfied == "true"){
+        // If au satisfied is ever true then we found it, once satisified it
+        // doesn't matter if others have failed or were also satisified.
+        if ($ausatisfied == "true") {
             break;
-        }
 
-        // This elseif was built as a failsafe. Very rarely there may be an instance where the player issues a duplicate lms id or registration number.
-        // For example, this can happen if the server crashes while a course is being made or updated. However, under normal circumstances, the AU LMSID
-        // should always match at least one of the AUs returned by player. 
-        elseif($ausatisfied = "No ids match"){ 
-            
+            // This elseif was built as a failsafe. Very rarely there may be an instance where the player issues
+            // a duplicate lms id or registration number. For example, this can happen if the server crashes while a course
+            // is being made or updated.
+            // However, under normal circumstances, the AU LMSID should always match at least one of the AUs returned by player.
+        } else if ($ausatisfied = "No ids match") {
+
             // If there are sessions for this AU.
             if ($au->sessions != null) {
 
                 // Retrieve session ids for this AU from DB.
                 $sessions = json_decode($au->sessions, true);
-                $session_helpers = new session_helpers;
-                $getsessioninfo = $session_helpers->cmi5launch_get_retrieve_sessions_from_db();
-        
-                // Retrieve what this AU needs to moveon. We will search through the session data to see if it is fulfilled
+                $sessionhelpers = new session_helpers;
+                $getsessioninfo = $sessionhelpers->cmi5launch_get_retrieve_sessions_from_db();
+
+                // Retrieve what this AU needs to moveon. We will search through the session data to see if it is fulfilled.
                 $aumoveon = $au->moveon;
 
                 // Hold if completed or passed is found.
                 $completedfound = false;
                 $passedfound = false;
 
-                //Cycle through them looking to see if any were passed and/or completed.
+                // Cycle through them looking to see if any were passed and/or completed.
                 foreach ($sessions as $key => $value) {
-  
-                    $au_session = $getsessioninfo($value);
 
-                    if ($au_session->iscompleted == "1") {
+                    $ausession = $getsessioninfo($value);
+
+                    if ($ausession->iscompleted == "1") {
                         $completedfound = true;
                     }
-                    if ($au_session->ispassed == "1") {
+                    if ($ausession->ispassed == "1") {
                         $passedfound = true;
                     }
-              
+
                     // See if the pass and completed fulfill move on value for AU.
                     switch ($aumoveon) {
                         case "Completed":
@@ -294,80 +296,79 @@ foreach ($auids as $key => $auid) {
                             };
                             break;
                     }
-                    
-                    //If even one AU satisifed is met, then the AU is satisfied overall. Later or earlier sessions don't matter. 
-                    if($ausatisfied == "true"){
+
+                    // If even one AU satisifed is met, then the AU is satisfied overall. Later or earlier sessions don't matter.
+                    if ($ausatisfied == "true") {
                         break;
                     }
                 }
             }
         }
-    } 
-        // If the 'sessions' in this AU are null we know this hasn't even been attempted.
-        if($au->sessions == null) {
+    }
+    // If the 'sessions' in this AU are null we know this hasn't even been attempted.
+    if ($au->sessions == null) {
 
-            $austatus = "Not attempted";
+        $austatus = "Not attempted";
 
+    } else {
+
+        // Retrieve AUs moveon specification.
+        $aumoveon = $au->moveon;
+
+        // If it's been attempted but no moveon value.
+        if ($aumoveon == "NotApplicable") {
+            $austatus = "viewed";
         } else {
+            // IF it DOES have a moveon value.
+            // If satisifed is returned true.
+            if ($ausatisfied == "true") {
 
-            // Retrieve AUs moveon specification.
-            $aumoveon = $au->moveon;
+                $austatus = "Satisfied";
+                // Also update AU.
+                $au->satisfied = "true";
+            } else {
 
-            // If it's been attempted but no moveon value.
-            if ($aumoveon == "NotApplicable") {
-                $austatus = "viewed";
-            } 
-            else { // IF it DOES have a moveon value.
-
-                // If satisifed is returned true.
-                if ($ausatisfied == "true") {
-
-                    $austatus = "Satisfied";
-                    // Also update AU.
-                    $au->satisfied = "true";
-                } else {
-
-                    // If not, its in progress.
-                    $austatus = "In Progress";
-                    // Also update AU.
-                    $au->satisfied = "false";
-                }
+                // If not, its in progress.
+                $austatus = "In Progress";
+                // Also update AU.
+                $au->satisfied = "false";
             }
         }
+    }
 
-        // Create array of info to place in table.
-        $auinfo = array();
+    // Create array of info to place in table.
+    $auinfo = array();
 
-        // Assign au name, progress, and index.
-        $auinfo[] = $au->title;
-        $auinfo[] = ($austatus);
+    // Assign au name, progress, and index.
+    $auinfo[] = $au->title;
+    $auinfo[] = ($austatus);
 
-        $grade = 0;
+    $grade = 0;
 
-        // Retrieve grade.
-        if (!$au->grade == 0 || $au->grade == null) {
+    // Retrieve grade.
+    if (!$au->grade == 0 || $au->grade == null) {
 
-            $grade = $au->grade;
+        $grade = $au->grade;
 
-            $auinfo[] = ($grade);
-        } elseif ($au->grade == 0) {
+        $auinfo[] = ($grade);
+    } else if ($au->grade == 0) {
 
-            // Display the 0.
-            $auinfo[] = ($grade);
-        } else {
-            // There is no grade, leave blank
-            $auinfo[] = (" ");
-        }
+        // Display the 0.
+        $auinfo[] = ($grade);
+    } else {
+        // There is no grade, leave blank.
+        $auinfo[] = (" ");
+    }
 
         $auindex = $au->auindex;
 
         // AU id for next page (to be loaded).
-        $infoForNextPage = $auid;
+        $infofornextpage = $auid;
 
         // Assign au link to auviews.
         $auinfo[] = "<button tabindex=\"0\" id='cmi5relaunch_attempt'
-            onkeyup=\"key_test('" . $infoForNextPage . "')\"
-            onclick=\"mod_cmi5launch_launchexperience('" . $infoForNextPage . "')\" style='cursor: pointer;'>"
+            onkeyup=\"key_test('" . $infofornextpage . "')\"
+            onclick=\"mod_cmi5launch_launchexperience('" . $infofornextpage . "')\" style='cursor: pointer;'>"
             . get_string('cmi5launchviewlaunchlink', 'cmi5launch') . "</button>";
 
         // Add to be fed to table.
@@ -375,10 +376,10 @@ foreach ($auids as $key => $auid) {
 
         // Update AU scores.
         $auscores[$au->lmsid] = array ($au->title => $au->scores);
-        
+
         // Update the AU in DB.
         $DB->update_record("cmi5launch_aus", $au);
-    }
+}
 
 // Add our newly updated auscores array to the course record.
 $userscourse->ausgrades = json_encode($auscores);

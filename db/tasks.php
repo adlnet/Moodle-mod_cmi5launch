@@ -28,6 +28,6 @@ $tasks = array(
         'classname' => 'mod_cmi5launch\task\check_completion',
         'blocking' => 0,
         'minute' => '01',
-        'hour' => '23'
-    )
+        'hour' => '23',
+    ),
 );

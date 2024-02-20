@@ -40,7 +40,7 @@ if ($ADMIN->fulltree) {
     $options = array(
         1 => get_string('cmi5launchlrsauthentication_option_0', 'cmi5launch'),
         2 => get_string('cmi5launchlrsauthentication_option_1', 'cmi5launch'),
-        0 => get_string('cmi5launchlrsauthentication_option_2', 'cmi5launch')
+        0 => get_string('cmi5launchlrsauthentication_option_2', 'cmi5launch'),
     );
     // Note the numbers above are deliberately mis-ordered for reasons of backwards compatibility with older settings.
 
@@ -124,9 +124,10 @@ if ($ADMIN->fulltree) {
         get_string('whatmaxdesc', 'cmi5launch'), );
 
     $settings->add(new admin_setting_configselect('cmi5launch/whatgrade',
-        get_string('whatgrade', 'cmi5launch'), get_string('whatgradedesc', 'cmi5launch'), HIGHEST_ATTEMPT_CMI5, cmi5_get_what_grade_array()));
+        get_string('whatgrade', 'cmi5launch'), get_string('whatgradedesc', 'cmi5launch'),
+        HIGHEST_ATTEMPT_CMI5, cmi5_get_what_grade_array()));
 
-    // Not sure if we wan to implement mastery override? -MB
+    // Not sure if we want to implement mastery override at this time -MB.
     /*
     $settings->add(new admin_setting_configselect('cmi5launch/masteryoverride',
     get_string('masteryoverride', 'cmi5launch'), get_string('masteryoverridedesc', 'cmi5launch'), 1, $yesno));

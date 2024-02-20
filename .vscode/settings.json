@@ -6,5 +6,6 @@
         "markdown": false,
         "scminput": false
     },
-    "github.copilot.advanced": {}
+    "github.copilot.advanced": {},
+    "files.eol": "\n"
 }

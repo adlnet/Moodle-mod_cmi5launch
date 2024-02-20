@@ -10,7 +10,7 @@
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -28,7 +28,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-//defined('MOODLE_INTERNAL') || die();
+defined('MOODLE_INTERNAL') || die();
 
 // Cmi5PHP - required for interacting with the LRS in cmi5launch_get_statements.
 require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/autoload.php");
@@ -54,35 +54,35 @@ $cmi5launchsettings = null;
  */
 function cmi5launch_supports($feature) {
     switch($feature) {
-        /** True if module supports intro editor */
+        // True if module supports intro editor.
         case FEATURE_MOD_INTRO:
             return true;
-            //MB - we do not currently support the next two, but leaving in, in case we start to.
-            /** True if module has code to track whether somebody viewed it */
-        //case FEATURE_COMPLETION_TRACKS_VIEWS:
-          //  return true;
-            /** True if module has custom completion rules */
-      // case FEATURE_COMPLETION_HAS_RULES:
-        //    return true;
-/** True if module supports backup/restore of moodle2 format */
+            // MB - we do not currently support the next two, but leaving in, in case we start to.
+            // True if module has code to track whether somebody viewed it
+            // case FEATURE_COMPLETION_TRACKS_VIEWS:
+            // return true;
+            // True if module has custom completion rules
+            // case FEATURE_COMPLETION_HAS_RULES:
+            // return true;
+        // True if module supports backup/restore of moodle2 format.
         case FEATURE_BACKUP_MOODLE2:
             return true;
-            /** True if module supports groups */
+        // True if module supports groups.
         case FEATURE_GROUPS:
             return true;
-            /** True if module supports groupings */
+        // True if module supports groupings.
         case FEATURE_GROUPINGS:
             return true;
-            /** True if module can provide a grade */
+        // True if module can provide a grade.
         case FEATURE_GRADE_HAS_GRADE:
             return true;
-            /** True if module supports outcomes */
+        // True if module supports outcomes.
         case FEATURE_GRADE_OUTCOMES:
             return true;
-            /** True if module can show description on course main page */
+        // True if module can show description on course main page.
         case FEATURE_SHOW_DESCRIPTION:
             return true;
-            /** Type of module */
+        // Type of module.
         case FEATURE_MOD_PURPOSE:
             return MOD_PURPOSE_CONTENT;
         default:
@@ -102,7 +102,6 @@ function cmi5launch_supports($feature) {
  * @param mod_cmi5launch_mod_form $mform
  * @return int The id of the newly inserted cmi5launch record
  */
-
 function cmi5launch_add_instance(stdClass $cmi5launch, mod_cmi5launch_mod_form $mform = null) {
 
     global $DB, $CFG;
@@ -138,9 +137,8 @@ function cmi5launch_update_instance(stdClass $cmi5launch, mod_cmi5launch_mod_for
     $cmi5launch->timemodified = time();
     $cmi5launch->id = $cmi5launch->instance;
 
-   // $cmi5launchlrs = cmi5launch_build_lrs_settings($cmi5launch);
-
     // We removed this part of lrs box -MB
+    // $cmi5launchlrs = cmi5launch_build_lrs_settings($cmi5launch);
     /*
     // Determine if override defaults checkbox is checked.
     if ($cmi5launch->overridedefaults == '1') {
@@ -409,7 +407,7 @@ function cmi5launch_pluginfile($course, $cm, $context, $filearea, $args, $forced
     $fs = get_file_storage();
 
     if (
-        (!$file = $fs->get_file($context->id, 'mod_cmi5launch', $filearea, 0, '/'.$filepath.'/', $filename)) 
+        (!$file = $fs->get_file($context->id, 'mod_cmi5launch', $filearea, 0, '/'.$filepath.'/', $filename))
         || ($file->is_directory())
     ) {
         if ($filearea === 'content') { // Return file not found straight away to improve performance.
@@ -560,7 +558,7 @@ function cmi5launch_process_new_package($cmi5launch) {
 
     // Bring in functions from class cmi5_table_connectors and AU helpers.
     $createcourse = $connectors->cmi5launch_get_create_course();
-    $retrieveaus = $auhelper-> get_cmi5launch_retrieve_aus();
+    $retrieveaus = $auhelper->get_cmi5launch_retrieve_aus();
     // Reload cmi5 instance.
     $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
 
@@ -586,14 +584,14 @@ function cmi5launch_process_new_package($cmi5launch) {
     $packagefile = false;
 
     $packagefile = $fs->get_file($context->id, 'mod_cmi5launch', 'package', 0, '/', $zipfilename);
- 
+
     // Retrieve user settings to apply to newly created record.
     $settings = cmi5launch_settings($cmi5launch->id);
     $token = $settings['cmi5launchtenanttoken'];
     // Create the course and retrieve info for saving to DB.
     $courseresults = $createcourse($context->id, $token, $packagefile);
 
-	// Take the results of created course and save new course id to table.
+    // Take the results of created course and save new course id to table.
     $record->courseinfo = $courseresults;
 
     $returnedinfo = json_decode($courseresults, true);
@@ -634,7 +632,7 @@ function cmi5launch_process_new_package($cmi5launch) {
         $objxml = new xml2Array();
         $manifest = $objxml->parse($xmltext);
 
-	    // Update activity id from the first activity in cmi5.xml, if it is found.
+        // Update activity id from the first activity in cmi5.xml, if it is found.
         // Skip without error if not. (The Moodle admin will need to enter the id manually).
         if (isset($manifest[0]["children"][0]["children"][0]["attrs"]["ID"])) {
             $record->cmi5activityid = $manifest[0]["children"][0]["children"][0]["attrs"]["ID"];
@@ -651,7 +649,7 @@ function cmi5launch_process_new_package($cmi5launch) {
     }
     // Save reference.
     // Turn off to trigger echo.
-   return $DB->update_record('cmi5launch', $record);
+    return $DB->update_record('cmi5launch', $record);
 }
 
 /**
@@ -695,62 +693,62 @@ function cmi5launch_validate_package($file) {
  *
  * @package  mod_cmi5launch
  * @category cmi5
- * 
  * @param mixed bool|array - $auinfoin - the info containing a block, au, or true/false au satisfied value
  * @param string $aulmsid - the lms id of the au we are looking for.
  * @return mixed - returns an array of aus or au satisfied value.
  */
- 
-function cmi5launch_find_au_satisfied($auinfoin, $aulmsid)
-{
+
+function cmi5launch_find_au_satisfied($auinfoin, $aulmsid) {
+
     $ausatisfied = "";
-    
+
     // Check if auinfoin is a boolean or an array.
     // It will be an array if an AU was found on recursive call.
-    if(is_bool($auinfoin)){
-        
+    if (is_bool($auinfoin)) {
+
         // Return value to func that called it.
         return $auinfoin;
-    }
-    // If it's an array it is either a block we still need to break down, or an AU we need to find satisfied value for.
-    elseif(is_array($auinfoin)){
-        
-        // Check AU's satisifeid value and display accordingly. 
+
+        // If it's an array it is either a block we still need to break down, or an AU we need to find satisfied value for.
+    } else if (is_array($auinfoin)) {
+
+        // Check AU's satisifeid value and display accordingly.
         foreach ($auinfoin as $key => $auinfo) {
+
             $ausatisfied = "false";
-            
+
             // If it's a block, we need to keep breaking it down.
-            if($auinfo["type"] == "block" ){
-            
+            if ($auinfo["type"] == "block" ) {
+
                 // Grab its children, this is what other blocks or AU's will be nested in.
                 $auchildren = $auinfo["children"];
-                
+
                 // Now recursively call function again.
                 $ausatisfied = cmi5launch_find_au_satisfied($auchildren, $aulmsid);
-            }
-            // If it's an AU, we need to check if it's the one we are looking for.
-            elseif($auinfo["type"] == "au"){
-                
+
+                // If it's an AU, we need to check if it's the one we are looking for.
+            } else if ($auinfo["type"] == "au") {
+
                 // Search for the correct lms id and take only the AU that matches.
-                if ( $auinfo["lmsId"] == $aulmsid)
-                {
+                if ( $auinfo["lmsId"] == $aulmsid) {
                     // If it is, retrieve the satisfied value.
                     $ausatisfied = $auinfo["satisfied"];
-                }else{
+                } else {
 
                     // If no ids match we have a problem, and need to return.
                     $ausatisfied = "No ids match";
                 }
-        
-            }else{
+            } else {
                 // This shouldn't be reachable, but in case add error message.
                 echo "Type from statement does not equal either block or AU.";
-            }  
+            }
         }
+    } else {
+
+        echo"Incorrect value passed to function cmi5launch_find_au_satisfied. Correct values are a boolean or array";
+
     }
-else{
-    echo"Incorrect value passed to function cmi5launch_find_au_satisfied. Correct values are a boolean or array";
-}  
+
     return $ausatisfied;
 }
 
@@ -779,7 +777,7 @@ function cmi5launch_get_statements($url, $basiclogin, $basicpass, $version, $act
         "verb" => new \cmi5\Verb(array("id" => trim($verb))),
         "activity" => new \cmi5\Activity(array("id" => trim($activityid))),
         "related_activities" => "false",
-        "format" => "ids"
+        "format" => "ids",
     );
 
     if (!is_null($since)) {
@@ -833,24 +831,24 @@ function cmi5launch_getactor($instance) {
             "name" => fullname($USER),
             "account" => array(
                 "homePage" => $settings['cmi5launchcustomacchp'],
-                "name" => $USER->idnumber
+                "name" => $USER->idnumber,
             ),
-            "objectType" => "Agent"
+            "objectType" => "Agent",
         );
     } else if ($USER->email && $settings['cmi5launchuseactoremail']) {
         $agent = array(
             "name" => fullname($USER),
             "mbox" => "mailto:".$USER->email,
-            "objectType" => "Agent"
+            "objectType" => "Agent",
         );
     } else {
         $agent = array(
             "name" => fullname($USER),
             "account" => array(
                 "homePage" => $CFG->wwwroot,
-                "name" => $USER->username
+                "name" => $USER->username,
             ),
-            "objectType" => "Agent"
+            "objectType" => "Agent",
         );
     }
 
@@ -866,7 +864,8 @@ function cmi5launch_getactor($instance) {
  * @param string $instance The Moodle id for the cmi5 module instance.
  * @return array LRS settings to use
  */
- function cmi5launch_settings($instance) {
+function cmi5launch_settings($instance) {
+
     global $DB, $CFG, $cmi5launchsettings;
 
     if (!is_null($cmi5launchsettings)) {
@@ -874,29 +873,12 @@ function cmi5launch_getactor($instance) {
     }
 
     $expresult = array();
-   /* $activitysettings = $DB->get_record(
-        'cmi5launch_lrs',
-        array('cmi5launchid' => $instance),
-        $fields = '*',
-        $strictness = IGNORE_MISSING
-    );
-  
-    // If global settings are not used, retrieve activity settings.
-    if (!use_global_cmi5_lrs_settings($instance)) {
-        $expresult['cmi5launchlrsendpoint'] = $activitysettings->lrsendpoint;
-        $expresult['cmi5launchlrsauthentication'] = $activitysettings->lrsauthentication;
-        $expresult['cmi5launchlrslogin'] = $activitysettings->lrslogin;
-        $expresult['cmi5launchlrspass'] = $activitysettings->lrspass;
-        $expresult['cmi5launchcustomacchp'] = $activitysettings->customacchp;
-        $expresult['cmi5launchuseactoremail'] = $activitysettings->useactoremail;
-        $expresult['cmi5launchlrsduration'] = $activitysettings->lrsduration;
-    } else { */
-        // Use global lrs settings.
-        $result = $DB->get_records('config_plugins', array('plugin' => 'cmi5launch'));
-        foreach ($result as $value) {
-            $expresult[$value->name] = $value->value;
-        }
-   // }
+
+    $result = $DB->get_records('config_plugins', array('plugin' => 'cmi5launch'));
+
+    foreach ($result as $value) {
+        $expresult[$value->name] = $value->value;
+    }
 
     $expresult['cmi5launchlrsversion'] = '1.0.0';
 
@@ -918,7 +900,7 @@ function use_global_cmi5_lrs_settings($instance) {
     global $DB;
     // Determine if there is a row in cmi5launch_lrs matching the current activity id.
     $activitysettings = $DB->get_record('cmi5launch', array('id' => $instance));
-   
+
     /* Removed override defaults from db
     if ($activitysettings->overridedefaults == 1) {
         return false;
@@ -927,9 +909,8 @@ function use_global_cmi5_lrs_settings($instance) {
     return true;
 }
 
-/*
+// Grade functions.
 
-// Grade functions
 /**
  * Return grade for given user or all users.
  *
@@ -947,7 +928,7 @@ function cmi5launch_get_user_grades($cmi5launch, $userid=0) {
     $updategrades = $gradehelpers->get_cmi5launch_check_user_grades_for_updates();
 
     global $CFG, $DB;
-    
+
     $id = required_param('id', PARAM_INT);
     $contextmodule = context_module::instance($id);
 
@@ -955,30 +936,28 @@ function cmi5launch_get_user_grades($cmi5launch, $userid=0) {
 
     // If userid is empty it means we want all users.
     if (empty($userid)) {
-        
-        // If the userid is empty, we will use get_enrolled_users for this course then update all their grades.
+
+        // If the userid is empty, use get_enrolled_users for this course then update all their grades.
         $users = get_enrolled_users($contextmodule);
 
-        // If there is a list of users then iterate through it and make grade objects with the individual users and their updated grades.
+        // If there is a list of users then iterate through it and make grade objects with them and their updated grades.
         if ($users) {
-        
+
             foreach ($users as $user) {
-             
+
                 $grades[$user->id] = new stdClass();
-                $grades[$user->id]->id         = $user->id;
-                $grades[$user->id]->userid     = $user->id;
-                $grades[$user->id]->rawgrade =  $updategrades($user);
-             
+                $grades[$user->id]->id = $user->id;
+                $grades[$user->id]->userid = $user->id;
+                $grades[$user->id]->rawgrade = $updategrades($user);
             }
         } else {
-            // Return false to avoid null values if no users. 
+            // Return false to avoid null values if no users.
             return false;
         }
     } else {
 
-        //This is if we have a specific user, so we need to retrieve their information.
+        // This is if we have a specific user, so we need to retrieve their information.
         $user = $DB->get_record('user', ['id' => $userid]);
-        
 
         // Make grade objects with the individual user and their updated grades.
         $grades[$userid] = new stdClass();
@@ -995,46 +974,46 @@ function cmi5launch_get_user_grades($cmi5launch, $userid=0) {
  * @category grade
  * @param object $cmi5launch - mod object
  * @param int $userid - A user ID or 0 for all users.
- * @param bool $nullifnone - If a single user is specified, $nullifnone is true and the user has no grade then a grade item with a null rawgrade should be inserted.
+ * @param bool $nullifnone - If true and a single user is specified with no grade, a grade item with a null rawgrade is inserted.
  */
 // This function is called automatically by moodle if it needs the users grades updated.
 // It can also be called manually when you want to push a new grade to gradebook.
 // This function should do whatever is needed to generate the relevant grades to push into gradebook
 // then call 'myplugin_grade_item_update with the grades to write.
 
-function cmi5launch_update_grades($cmi5launch, $userid = 0, $nullifnone = true)
-{
+function cmi5launch_update_grades($cmi5launch, $userid = 0, $nullifnone = true) {
+
     global $CFG, $DB;
 
     require_once($CFG->libdir . '/gradelib.php');
     require_once($CFG->libdir . '/completionlib.php');
     $id = required_param('id', PARAM_INT);
-    
+
     // Reload cmi5 course instance.
     $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
     $cm = get_coursemodule_from_id('cmi5launch', $id, 0, false, MUST_EXIST);
     $contextmodule = context_module::instance($cm->id);
-    $users = get_enrolled_users($contextmodule);; //returns an array of users
+    $users = get_enrolled_users($contextmodule);
 
     // Retrieve user grades and update gradebook.
     if ($userid) {
-        
+
         $grades = cmi5launch_get_user_grades($cmi5launch, $userid);
-        
-        //Grades come back nested in array, with keys being the user id.
+
+        // Grades come back nested in array, with keys being the user id.
         $grades = $grades[$userid];
 
         cmi5launch_grade_item_update($cmi5launch, $grades);
 
-    } else if ($userid and $nullifnone) {
-        
+    } else if ($userid && $nullifnone) {
+
         // User has no grades so assign null.
         $grade = new stdClass();
         $grade->userid   = $userid;
         $grade->rawgrade = null;
 
         cmi5launch_grade_item_update($cmi5launch, $grade);
-  
+
     } else {
 
         cmi5launch_grade_item_update($cmi5launch);
@@ -1053,70 +1032,71 @@ function cmi5launch_update_grades($cmi5launch, $userid = 0, $nullifnone = true)
 // And this function should be called from cmi5launch_add_instance, cmi5launch_update_instance and cmi5launch_update_grades.
 // It should look at settings in the activity $activitydbrecord to determine grading type, max and min
 // values, etc. Then setup gradeinfo to pass to grade_update, it should also pass on the optional grades value.
-// $gradeinfo is an array containing: ['itemname' => $activityname, 'idnumber' => $activityidnumber, 'gradetype' => GRADE_TYPE_VALUE, 'grademax' => 100, 'grademin' => 0]
-    function cmi5launch_grade_item_update($cmi5launch, $grades = null)
-    {
-        global $CFG, $DB, $USER, $cmi5launchsettings;
-        
-        // Bring in grade helpers.
-        $gradehelpers = new grade_helpers;
+// $gradeinfo is an array containing: ['itemname' => $activityname, 'idnumber' => $activityidnumber,
+// 'gradetype' => GRADE_TYPE_VALUE, 'grademax' => 100, 'grademin' => 0].
+function cmi5launch_grade_item_update($cmi5launch, $grades = null) {
 
-        // Functions from other classes.
-        $highestgrade = $gradehelpers->get_cmi5launch_highest_grade();
-        $averagegrade = $gradehelpers->get_cmi5launch_average_grade();
-        $settings = cmi5launch_settings($cmi5launch->id);
-        
-        if (!function_exists('grade_update')) { // Workaround for buggy PHP versions.
-            require_once($CFG->libdir . '/gradelib.php');
-        }
-        // Reload cmi5 course instance.
-        $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
+    global $CFG, $DB, $USER, $cmi5launchsettings;
 
-        // Assign course instance info to grade params.
-        $params = array('itemname' => $cmi5launch->name);
-        if (isset($cmi5launch->id)) {
-            $params['idnumber'] = $cmi5launch->id;
-        }
+    // Bring in grade helpers.
+    $gradehelpers = new grade_helpers;
 
-        // Retrieve the settings for course grading.
-        $gradetype = $cmi5launchsettings["grademethod"];    
-        $maxgrade = $settings['maxgrade'];
+    // Functions from other classes.
+    $highestgrade = $gradehelpers->get_cmi5launch_highest_grade();
+    $averagegrade = $gradehelpers->get_cmi5launch_average_grade();
+    $settings = cmi5launch_settings($cmi5launch->id);
 
-        // Assign settings to grade item param.
+    if (!function_exists('grade_update')) { // Workaround for buggy PHP versions.
+        require_once($CFG->libdir . '/gradelib.php');
+    }
+    // Reload cmi5 course instance.
+    $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
+
+    // Assign course instance info to grade params.
+    $params = array('itemname' => $cmi5launch->name);
+    if (isset($cmi5launch->id)) {
+        $params['idnumber'] = $cmi5launch->id;
+    }
+
+    // Retrieve the settings for course grading.
+    $gradetype = $cmi5launchsettings["grademethod"];
+    $maxgrade = $settings['maxgrade'];
+
+    // Assign settings to grade item param.
+    $params['grademax'] = $maxgrade;
+    $params['grademin'] = 0;
+
+    // If there's a max grade, set it.
+    if ($maxgrade) {
+        $params['gradetype'] = $gradetype;
         $params['grademax'] = $maxgrade;
         $params['grademin'] = 0;
-        
-        // If there's a max grade, set it.
-        if ($maxgrade) {
-            $params['gradetype'] = $gradetype; 
-            $params['grademax'] = $maxgrade;
-            $params['grademin'] = 0;
-        } else {
-        
-            $params['gradetype'] = $gradetype; 
-        }
+    } else {
 
-        // Check if it's call to reset.
-        if ($grades === 'reset') {
-            $params['reset'] = true;
-            $grades = null;
-        } else{
+        $params['gradetype'] = $gradetype;
+    }
+
+    // Check if it's call to reset.
+    if ($grades === 'reset') {
+        $params['reset'] = true;
+        $grades = null;
+    } else {
 
         // Calculate grade based on grade type, and update rawgrade (a param of grade item).
         switch($gradetype){
-            /**
-            * ('GRADE_AUS_CMI5' = '0');
-            *('GRADE_HIGHEST_CMI5' = '1');
-            *'GRADE_AVERAGE_CMI5', =  '2');
-            *('GRADE_SUM_CMI5', = '3');
-            */
+
+            // 'GRADE_AUS_CMI5' = '0'.
+            // 'GRADE_HIGHEST_CMI5' = '1'.
+            // 'GRADE_AVERAGE_CMI5', =  '2'.
+            // 'GRADE_SUM_CMI5', = '3'.
+
             case 1:
                 foreach ($grades as $key => $grade) {
 
                     $grades->rawgrade = $highestgrade($grades->rawgrade);
                 }
                 break;
-                
+
             case 2:
                 foreach ($grades as $key => $grade) {
 
@@ -1124,11 +1104,10 @@ function cmi5launch_update_grades($cmi5launch, $userid = 0, $nullifnone = true)
 
                 }
                 break;
-            }
         }
-
-        // Call grade_update to update gradebook.
-        return grade_update('mod/cmi5launch', $cmi5launch->course, 'mod', 'cmi5launch', $cmi5launch->id, 0, $grades, $params);
     }
 
+    // Call grade_update to update gradebook.
+    return grade_update('mod/cmi5launch', $cmi5launch->course, 'mod', 'cmi5launch', $cmi5launch->id, 0, $grades, $params);
+}
 

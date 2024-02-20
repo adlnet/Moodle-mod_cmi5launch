@@ -25,36 +25,36 @@
 
 class course {
     public $id, $url, $type, $lmsid, $grade, $scores, $title, $moveon, $auindex,
-    $parents, $objectives, $launchurl, $sessions = array(), $sessionid, $returnurl, $description = [], $activitytype, $launchmethod, $masteryscore,
-    $progress, $noattempt, $completed, $passed, $inprogress, $satisfied ;
+    $parents, $objectives, $launchurl, $sessions = array(), $sessionid, $returnurl, $description = [], $activitytype, $launchmethod,
+    $masteryscore, $progress, $noattempt, $completed, $passed, $inprogress, $satisfied;
 
     // The id assigned by cmi5 player.
     public $courseid;
-    
+
     // The user id who is taking the course.
     public $userid;
 
     // The registration id assigned by the CMI5 player.
     public $registrationid;
-    
-    // Array of AUs in the course
+
+    // Array of AUs in the course.
     public $aus = array();
 
-    // Constructs courses. Is fed array and where array key matches property, sets the property.  
-    function __construct($statement) {
+    // Constructs courses. Is fed array and where array key matches property, sets the property.
+    public function __construct($statement) {
 
-        foreach($statement as $key => $value){
-    
-            //If the key exists as a property, set it.
-            if(property_exists($this, $key) ){
-      
+        foreach ($statement as $key => $value) {
+
+            // If the key exists as a property, set it.
+            if (property_exists($this, $key) ) {
+
                 $this->$key = ($value);
 
                 // We want the ID to be null here, so we can assign it later.
-                if($key == 'id'){
+                if ($key == 'id') {
                     $this->$key = null;
                 }
             }
-	    }	
+        }
     }
 }

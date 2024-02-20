@@ -27,7 +27,7 @@ defined('MOODLE_INTERNAL') || die;
 /**
  * Structure step to backup one cmi5launch activity
  */
-class backup_cmi5launch_activity_structure_step extends backup_activity_structure_step {
+class backup_tincan_activity_structure_step extends backup_activity_structure_step {
 
     protected function define_structure() {
 

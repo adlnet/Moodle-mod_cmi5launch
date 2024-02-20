@@ -64,29 +64,28 @@ class session_helpers {
         $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
 
         // Reload user course instance.
-        $usersCourse = $DB->get_record('cmi5launch_usercourse', ['courseid'  => $record->courseid, 'userid'  => $user->id]);
+        $userscourse = $DB->get_record('cmi5launch_usercourse', ['courseid'  => $record->courseid, 'userid'  => $user->id]);
 
         // Get updates from the LRS as well.
-        $session = $getprogress($usersCourse->registrationid, $session);
-    
+        $session = $getprogress($userscourse->registrationid, $session);
+
         // Get updates from cmi5player.
         // This is sessioninfo from CMI5 player.
         $sessioninfo = $getsessioninfo($sessionid, $cmi5id);
 
         // Update session.
         foreach ($sessioninfo as $key => $value) {
-            
             // We don't want to overwrite ids.
-            // If the property exists and it's not id or sessionid, set it to lowercase and 
-            // encode value if it is array. (DB needs properties in lowercase, but player returns camelcase.)
+            // If the property exists and it's not id or sessionid, set it to lowercase and
+            // encode value if it is array. (DB needs properties in lowercase, but player returns camelcase).
             if (property_exists($session, $key ) && $key != 'id' && $key != 'sessionid') {
-                
+
                 // If it's an array, encode it so it can be saved to DB.
                 if (is_array($value)) {
                     $value = json_encode($value);
                 }
 
-                if(is_string($key)){
+                if (is_string($key)) {
                     $key = mb_convert_case($key, MB_CASE_LOWER, "UTF-8");
                 }
 

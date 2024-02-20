@@ -25,8 +25,8 @@ namespace mod_cmi5launch\local;
 defined('MOODLE_INTERNAL') || die();
 
 class session {
-    // Properties.
-    // id is session id.
+    // Properties, these need to be capitilized as they are because that's how they are returned in statements and need to be saved.
+    // Id is session id.
     public $id, $tenantname, $tenantId, $registrationsCoursesAusId, $lmsid,
     $progress = [], $aulaunchurl, $launchurl, $grade,
     $createdAt, $updatedAt, $registrationCourseAusId,

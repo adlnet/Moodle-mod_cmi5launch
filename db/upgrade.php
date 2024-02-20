@@ -41,7 +41,7 @@ function xmldb_cmi5launch_upgrade($oldversion) {
     global $DB;
     $dbman = $DB->get_manager();
 
-    if ($oldversion < 202402XXXX) {
+    if ($oldversion < 2024011612) {
 
         // Define field grade to be dropped from cmi5launch.
         $tablecmi5launch = new xmldb_table('cmi5launch');
@@ -51,17 +51,17 @@ function xmldb_cmi5launch_upgrade($oldversion) {
         $tableusercourse = new xmldb_table('cmi5launch_usercourse');
         $field2 = new xmldb_field('cmi5launchurl');
 
-        //Define fields to be dropped from table cmi5launch_player. 
+        // Define fields to be dropped from table cmi5launch_player.
         $tableplayer = new xmldb_table('cmi5launch_player');
         $fieldstoremove = array (new xmldb_field('courseinfo'), new xmldb_field('firstlaunched'), new xmldb_field('lastlaunched') );
 
         // Now cycle through array and remove fields.
         foreach ($fieldstoremove as $field) {
-        // Conditionally launch drop field registrationcourseausid.
-        if ($dbman->field_exists($tableplayer, $field)) {
-            $dbman->drop_field($tableplayer, $field);
+            // Conditionally launch drop field registrationcourseausid.
+            if ($dbman->field_exists($tableplayer, $field)) {
+                $dbman->drop_field($tableplayer, $field);
+            }
         }
-    }
         // Conditionally launch drop field grade.
         if ($dbman->field_exists($tablecmi5launch, $field1)) {
             $dbman->drop_field($tablecmi5launch, $field1);
@@ -71,27 +71,27 @@ function xmldb_cmi5launch_upgrade($oldversion) {
         if ($dbman->field_exists($tableusercourse, $field2)) {
             $dbman->drop_field($tableusercourse, $field2);
         }
-        
 
-    // Cmi5launch savepoint reached.
-    upgrade_mod_savepoint(true, 202402XXXX, 'cmi5launch');
+        // Cmi5launch savepoint reached.
+        upgrade_mod_savepoint(true, 2024011612, 'cmi5launch');
+    }
 
-}
     if ($oldversion < 2024020915) {
 
-            // Define field grade to be dropped from cmi5launch.
-            $table = new xmldb_table('cmi5launch');
-            $field = new xmldb_field('grade');
-    
-            // Conditionally launch drop field grade.
-            if ($dbman->field_exists($table, $field)) {
-                $dbman->drop_field($table, $field);
-            }
-    
+        // Define field grade to be dropped from cmi5launch.
+        $table = new xmldb_table('cmi5launch');
+        $field = new xmldb_field('grade');
+
+        // Conditionally launch drop field grade.
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
         // Cmi5launch savepoint reached.
         upgrade_mod_savepoint(true, 2024020915, 'cmi5launch');
 
     }
+
     if ($oldversion < 2024020816) {
 
         // Conditionally rename table if it exists.
@@ -111,14 +111,12 @@ function xmldb_cmi5launch_upgrade($oldversion) {
         // This table is not used, dropping from future versions.
         $tablelrs = new xmldb_table('cmi5launch_lrs');
 
-        // Rname this table for more clarity.
-      //  $tableusercourse = new xmldb_table('cmi5launch_usercourse');
-
         // Define field registrationcourseausid to be dropped from cmi5launch_sessions.
         $tablesessions = new xmldb_table('cmi5launch_sessions');
-        
-        $fieldstoremove = array($fieldregcourse = new xmldb_field('registrationcourseausid'), $fieldregid = new xmldb_field('registrationid'), $fieldlrscode = new xmldb_field('lrscode'),
-        $fieldauid = new xmldb_field('auid'));
+
+        $fieldstoremove = array($fieldregcourse = new xmldb_field('registrationcourseausid'),
+            $fieldregid = new xmldb_field('registrationid'), $fieldlrscode = new xmldb_field('lrscode'),
+            $fieldauid = new xmldb_field('auid'));
 
         // Define field registrationcourseausid to be dropped from cmi5launch_sessions.
         $tableaus = new xmldb_table('cmi5launch_aus');
@@ -132,7 +130,7 @@ function xmldb_cmi5launch_upgrade($oldversion) {
                 $dbman->drop_field($tablesessions, $field);
             }
         }
-    
+
         // Conditionally launch drop field registrationid.
         if ($dbman->field_exists($tableaus, $fieldsessionid)) {
             $dbman->drop_field($tableaus, $fieldsessionid);
@@ -142,20 +140,19 @@ function xmldb_cmi5launch_upgrade($oldversion) {
         if ($dbman->table_exists($tablelrs)) {
             $dbman->drop_table($tablelrs);
         }
-        
+
         // Cmi5launch savepoint reached.
         upgrade_mod_savepoint(true, 2024020717, 'cmi5launch');
     }
 
-
     if ($oldversion < 2024012516) {
 
-       // Changing type of field ausgrades on table cmi5launch_course to text.
-       $table = new xmldb_table('cmi5launch_course');
-       $field = new xmldb_field('ausgrades', XMLDB_TYPE_TEXT, 4000, null, null, null, null, 'aus');
+        // Changing type of field ausgrades on table cmi5launch_course to text.
+        $table = new xmldb_table('cmi5launch_course');
+        $field = new xmldb_field('ausgrades', XMLDB_TYPE_TEXT, 4000, null, null, null, null, 'aus');
 
-       // Launch change of type for field ausgrades.
-       $dbman->change_field_type($table, $field);
+        // Launch change of type for field ausgrades.
+        $dbman->change_field_type($table, $field);
 
         // Cmi5launch savepoint reached.
         upgrade_mod_savepoint(true, 2024012516, 'cmi5launch');
@@ -174,12 +171,10 @@ function xmldb_cmi5launch_upgrade($oldversion) {
     }
     if ($oldversion < 2023121209) {
 
-        
         // I need to remove 7 unused columns from the cmi5launch_aus table.
         // Define field auid to be dropped from cmi5launch_aus.
         $table = new xmldb_table('cmi5launch_aus');
 
-        
         $fieldauid = new xmldb_field('auid');
         $fielduserid = new xmldb_field('userid');
         $fieldtenantname = new xmldb_field('tenantname');
@@ -187,8 +182,9 @@ function xmldb_cmi5launch_upgrade($oldversion) {
         $fieldregistrationid = new xmldb_field('registrationid');
         $fieldreturnurl = new xmldb_field('returnurl');
 
-        $arraytoremove = array($fieldauid, $fielduserid, $fieldtenantname, $fieldcurrentgrade, $fieldregistrationid, $fieldreturnurl);
-       
+        $arraytoremove = array($fieldauid, $fielduserid, $fieldtenantname, $fieldcurrentgrade,
+            $fieldregistrationid, $fieldreturnurl);
+
         // Now cycle through array and remove fields.
         foreach ($arraytoremove as $field) {
             // Conditionally launch drop field auid.
@@ -225,7 +221,7 @@ function xmldb_cmi5launch_upgrade($oldversion) {
         // Cmi5launch savepoint reached.
         upgrade_mod_savepoint(true, 2023112113, 'cmi5launch');
     }
-    
+
     if ($oldversion < 2023111714) {
 
         // Changing type of field objectives on table cmi5launch_aus to text.
@@ -295,30 +291,29 @@ function xmldb_cmi5launch_upgrade($oldversion) {
             $table->add_field('aus', XMLDB_TYPE_TEXT, null, null, null, null, null);
             $table->add_field('ausgrades', XMLDB_TYPE_CHAR, '1000', null, null, null, '0');
             $table->add_field('grade', XMLDB_TYPE_INTEGER, '10', null, null, null, '0');
-    
+
             // Adding keys to table cmi5launch_course.
             $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
-    
+
             // Adding indexes to table cmi5launch_course.
             $table->add_index('courseid', XMLDB_INDEX_NOTUNIQUE, ['courseid']);
-    
-            // Conditionally launch create table for cmi5launch_course.
-            if (!$dbman->table_exists($table)) {
-                $dbman->create_table($table);
-            }
-            {
-                //If the table already exists, we just need to add the new field
-                       // Define field ausgrades to be added to cmi5launch_course.
-                    $table = new xmldb_table('cmi5launch_course');
-                     $field = new xmldb_field('ausgrades', XMLDB_TYPE_CHAR, '1000', null, null, null, '0', 'aus');
 
-                     // Conditionally launch add field ausgrades.
-                    if (!$dbman->field_exists($table, $field)) {
-                        $dbman->add_field($table, $field);
-                    }
-            }
+        // Conditionally launch create table for cmi5launch_course.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
 
-                    // Define table cmi5launch_lrs to be created.
+        // If the table already exists, we just need to add the new field
+        // Define field ausgrades to be added to cmi5launch_course.
+        $table = new xmldb_table('cmi5launch_course');
+        $field = new xmldb_field('ausgrades', XMLDB_TYPE_CHAR, '1000', null, null, null, '0', 'aus');
+
+            // Conditionally launch add field ausgrades.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define table cmi5launch_lrs to be created.
         $table = new xmldb_table('cmi5launch_lrs');
 
         // Adding fields to table cmi5launch_lrs.
@@ -347,110 +342,102 @@ function xmldb_cmi5launch_upgrade($oldversion) {
         if (!$dbman->table_exists($table)) {
             $dbman->create_table($table);
         }
-      // Define table cmi5launch_player to be created.
-      $table = new xmldb_table('cmi5launch_player');
 
-      // Adding fields to table cmi5launch_player.
-      $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
-      $table->add_field('name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
-      $table->add_field('tenantid', XMLDB_TYPE_INTEGER, '10', null, null, null, '0');
-      $table->add_field('tenantname', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
-      $table->add_field('tenanttoken', XMLDB_TYPE_CHAR, '350', null, null, null, null);
-      $table->add_field('courseid', XMLDB_TYPE_INTEGER, '10', null, null, null, '0');
-      $table->add_field('launchmethod', XMLDB_TYPE_CHAR, '10', null, null, null, 'AnyWindow');
-      $table->add_field('returnurl', XMLDB_TYPE_CHAR, '255', null, null, null, null);
-      $table->add_field('homepage', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
-      $table->add_field('registrationid', XMLDB_TYPE_CHAR, '50', null, null, null, null);
-      $table->add_field('sessionid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
-      $table->add_field('launchurl', XMLDB_TYPE_CHAR, '500', null, null, null, null);
-      $table->add_field('cmi5playerurl', XMLDB_TYPE_CHAR, '255', null, null, null, null);
-      $table->add_field('cmi5playerport', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
-      $table->add_field('courseinfo', XMLDB_TYPE_TEXT, null, null, null, null, null);
-      $table->add_field('firstlaunch', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
-      $table->add_field('lastlaunch', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        // Define table cmi5launch_player to be created.
+        $table = new xmldb_table('cmi5launch_player');
 
-      // Adding keys to table cmi5launch_player.
-      $table->add_key('primary', XMLDB_KEY_PRIMARY, ['registrationid']);
+        // Adding fields to table cmi5launch_player.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('tenantid', XMLDB_TYPE_INTEGER, '10', null, null, null, '0');
+        $table->add_field('tenantname', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('tenanttoken', XMLDB_TYPE_CHAR, '350', null, null, null, null);
+        $table->add_field('courseid', XMLDB_TYPE_INTEGER, '10', null, null, null, '0');
+        $table->add_field('launchmethod', XMLDB_TYPE_CHAR, '10', null, null, null, 'AnyWindow');
+        $table->add_field('returnurl', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        $table->add_field('homepage', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('registrationid', XMLDB_TYPE_CHAR, '50', null, null, null, null);
+        $table->add_field('sessionid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('launchurl', XMLDB_TYPE_CHAR, '500', null, null, null, null);
+        $table->add_field('cmi5playerurl', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        $table->add_field('cmi5playerport', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('courseinfo', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('firstlaunch', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('lastlaunch', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
 
-      // Adding indexes to table cmi5launch_player.
-      $table->add_index('name', XMLDB_INDEX_NOTUNIQUE, ['name']);
+        // Adding keys to table cmi5launch_player.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['registrationid']);
 
-      // Conditionally launch create table for cmi5launch_player.
-      if (!$dbman->table_exists($table)) {
-          $dbman->create_table($table);
-      }
+        // Adding indexes to table cmi5launch_player.
+        $table->add_index('name', XMLDB_INDEX_NOTUNIQUE, ['name']);
 
-          // Define table cmi5launch_sessions to be created.
-          $table = new xmldb_table('cmi5launch_sessions');
+        // Conditionally launch create table for cmi5launch_player.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
 
-          // Adding fields to table cmi5launch_sessions.
-          $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, null, XMLDB_SEQUENCE, null);
-          $table->add_field('sessionid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
-          $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
-          $table->add_field('registrationscoursesausid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
-          $table->add_field('tenantname', XMLDB_TYPE_CHAR, '255', null, null, null, null);
-          $table->add_field('lmsid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
-          $table->add_field('createdat', XMLDB_TYPE_CHAR, '30', null, null, null, null);
-          $table->add_field('updatedat', XMLDB_TYPE_CHAR, '30', null, null, null, null);
-          $table->add_field('registrationcourseausid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
-          $table->add_field('code', XMLDB_TYPE_CHAR, '550', null, null, null, null);
-          $table->add_field('launchtokenid', XMLDB_TYPE_CHAR, '550', null, null, null, null);
-          $table->add_field('lastrequesttime', XMLDB_TYPE_CHAR, '30', null, null, null, null);
-          $table->add_field('launchmode', XMLDB_TYPE_CHAR, '25', null, null, null, null);
-          $table->add_field('masteryscore', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
-          $table->add_field('score', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
-          $table->add_field('response', XMLDB_TYPE_TEXT, null, null, null, null, null);
-          $table->add_field('islaunched', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
-          $table->add_field('isinitialized', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
-          $table->add_field('initializedat', XMLDB_TYPE_CHAR, '30', null, null, null, null);
-          $table->add_field('duration', XMLDB_TYPE_CHAR, '30', null, null, null, null);
-          $table->add_field('iscompleted', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
-          $table->add_field('ispassed', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
-          $table->add_field('isfailed', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
-          $table->add_field('isterminated', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
-          $table->add_field('isabandoned', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
-          $table->add_field('progress', XMLDB_TYPE_TEXT, null, null, null, null, null);
-          $table->add_field('courseid', XMLDB_TYPE_INTEGER, '10', null, null, null, '0');
-          $table->add_field('launchmethod', XMLDB_TYPE_CHAR, '10', null, null, null, 'AnyWindow');
-          $table->add_field('registrationid', XMLDB_TYPE_CHAR, '50', null, null, null, null);
-          $table->add_field('lrscode', XMLDB_TYPE_CHAR, '50', null, null, null, null);
-          $table->add_field('auid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
-          $table->add_field('launchurl', XMLDB_TYPE_CHAR, '750', null, null, null, null);
-    
-          // Adding keys to table cmi5launch_sessions.
-          $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
-  
-          // Adding indexes to table cmi5launch_sessions.
-          $table->add_index('lmsid', XMLDB_INDEX_NOTUNIQUE, ['lmsid']);
-  
-          // Conditionally launch create table for cmi5launch_sessions.
-          if (!$dbman->table_exists($table)) {
-              $dbman->create_table($table);
-          }else{
-                // Define fields to be dropped from cmi5launch_sessions.
-                $table = new xmldb_table('cmi5launch_sessions');
-                $firstlaunch = new xmldb_field('firstlaunch');
-                $lastlaunch = new xmldb_field('lastlaunch');
-                $completed_passed = new xmldb_field('completed_passed');
-                $contexttemplate = new xmldb_field('contexttemplate');
+        // Define table cmi5launch_sessions to be created.
+        $table = new xmldb_table('cmi5launch_sessions');
 
-                // Conditionally launch drop field firstlaunch.
-                if ($dbman->field_exists($table, $firstlaunch)) {
-                        $dbman->drop_field($table, $firstlaunch);
-                }
-                // Conditionally launch drop field lastlaunch.
-                if ($dbman->field_exists($table, $lastlaunch)) {
-                        $dbman->drop_field($table, $lastlaunch);
-                }
-                // Conditionally launch drop field completed_passed.
-                if ($dbman->field_exists($table, $completed_passed)) {
-                        $dbman->drop_field($table, $completed_passed);
-                }
-                // Conditionally launch drop field contexttemplate.
-                if ($dbman->field_exists($table, $contexttemplate)) {
-                        $dbman->drop_field($table, $contexttemplate);
+        // Adding fields to table cmi5launch_sessions.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, null, XMLDB_SEQUENCE, null);
+        $table->add_field('sessionid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('registrationscoursesausid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('tenantname', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        $table->add_field('lmsid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('createdat', XMLDB_TYPE_CHAR, '30', null, null, null, null);
+        $table->add_field('updatedat', XMLDB_TYPE_CHAR, '30', null, null, null, null);
+        $table->add_field('registrationcourseausid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('code', XMLDB_TYPE_CHAR, '550', null, null, null, null);
+        $table->add_field('launchtokenid', XMLDB_TYPE_CHAR, '550', null, null, null, null);
+        $table->add_field('lastrequesttime', XMLDB_TYPE_CHAR, '30', null, null, null, null);
+        $table->add_field('launchmode', XMLDB_TYPE_CHAR, '25', null, null, null, null);
+        $table->add_field('masteryscore', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('score', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('response', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('islaunched', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('isinitialized', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('initializedat', XMLDB_TYPE_CHAR, '30', null, null, null, null);
+        $table->add_field('duration', XMLDB_TYPE_CHAR, '30', null, null, null, null);
+        $table->add_field('iscompleted', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('ispassed', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('isfailed', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('isterminated', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('isabandoned', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('progress', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('courseid', XMLDB_TYPE_INTEGER, '10', null, null, null, '0');
+        $table->add_field('launchmethod', XMLDB_TYPE_CHAR, '10', null, null, null, 'AnyWindow');
+        $table->add_field('registrationid', XMLDB_TYPE_CHAR, '50', null, null, null, null);
+        $table->add_field('lrscode', XMLDB_TYPE_CHAR, '50', null, null, null, null);
+        $table->add_field('auid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('launchurl', XMLDB_TYPE_CHAR, '750', null, null, null, null);
+
+        // Adding keys to table cmi5launch_sessions.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+
+        // Adding indexes to table cmi5launch_sessions.
+        $table->add_index('lmsid', XMLDB_INDEX_NOTUNIQUE, ['lmsid']);
+
+        // Conditionally launch create table for cmi5launch_sessions.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        } else {
+
+            // Define fields to be dropped from table cmi5launch_player.
+            $fieldstoremove = array ($firstlaunch = new xmldb_field('firstlaunch'), $lastlaunch = new xmldb_field('lastlaunch'),
+                $completedpassed = new xmldb_field('completed_passed'), $contexttemplate = new xmldb_field('contexttemplate') );
+            // Define fields to be dropped from cmi5launch_sessions.
+            $table = new xmldb_table('cmi5launch_sessions');
+
+            // Now cycle through array and remove fields.
+            foreach ($fieldstoremove as $field) {
+                // Conditionally launch drop field registrationcourseausid.
+                if ($dbman->field_exists($table, $field)) {
+                    $dbman->drop_field($table, $field);
                 }
             }
+        }
 
         // Define table cmi5launch_aus to be created.
         $table = new xmldb_table('cmi5launch_aus');
@@ -498,12 +485,10 @@ function xmldb_cmi5launch_upgrade($oldversion) {
             $dbman->create_table($table);
         }
 
-
         // Cmi5launch savepoint reached.
         upgrade_mod_savepoint(true, 2023101217, 'cmi5launch');
     }
 
-    
     if ($oldversion < 2023081516) {
 
         // Define table cmi5launch to be created.
@@ -727,7 +712,6 @@ function xmldb_cmi5launch_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2023081516, 'cmi5launch');
 
     }
-
 
     if ($oldversion < 2013083100) {
         // Define field cmi5activityid to be added to cmi5launch.

@@ -31,6 +31,8 @@ require_once("$CFG->dirroot/lib/outputcomponents.php");
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once('header.php');
 
+require_login($course, false, $cm);
+
 global $CFG, $cmi5launch, $USER, $DB;
 
 // MB - currently not utilizing events, but may in future.
@@ -126,7 +128,7 @@ $launchmethod = $urldecoded['launchMethod'];
 // Create and save session object to session table.
 $savesession($sessionid, $location, $launchmethod);
 
-// Last thing check for updates
+// Last thing check for updates.
 cmi5launch_update_grades($cmi5launch, $USER->id);
 
 header("Location: ". $location);

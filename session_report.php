@@ -1,11 +1,10 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version..
+// (at your option) any later version.
 //
 // Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -13,10 +12,10 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 // A break down of the users AU sessions as grade report.
-// Megan Bohland 2023
+// Megan Bohland 2023.
 
 
 use mod_cmi5launch\local\au_helpers;
@@ -54,16 +53,16 @@ $getaus = $aushelpers->get_cmi5launch_retrieve_aus_from_db();
 // Activity Module ID.
 $id = required_param('id', PARAM_INT);
 
-// Retrieve the user and AU specific info from previous page. 
+// Retrieve the user and AU specific info from previous page.
 $fromreportpage = base64_decode(required_param('session_report', PARAM_TEXT) );
 // Break it into array.
 $fromreportpage = json_decode($fromreportpage, true);
 
 // The args from the previous page come through in this order:
-// 0: cmi5 unique AU ID
-// 1: AU title
-// 2: AU IDs to retrieve AUs from DB for this user
-// 3: The user id, the one whose grades we need
+// 0: cmi5 unique AU ID.
+// 1: AU title.
+// 2: AU IDs to retrieve AUs from DB for this user.
+// 3: The user id, the one whose grades we need.
 $cmi5idprevpage = $fromreportpage[0];
 $currenttitle = $fromreportpage[1];
 $auidprevpage = $fromreportpage[2];
@@ -89,15 +88,15 @@ if (!empty($download)) {
 if (empty($noheader)) {
 
     $strreport = get_string('report', 'cmi5launch');
-    
-    // Setup the page
+
+    // Setup the page.
     $PAGE->set_url($url);
     $PAGE->set_pagelayout('report');
     $PAGE->set_title("$course->shortname: ".format_string($cm->name));
     $PAGE->set_heading($course->fullname);
     $PAGE->activityheader->set_attrs([
         'hidecompletion' => true,
-        'description' => ''
+        'description' => '',
     ]);
     $PAGE->navbar->add($strreport, new moodle_url('/mod/cmi5launch/report.php', array('id' => $cm->id)));
 
@@ -225,22 +224,22 @@ if ($aurecord->sessions != null || false) {
             $scoreheaders[] = "Attempt " . $attempt;
             $scorerow["Attempt " . $attempt] = $usersession->score;
 
-            switch ($gradetype) {
-                /**
-                 * ('GRADE_AUS_CMI5' = '0');
-                 *('GRADE_HIGHEST_CMI5' = '1');
-                 *'GRADE_AVERAGE_CMI5', =  '2');
-                 *('GRADE_SUM_CMI5', = '3');
-                 */
-                case 1:
-                    $grade = "Highest";
-                   $overall = max($sessionscores);
-                    break;
-                case 2:
-                    $grade = "Average";
+        switch ($gradetype) {
+
+            // 'GRADE_AUS_CMI5' = '0').
+            // 'GRADE_HIGHEST_CMI5' = '1'.
+            // 'GRADE_AVERAGE_CMI5', =  '2'.
+            // 'GRADE_SUM_CMI5', = '3'.
+
+            case 1:
+                $grade = "Highest";
+                $overall = max($sessionscores);
+                break;
+            case 2:
+                $grade = "Average";
                 $overall = (array_sum($sessionscores) / count($sessionscores));
-                    break;
-            }
+                break;
+        }
 
             $scorerow["Grading type"] = $grade;
 
@@ -251,22 +250,22 @@ if ($aurecord->sessions != null || false) {
             $rowdata["Score"] = $usersession->score;
 
             $table->add_data_keyed($rowdata);
-        }
     }
+}
 
-    // Display the grading type, highest, avg, etc.
-    $scorecolumns[] = 'Grading type';
-    $scoreheaders[] = 'Gradingtype';
-    $scorecolumns[] = 'Overall Score';
-    $scoreheaders[] = 'Overall Score';
+// Display the grading type, highest, avg, etc.
+$scorecolumns[] = 'Grading type';
+$scoreheaders[] = 'Gradingtype';
+$scorecolumns[] = 'Overall Score';
+$scoreheaders[] = 'Overall Score';
 
-    // Session score may be null or empty.
-    if (!empty($sessionscores)) {
+// Session score may be null or empty.
+if (!empty($sessionscores)) {
 
-        $scorerow["Overall Score"] = $overall;
-    }
+    $scorerow["Overall Score"] = $overall;
+}
 
-// Setup score table
+// Setup score table.
 $scoretable->define_columns($scorecolumns);
 $scoretable->define_headers($scoreheaders);
 $scoretable->define_baseurl($PAGE->url);
@@ -274,7 +273,6 @@ $scoretable->setup();
 $scoretable->add_data_keyed($scorerow);
 $scoretable->add_data_keyed("SCORE");
 
-   
 $table->get_page_start();
 $table->get_page_size();
 
@@ -284,7 +282,3 @@ $scoretable->get_page_size();
 $table->add_separator();
 $scoretable->finish_output();
 $table->finish_output();
-
-
-
-
