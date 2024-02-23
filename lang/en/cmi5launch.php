@@ -28,23 +28,23 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['modulename'] = 'cmi5 Launch Link';
-$string['modulenameplural'] = 'cmi5 Launch Links';
+$string['modulename'] = 'cmi5 launch link';
+$string['modulenameplural'] = 'cmi5 launch links';
 $string['modulename_help'] = 'A plug in for Moodle that allows the launch of cmi5 (xAPI) content which is then tracked to a separate LRS.';
 
 // Start Default LRS Admin Settings.
-$string['cmi5launchlrsfieldset'] = 'Default values for cmi5 Launch Link activity settings';
+$string['cmi5launchlrsfieldset'] = 'Default values for cmi5 launch link activity settings';
 $string['cmi5launchlrsfieldset_help'] = 'These are site-wide, default values used when creating a new activity. Each activity has the ability to override and provide alternative values.';
 
 $string['cmi5launchlrsendpoint'] = 'Endpoint';
 $string['cmi5launchlrsendpoint_help'] = 'The LRS endpoint (e.g. http://lrs.example.com/endpoint/). Must include trailing forward slash.';
 $string['cmi5launchlrsendpoint_default'] = '';
 
-$string['cmi5launchlrslogin'] = 'LRS: Basic Username';
+$string['cmi5launchlrslogin'] = 'LRS: basic username';
 $string['cmi5launchlrslogin_help'] = 'Your LRS login username.';
 $string['cmi5launchlrslogin_default'] = '';
 
-$string['cmi5launchlrspass'] = 'LRS: Basic Password';
+$string['cmi5launchlrspass'] = 'LRS: basic password';
 $string['cmi5launchlrspass_help'] = 'Your LRS password (secret).';
 $string['cmi5launchlrspass_default'] = '';
 
@@ -54,7 +54,7 @@ $string['cmi5launchlrsduration_default'] = '9000';
 
 $string['cmi5launchlrsauthentication'] = 'LRS integration';
 $string['cmi5launchlrsauthentication_help'] = 'Use additional integration features to create new authentication credentials for each launch for supported LRSs.';
-$string['cmi5launchlrsauthentication_watershedhelp'] = 'Note: for Watershed integration, the Activity Provider does not require API access enabled.';
+$string['cmi5launchlrsauthentication_watershedhelp'] = 'Note: for Watershed integration, the activity provider does not require API access enabled.';
 $string['cmi5launchlrsauthentication_watershedhelp_label'] = 'Watershed integration';
 $string['cmi5launchlrsauthentication_option_0'] = 'None';
 $string['cmi5launchlrsauthentication_option_1'] = 'Watershed';
@@ -63,49 +63,46 @@ $string['cmi5launchlrsauthentication_option_2'] = 'Learning Locker 1';
 $string['cmi5launchuseactoremail'] = 'Identify by email';
 $string['cmi5launchuseactoremail_help'] = 'If selected, learners will be identified by their email address if they have one recorded in Moodle.';
 
-$string['cmi5launchcustomacchp'] = 'Custom account homePage';
-$string['cmi5launchcustomacchp_help'] = 'If entered, Moodle will use this homePage in conjunction with the ID number user profile field to identify the learner.
+$string['cmi5launchcustomacchp'] = 'Custom account homepage';
+$string['cmi5launchcustomacchp_help'] = 'If entered, Moodle will use this homepage in conjunction with the ID number user profile field to identify the learner.
 If the ID number is not entered for a learner, they will instead be identified by email or Moodle ID number.
 Note: If a learner\'s id changes, they will lose access to registrations associated with former ids and completion data may be reset. Reports in your LRS may also be affected.';
 $string['cmi5launchcustomacchp_default'] = 'https://moodle.com';
 
 // Cmi5 grades admin.
 // Start Default LRS Admin Settings.
-$string['cmi5launchgradesettings'] = 'Default values for cmi5 Launch Link activity settings';
+$string['cmi5launchgradesettings'] = 'Default values for cmi5 launch link activity settings';
 $string['cmi5launchgradesettings_help'] = 'These are site-wide, default values used when creating a new activity. Each activity has the ability to override and provide alternative values.';
 
 $string['othersettings'] = 'Additional settings';
 
 // Cmi5 player root location.
-$string['cmi5launchplayerurl'] = 'cmi5 Player URL';
-$string['cmi5launchplayerurl_help'] = 'The url to communicate with CMI5 player, can include port number(e.g. http://player.example.com or http://localhost:63398). Must NOT include a trailing forward slash.';
+$string['cmi5launchplayerurl'] = 'cmi5 player URL';
+$string['cmi5launchplayerurl_help'] = 'The url to communicate with cmi5 player, can include port number(e.g. http://player.example.com or http://localhost:63398). Must NOT include a trailing forward slash.';
 $string['cmi5launchplayerurl_default'] = '';
 
 // Cmi5 player credentials.
-$string['cmi5launchtenantname'] = 'cmi5 Player: Basic Username';
+$string['cmi5launchtenantname'] = 'cmi5 player: basic username';
 $string['cmi5launchtenantname_help'] = 'The cmi5 tenant username.';
 $string['cmi5launchtenantname_default'] = '';
 
-$string['cmi5launchtenantpass'] = 'cmi5 Player: Basic Password';
+$string['cmi5launchtenantpass'] = 'cmi5 player: basic password';
 $string['cmi5launchtenantpass_help'] = 'The cmi5 tenant password (secret).';
 $string['cmi5launchtenantpass_default'] = '';
 
-$string['cmi5launchtenanttoken'] = 'cmi5 Player: Bearer Token';
+$string['cmi5launchtenanttoken'] = 'cmi5 player: bearer token';
 $string['cmi5launchtenanttoken_help'] = 'The cmi5 tenant bearer token (should be a long string).';
 $string['cmi5launchtenanttoken_default'] = '';
 
 // Grading info - MB.
 // Headers.
-$string['defaultgradesettings'] = 'Default values for CMI5 Launch Link activity grades';
-$string['defaultothersettings'] = 'Default values for CMI5 Launch Link activity attempts and completion';
+$string['defaultgradesettings'] = 'Default values for cmi5 launch link activity grades';
+$string['defaultothersettings'] = 'Default values for cmi5 launch link activity attempts and completion';
 
 // Other.
-$string['maximumgradedesc'] = 'The maximum grade for a CMI5 Launch Link activity';
+$string['maximumgradedesc'] = 'The maximum grade for a cmi5 launch link activity';
 
-$string['maximumattempts'] = 'Maxium Attempt Amount';
-$string['whatmaxdesc'] = 'The maximum amount of allowed attempts';
-
-$string['maximumattempts'] = 'Maxium Attempt Amount';
+$string['maximumattempts'] = 'Maxium attempt amount';
 $string['whatmaxdesc'] = 'The maximum amount of allowed attempts';
 
 $string['nolimit'] = 'No limit';
@@ -121,8 +118,8 @@ $string['MOD_CMI5LAUNCH_LAST_ATTEMPT'] = 'Last attempt';
 
 $string['lastattempt'] = 'Last completed attempt';
 $string['MOD_CMI5LAUNCH_LAST_ATTEMPT_lock'] = 'Lock after final attempt';
-$string['lastattemptlock_help'] = 'If enabled, a student is prevented from launching the CMI5 player after using up all their allocated attempts.';
-$string['MOD_CMI5LAUNCH_LAST_ATTEMPT_lockdesc'] = 'If enabled, a student is prevented from launching the CMI5 player after using up all their allocated attempts.';
+$string['lastattemptlock_help'] = 'If enabled, a student is prevented from launching the cmi5 player after using up all their allocated attempts.';
+$string['MOD_CMI5LAUNCH_LAST_ATTEMPT_lockdesc'] = 'If enabled, a student is prevented from launching the cmi5 player after using up all their allocated attempts.';
 
 /*
 MB - Not sure if we need ALL of these
@@ -173,21 +170,21 @@ $string['cmi5activityid'] = 'Activity ID';
 $string['cmi5activityid_help'] = 'The identifying IRI for the primary activity being launched.';
 
 $string['cmi5package'] = 'Zip package';
-$string['cmi5package_help'] = 'If you have a packaged cmi5 course, you can upload it here. If you upload a package, the Launch URL and Activity ID fields above will be automatically populated when you save using data from the cmi5.xml file contained in the zip. You can edit these settings at any time, but should not change the Activity ID (either directly or by file upload) unless you understand the consequences.';
+$string['cmi5package_help'] = 'If you have a packaged cmi5 course, you can upload it here. If you upload a package, the launch URL and activity ID fields above will be automatically populated when you save using data from the cmi5.xml file contained in the zip. You can edit these settings at any time, but should not change the activity ID (either directly or by file upload) unless you understand the consequences.';
 
-$string['cmi5packagetitle'] = 'CMI5 Package Upload';
-$string['cmi5packagetext'] = 'Here you upload a zip package containing a cmi5.xml file. The launch url defined in the cmi5.xml may point to other files in the zip package, or to an external URL.';
+$string['cmi5packagetitle'] = 'cmi5 package upload';
+$string['cmi5packagetext'] = 'Here you upload a zip package containing a cmi5.xml file. The launch URL defined in the cmi5.xml may point to other files in the zip package, or to an external URL.';
 
 $string['lrsheading'] = 'LRS settings';
-$string['lrsdefaults'] = 'LRS Default Settings';
-$string['lrssettingdescription'] = 'By default, this activity uses the global LRS settings found in Site administration > Plugins > Activity modules > cmi5 Launch Link. To change the settings for this specific activity, select Unlock Defaults.';
+$string['lrsdefaults'] = 'LRS default settings';
+$string['lrssettingdescription'] = 'By default, this activity uses the global LRS settings found in Site administration > Plugins > Activity modules > cmi5 launch link. To change the settings for this specific activity, select \'unlock Defaults.\'';
 
 $string['behaviorheading'] = 'Module behavior';
 
 $string['cmi5multipleregs'] = 'Allow multiple registrations.';
 $string['cmi5multipleregs_help'] = 'If selected, allow the learner to start more than one registration for the activity. Learners can always return to any registrations they have started, even if this setting is unchecked.';
 
-$string['apCreationFailed'] = 'Failed to create Watershed Activity Provider.';
+$string['apCreationFailed'] = 'Failed to create Watershed activity provider.';
 
 // Zip errors.
 $string['badmanifest'] = 'Some manifest errors: see errors log';
@@ -195,9 +192,9 @@ $string['badimsmanifestlocation'] = 'A cmi5.xml file was found but it was not in
 $string['badarchive'] = 'You must provide a valid zip file';
 $string['nomanifest'] = 'Incorrect file package - missing cmi5.xml';
 
-$string['cmi5launch'] = 'cmi5 Launch Link';
-$string['pluginadministration'] = 'cmi5 Launch Link administration';
-$string['pluginname'] = 'cmi5 Launch Link';
+$string['cmi5launch'] = 'cmi5 launch link';
+$string['pluginadministration'] = 'cmi5 launch link administration';
+$string['pluginname'] = 'cmi5 launch link';
 
 // Verb completion settings.
 $string['completionverb'] = 'Verb';
@@ -228,7 +225,7 @@ $string['AUtableheader'] = 'Assignable Units';
 
 $string['cmi5launch_completed'] = 'Experience complete!';
 $string['cmi5launch_progress'] = 'Attempt in progress.';
-$string['cmi5launch_attempt'] = 'Start New Session';
+$string['cmi5launch_attempt'] = 'Start new session';
 $string['cmi5launch_notavailable'] = 'The Learning Record Store is not available. Please contact a system administrator.
 
 If you are the system administrator, go to Site admin / Development / Debugging and set Debug messages to DEVELOPER. Set it back to NONE or MINIMAL once the error details have been recorded.';
@@ -245,7 +242,7 @@ $string['cmi5launch:view'] = 'View cmi5 (xAPI) activity';
 $string['cmi5launch:viewgrades'] = "Ability to view all of a course's grades. Often assigned to teachers.";
 
 $string['expirecredentials'] = 'Expire credentials';
-$string['checkcompletion'] = 'Check Completion';
+$string['checkcompletion'] = 'Check completion';
 
 // For reports.
 $string['report'] = 'Report';
