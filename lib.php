@@ -1085,10 +1085,10 @@ function cmi5launch_grade_item_update($cmi5launch, $grades = null) {
         // Calculate grade based on grade type, and update rawgrade (a param of grade item).
         switch($gradetype){
 
-            // 'GRADE_AUS_CMI5' = '0'.
-            // 'GRADE_HIGHEST_CMI5' = '1'.
-            // 'GRADE_AVERAGE_CMI5', =  '2'.
-            // 'GRADE_SUM_CMI5', = '3'.
+            // 'MOD_CMI5LAUNCH_AUS_GRADE' = '0'.
+            // 'MOD_CMI5LAUNCH_GRADE_HIGHEST' = '1'.
+            // 'MOD_CMI5LAUNCH_GRADE_AVERAGE', =  '2'.
+            // 'MOD_CMI5LAUNCH_GRADE_SUM', = '3'.
 
             case 1:
                 foreach ($grades as $key => $grade) {

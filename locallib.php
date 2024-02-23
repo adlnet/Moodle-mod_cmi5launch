@@ -32,23 +32,23 @@ require_once("$CFG->dirroot/mod/cmi5launch/lib.php");
 use mod_cmi5launch\local\cmi5_connectors;
 
 // Grade stuff.
-define('GRADE_AUS_CMI5', '0');
-define('GRADE_HIGHEST_CMI5', '1');
-define('GRADE_AVERAGE_CMI5', '2');
-define('GRADE_SUM_CMI5', '3');
+define('MOD_CMI5LAUNCH_AUS_GRADE', '0');
+define('MOD_CMI5LAUNCH_GRADE_HIGHEST', '1');
+define('MOD_CMI5LAUNCH_GRADE_AVERAGE', '2');
+define('MOD_CMI5LAUNCH_GRADE_SUM', '3');
 
-define('HIGHEST_ATTEMPT_CMI5', '0');
-define('AVERAGE_ATTEMPT_CMI5', '1');
-define('FIRST_ATTEMPT_CMI5', '2');
-define('LAST_ATTEMPT_CMI5', '3');
+define('MOD_CMI5LAUNCH_HIGHEST_ATTEMPT', '0');
+define('MOD_CMI5LAUNCH_AVERAGE_ATTEMPT', '1');
+define('MOD_CMI5LAUNCH_FIRST_ATTEMPT', '2');
+define('MOD_CMI5LAUNCH_LAST_ATTEMPT', '3');
 
-define('CMI5_FORCEATTEMPT_NO', 0);
-define('CMI5_FORCEATTEMPT_ONCOMPLETE', 1);
-define('CMI5_FORCEATTEMPT_ALWAYS', 2);
+define('MOD_CMI5LAUNCH_FORCEATTEMPT_NO', 0);
+define('MOD_CMI5LAUNCH_FORCEATTEMPT_ONCOMPLETE', 1);
+define('MOD_CMI5LAUNCH_FORCEATTEMPT_ALWAYS', 2);
 
-define('CMI5_UPDATE_NEVER', '0');
-define('CMI5_UPDATE_EVERYDAY', '2');
-define('CMI5_UPDATE_EVERYTIME', '3');
+define('MOD_CMI5LAUNCH_UPDATE_NEVER', '0');
+define('MOD_CMI5LAUNCH_UPDATE_EVERYDAY', '2');
+define('MOD_CMI5LAUNCH_UPDATE_EVERYTIME', '3');
 
 /**
  * Send a statement that the activity was launched.
@@ -533,9 +533,9 @@ function cmi5launch_send_api_request($auth, $method, $url) {
  * @return array an array of update frequency options
  */
 function cmi5_get_updatefreq_array() {
-    return array(CMI5_UPDATE_NEVER => get_string('never'),
-    CMI5_UPDATE_EVERYDAY => get_string('everyday', 'cmi5launch'),
-    CMI5_UPDATE_EVERYTIME => get_string('everytime', 'cmi5launch'));
+    return array(MOD_CMI5LAUNCH_UPDATE_NEVER => get_string('never'),
+    MOD_CMI5LAUNCH_UPDATE_EVERYDAY => get_string('everyday', 'cmi5launch'),
+    MOD_CMI5LAUNCH_UPDATE_EVERYTIME => get_string('everytime', 'cmi5launch'));
 }
 
 /**
@@ -545,8 +545,8 @@ function cmi5_get_updatefreq_array() {
  */
 function cmi5_get_grade_method_array() {
     return array (
-                  GRADE_HIGHEST_CMI5 => get_string('GRADE_HIGHEST_CMI5', 'cmi5launch'),
-                  GRADE_AVERAGE_CMI5 => get_string('GRADE_AVERAGE_CMI5', 'cmi5launch'),
+                  MOD_CMI5LAUNCH_GRADE_HIGHEST => get_string('MOD_CMI5LAUNCH_GRADE_HIGHEST', 'cmi5launch'),
+                  MOD_CMI5LAUNCH_GRADE_AVERAGE => get_string('MOD_CMI5LAUNCH_GRADE_AVERAGE', 'cmi5launch'),
     );
 }
 
@@ -572,10 +572,10 @@ function cmi5_get_attempts_array() {
  * @return array an array of what grade options
  */
 function cmi5_get_what_grade_array() {
-    return array (HIGHEST_ATTEMPT_CMI5 => get_string('HIGHEST_ATTEMPT_CMI5', 'cmi5launch'),
-                  AVERAGE_ATTEMPT_CMI5 => get_string('AVERAGE_ATTEMPT_CMI5', 'cmi5launch'),
-                  FIRST_ATTEMPT_CMI5 => get_string('FIRST_ATTEMPT_CMI5', 'cmi5launch'),
-                  LAST_ATTEMPT_CMI5 => get_string('last_attempt_cmi5', 'cmi5launch'));
+    return array (MOD_CMI5LAUNCH_HIGHEST_ATTEMPT => get_string('MOD_CMI5LAUNCH_HIGHEST_ATTEMPT', 'cmi5launch'),
+                  MOD_CMI5LAUNCH_AVERAGE_ATTEMPT => get_string('MOD_CMI5LAUNCH_AVERAGE_ATTEMPT', 'cmi5launch'),
+                  MOD_CMI5LAUNCH_FIRST_ATTEMPT => get_string('MOD_CMI5LAUNCH_FIRST_ATTEMPT', 'cmi5launch'),
+                  MOD_CMI5LAUNCH_LAST_ATTEMPT => get_string('MOD_CMI5LAUNCH_LAST_ATTEMPT', 'cmi5launch'));
 }
 
 /**
@@ -584,7 +584,7 @@ function cmi5_get_what_grade_array() {
  * @return array an array of attempt options
  */
 function cmi5_get_forceattempt_array() {
-    return array(CMI5_FORCEATTEMPT_NO => get_string('no'),
-                 CMI5_FORCEATTEMPT_ONCOMPLETE => get_string('forceattemptoncomplete', 'cmi5launch'),
-                 CMI5_FORCEATTEMPT_ALWAYS => get_string('forceattemptalways', 'cmi5launch'));
+    return array(MOD_CMI5LAUNCH_FORCEATTEMPT_NO => get_string('no'),
+                 MOD_CMI5LAUNCH_FORCEATTEMPT_ONCOMPLETE => get_string('forceattemptoncomplete', 'cmi5launch'),
+                 MOD_CMI5LAUNCH_FORCEATTEMPT_ALWAYS => get_string('forceattemptalways', 'cmi5launch'));
 }

@@ -34,11 +34,17 @@ class session {
     $isLaunched, $isInitialized, $initializedAt, $isCompleted,
     $isPassed, $isFailed, $isTerminated, $isAbandoned, $courseid, $completed, $passed, $inprogress;
 
+    // Database properties, that need to be lower case.
+    public $sessionid, $userid, $registrationscoursesausid, $createdat, $updatedat, $launchtokenid, $lastrequesttime, $launchmode, $masteryscore, $tenantid,
+    $score, $response, $islaunched, $isinitialized, $initializedat, $duration, $iscompleted, $ispassed, $isfailed, $isterminated, $isabandoned, $launchmethod;  
+
+
     // Constructs sessions. Is fed array and where array key matches property, sets the property.
     public function __construct($statement) {
 
         foreach ($statement as $key => $value) {
 
+      
             $this->$key = ($value);
         }
 

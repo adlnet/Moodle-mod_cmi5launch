@@ -114,15 +114,15 @@ $string['attemptsx'] = '{$a} attempts';
 
 $string['whatgrade'] = 'Attempts grading';
 $string['whatgradedesc'] = 'If multiple attempts are allowed, this setting specifies whether the highest, average (mean), first or last completed attempt is recorded in the gradebook. The last completed attempt option does not include attempts with a \'failed\' status.';
-$string['HIGHEST_ATTEMPT_CMI5'] = 'Highest attempt';
-$string['AVERAGE_ATTEMPT_CMI5'] = 'Average of attempts';
-$string['FIRST_ATTEMPT_CMI5'] = 'First attempt';
-$string['last_attempt_cmi5'] = 'Last attempt';
+$string['MOD_CMI5LAUNCH_HIGHEST_ATTEMPT'] = 'Highest attempt';
+$string['MOD_CMI5LAUNCH_AVERAGE_ATTEMPT'] = 'Average of attempts';
+$string['MOD_CMI5LAUNCH_FIRST_ATTEMPT'] = 'First attempt';
+$string['MOD_CMI5LAUNCH_LAST_ATTEMPT'] = 'Last attempt';
 
 $string['lastattempt'] = 'Last completed attempt';
-$string['last_attempt_cmi5_lock'] = 'Lock after final attempt';
+$string['MOD_CMI5LAUNCH_LAST_ATTEMPT_lock'] = 'Lock after final attempt';
 $string['lastattemptlock_help'] = 'If enabled, a student is prevented from launching the CMI5 player after using up all their allocated attempts.';
-$string['last_attempt_cmi5_lockdesc'] = 'If enabled, a student is prevented from launching the CMI5 player after using up all their allocated attempts.';
+$string['MOD_CMI5LAUNCH_LAST_ATTEMPT_lockdesc'] = 'If enabled, a student is prevented from launching the CMI5 player after using up all their allocated attempts.';
 
 /*
 MB - Not sure if we need ALL of these
@@ -149,9 +149,9 @@ $string['masteryoverridedesc'] = 'This preference sets the default for the maste
 */
 
 $string['general'] = 'General data';
-$string['GRADE_AVERAGE_CMI5'] = 'Average grade';
+$string['MOD_CMI5LAUNCH_GRADE_AVERAGE'] = 'Average grade';
 $string['gradeforattempt'] = 'Grade for attempt';
-$string['GRADE_HIGHEST_CMI5'] = 'Highest grade';
+$string['MOD_CMI5LAUNCH_GRADE_HIGHEST'] = 'Highest grade';
 $string['grademethod'] = 'Grading method';
 $string['grademethod_help'] = 'The grading method defines how the grade for a single attempt of the activity is determined.';
 

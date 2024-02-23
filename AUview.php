@@ -153,13 +153,14 @@ if (!$au->sessions == null) {
         // Array to hold data for table.
         $sessioninfo = array();
 
+    
         // Retrieve createdAt and format.
         $date = new DateTime($session->createdat, new DateTimeZone('US/Eastern'));
         $date->setTimezone(new DateTimeZone('America/New_York'));
         $sessioninfo[] = $date->format('D d M Y H:i:s');
 
         // Retrieve lastRequestTime and format.
-        $date = new DateTime($session->lastrequesttime, new DateTimeZone('US/Eastern'));
+        $date = new DateTime($session->updatedat, new DateTimeZone('US/Eastern'));
         $date->setTimezone(new DateTimeZone('America/New_York'));
         $sessioninfo[] = $date->format('D d M Y H:i:s');
 
