@@ -134,5 +134,5 @@ if ($ADMIN->fulltree) {
     */
 
     $settings->add(new admin_setting_configselect('cmi5launch/MOD_CMI5LAUNCH_LAST_ATTEMPTlock',
-        get_string('MOD_CMI5LAUNCH_LAST_ATTEMPT_lock', 'cmi5launch'), get_string('MOD_CMI5LAUNCH_LAST_ATTEMPT_lockdesc', 'cmi5launch'), 0, $yesno));
+        get_string('mod_cmi5launch_last_attempt_lock', 'cmi5launch'), get_string('mod_cmi5launch_last_attempt_lockdesc', 'cmi5launch'), 0, $yesno));
 }

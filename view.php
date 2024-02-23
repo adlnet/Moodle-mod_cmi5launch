@@ -191,7 +191,7 @@ $cmid = $cmi5launch->id;
 // Create table to display on page.
 $table = new html_table();
 $table->id = 'cmi5launch_autable';
-$table->caption = get_string('AUtableheader', 'cmi5launch');
+$table->caption = get_string('autableheader', 'cmi5launch');
 $table->head = array(
     get_string('cmi5launchviewAUname', 'cmi5launch'),
     get_string('cmi5launchviewstatus', 'cmi5launch'),

@@ -545,8 +545,8 @@ function cmi5_get_updatefreq_array() {
  */
 function cmi5_get_grade_method_array() {
     return array (
-                  MOD_CMI5LAUNCH_GRADE_HIGHEST => get_string('MOD_CMI5LAUNCH_GRADE_HIGHEST', 'cmi5launch'),
-                  MOD_CMI5LAUNCH_GRADE_AVERAGE => get_string('MOD_CMI5LAUNCH_GRADE_AVERAGE', 'cmi5launch'),
+                  MOD_CMI5LAUNCH_GRADE_HIGHEST => get_string('mod_cmi5launch_grade_highest', 'cmi5launch'),
+                  MOD_CMI5LAUNCH_GRADE_AVERAGE => get_string('mod_cmi5launch_grade_average', 'cmi5launch'),
     );
 }
 
@@ -572,10 +572,10 @@ function cmi5_get_attempts_array() {
  * @return array an array of what grade options
  */
 function cmi5_get_what_grade_array() {
-    return array (MOD_CMI5LAUNCH_HIGHEST_ATTEMPT => get_string('MOD_CMI5LAUNCH_HIGHEST_ATTEMPT', 'cmi5launch'),
-                  MOD_CMI5LAUNCH_AVERAGE_ATTEMPT => get_string('MOD_CMI5LAUNCH_AVERAGE_ATTEMPT', 'cmi5launch'),
-                  MOD_CMI5LAUNCH_FIRST_ATTEMPT => get_string('MOD_CMI5LAUNCH_FIRST_ATTEMPT', 'cmi5launch'),
-                  MOD_CMI5LAUNCH_LAST_ATTEMPT => get_string('MOD_CMI5LAUNCH_LAST_ATTEMPT', 'cmi5launch'));
+    return array (MOD_CMI5LAUNCH_HIGHEST_ATTEMPT => get_string('mod_cmi5launch_highest_attempt', 'cmi5launch'),
+                  MOD_CMI5LAUNCH_AVERAGE_ATTEMPT => get_string('mod_cmi5launch_average_attempt', 'cmi5launch'),
+                  MOD_CMI5LAUNCH_FIRST_ATTEMPT => get_string('mod_cmi5launch_first_attempt', 'cmi5launch'),
+                  MOD_CMI5LAUNCH_LAST_ATTEMPT => get_string('mod_cmi5launch_last_attempt', 'cmi5launch'));
 }
 
 /**

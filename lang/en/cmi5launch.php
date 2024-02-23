@@ -111,15 +111,15 @@ $string['attemptsx'] = '{$a} attempts';
 
 $string['whatgrade'] = 'Attempts grading';
 $string['whatgradedesc'] = 'If multiple attempts are allowed, this setting specifies whether the highest, average (mean), first or last completed attempt is recorded in the gradebook. The last completed attempt option does not include attempts with a \'failed\' status.';
-$string['MOD_CMI5LAUNCH_HIGHEST_ATTEMPT'] = 'Highest attempt';
-$string['MOD_CMI5LAUNCH_AVERAGE_ATTEMPT'] = 'Average of attempts';
-$string['MOD_CMI5LAUNCH_FIRST_ATTEMPT'] = 'First attempt';
-$string['MOD_CMI5LAUNCH_LAST_ATTEMPT'] = 'Last attempt';
+$string['mod_cmi5launch_highest_attempt'] = 'Highest attempt';
+$string['mod_cmi5launch_average_attempt'] = 'Average of attempts';
+$string['mod_cmi5launch_first_attempt'] = 'First attempt';
+$string['mod_cmi5launch_last_attempt'] = 'Last attempt';
 
 $string['lastattempt'] = 'Last completed attempt';
-$string['MOD_CMI5LAUNCH_LAST_ATTEMPT_lock'] = 'Lock after final attempt';
+$string['mod_cmi5launch_last_attempt_lock'] = 'Lock after final attempt';
 $string['lastattemptlock_help'] = 'If enabled, a student is prevented from launching the cmi5 player after using up all their allocated attempts.';
-$string['MOD_CMI5LAUNCH_LAST_ATTEMPT_lockdesc'] = 'If enabled, a student is prevented from launching the cmi5 player after using up all their allocated attempts.';
+$string['mod_cmi5launch_last_attempt_lockdesc'] = 'If enabled, a student is prevented from launching the cmi5 player after using up all their allocated attempts.';
 
 /*
 MB - Not sure if we need ALL of these
@@ -146,9 +146,9 @@ $string['masteryoverridedesc'] = 'This preference sets the default for the maste
 */
 
 $string['general'] = 'General data';
-$string['MOD_CMI5LAUNCH_GRADE_AVERAGE'] = 'Average grade';
+$string['mod_cmi5launch_grade_average'] = 'Average grade';
 $string['gradeforattempt'] = 'Grade for attempt';
-$string['MOD_CMI5LAUNCH_GRADE_HIGHEST'] = 'Highest grade';
+$string['mod_cmi5launch_grade_highest'] = 'Highest grade';
 $string['grademethod'] = 'Grading method';
 $string['grademethod_help'] = 'The grading method defines how the grade for a single attempt of the activity is determined.';
 
@@ -220,7 +220,7 @@ $string['cmi5launchviewstatus'] = 'AU Satisfied Status';
 $string['cmi5launchviewregistrationheader'] = 'Sessions';
 $string['cmi5launchviewgradeheader'] = 'Grade';
 $string['cmi5launchviewlaunchlink'] = 'view';
-$string['AUtableheader'] = 'Assignable Units';
+$string['autableheader'] = 'Assignable Units';
 
 
 $string['cmi5launch_completed'] = 'Experience complete!';
