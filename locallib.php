@@ -22,6 +22,7 @@
  *
  * @package mod_cmi5launch
  * @copyright  2013 Andrew Downes
+ * @copyright 2024 Megan Bohland - added functions
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -50,93 +51,7 @@ define('MOD_CMI5LAUNCH_UPDATE_NEVER', '0');
 define('MOD_CMI5LAUNCH_UPDATE_EVERYDAY', '2');
 define('MOD_CMI5LAUNCH_UPDATE_EVERYTIME', '3');
 
-/**
- * Send a statement that the activity was launched.
- * This is useful for debugging - if the 'launched' statement is present in the LRS, you know the activity was at least launched.
- *
- * @package  mod_cmi5launch
- * @category cmi5
- * @param string/UUID $registrationid The cmi5 Registration UUID associated with the launch.
- * @return cmi5 LRS Response
- */
-function cmi5_launched_statement($registrationid) {
-    global $cmi5launch, $course, $CFG;
-    $cmi5launchsettings = cmi5launch_settings($cmi5launch->id);
 
-    $version = $cmi5launchsettings['cmi5launchlrsversion'];
-    $url = $cmi5launchsettings['cmi5launchlrsendpoint'];
-    $basiclogin = $cmi5launchsettings['cmi5launchlrslogin'];
-    $basicpass = $cmi5launchsettings['cmi5launchlrspass'];
-
-    $cmi5phputil = new \cmi5\Util();
-    $statementid = $cmi5phputil->getUUID();
-
-    $lrs = new \cmi5\RemoteLRS($url, $version, $basiclogin, $basicpass);
-
-    $parentdefinition = array();
-    if (isset($course->summary) && $course->summary !== "") {
-        $parentdefinition["description"] = array(
-            "en-US" => $course->summary,
-        );
-    }
-
-    if (isset($course->fullname) && $course->fullname !== "") {
-        $parentdefinition["name"] = array(
-            "en-US" => $course->fullname,
-        );
-    }
-
-    $statement = new \cmi5\Statement(
-        array(
-            'id' => $statementid,
-            'actor' => cmi5launch_getactor($cmi5launch->id),
-            'verb' => array(
-                'id' => 'http://adlnet.gov/expapi/verbs/launched',
-                'display' => array(
-                    'en-US' => 'launched',
-                ),
-            ),
-
-            'object' => array(
-                'id' => $cmi5launch->cmi5activityid,
-                'objectType' => "Activity",
-            ),
-
-            "context" => array(
-                "registration" => $registrationid,
-                "contextActivities" => array(
-                    "parent" => array(
-                        array(
-                            "id" => $CFG->wwwroot.'/course/view.php?id='. $course->id,
-                            "objectType" => "Activity",
-                            "definition" => $parentdefinition,
-                        ),
-                    ),
-                    "grouping"  => array(
-                        array(
-                            "id" => $CFG->wwwroot,
-                            "objectType" => "Activity",
-                        ),
-                    ),
-                    "category"  => array(
-                        array(
-                            "id" => "https://moodle.org",
-                            "objectType" => "Activity",
-                            "definition" => array (
-                                "type" => "http://id.cmi5api.com/activitytype/source",
-                            ),
-                        ),
-                    ),
-                ),
-                "language" => cmi5launch_get_moodle_langauge(),
-            ),
-            "timestamp" => date(DATE_ATOM),
-        )
-    );
-
-    $response = $lrs->saveStatement($statement);
-    return $response;
-}
 
 /**
  * Builds a cmi5 launch link for the current module and a given registration
@@ -532,7 +447,7 @@ function cmi5launch_send_api_request($auth, $method, $url) {
  *
  * @return array an array of update frequency options
  */
-function cmi5_get_updatefreq_array() {
+function cmi5launch_get_updatefreq_array() {
     return array(MOD_CMI5LAUNCH_UPDATE_NEVER => get_string('never'),
     MOD_CMI5LAUNCH_UPDATE_EVERYDAY => get_string('everyday', 'cmi5launch'),
     MOD_CMI5LAUNCH_UPDATE_EVERYTIME => get_string('everytime', 'cmi5launch'));
@@ -543,7 +458,7 @@ function cmi5_get_updatefreq_array() {
  *
  * @return array an array of what grade options
  */
-function cmi5_get_grade_method_array() {
+function cmi5launch_get_grade_method_array() {
     return array (
                   MOD_CMI5LAUNCH_GRADE_HIGHEST => get_string('mod_cmi5launch_grade_highest', 'cmi5launch'),
                   MOD_CMI5LAUNCH_GRADE_AVERAGE => get_string('mod_cmi5launch_grade_average', 'cmi5launch'),
@@ -555,7 +470,7 @@ function cmi5_get_grade_method_array() {
  *
  * @return array an array of attempt options
  */
-function cmi5_get_attempts_array() {
+function cmi5launch_get_attempts_array() {
     $attempts = array(0 => get_string('nolimit', 'cmi5launch'),
                       1 => get_string('attempt1', 'cmi5launch'));
 
@@ -571,7 +486,7 @@ function cmi5_get_attempts_array() {
  *
  * @return array an array of what grade options
  */
-function cmi5_get_what_grade_array() {
+function cmi5launch_get_what_grade_array() {
     return array (MOD_CMI5LAUNCH_HIGHEST_ATTEMPT => get_string('mod_cmi5launch_highest_attempt', 'cmi5launch'),
                   MOD_CMI5LAUNCH_AVERAGE_ATTEMPT => get_string('mod_cmi5launch_average_attempt', 'cmi5launch'),
                   MOD_CMI5LAUNCH_FIRST_ATTEMPT => get_string('mod_cmi5launch_first_attempt', 'cmi5launch'),
@@ -583,7 +498,7 @@ function cmi5_get_what_grade_array() {
  *
  * @return array an array of attempt options
  */
-function cmi5_get_forceattempt_array() {
+function cmi5launch_get_forceattempt_array() {
     return array(MOD_CMI5LAUNCH_FORCEATTEMPT_NO => get_string('no'),
                  MOD_CMI5LAUNCH_FORCEATTEMPT_ONCOMPLETE => get_string('forceattemptoncomplete', 'cmi5launch'),
                  MOD_CMI5LAUNCH_FORCEATTEMPT_ALWAYS => get_string('forceattemptalways', 'cmi5launch'));

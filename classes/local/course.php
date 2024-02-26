@@ -24,7 +24,7 @@
  defined('MOODLE_INTERNAL') || die();
 
 class course {
-    public $id, $url, $type, $lmsid, $grade, $scores, $title, $moveon, $auindex,
+    public $id, $url, $ausgrades, $type, $lmsid, $grade, $scores, $title, $moveon, $auindex,
     $parents, $objectives, $launchurl, $sessions = array(), $sessionid, $returnurl, $description = [], $activitytype, $launchmethod,
     $masteryscore, $progress, $noattempt, $completed, $passed, $inprogress, $satisfied;
 

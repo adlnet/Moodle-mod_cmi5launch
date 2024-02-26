@@ -25,6 +25,7 @@
  *
  * @package mod_cmi5launch
  * @copyright  2013 Andrew Downes
+ * @copyright 2024 Megan Bohland - added functions for cmi5launch
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -896,7 +897,7 @@ function cmi5launch_settings($instance) {
  * @param string $instance The Moodle id for the cmi5 module instance.
  * @return bool
  */
-function use_global_cmi5_lrs_settings($instance) {
+function cmi5launch_use_global_cmi5_lrs_settings($instance) {
     global $DB;
     // Determine if there is a row in cmi5launch_lrs matching the current activity id.
     $activitysettings = $DB->get_record('cmi5launch', array('id' => $instance));

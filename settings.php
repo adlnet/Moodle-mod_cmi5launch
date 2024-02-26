@@ -107,7 +107,7 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_heading('cmi5launch/gradesettings', get_string('defaultgradesettings', 'cmi5launch'), ''));
     $settings->add(new admin_setting_configselect('cmi5launch/grademethod',
         get_string('grademethod', 'cmi5launch'), get_string('grademethoddesc', 'cmi5launch'),
-        MOD_CMI5LAUNCH_GRADE_HIGHEST, cmi5_get_grade_method_array()));
+        MOD_CMI5LAUNCH_GRADE_HIGHEST, cmi5launch_get_grade_method_array()));
 
     for ($i = 0; $i <= 100; $i++) {
         $grades[$i] = "$i";
@@ -120,12 +120,12 @@ if ($ADMIN->fulltree) {
 
     // Default attempts settings.
     $settings->add(new admin_setting_configselect('cmi5launch/maxattempt',
-        get_string('maximumattempts', 'cmi5launch'), '', '0', cmi5_get_attempts_array()),
+        get_string('maximumattempts', 'cmi5launch'), '', '0', cmi5launch_get_attempts_array()),
         get_string('whatmaxdesc', 'cmi5launch'), );
 
     $settings->add(new admin_setting_configselect('cmi5launch/whatgrade',
         get_string('whatgrade', 'cmi5launch'), get_string('whatgradedesc', 'cmi5launch'),
-        MOD_CMI5LAUNCH_HIGHEST_ATTEMPT, cmi5_get_what_grade_array()));
+        MOD_CMI5LAUNCH_HIGHEST_ATTEMPT, cmi5launch_get_what_grade_array()));
 
     // Not sure if we want to implement mastery override at this time -MB.
     /*
