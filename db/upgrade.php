@@ -41,6 +41,25 @@ function xmldb_cmi5launch_upgrade($oldversion) {
     global $DB;
     $dbman = $DB->get_manager();
 
+    /*
+    if ($oldversion < XXXXXXXXXX) {
+
+        // Define field lmsid to be dropped from cmi5launch_sessions.
+        $table = new xmldb_table('cmi5launch_sessions');
+       $fieldstoremove = array($fieldlmsid = new xmldb_field('lmsid'), $fieldresponse = new xmldb_field('response'), $fieldcourseid = new xmldb_field('courseid'));
+
+         // Now cycle through array and remove fields.
+        foreach ($fieldstoremove as $field) {
+            // Conditionally launch drop field registrationcourseausid.
+            if ($dbman->field_exists($table, $field)) {
+                $dbman->drop_field($table, $field);
+            }
+        }
+        // Cmi5launch savepoint reached.
+        upgrade_mod_savepoint(true, XXXXXXXXXX, 'cmi5launch');
+    }
+
+*/
     if ($oldversion < 2024011612) {
 
         // Define field grade to be dropped from cmi5launch.

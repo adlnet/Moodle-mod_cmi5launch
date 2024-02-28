@@ -256,3 +256,50 @@ $string['attempt'] = 'Attempt';
 $string['started'] = 'Started';
 $string['last'] = 'Finished';
 $string['score'] = 'Score';
+
+// For privacy module.
+// Usercourse
+$string['privacy:metadata:cmi5launch_usercourse'] = 'The cmi5 launch link plugin stores a users particular instance of a cmi5 Activity. While some things, like the courseid are generic to all users of the course, others, like the grade are specific to user.';  
+$string['privacy:metadata:cmi5launch_usercourse:id'] = 'The ID of the user course\'s particular instance assigned by Moodle.';
+$string['privacy:metadata:cmi5launch_usercourse:userid'] = 'The ID of the user';
+$string['privacy:metadata:cmi5launch_usercourse:registrationid'] = 'The registration ID is unique to each users particular cmi5 activity and is assigned by the cmi5 player.';
+$string['privacy:metadata:cmi5launch_usercourse:ausgrades'] = 'All the AUs and their grades (overall session grades) saved in this format: AU lmsid => [AU Title => [Scores from that title\'s sessions].';
+$string['privacy:metadata:cmi5launch_usercourse:grade'] = 'The current overall grade (based on grading type) for the cmi5 activity.';
+
+// Sessions
+$string['privacy:metadata:cmi5launch_sessions'] = 'The cmi5 launch link plugin stores each session of a users particular instance of a cmi5 Activity. While some things, like the masteryscore are generic to all users of the course, others, like the grade are specific to user.';  
+$string['privacy:metadata:cmi5launch_sessions:id'] = 'The ID of the user\'s session\'s particular instance assigned by Moodle.';
+$string['privacy:metadata:cmi5launch_sessions:sessionid'] = 'The session id. This is created by the cmi5 player and returned with URL request. Each session has a unique ID.';  
+$string['privacy:metadata:cmi5launch_sessions:userid'] = 'User id, which combined with course ID can be used to retrieve unique records.';
+$string['privacy:metadata:cmi5launch_sessions:registrationscoursesausid'] = 'ID assigned by the cmi5 player to AUs.';
+$string['privacy:metadata:cmi5launch_sessions:createdat'] = 'Time a session started (string that is returned by CMI5 player).';
+$string['privacy:metadata:cmi5launch_sessions:updatedat'] = 'Time a session was updated (string that is returned by CMI5 player).';
+$string['privacy:metadata:cmi5launch_sessions:code'] = 'Unique code for each session assigned by CMI5 plyer.';
+$string['privacy:metadata:cmi5launch_sessions:launchtokenid'] = 'Launchtoken assigned by CMI5 player.';
+$string['privacy:metadata:cmi5launch_sessions:lastrequesttime'] = 'Time of last request (string that is returned by CMI5 player).';
+$string['privacy:metadata:cmi5launch_sessions:score'] = 'The score of session (returned from "result" parameter in statements from LRS).';
+$string['privacy:metadata:cmi5launch_sessions:islaunched'] = 'Whether the session has been launched.';
+$string['privacy:metadata:cmi5launch_sessions:isinitialized'] = 'Whether the session has been initialized.';
+$string['privacy:metadata:cmi5launch_sessions:initializedat'] = 'The status of session (returned from "success" parameter in statements from LRS).';
+$string['privacy:metadata:cmi5launch_sessions:duration'] = 'Time a session lasted (from "result" parameter).';
+$string['privacy:metadata:cmi5launch_sessions:iscompleted'] = 'Whether the session has been completed.';
+$string['privacy:metadata:cmi5launch_sessions:ispassed'] = 'Whether the session has been passed.';
+$string['privacy:metadata:cmi5launch_sessions:isfailed'] = 'Whether the session has been failed.';
+$string['privacy:metadata:cmi5launch_sessions:isterminated'] = 'Whether the session has been terminated.';
+$string['privacy:metadata:cmi5launch_sessions:isabandoned'] = 'Whether the session has been abandoned.';
+$string['privacy:metadata:cmi5launch_sessions:progress'] = 'The full string of session progress reported from LRS".';
+$string['privacy:metadata:cmi5launch_sessions:launchurl'] = 'Returned launch url from cmi5 player.';
+
+// AUs
+$string['privacy:metadata:cmi5launch_aus'] = 'The cmi5 launch link plugin stores each AU of a users particular instance of a cmi5 Activity. While some things, like the masteryscore are generic to all users of the course, others, like the grade are specific to user.';
+$string['privacy:metadata:cmi5launch_aus:id'] = 'The ID of the user\'s AU\'s particular instance assigned by Moodle.';
+$string['privacy:metadata:cmi5launch_aus:attempt'] = 'The attempt of the au, ie, first, second, third.';
+$string['privacy:metadata:cmi5launch_aus:lmsid'] = 'The lmsid id from the course packet. The singular CMI5 compliant id.';
+$string['privacy:metadata:cmi5launch_aus:completed'] = 'Whether an AU has met completed criteria (0 if false, 1 if true).';
+$string['privacy:metadata:cmi5launch_aus:passed'] = 'Whether an AU has met passed criteria (0 if false, 1 if true).';
+$string['privacy:metadata:cmi5launch_aus:inprogress'] = 'Whether an AU is in progress (0 if false, 1 if true).';
+$string['privacy:metadata:cmi5launch_aus:noattempt'] = 'Whether an AU has been attempted (0 if false, 1 if true).';
+$string['privacy:metadata:cmi5launch_aus:satisfied'] = 'Whether an AU has been satisfied (0 if false, 1 if true).';
+$string['privacy:metadata:cmi5launch_aus:sessions'] = 'The IDs of the AU\'s individual sessions, saved as array for retrieval.';
+$string['privacy:metadata:cmi5launch_aus:scores'] = 'The scores of the AU\'s individual sessions, saved as array for retrieval.';
+$string['privacy:metadata:cmi5launch_aus:grade'] = 'The overall grade of the AU (based on grading type).';

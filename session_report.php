@@ -205,7 +205,7 @@ if ($aurecord->sessions != null || false) {
         $ispassed = $session->ispassed;
         $isfailed = $session->isfailed;
         $isterminated = $session->isterminated;
-        $isabanadoned = $session->isabandoned;
+        $isabandoned = $session->isabandoned;
 
         // If it's been attempted but no moveon value.
         if ($iscompleted == 1) {
