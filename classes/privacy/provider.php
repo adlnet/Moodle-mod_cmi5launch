@@ -102,6 +102,24 @@ class provider implements
 
             'privacy:metadata:cmi5launch_aus',
         );
+
+            // Now we L TO TWO EXTERNAL SYSTEMS , THIS Needs to be idicated , I THINK hte cmi5 player does get data and 
+            // should count
+            //This is added to collection 
+        $collection->add_external_location_link('lrs', [
+            'registrationid' => 'privacy:metadata:lrs:registrationid',
+            'createdat' => 'privacy:metadata:lrs:createdat',
+        ], 'privacy:metadata:lrs');
+
+        $collection->add_external_location_link('cmi5_player', [
+            'registrationid' => 'privacy:metadata:cmi5_player:registrationid',
+            'actor' => 'privacy:metadata:cmi5_player:actor',
+            'courseid' => 'privacy:metadata:cmi5_player:courseid',
+            'returnurl' => 'privacy:metadata:cmi5_player:returnurl',
+            'sessionid' => 'privacy:metadata:cmi5_player:sessionid',
+        ], 'privacy:metadata:cmi5_player');
+
+
         return $collection;
     }
         // further for retrieval and delete? 
@@ -121,6 +139,9 @@ class provider implements
        
 
         //from scorm example:
+
+
+       
 
             /**
      * Export all user data for the specified user, in the specified contexts.

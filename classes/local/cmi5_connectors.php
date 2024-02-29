@@ -126,7 +126,7 @@ class cmi5_connectors {
      * This way uses the registration ID and GET request.
      * Registration  is "code" in returned json body.
      * @param $registration - registration UUID
-     * @param $id - launch id
+     * @param $id - cmi5 launch id
      */
     public function cmi5launch_retrieve_registration_with_get($registration, $id) {
 

@@ -258,7 +258,8 @@ $string['last'] = 'Finished';
 $string['score'] = 'Score';
 
 // For privacy module.
-// Usercourse
+
+// Usercourse table.
 $string['privacy:metadata:cmi5launch_usercourse'] = 'The cmi5 launch link plugin stores a users particular instance of a cmi5 Activity. While some things, like the courseid are generic to all users of the course, others, like the grade are specific to user.';  
 $string['privacy:metadata:cmi5launch_usercourse:id'] = 'The ID of the user course\'s particular instance assigned by Moodle.';
 $string['privacy:metadata:cmi5launch_usercourse:userid'] = 'The ID of the user';
@@ -266,7 +267,7 @@ $string['privacy:metadata:cmi5launch_usercourse:registrationid'] = 'The registra
 $string['privacy:metadata:cmi5launch_usercourse:ausgrades'] = 'All the AUs and their grades (overall session grades) saved in this format: AU lmsid => [AU Title => [Scores from that title\'s sessions].';
 $string['privacy:metadata:cmi5launch_usercourse:grade'] = 'The current overall grade (based on grading type) for the cmi5 activity.';
 
-// Sessions
+// Sessions table.
 $string['privacy:metadata:cmi5launch_sessions'] = 'The cmi5 launch link plugin stores each session of a users particular instance of a cmi5 Activity. While some things, like the masteryscore are generic to all users of the course, others, like the grade are specific to user.';  
 $string['privacy:metadata:cmi5launch_sessions:id'] = 'The ID of the user\'s session\'s particular instance assigned by Moodle.';
 $string['privacy:metadata:cmi5launch_sessions:sessionid'] = 'The session id. This is created by the cmi5 player and returned with URL request. Each session has a unique ID.';  
@@ -290,7 +291,7 @@ $string['privacy:metadata:cmi5launch_sessions:isabandoned'] = 'Whether the sessi
 $string['privacy:metadata:cmi5launch_sessions:progress'] = 'The full string of session progress reported from LRS".';
 $string['privacy:metadata:cmi5launch_sessions:launchurl'] = 'Returned launch url from cmi5 player.';
 
-// AUs
+// AUs table.
 $string['privacy:metadata:cmi5launch_aus'] = 'The cmi5 launch link plugin stores each AU of a users particular instance of a cmi5 Activity. While some things, like the masteryscore are generic to all users of the course, others, like the grade are specific to user.';
 $string['privacy:metadata:cmi5launch_aus:id'] = 'The ID of the user\'s AU\'s particular instance assigned by Moodle.';
 $string['privacy:metadata:cmi5launch_aus:attempt'] = 'The attempt of the au, ie, first, second, third.';
@@ -303,3 +304,18 @@ $string['privacy:metadata:cmi5launch_aus:satisfied'] = 'Whether an AU has been s
 $string['privacy:metadata:cmi5launch_aus:sessions'] = 'The IDs of the AU\'s individual sessions, saved as array for retrieval.';
 $string['privacy:metadata:cmi5launch_aus:scores'] = 'The scores of the AU\'s individual sessions, saved as array for retrieval.';
 $string['privacy:metadata:cmi5launch_aus:grade'] = 'The overall grade of the AU (based on grading type).';
+
+// For external systems.
+
+// LRS info.
+$string['privacy:metadata:lrs'] = 'The cmi5 launch link requests xAPI statements from an LRS to dispaly progress reports to students.';
+$string['privacy:metadata:lrs:registrationid'] = 'There are several ways to request xAPI statements from an LRS, the only way compatible with Moodle information is the registration ID. This ID will request all statements from that instance of cmi5 launch link activity.';
+$string['privacy:metadata:lrs:createdat'] = 'By sending the \'created at\' time we can filter out irrelevant statements and only get those created after or on that time.';
+
+// Cmi5 player info.
+$string['privacy:metadata:cmi5_player'] = 'The cmi5 launch link communicates with the cmi5 player to upload cmi5 activities, request launch URLs for them, and track staus of the activity and it\'s AU\s status such as completed or not satisified. It can also assign registration ID\'s and return info on registrations and sessions.';
+$string['privacy:metadata:cmi5_player:registrationid'] = 'The cmi5 player assigns each user and their activity instance a registration id, and it can be used to query updated information from the cmi5 player.';
+$string['privacy:metadata:cmi5_player:actor'] = 'When retrieving a launch URL or new registration the cmi5 player requests the "actor" name, which is the username in Moodle.';
+$string['privacy:metadata:cmi5_player:courseid'] = 'The cmi5 player assigns each user and their activity instance a course ID, and it can is used to request a launch URL.';
+$string['privacy:metadata:cmi5_player:returnurl'] = 'The return URL is a parameter sent to the cmi5 player when requesting a launch URL. It is where the browser returns to upon closing the launched activity. It has a unique ID on the end directing back to the user\'s particular course instance.';
+$string['privacy:metadata:cmi5_player:sessionid'] = 'The cmi5 player assigns each user\'s session a unique ID, and this is sent to the cmi5 player when requesting updated session info.';
