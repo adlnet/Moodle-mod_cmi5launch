@@ -41,25 +41,87 @@ function xmldb_cmi5launch_upgrade($oldversion) {
     global $DB;
     $dbman = $DB->get_manager();
 
-    /*
-    if ($oldversion < XXXXXXXXXX) {
+
+    if ($oldversion < 2024030615) {
+
+        // Define field courseid to be dropped from cmi5launch_player.
+        $table = new xmldb_table('cmi5launch_player');
+        $field = new xmldb_field('courseid');
+
+        // Conditionally launch drop field courseid.
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        //  Add fields to help with data tracking and deletion.
+        // Define field courseid to be added to cmi5launch_player.
+        $tablestoadd = array(new xmldb_table('cmi5launch_usercourse'), new xmldb_table('cmi5launch_aus'),new xmldb_table('cmi5launch_sessions'));
+        $fieldmcid = new xmldb_field('moodlecourseid', XMLDB_TYPE_INTEGER, '10', null, null, null, '0', 'id');
+
+        // Now cycle through array and remove fields.
+        foreach ($tablestoadd as $table) {
+        
+        // Conditionally launch add field moodlecourseid.
+        if (!$dbman->field_exists($table, $fieldmcid)) {
+            $dbman->add_field($table, $fieldmcid);
+        }
+        }
+
+ 
+
+        // Cmi5launch savepoint reached.
+        upgrade_mod_savepoint(true, 2024030615, 'cmi5launch');
+    }
+
+    if ($oldversion < 2024030425) {
 
         // Define field lmsid to be dropped from cmi5launch_sessions.
         $table = new xmldb_table('cmi5launch_sessions');
-       $fieldstoremove = array($fieldlmsid = new xmldb_field('lmsid'), $fieldresponse = new xmldb_field('response'), $fieldcourseid = new xmldb_field('courseid'));
 
-         // Now cycle through array and remove fields.
-        foreach ($fieldstoremove as $field) {
-            // Conditionally launch drop field registrationcourseausid.
-            if ($dbman->field_exists($table, $field)) {
-                $dbman->drop_field($table, $field);
-            }
+        // Define index lmsid (not unique) to be dropped from cmi5launch_sessions.
+        $index = new xmldb_index('lmsid', XMLDB_INDEX_NOTUNIQUE, ['lmsid']);
+
+        $indexnew = new xmldb_index('sessionid', XMLDB_INDEX_NOTUNIQUE, ['lmsid']);
+
+        // Conditionally launch add index lmsid.
+        if (!$dbman->index_exists($table, $indexnew)) {
+
+            
+            $dbman->add_index($table, $indexnew);
         }
-        // Cmi5launch savepoint reached.
-        upgrade_mod_savepoint(true, XXXXXXXXXX, 'cmi5launch');
-    }
 
-*/
+        // Conditionally launch drop index lmsid.
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+           
+
+            $fieldstoremove = array($fieldlmsid = new xmldb_field('lmsid'), $fieldresponse = new xmldb_field('response'), $fieldcourseid = new xmldb_field('courseid'));
+
+            // Now cycle through array and remove fields.
+            foreach ($fieldstoremove as $field) {
+                // Conditionally launch drop field registrationcourseausid.
+                if ($dbman->field_exists($table, $field)) {
+                    $dbman->drop_field($table, $field);
+                }
+            }
+
+
+            // Define field id to be added to cmi5launch_aus.
+            $tableaus = new xmldb_table('cmi5launch_aus');
+            $fielduserid = new xmldb_field('userid', XMLDB_TYPE_INTEGER, '10', null, null, XMLDB_SEQUENCE, null, null);
+
+            // Conditionally launch add field id.
+            if (!$dbman->field_exists($tableaus, $fielduserid)) {
+                $dbman->add_field($tableaus, $fielduserid);
+            }
+
+            // Cmi5launch savepoint reached.
+            upgrade_mod_savepoint(true, 2024030425, 'cmi5launch');
+        }
+    
+
+
     if ($oldversion < 2024011612) {
 
         // Define field grade to be dropped from cmi5launch.

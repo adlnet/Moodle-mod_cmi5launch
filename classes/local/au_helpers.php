@@ -87,7 +87,7 @@ class au_helpers {
      */
     public function cmi5launch_save_aus($auobjectarray) {
         // Add userid to the record.
-        global $DB, $USER;
+        global $DB, $USER, $cmi5launch;
         $table = "cmi5launch_aus";
 
         // An array to hold the created ids.
@@ -122,6 +122,8 @@ class au_helpers {
             $newrecord->inprogress = $auobject->inprogress;
             $newrecord->noattempt = $auobject->noattempt;
             $newrecord->satisfied = $auobject->satisfied;
+            // And HERE we can add the moodlecourseid.
+            $newrecord->moodlecourseid = $cmi5launch->id;
 
             // Save the record and get the new id.
             $newid = $DB->insert_record($table, $newrecord, true);

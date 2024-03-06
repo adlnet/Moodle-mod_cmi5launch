@@ -26,7 +26,7 @@
 class course {
     public $id, $url, $ausgrades, $type, $lmsid, $grade, $scores, $title, $moveon, $auindex,
     $parents, $objectives, $launchurl, $sessions = array(), $sessionid, $returnurl, $description = [], $activitytype, $launchmethod,
-    $masteryscore, $progress, $noattempt, $completed, $passed, $inprogress, $satisfied;
+    $masteryscore, $progress, $noattempt, $completed, $passed, $inprogress, $satisfied, $moodlecourseid;
 
     // The id assigned by cmi5 player.
     public $courseid;

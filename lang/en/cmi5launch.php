@@ -294,6 +294,7 @@ $string['privacy:metadata:cmi5launch_sessions:launchurl'] = 'Returned launch url
 // AUs table.
 $string['privacy:metadata:cmi5launch_aus'] = 'The cmi5 launch link plugin stores each AU of a users particular instance of a cmi5 Activity. While some things, like the masteryscore are generic to all users of the course, others, like the grade are specific to user.';
 $string['privacy:metadata:cmi5launch_aus:id'] = 'The ID of the user\'s AU\'s particular instance assigned by Moodle.';
+$string['privacy:metadata:cmi5launch_aus:userid'] = 'User id, which combined with course ID can be used to retrieve unique records.';
 $string['privacy:metadata:cmi5launch_aus:attempt'] = 'The attempt of the au, ie, first, second, third.';
 $string['privacy:metadata:cmi5launch_aus:lmsid'] = 'The lmsid id from the course packet. The singular CMI5 compliant id.';
 $string['privacy:metadata:cmi5launch_aus:completed'] = 'Whether an AU has met completed criteria (0 if false, 1 if true).';

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="mod/cmi5launch/db" VERSION="20240223" COMMENT="XMLDB file for Moodle mod/cmi5launch"
+<XMLDB PATH="mod/cmi5launch/db" VERSION="20240304" COMMENT="XMLDB file for Moodle mod/cmi5launch"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -35,6 +35,7 @@
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" COMMENT="Main ID for tracking."/>
         <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Course ID, assigned by CMI5 player"/>
+        <FIELD NAME="moodlecourseid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Course ID, assigned by Moodle for context and data tracking. (Id field in cmi5launch table)"/>
         <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="User ID, combined with courseid can be used to retrieve unique records"/>
         <FIELD NAME="cmi5activityid" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="The LMS ID"/>
         <FIELD NAME="registrationid" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" COMMENT="Course registration ID returned by CMI5 player. We want to use this to connect to LRS."/>
@@ -79,6 +80,7 @@
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="true" COMMENT="Main ID for tracking, assigned by Moodle."/>
         <FIELD NAME="sessionid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="The session ID. This is created by cmi5 player and returned with URL request"/>
         <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="User ID, which combined with course ID can be used to retrieve unique records"/>
+        <FIELD NAME="moodlecourseid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Course ID, assigned by Moodle for context and data tracking. (Id field in cmi5launch table)"/>
         <FIELD NAME="registrationscoursesausid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="ID assigned by the cmi5 player to AUs"/>
         <FIELD NAME="tenantname" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="The tenant name"/>
         <FIELD NAME="createdat" TYPE="char" LENGTH="30" NOTNULL="false" SEQUENCE="false" COMMENT="Time a session started (string that is returned by CMI5 player)"/>
@@ -112,9 +114,11 @@
     <TABLE NAME="cmi5launch_aus" COMMENT="Stores a courses AUs">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="true" COMMENT="The id of the AU (assigned by Moodle)."/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="User ID, which combined with course ID can be used to retrieve unique records."/>
         <FIELD NAME="attempt" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="The attempt of the au, ie, first, second, third"/>
         <FIELD NAME="launchmethod" TYPE="char" LENGTH="10" NOTNULL="false" DEFAULT="AnyWindow" SEQUENCE="false" COMMENT="Whether the course's retrieved URL opens in it's own window or new one"/>
         <FIELD NAME="lmsid" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="The lmsid id from the course packet. The singular CMI5 compliant id"/>
+        <FIELD NAME="moodlecourseid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Course ID, assigned by Moodle for context and data tracking. (Id field in cmi5launch table)"/>
         <FIELD NAME="url" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="The ending to be added to url that takes you to a specific AU"/>
         <FIELD NAME="type" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" COMMENT="The AU activity type."/>
         <FIELD NAME="title" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="The au title (from course package)."/>

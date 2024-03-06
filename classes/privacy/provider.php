@@ -40,108 +40,89 @@ class provider implements
 
         public static function get_metadata(collection $collection): collection {
 
-        // Here you will add more items into the collection.
+            // Database tables.
+            $collection->add_database_table(
+                'cmi5launch_usercourse',
+                [
+                    'id' => 'privacy:metadata:cmi5launch_usercourse:id',
+                    'userid' => 'privacy:metadata:cmi5launch_usercourse:userid',
+                    'registrationid' => 'privacy:metadata:cmi5launch_usercourse:registrationid',
+                    'ausgrades' => 'privacy:metadata:cmi5launch_usercourse:ausgrades',
+                    'grade' => 'privacy:metadata:cmi5launch_usercourse:grade',
+                ],
 
-        $collection->add_database_table(
-            'cmi5launch_usercourse',
-            [
-                'id' => 'privacy:metadata:cmi5launch_usercourse:id',
-                'userid' => 'privacy:metadata:cmi5launch_usercourse:userid',
-                'registrationid' => 'privacy:metadata:cmi5launch_usercourse:registrationid',
-                'ausgrades' => 'privacy:metadata:cmi5launch_usercourse:ausgrades',
-                'grade' => 'privacy:metadata:cmi5launch_usercourse:grade',
-            ],
+                'privacy:metadata:cmi5launch_usercourse',
+            );
+            $collection->add_database_table(
+                'cmi5launch_sessions',
+                [
+                    'id' => 'privacy:metadata:cmi5launch_sessions:id',
+                    'sessionid' => 'privacy:metadata:cmi5launch_sessions:sessionid',
+                    'userid' => 'privacy:metadata:cmi5launch_sessions:userid',
+                    'registrationscoursesausid' => 'privacy:metadata:cmi5launch_sessions:registrationscoursesausid',
+                    'createdat' => 'privacy:metadata:cmi5launch_sessions:createdat',
+                    'updatedat' => 'privacy:metadata:cmi5launch_sessions:updatedat',
+                    'code' => 'privacy:metadata:cmi5launch_sessions:code',
+                    'launchtokenid' => 'privacy:metadata:cmi5launch_sessions:launchtokenid',
+                    'lastrequesttime' => 'privacy:metadata:cmi5launch_sessions:lastrequesttime',
+                    'score' => 'privacy:metadata:cmi5launch_sessions:score',
+                    'islaunched' => 'privacy:metadata:cmi5launch_sessions:islaunched',
+                    'isinitialized' => 'privacy:metadata:cmi5launch_sessions:isinitialized',
+                    'initializedat' => 'privacy:metadata:cmi5launch_sessions:initializedat',
+                    'duration' => 'privacy:metadata:cmi5launch_sessions:duration',
+                    'iscompleted' => 'privacy:metadata:cmi5launch_sessions:iscompleted',
+                    'ispassed' => 'privacy:metadata:cmi5launch_sessions:ispassed',
+                    'isfailed' => 'privacy:metadata:cmi5launch_sessions:isfailed',
+                    'isterminated' => 'privacy:metadata:cmi5launch_sessions:isterminated',
+                    'isabandoned' => 'privacy:metadata:cmi5launch_sessions:isabandoned',
+                    'progress' => 'privacy:metadata:cmi5launch_sessions:progress',
+                    'launchurl' => 'privacy:metadata:cmi5launch_sessions:launchurl',
 
-            'privacy:metadata:cmi5launch_usercourse',
-        );
-        $collection->add_database_table(
-            'cmi5launch_sessions',
-            [
-                'id' => 'privacy:metadata:cmi5launch_sessions:id',
-                'sessionid' => 'privacy:metadata:cmi5launch_sessions:sessionid',
-                'userid' => 'privacy:metadata:cmi5launch_sessions:userid',
-                'registrationscoursesausid' => 'privacy:metadata:cmi5launch_sessions:registrationscoursesausid',
-                'createdat' => 'privacy:metadata:cmi5launch_sessions:createdat',
-                'updatedat' => 'privacy:metadata:cmi5launch_sessions:updatedat',
-                'code' => 'privacy:metadata:cmi5launch_sessions:code',
-                'launchtokenid' => 'privacy:metadata:cmi5launch_sessions:launchtokenid',
-                'lastrequesttime' => 'privacy:metadata:cmi5launch_sessions:lastrequesttime',
-                'score' => 'privacy:metadata:cmi5launch_sessions:score',
-                'islaunched' => 'privacy:metadata:cmi5launch_sessions:islaunched',
-                'isinitialized' => 'privacy:metadata:cmi5launch_sessions:isinitialized',
-                'initializedat' => 'privacy:metadata:cmi5launch_sessions:initializedat',
-                'duration' => 'privacy:metadata:cmi5launch_sessions:duration',
-                'iscompleted' => 'privacy:metadata:cmi5launch_sessions:iscompleted',
-                'ispassed' => 'privacy:metadata:cmi5launch_sessions:ispassed',
-                'isfailed' => 'privacy:metadata:cmi5launch_sessions:isfailed',
-                'isterminated' => 'privacy:metadata:cmi5launch_sessions:isterminated',
-                'isabandoned' => 'privacy:metadata:cmi5launch_sessions:isabandoned',
-                'progress' => 'privacy:metadata:cmi5launch_sessions:progress',
-                'launchurl' => 'privacy:metadata:cmi5launch_sessions:launchurl',
+                ],
 
-            ],
+                'privacy:metadata:cmi5launch_sessions',
+            );
 
-            'privacy:metadata:cmi5launch_sessions',
-        );
+            $collection->add_database_table(
+                'cmi5launch_aus',
+                [
+                    'id' => 'privacy:metadata:cmi5launch_aus:id',
+                    'userid' => 'privacy:metadata:cmi5launch_aus:userid',
+                    'attempt' => 'privacy:metadata:cmi5launch_aus:attempt',
+                    'lmsid' => 'privacy:metadata:cmi5launch_aus:lmsid',
+                    'completed' => 'privacy:metadata:cmi5launch_aus:completed',
+                    'passed' => 'privacy:metadata:cmi5launch_aus:passed',
+                    'inprogress' => 'privacy:metadata:cmi5launch_aus:inprogress',
+                    'noattempt' => 'privacy:metadata:cmi5launch_aus:noattempt',
+                    'satisfied' => 'privacy:metadata:cmi5launch_aus:satisfied',
+                    'sessions' => 'privacy:metadata:cmi5launch_aus:sessions',
+                    'scores' => 'privacy:metadata:cmi5launch_aus:scores',
+                    'grade' => 'privacy:metadata:cmi5launch_aus:grade',
+                ],
 
-        $collection->add_database_table(
-            'cmi5launch_aus',
-            [
-                'id' => 'privacy:metadata:cmi5launch_aus:id',
-                'attempt' => 'privacy:metadata:cmi5launch_aus:attempt',
-                'lmsid' => 'privacy:metadata:cmi5launch_aus:lmsid',
-                'completed' => 'privacy:metadata:cmi5launch_aus:completed',
-                'passed' => 'privacy:metadata:cmi5launch_aus:passed',
-                'inprogress' => 'privacy:metadata:cmi5launch_aus:inprogress',
-                'noattempt' => 'privacy:metadata:cmi5launch_aus:noattempt',
-                'satisfied' => 'privacy:metadata:cmi5launch_aus:satisfied',
-                'sessions' => 'privacy:metadata:cmi5launch_aus:sessions',
-                'scores' => 'privacy:metadata:cmi5launch_aus:scores',
-                'grade' => 'privacy:metadata:cmi5launch_aus:grade',
-            ],
+                'privacy:metadata:cmi5launch_aus',
+            );
 
-            'privacy:metadata:cmi5launch_aus',
-        );
+            // External systems.
+            $collection->add_external_location_link('lrs', [
+                'registrationid' => 'privacy:metadata:lrs:registrationid',
+                'createdat' => 'privacy:metadata:lrs:createdat',
+            ], 'privacy:metadata:lrs');
 
-            // Now we L TO TWO EXTERNAL SYSTEMS , THIS Needs to be idicated , I THINK hte cmi5 player does get data and 
-            // should count
-            //This is added to collection 
-        $collection->add_external_location_link('lrs', [
-            'registrationid' => 'privacy:metadata:lrs:registrationid',
-            'createdat' => 'privacy:metadata:lrs:createdat',
-        ], 'privacy:metadata:lrs');
-
-        $collection->add_external_location_link('cmi5_player', [
-            'registrationid' => 'privacy:metadata:cmi5_player:registrationid',
-            'actor' => 'privacy:metadata:cmi5_player:actor',
-            'courseid' => 'privacy:metadata:cmi5_player:courseid',
-            'returnurl' => 'privacy:metadata:cmi5_player:returnurl',
-            'sessionid' => 'privacy:metadata:cmi5_player:sessionid',
-        ], 'privacy:metadata:cmi5_player');
+            $collection->add_external_location_link('cmi5_player', [
+                'registrationid' => 'privacy:metadata:cmi5_player:registrationid',
+                'actor' => 'privacy:metadata:cmi5_player:actor',
+                'courseid' => 'privacy:metadata:cmi5_player:courseid',
+                'returnurl' => 'privacy:metadata:cmi5_player:returnurl',
+                'sessionid' => 'privacy:metadata:cmi5_player:sessionid',
+            ], 'privacy:metadata:cmi5_player');
 
 
-        return $collection;
+            return $collection;
     }
-        // further for retrieval and delete? 
 
-        //from tutorial
-        /*
-        public static function get_contexts_for_userid(int $userid): \core_privacy\local\request\contextlist {
-            $contextlist = new \core_privacy\local\request\contextlist();
-            return $contextlist;
-        }
-    
-        public static function export_user_data(\core_privacy\local\request\approved_contextlist $contextlist) {}
-    */
-   //     public static function delete_data_for_all_users_in_context(\context $context) {}
-    
-     //   public static function delete_data_for_user(\core_privacy\local\request\approved_contextlist $contextlist) {}
-       
 
         //from scorm example:
-
-
-       
 
             /**
      * Export all user data for the specified user, in the specified contexts.
@@ -275,7 +256,7 @@ class provider implements
      * @return contextlist $contextlist The contextlist containing the list of contexts used in this plugin.
      */
     public static function get_contexts_for_userid(int $userid) : contextlist {
-        $sql = "SELECT ctx.id
+        /* $sql = "SELECT ctx.id
                   FROM {%s} ss
                   JOIN {modules} m
                     ON m.name = 'scorm'
@@ -285,16 +266,30 @@ class provider implements
                   JOIN {context} ctx
                     ON ctx.instanceid = cm.id
                    AND ctx.contextlevel = :modlevel
-                 WHERE ss.userid = :userid";
+                 WHERE ss.userid = :userid";*/
 
-        $params = ['modlevel' => CONTEXT_MODULE, 'userid' => $userid];
+            $sql = "SELECT ctx.id
+            FROM {context} ctx
+            JOIN {course_modules} cm
+            ON cm.id = ctx.instanceid
+            AND ctx.contextlevel = :context
+            JOIN {modules} m
+            ON m.id = cm.module
+            AND m.name = 'cmi5launch'
+            JOIN {%s} c5l
+            ON c5l.id = cm.instance
+            WHERE c5l.userid = :userid";
+
+        $params = ['context' => CONTEXT_MODULE, 'userid' => $userid];
         $contextlist = new contextlist();
-        $contextlist->add_from_sql(sprintf($sql, 'scorm_attempt'), $params);
-        $contextlist->add_from_sql(sprintf($sql, 'scorm_aicc_session'), $params);
+        $contextlist->add_from_sql(sprintf($sql, 'cmi5launch_usercourse'), $params);
+        $contextlist->add_from_sql(sprintf($sql, 'cmi5launch_sessions'), $params);
+        $contextlist->add_from_sql(sprintf($sql, 'cmi5launch_aus'), $params);
 
         return $contextlist;
     }
-            /**
+    
+    /**
      * Get the list of users who have data within a context.
      *
      * @param   userlist    $userlist   The userlist containing the list of users who have data in this context/plugin combination.
@@ -305,7 +300,7 @@ class provider implements
         if (!is_a($context, \context_module::class)) {
             return;
         }
-
+/*
         $sql = "SELECT ss.userid
                   FROM {%s} ss
                   JOIN {modules} m
@@ -316,14 +311,26 @@ class provider implements
                   JOIN {context} ctx
                     ON ctx.instanceid = cm.id
                    AND ctx.contextlevel = :modlevel
-                 WHERE ctx.id = :contextid";
-
+                 WHERE ctx.id = :contextid"; */
+       
+        $sql = "SELECT c5l.userid
+            FROM {%s} c5l
+            JOIN {modules} m
+            ON m.name = 'cmi5launch'
+            JOIN {course_modules} cm
+            ON cm.module = m.id
+            JOIN {context} ctx
+            ON ctx.instanceid = cm.id
+            AND ctx.contextlevel = :modlevel
+            WHERE ctx.id = :contextid";
+    
         $params = ['modlevel' => CONTEXT_MODULE, 'contextid' => $context->id];
 
-        $userlist->add_from_sql('userid', sprintf($sql, 'scorm_attempt'), $params);
-        $userlist->add_from_sql('userid', sprintf($sql, 'scorm_aicc_session'), $params);
-    }
+        $userlist->add_from_sql('userid', sprintf($sql, 'cmi5launch_usercourse'), $params);
+        $userlist->add_from_sql('userid', sprintf($sql, 'cmi5launch_sessions'), $params);
+        $userlist->add_from_sql('userid', sprintf($sql, 'cmi5launch_aus'), $params);
 
+    }
 
     /**
      * Delete all user data which matches the specified context.
@@ -331,25 +338,29 @@ class provider implements
      * @param context $context A user context.
      */
     public static function delete_data_for_all_users_in_context(\context $context) {
-        // This should not happen, but just in case.
+        global $DB;
+
+                // This should not happen, but just in case.
         if ($context->contextlevel != CONTEXT_MODULE) {
             return;
         }
+    
+        $cm = get_coursemodule_from_id('cmi5launch', $context->instanceid);
+        if (!$cm) {
+            return;
+        }
+    
+        //This able needs a diferent key, but to be deleted stil
+        $DB->delete_records('cmi5launch', ['id' => $cm->instance]);
+        
+        // Tables to delete from with same key.
+        $tables = ['cmi5launch_usercourse', 'cmi5launch_sessions', 'cmi5launch_aus'];
+        
+        foreach ($tables as $table) {
 
-        // Prepare SQL to gather all IDs to delete.
-        $sql = "SELECT ss.id
-                  FROM {%s} ss
-                  JOIN {modules} m
-                    ON m.name = 'scorm'
-                  JOIN {course_modules} cm
-                    ON cm.instance = ss.scormid
-                   AND cm.module = m.id
-                 WHERE cm.id = :cmid";
-        $params = ['cmid' => $context->instanceid];
-
-        static::delete_data('scorm_aicc_session', $sql, $params);
-        $coursemodule = get_coursemodule_from_id('scorm', $context->instanceid);
-        scorm_delete_tracks($coursemodule->instance);
+            $DB->delete_records($table, ['moodlecourseid' => $cm->instance]);
+        
+        }
     }
 
 
@@ -361,92 +372,53 @@ class provider implements
     public static function delete_data_for_user(approved_contextlist $contextlist) {
         global $DB;
 
-        // Remove contexts different from COURSE_MODULE.
-        $contextids = array_reduce($contextlist->get_contexts(), function($carry, $context) {
-            if ($context->contextlevel == CONTEXT_MODULE) {
-                $carry[] = $context->id;
-            }
-            return $carry;
-        }, []);
-
-        if (empty($contextids)) {
+        if (empty($contextlist->count())) {
             return;
         }
         $userid = $contextlist->get_user()->id;
-        // Prepare SQL to gather all completed IDs.
-        list($insql, $inparams) = $DB->get_in_or_equal($contextids, SQL_PARAMS_NAMED);
-        $sql = "SELECT ss.id
-                  FROM {%s} ss
-                  JOIN {modules} m
-                    ON m.name = 'scorm'
-                  JOIN {course_modules} cm
-                    ON cm.instance = ss.scormid
-                   AND cm.module = m.id
-                  JOIN {context} ctx
-                    ON ctx.instanceid = cm.id
-                 WHERE ss.userid = :userid
-                   AND ctx.id $insql";
-        $params = array_merge($inparams, ['userid' => $userid]);
 
-        static::delete_data('scorm_aicc_session', $sql, $params);
         foreach ($contextlist->get_contexts() as $context) {
-            if ($context->contextlevel == CONTEXT_MODULE) {
-                $coursemodule = get_coursemodule_from_id('scorm', $context->instanceid);
-                scorm_delete_tracks($coursemodule->instance, null, $userid);
-            }
+            $instanceid = $DB->get_field('course_modules', 'instance', ['id' => $context->instanceid], MUST_EXIST);
+
+        // Tables to delete from with same key if context matches.
+        $tables = ['cmi5launch_usercourse', 'cmi5launch_sessions', 'cmi5launch_aus'];
+        
+        foreach ($tables as $table) {
+
+            $DB->delete_records($table, ['moodlecourseid' => $instanceid, 'userid' => $userid]);
         }
     }
+
+
+    }
+
     /**
      * Delete multiple users within a single context.
      *
      * @param   approved_userlist       $userlist The approved context and user information to delete information for.
      */
     public static function delete_data_for_users(approved_userlist $userlist) {
+        
         global $DB;
+
         $context = $userlist->get_context();
 
-        if (!is_a($context, \context_module::class)) {
-            return;
-        }
+        $cm = $DB->get_record('course_modules', ['id' => $context->instanceid]);
+        
+        $usercourse = $DB->get_record('cmi5lauch_usercourse', ['moodlecourseid' => $cm->instance]);
+        $sessions = $DB->get_record('cmi5lauch_sessions', ['moodlecourseid' => $cm->instance]);
+        $aus = $DB->get_record('cmi5lauch_aus', ['moodlecourseid' => $cm->instance]);
 
-        // Prepare SQL to gather all completed IDs.
-        $userids = $userlist->get_userids();
-        list($insql, $inparams) = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED);
 
-        $sql = "SELECT ss.id
-                  FROM {%s} ss
-                  JOIN {modules} m
-                    ON m.name = 'scorm'
-                  JOIN {course_modules} cm
-                    ON cm.instance = ss.scormid
-                   AND cm.module = m.id
-                  JOIN {context} ctx
-                    ON ctx.instanceid = cm.id
-                 WHERE ctx.id = :contextid
-                   AND ss.userid $insql";
-        $params = array_merge($inparams, ['contextid' => $context->id]);
 
-        static::delete_data('scorm_aicc_session', $sql, $params);
-        $coursemodule = get_coursemodule_from_id('scorm', $context->instanceid);
-        foreach ($userlist->get_userids() as $userid) {
-            scorm_delete_tracks($coursemodule->instance, null, $userid);
-        }
+        list($userinsql, $userinparams) = $DB->get_in_or_equal($userlist->get_userids(), SQL_PARAMS_NAMED);
+        $params = array_merge(['chatid' => $chat->id], $userinparams);
+        $sql = "chatid = :chatid AND userid {$userinsql}";
+    
+        $DB->delete_records_select('chat_messages', $sql, $params);
+        $DB->delete_records_select('chat_messages_current', $sql, $params);
+        $DB->delete_records_select('chat_users', $sql, $params);
     }
 
-    /**
-     * Delete data from $tablename with the IDs returned by $sql query.
-     *
-     * @param  string $tablename  Table name where executing the SQL query.
-     * @param  string $sql    SQL query for getting the IDs of the scoestrack entries to delete.
-     * @param  array  $params SQL params for the query.
-     */
-    protected static function delete_data(string $tablename, string $sql, array $params) {
-        global $DB;
-
-        $scoestracksids = $DB->get_fieldset_sql(sprintf($sql, $tablename), $params);
-        if (!empty($scoestracksids)) {
-            list($insql, $inparams) = $DB->get_in_or_equal($scoestracksids, SQL_PARAMS_NAMED);
-            $DB->delete_records_select($tablename, "id $insql", $inparams);
-        }
-    }
+   
     }

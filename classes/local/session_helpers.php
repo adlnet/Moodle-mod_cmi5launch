@@ -119,6 +119,8 @@ class session_helpers {
         $newrecord->launchurl = $launchurl;
         $newrecord->tenantname = $USER->username;
         $newrecord->launchmethod = $launchmethod;
+        // I think here is where we eed to implement : moodlecourseid
+        $newrecord->moodlecourseid = $cmi5launch->id;
 
         // Save record to table.
         $DB->insert_record($table, $newrecord, true);

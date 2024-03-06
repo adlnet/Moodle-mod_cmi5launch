@@ -148,6 +148,9 @@ if ($exists == false) {
     $registrationid = $getregistration($userscourse->courseid, $cmi5launch->id);
     $userscourse->registrationid = $registrationid;
 
+    // Retreive the Moodle course id
+    $userscourse->moodlecourseid = $cmi5launch->id;
+
     // Retrieve AU ids for this user/course.
     $aus = json_decode($record->aus);
 
