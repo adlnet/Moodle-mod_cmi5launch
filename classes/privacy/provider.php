@@ -170,7 +170,7 @@ class provider implements
                   JOIN {context} ctx
                     ON ctx.instanceid = cm.id
                  WHERE ctx.id $insql
-                   AND a.userid = :userid";
+                   AND a.userid = :userid ";
         $params = array_merge($inparams, ['userid' => $userid]);
 
         $alldata = [];
@@ -256,31 +256,24 @@ class provider implements
      * @return contextlist $contextlist The contextlist containing the list of contexts used in this plugin.
      */
     public static function get_contexts_for_userid(int $userid) : contextlist {
-        /* $sql = "SELECT ctx.id
-                  FROM {%s} ss
-                  JOIN {modules} m
-                    ON m.name = 'scorm'
-                  JOIN {course_modules} cm
-                    ON cm.instance = ss.scormid
-                   AND cm.module = m.id
-                  JOIN {context} ctx
-                    ON ctx.instanceid = cm.id
-                   AND ctx.contextlevel = :modlevel
-                 WHERE ss.userid = :userid";*/
 
-            $sql = "SELECT ctx.id
-            FROM {context} ctx
-            JOIN {course_modules} cm
-            ON cm.id = ctx.instanceid
-            AND ctx.contextlevel = :context
-            JOIN {modules} m
-            ON m.id = cm.module
-            AND m.name = 'cmi5launch'
-            JOIN {%s} c5l
-            ON c5l.id = cm.instance
-            WHERE c5l.userid = :userid";
+
+        global $DB;
+
+        $sql = "SELECT ctx.id
+        FROM {context} ctx
+        JOIN {course_modules} cm
+        ON cm.id = ctx.instanceid
+        AND ctx.contextlevel = :context
+        JOIN {modules} m
+        ON m.id = cm.module
+        AND m.name = 'cmi5launch'
+        JOIN {%s} c5l
+        ON c5l.moodlecourseid = cm.instance
+        WHERE c5l.userid = :userid";
 
         $params = ['context' => CONTEXT_MODULE, 'userid' => $userid];
+
         $contextlist = new contextlist();
         $contextlist->add_from_sql(sprintf($sql, 'cmi5launch_usercourse'), $params);
         $contextlist->add_from_sql(sprintf($sql, 'cmi5launch_sessions'), $params);
@@ -300,19 +293,7 @@ class provider implements
         if (!is_a($context, \context_module::class)) {
             return;
         }
-/*
-        $sql = "SELECT ss.userid
-                  FROM {%s} ss
-                  JOIN {modules} m
-                    ON m.name = 'scorm'
-                  JOIN {course_modules} cm
-                    ON cm.instance = ss.scormid
-                   AND cm.module = m.id
-                  JOIN {context} ctx
-                    ON ctx.instanceid = cm.id
-                   AND ctx.contextlevel = :modlevel
-                 WHERE ctx.id = :contextid"; */
-       
+
         $sql = "SELECT c5l.userid
             FROM {%s} c5l
             JOIN {modules} m
@@ -338,6 +319,7 @@ class provider implements
      * @param context $context A user context.
      */
     public static function delete_data_for_all_users_in_context(\context $context) {
+        
         global $DB;
 
                 // This should not happen, but just in case.
@@ -350,7 +332,7 @@ class provider implements
             return;
         }
     
-        //This able needs a diferent key, but to be deleted stil
+        // This table needs a diferent key, but to be deleted still
         $DB->delete_records('cmi5launch', ['id' => $cm->instance]);
         
         // Tables to delete from with same key.
@@ -373,51 +355,61 @@ class provider implements
         global $DB;
 
         if (empty($contextlist->count())) {
+            echo"empty";
             return;
         }
         $userid = $contextlist->get_user()->id;
-
+      
+        
         foreach ($contextlist->get_contexts() as $context) {
+
+            //Retrieve the instance id from the context.
             $instanceid = $DB->get_field('course_modules', 'instance', ['id' => $context->instanceid], MUST_EXIST);
 
-        // Tables to delete from with same key if context matches.
-        $tables = ['cmi5launch_usercourse', 'cmi5launch_sessions', 'cmi5launch_aus'];
-        
-        foreach ($tables as $table) {
+            // Tables to delete from with same key if context matches.
+            $tables = ['cmi5launch_usercourse', 'cmi5launch_sessions', 'cmi5launch_aus'];
 
-            $DB->delete_records($table, ['moodlecourseid' => $instanceid, 'userid' => $userid]);
+            foreach ($tables as $table) {
+
+                $sql = array("moodlecourseid" => $instanceid, "userid" => $userid);
+                
+                $params = array('moodlecourseid' => $instanceid, 'userid' => $userid);
+
+                $deleted = $DB->delete_records($table, $sql);
+
         }
     }
 
 
     }
-
+/*
     /**
      * Delete multiple users within a single context.
      *
      * @param   approved_userlist       $userlist The approved context and user information to delete information for.
      */
     public static function delete_data_for_users(approved_userlist $userlist) {
-        
+
+        echo " FINE ARE WE CALLIN IT THEN?";
         global $DB;
 
         $context = $userlist->get_context();
 
         $cm = $DB->get_record('course_modules', ['id' => $context->instanceid]);
-        
+        /*
         $usercourse = $DB->get_record('cmi5lauch_usercourse', ['moodlecourseid' => $cm->instance]);
         $sessions = $DB->get_record('cmi5lauch_sessions', ['moodlecourseid' => $cm->instance]);
         $aus = $DB->get_record('cmi5lauch_aus', ['moodlecourseid' => $cm->instance]);
-
+    */
 
 
         list($userinsql, $userinparams) = $DB->get_in_or_equal($userlist->get_userids(), SQL_PARAMS_NAMED);
-        $params = array_merge(['chatid' => $chat->id], $userinparams);
-        $sql = "chatid = :chatid AND userid {$userinsql}";
+        $params = array_merge(['moodlecourseid' => $cm->instance], $userinparams);
+        $sql = "moodlecourseid = :moodlecourseid AND userid {$userinsql}";
     
-        $DB->delete_records_select('chat_messages', $sql, $params);
-        $DB->delete_records_select('chat_messages_current', $sql, $params);
-        $DB->delete_records_select('chat_users', $sql, $params);
+        $DB->delete_records_select('cmi5lauch_usercourse', $sql, $params);
+        $DB->delete_records_select('cmi5lauch_sessions', $sql, $params);
+        $DB->delete_records_select('cmi5lauch_aus', $sql, $params);
     }
 
    

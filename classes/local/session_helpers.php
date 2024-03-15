@@ -121,6 +121,8 @@ class session_helpers {
         $newrecord->launchmethod = $launchmethod;
         // I think here is where we eed to implement : moodlecourseid
         $newrecord->moodlecourseid = $cmi5launch->id;
+        // And userid!
+        $newrecord->userid = $USER->id;
 
         // Save record to table.
         $DB->insert_record($table, $newrecord, true);
