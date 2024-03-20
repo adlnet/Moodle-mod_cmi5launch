@@ -18,6 +18,7 @@
  * Launches the experience with the requested registration
  *
  * @copyright  2023 Megan Bohland
+ * @copyright  Based on work by 2013 Andrew Downes
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 

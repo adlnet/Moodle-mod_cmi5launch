@@ -15,8 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Displays the AU's of a course and their progress
+ * Displays the AU's of a course and their progress.
  * @copyright  2023 Megan Bohland
+ * @copyright  Based on work by 2013 Andrew Downes
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 

@@ -14,9 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-// The report page. Displays either the course grades for teacher, or user grades for student.
-// Megan Bohland 2023.
+/**
+ * The report page. Displays either the course grades for teacher, or user grades for student.
+ *
+ * @copyright  2023 Megan Bohland
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
+ 
 use mod_cmi5launch\local\grade_helpers;
 
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');

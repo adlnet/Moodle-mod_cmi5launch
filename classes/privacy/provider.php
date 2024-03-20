@@ -17,7 +17,7 @@
 /**
  * Class to implement Moodle's privacy APIs.
  *
- * @copyright  2023 Megan Bohland
+ * @copyright  2024 Megan Bohland
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -28,7 +28,6 @@
  use core_privacy\local\request\approved_userlist;
  use core_privacy\local\request\contextlist;
  use core_privacy\local\request\helper;
- use core_privacy\local\request\transform;
  use core_privacy\local\request\userlist;
  use core_privacy\local\request\writer;
 class provider implements

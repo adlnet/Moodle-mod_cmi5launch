@@ -18,7 +18,8 @@
  * Define all the backup steps that will be used by the backup_cmi5launch_activity_task
  *
  * @package    mod_cmi5launch
- * @copyright  2016 onward Remote-Learner.net Inc
+ * @copyright 2023 Megan Bohland
+ * @copyright  Based on work by 2016 onward Remote-Learner.net Inc
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 

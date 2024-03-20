@@ -14,9 +14,12 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-// A break down of the users AU sessions as grade report.
-// Megan Bohland 2023.
-
+/**
+ * Class to report on sessions grades.
+ *
+ * @copyright  2023 Megan Bohland
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 use mod_cmi5launch\local\au_helpers;
 use mod_cmi5launch\local\session_helpers;

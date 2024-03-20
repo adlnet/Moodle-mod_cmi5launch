@@ -16,6 +16,20 @@
 
 /* For global cmi5 settings  */
 
+
+/**
+ * Defines the version of cmi5launch
+ *
+ * This code fragment is called by moodle_needs_upgrading() and
+ * /admin/index.php
+ *
+ * @package mod_cmi5launch
+ * @copyright  2023 Megan Bohland
+ * @copyright  Based on work by 2013 Andrew Downes as well as some code from the scorm module (Source code was uncredited).
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+
 defined('MOODLE_INTERNAL') || die;
 
 if ($ADMIN->fulltree) {

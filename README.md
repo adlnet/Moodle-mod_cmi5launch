@@ -4,8 +4,11 @@ cmi5launch
 
 A plug in for Moodle that allows the launch of cmi5 content which is then played in a cmi5 player and tracked to a separate LRS. 
 
-## What you will need
+### Thanks
 
+This plugin is based on the xAPI Launch Link (Tin can launch) plugin developed by David Pesce and Andrew Downes. That plugin is located at https://github.com/davidpesce/moodle-mod_tincanlaunch.
+
+## What you will need
 
 To use this plugin you will need the following:
 

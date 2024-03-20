@@ -40,7 +40,8 @@
  * The variable name for the capability definitions array is $capabilities
  *
  * @package mod_cmi5launch
- * @copyright  2013 Andrew Downes
+ * @copyright  2023 Megan Bohland
+ * @copyright  Based on work by 2013 Andrew Downes
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 

@@ -18,7 +18,8 @@
  * Redirect the user based on their capabilities to reporting page.
  * @package   mod_cmi5
  * @category  grade
- * @copyright 2023 M.Bohland
+ * @copyright 2023 Megan Bohland
+ * @copyright Based on work by 2010 onwards Dan Marsden
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
