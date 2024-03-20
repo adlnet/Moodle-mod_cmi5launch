@@ -122,14 +122,13 @@ class provider implements
     }
 
 
-        //from scorm example:
-
-            /**
+     /**
      * Export all user data for the specified user, in the specified contexts.
      *
      * @param approved_contextlist $contextlist The approved contexts to export information for.
      */
     public static function export_user_data(approved_contextlist $contextlist) {
+        
         global $DB;
 
         if (empty($contextlist)) {
@@ -142,250 +141,152 @@ class provider implements
         $userid = $user->id;
 
         // Get the list of contexts that contain user information for the specified user.
+        // (The context->instanceid = cm->id and the cm.instance equals moodlecourseid).
         foreach ($contextlist as $context) {
            
-          //  $context = \context::instance_by_id($context->id);
-            echo "<br>";
-            echo "context is replaced? ??";
-            var_dump($context);
-            echo "<br>";
             $data = helper::get_context_data($context, $user);
-            echo "<br>";
-            echo "And the data we   are exporting is";
-            var_dump($data);
-            echo "<br>";
-            // Below is where the  name is coming from
-            writer::with_context($context)->export_data(['Course info'], $data);
-        
-            // LEt's iterate through tables and export them 
-            $tables = array('cmi5launch_usercourse', 'cmi5launch_sessions', 'cmi5launch_aus');
-            //    helper::export_context_files($context, $user);
-// For tomorrow it's saying cm is null
+
+            // Retrieve the coursemodule
             $cm = get_coursemodule_from_id('cmi5launch', $context->instanceid);
-            //what is courese modukle
-            echo "<br>";
-            echo "And the data we  CMCMCMCMCM are exporting is";
-            var_dump($cm);
-            echo "<br>";
             
+            // The course modules instance correlates to the moodle course id in our tables.
+            // Combined with the user id, we can get the specific records we need. 
             $mid =  $cm->instance;
             $params = array ('userid' => $userid,   'moodlecourseid'=> $mid);
-                // the context->instanceid = cm ->id and the cm.instance equals moodlecourseid
+            
+            // Start getting data on usercourse table
+            $recordset = $DB->get_recordset('cmi5launch_usercourse', $params);
 
-            $sql = "SELECT *
-            FROM {cmi5launch_usercourse} c5l
-            WHERE c5l.userid = :userid 
-            AND c5l.moodlecourseid = :moodlecourseid";
-            $stateset = $DB->get_recordset('cmi5launch_usercourse', $params);
+            // To hold the course data.
+            $coursedata = [];
+            
+            // Cycle through recordset in case there are multiple.
+            foreach ($recordset as $record) {
 
-             // userdata
-             $coursedata = [];
-            // now foreach it incase there are multiple
-            foreach ($stateset as $state) {
+                // Make user friendly names for data.
+                $userfriendly = array( 'ID of instance' => $record->id,
+                    'User ID' => $record->userid,
+                    'Course ID' => $record->courseid, 
+                    'Moodle Course ID' => $record->moodlecourseid, 
+                    'Registration ID' => $record->registrationid,
+                    'Return URL' => $record->returnurl,
+                    'AUs of instance' => $record->aus,
+                    'Grades of AUs' => $record->ausgrades, 
+                    'Overall grade of instance' => $record->grade);
 
-               //Ok what is state
-                echo "STate in STATE loop where I am tryin to get user to read info ";
-                echo " stata is ";
-                var_dump($state);
-                echo "< br>";
-                // Make user friendlynames
-                $userfriendly = array( 'ID of instance' => $state->id,
-                    'User ID' => $state->userid,
-                    'Course ID' => $state->courseid, 
-                    'Moodle Course ID' => $state->moodlecourseid, 
-                    'Registration ID' => $state->registrationid, 
-                    'CMI5 Activity ID' => $state->cmi5activityid,
-                    'Return URL' => $state->returnurl,
-                    'AUs of instance' => $state->aus,
-                    'Grades of AUs' => $state->ausgrades, 
-                    'Overall grade of instance' => $state->grade);
-
-                // Then add as ONE item in array, that way if there is more thannn one it unpacks nicely
-                $coursedata = ['userinfo' => $userfriendly];
-              // what is course data is it in 0
-                echo " &&&&&&&&&&&&&&&&&&&&course data is ";
-                var_dump($coursedata);
-                echo "< br>";
+                // Then add as ONE item in array, that way if there is more than one it unpacks nicely.
+                $coursedata = ['User information' => $userfriendly];
             }
+
+            // Combine the course data with the usercourse data.
             $contextdata = (object)array_merge((array)$data, $coursedata);
-                // If the activity has xAPI state data by the user, include it in the export.
-                writer::with_context($context)->export_data(
+            
+            // Write data out.
+            writer::with_context($context)->export_data(
                     ['Course info pertaining to user'],
                     (object) $contextdata
+            );
+
+            // Now get the AU data.
+            $recordset = $DB->get_recordset('cmi5launch_aus', $params);
+
+            // To hold the AU data.
+            $ausdata = [];
+            
+            // Cycle through recordset in case there are multiple.
+            foreach ($recordset as $record) {
+    
+               // Make user friendly names for data display.
+               $userfriendly = array( 'ID of AU instance' => $record->id,
+                    'User ID' => $record->userid,
+                    'The attempt number of the AU' => $record->attempt,
+                    'LMS ID of the AU' => $record->lmsid,
+                    'Moodle Course ID' => $record->moodlecourseid,
+                    'URL of the AU' => $record->url,
+                    'The type of the AU' => $record->type,
+                    'The title of the AU' => $record->title,
+                    'The description of the AU' => $record->description,
+                    'The objectives of the AU' => $record->objectives,
+                    'The move on value of the AU' => $record->moveon,
+                    'The AU index of the AU' => $record->auindex,
+                    'The cmi5 activity type of the AU' => $record->activitytype,
+                    'The amount it goes to mastery score' => $record->masteryscore,
+                    'Whether it has been completed' => $record->completed,
+                    'Whether it has been passed' => $record->passed,
+                    'Whether it is in progress' => $record->inprogress,
+                    'Whether it has been satisfied' => $record->satisfied,
+                    'Whether it has not been attempted' => $record->noattempt,
+                    'This AUs individual session\'s IDs' => $record->sessions,
+                    'The scores of the AU, as array' => $record->scores,
+                    'The overall grade of the AU' => $record->grade,
                 );
-//////////////////////////////////////////
-                    /////////////////////////////NOW AUS
-                    $stateset = $DB->get_recordset('cmi5launch_aus', $params);
-
-                    // userdata
-                    $ausdata = [];
-                // now foreach it incase there are multiple
-                foreach ($stateset as $state) {
-     
-               // Make user friendlynames
-               $userfriendly = array( 'ID of AU instance' => $state->id,
-                   'User ID' => $state->userid,
-                   'The attempt number of the AU' => $state->attempt,
-                     'LMS ID of the AU' => $state->lmsid,
-                     'Moodle Course ID' => $state->moodlecourseid,
-                     'URL of the AU' => $state->url,
-                     'The type of the AU' => $state->type,
-                        'The title of the AU' => $state->title,
-                        'The description of the AU' => $state->description,
-                        'The objectives of the AU' => $state->objectives,
-                        'The move on value of the AU' => $state->moveon,
-                        'The AU index of the AU' => $state->auindex,
-                        'The cmi5 activity type of the AU' => $state->activitytype,
-                        'The amount it goes to mastery score' => $state->masteryscore,
-                        'Whether it has been completed' => $state->completed,
-                        'Whether it has been passed' => $state->passed,
-                        'Whether it is in progress' => $state->inprogress,
-                        'Whether it has been satisfied' => $state->satisfied,
-                        'Whether it has not been attempted' => $state->noattempt,
-                        'The individual sessions of the AU' => $state->sessions,
-                        'The scores of the AU, as array' => $state->scores,
-                        'The overall grade of the AU' => $state->grade,
-                   );
             
-            
-               // Then add as ONE item in array, that way if there is more thannn one it unpacks nicely
-               $ausdata = ['Session info' => $userfriendly];
-             // what is course data is it in 0
-               echo " &&&&&&&&&&&&&&&&&&&&course data is ";
-               var_dump($ausdata);
-               echo "< br>";
+               // Then add as ONE item in array, that way if there is more than one it unpacks nicely.
+               $ausdata = ['AU info' => $userfriendly];
             }
             
+            // Combine the course data with the au data.
             $contextdata = (object)array_merge((array)$data, $ausdata);
-               // If the activity has xAPI state data by the user, include it in the export.
-               writer::with_context($context)->export_data(
-                   ['AU info pertaining to user'],
-                   (object) $contextdata
-               );
-            //////////////////////////////////////
-            ///////////////////////////////////////////
-            /////////////////////////////NOW SESSIONS
-            $stateset = $DB->get_recordset('cmi5launch_sessions', $params);
+            
+            // Write data out.
+            writer::with_context($context)->export_data(
+                ['AU info pertaining to user'],
+                (object) $contextdata
+            );
+            
+            // Now get the sessions data.
+            $recordset = $DB->get_recordset('cmi5launch_sessions', $params);
 
-        // userdata
+        // To hold session information.
         $sessiondata = [];
-    // now foreach it incase there are multiple
-    foreach ($stateset as $state) {
+        
+        // Cycle through recordset in case there are multiple.
+        foreach ($recordset as $record) {
 
-  //Ok what is state
-   echo "STate in STATE loop where I am tryin to get user to read info ";
-   echo " stata is ";
-   var_dump($state);
-   echo "< br>";
-   // Make user friendlynames
-   $userfriendly = array( 'ID of session instance' => $state->id,
-        'Session ID' => $state->sessionid,
-       'User ID' => $state->userid,
-       'Moodle Course ID' => $state->moodlecourseid, 
-       'Registration Courses AUs ID' => $state->registrationscoursesausid, 
-       'Time a session was started' => $state->creeatedat,
-         'Time a session was updated' => $state->updatedat,
-         'Code' => $state->code,
-            'Last request time' => $state->lastrequesttime,
-            'Amount it goes to MAstery Score' => $state->masteryscore,
-            'The score of the session' => $state->score,
-            'If it was launched' => $state->islaunched,
-            'If it was initialized' => $state->isinitialized,
-            'Time it was initialized' => $state->initializedat,
-            'Duration of session' => $state->duration,
-            'If it was completed' => $state->iscompleted,
-            'If it was passed' => $state->ispassed,
-            'If it was failed' => $state->isfailed,
-            'If it was terminated' => $state->isterminated,
-            'If it was abandoned' => $state->isabandoned,
-            'Progress of session in statements from LRS' => $state->progress,
-            'Launch URL' => $state->launchurl);
+            // Make user friendly names for display.
+            $userfriendly = array( 'ID of session instance' => $record->id,
+                'Session ID' => $record->sessionid,
+                'User ID' => $record->userid,
+                'Moodle Course ID' => $record->moodlecourseid, 
+                'Registration Courses AUs ID' => $record->registrationscoursesausid, 
+                'Time a session was started' => $record->creeatedat,
+                'Time a session was updated' => $record->updatedat,
+                'Code' => $record->code,
+                'Launch token ID' => $record->launchtokenid,
+                'Last request time' => $record->lastrequesttime,
+                'Amount it goes to Mastery Score' => $record->masteryscore,
+                'The score of the session' => $record->score,
+                'If it was launched' => $record->islaunched,
+                'If it was initialized' => $record->isinitialized,
+                'Time it was initialized' => $record->initializedat,
+                'Duration of session' => $record->duration,
+                'If it was completed' => $record->iscompleted,
+                'If it was passed' => $record->ispassed,
+                'If it was failed' => $record->isfailed,
+                'If it was terminated' => $record->isterminated,
+                'If it was abandoned' => $record->isabandoned,
+                'Progress of session in recordments from LRS' => ("<pre>" . implode("\n ", json_decode($record->progress) ) . "</pre>"),
+                'Launch URL' => $record->launchurl);
 
-
-   // Then add as ONE item in array, that way if there is more thannn one it unpacks nicely
-   $sessiondata = ['Session info' => $userfriendly];
- // what is course data is it in 0
-   echo " &&&&&&&&&&&&&&&&&&&&course data is ";
-   var_dump($sessiondata);
-   echo "< br>";
-}
-
-$contextdata = (object)array_merge((array)$data, $sessiondata);
-   // If the activity has xAPI state data by the user, include it in the export.
-   writer::with_context($context)->export_data(
-       ['Session info pertaining to user'],
-       (object) $contextdata
-   );
-//////////////////////////////////////
-///////////////////////////////////////////
-            // Now lets try to do specific queries to make it legible to user
-
-            foreach ($tables as $table) {
-                // There could be more than one so lets make this an array like the attempt array in tutorial
-                //$state = $DB->get_record($table, $params);
-                $stateset = $DB->get_recordset($table, $params);
-                foreach ($stateset as $state) {
-
-                    if ($state) {
-
-                        echo "STate in STATE loop ";
-                        echo " stata is ";
-                        //var_dump(json_decode(json_encode($state), true));
-                        var_dump(array($state));
-
-                        echo "< br>";
-                       // $state 
-
-                        $contextdata = (object) array_merge((array($state)),(array) $data);
-
-                        echo "PLEASE WORK";
-                        echo " contextdata is ";
-                        var_dump($contextdata);
-                        echo "< br>";
-
-                        writer::with_context($context)->export_data([$table], (object) $contextdata);
-                    }
-                }
-                // the context->instanceid = cm ->id and the cm.instance equals moodlecourseid
-                // Get user's xAPI state data for the particular context.
-                $state = $DB->get_record('cmi5launch_usercourse', $params);
-
-                echo "PLEASE WORK";
-                echo " state is ";
-                var_dump($state);
-                echo "< br>";
-/*
-                if ($state) {
-                    // If the activity has xAPI state data by the user, include it in the export.
-                    writer::with_context($context)->export_data(
-                        ['privacy:cmi5launch', 'core_cmi5', 'I BEt this makes a third'],
-                        (object) $state
-                    );
-                }*/
-            }
+            // Then add as ONE item in array, that way if there is more than one it unpacks nicely.
+            $sessiondata = ['Session info' => $userfriendly];
         }
 
+        // Combine the course data with the session data.
+        $contextdata = (object)array_merge((array)$data, $sessiondata);
+        
+        // Write data out.
+        writer::with_context($context)->export_data(
+            ['Session info pertaining to user'],
+            (object) $contextdata
+        );
 
-        /*
-        list($contextsql, $contextparams) = $DB->get_in_or_equal($contextlist->get_contextids(), SQL_PARAMS_NAMED);
+        }
 
-        $sql = "SELECT c5l.userid, c5l.moodlecourseid, c5l.registrationid, c5l.ausgrades, c5l.grade
-        FROM {cmi5launch_usercourse} c5l
-        JOIN {course_modules} cm
-        ON cm.id = c5l.moodlecourseid
-        JOIN {context} ctx
-        ON ctx.instanceid = cm.id
-        AND ctx.contextlevel = :modlevel
-        WHERE ctx.id {$contextsql}";
-        // To hold records
-        $records = [];
-        $params = ['modname' => 'cmi5launch', 'userid' => $user->id] + $contextparams;
-     
-       */
     }
 
 
-            /**
+    /**
      * Get the list of contexts that contain user information for the specified user.
      *
      * @param int $userid The user to search.
@@ -458,7 +359,7 @@ $contextdata = (object)array_merge((array)$data, $sessiondata);
         
         global $DB;
 
-                // This should not happen, but just in case.
+        // This should not happen, but just in case.
         if ($context->contextlevel != CONTEXT_MODULE) {
             return;
         }
