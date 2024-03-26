@@ -16,14 +16,28 @@
 
 /* For global cmi5 settings  */
 
+
+/**
+ * Defines the version of cmi5launch
+ *
+ * This code fragment is called by moodle_needs_upgrading() and
+ * /admin/index.php
+ *
+ * @package mod_cmi5launch
+ * @copyright  2023 Megan Bohland
+ * @copyright  Based on work by 2013 Andrew Downes as well as some code from the scorm module (Source code was uncredited).
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+
 defined('MOODLE_INTERNAL') || die;
 
 if ($ADMIN->fulltree) {
     require_once($CFG->dirroot . '/mod/cmi5launch/locallib.php');
     require_once($CFG->dirroot . '/mod/cmi5launch/settingslib.php');
 
-    //MB
-    //From scorm grading stuff
+    // MB
+    // From scorm grading stuff.
     $yesno = array(0 => get_string('no'),
                    1 => get_string('yes'));
 
@@ -40,7 +54,7 @@ if ($ADMIN->fulltree) {
     $options = array(
         1 => get_string('cmi5launchlrsauthentication_option_0', 'cmi5launch'),
         2 => get_string('cmi5launchlrsauthentication_option_1', 'cmi5launch'),
-        0 => get_string('cmi5launchlrsauthentication_option_2', 'cmi5launch')
+        0 => get_string('cmi5launchlrsauthentication_option_2', 'cmi5launch'),
     );
     // Note the numbers above are deliberately mis-ordered for reasons of backwards compatibility with older settings.
 
@@ -77,7 +91,7 @@ if ($ADMIN->fulltree) {
         get_string('cmi5launchuseactoremail', 'cmi5launch'),
         get_string('cmi5launchuseactoremail_help', 'cmi5launch'),
         1));
-    
+
     $settings->add(new admin_setting_configtext_mod_cmi5launch('cmi5launch/cmi5launchplayerurl',
         get_string('cmi5launchplayerurl', 'cmi5launch'),
         get_string('cmi5launchplayerurl_help', 'cmi5launch'),
@@ -101,39 +115,38 @@ if ($ADMIN->fulltree) {
         get_string('cmi5launchtenanttoken_default', 'cmi5launch'));
     $settings->add($setting);
 
-    //MB
-    //Grade stuff I'm bringing over
+    // MB.
+    // Grade stuff I'm bringing over.
         // Default grade settings.
-        $settings->add(new admin_setting_heading('cmi5launch/gradesettings', get_string('defaultgradesettings', 'cmi5launch'), ''));
-        $settings->add(new admin_setting_configselect('cmi5launch/grademethod',
-            get_string('grademethod', 'cmi5launch'), get_string('grademethoddesc', 'cmi5launch'),
-            GRADE_HIGHEST_CMI5, cmi5_get_grade_method_array()));
-    
-        for ($i = 0; $i <= 100; $i++) {
-            $grades[$i] = "$i";
-        }
-    
-        $settings->add(new admin_setting_configselect('cmi5launch/maxgrade',
-            get_string('maximumgrade'), get_string('maximumgradedesc', 'cmi5launch'), 100, $grades));
-    
-        $settings->add(new admin_setting_heading('cmi5launch/othersettings', get_string('defaultothersettings', 'cmi5launch'), ''));
-    
-        // Default attempts settings.
-        $settings->add(new admin_setting_configselect('cmi5launch/maxattempt',
-            get_string('maximumattempts', 'cmi5launch'), '', '0', cmi5_get_attempts_array()), get_string('whatmaxdesc', 'cmi5launch'),);
-    
-        $settings->add(new admin_setting_configselect('cmi5launch/whatgrade',
-            get_string('whatgrade', 'cmi5launch'), get_string('whatgradedesc', 'cmi5launch'), HIGHEST_ATTEMPT_CMI5, cmi5_get_what_grade_array()));
+    $settings->add(new admin_setting_heading('cmi5launch/gradesettings', get_string('defaultgradesettings', 'cmi5launch'), ''));
+    $settings->add(new admin_setting_configselect('cmi5launch/grademethod',
+        get_string('grademethod', 'cmi5launch'), get_string('grademethoddesc', 'cmi5launch'),
+        MOD_CMI5LAUNCH_GRADE_HIGHEST, cmi5launch_get_grade_method_array()));
 
-        //Not sure if we wan to implement mastery override? -MB
-        /*
-        $settings->add(new admin_setting_configselect('cmi5launch/masteryoverride',
-            get_string('masteryoverride', 'cmi5launch'), get_string('masteryoverridedesc', 'cmi5launch'), 1, $yesno));
-            */
-        
-        $settings->add(new admin_setting_configselect('cmi5launch/last_attempt_cmi5lock',
-            get_string('last_attempt_cmi5_lock', 'cmi5launch'), get_string('last_attempt_cmi5_lockdesc', 'cmi5launch'), 0, $yesno));
+    for ($i = 0; $i <= 100; $i++) {
+        $grades[$i] = "$i";
+    }
 
+    $settings->add(new admin_setting_configselect('cmi5launch/maxgrade',
+        get_string('maximumgrade'), get_string('maximumgradedesc', 'cmi5launch'), 100, $grades));
 
+    $settings->add(new admin_setting_heading('cmi5launch/othersettings', get_string('defaultothersettings', 'cmi5launch'), ''));
 
+    // Default attempts settings.
+    $settings->add(new admin_setting_configselect('cmi5launch/maxattempt',
+        get_string('maximumattempts', 'cmi5launch'), '', '0', cmi5launch_get_attempts_array()),
+        get_string('whatmaxdesc', 'cmi5launch'), );
+
+    $settings->add(new admin_setting_configselect('cmi5launch/whatgrade',
+        get_string('whatgrade', 'cmi5launch'), get_string('whatgradedesc', 'cmi5launch'),
+        MOD_CMI5LAUNCH_HIGHEST_ATTEMPT, cmi5launch_get_what_grade_array()));
+
+    // Not sure if we want to implement mastery override at this time -MB.
+    /*
+    $settings->add(new admin_setting_configselect('cmi5launch/masteryoverride',
+    get_string('masteryoverride', 'cmi5launch'), get_string('masteryoverridedesc', 'cmi5launch'), 1, $yesno));
+    */
+
+    $settings->add(new admin_setting_configselect('cmi5launch/MOD_CMI5LAUNCH_LAST_ATTEMPTlock',
+        get_string('mod_cmi5launch_last_attempt_lock', 'cmi5launch'), get_string('mod_cmi5launch_last_attempt_lockdesc', 'cmi5launch'), 0, $yesno));
 }

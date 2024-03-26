@@ -21,7 +21,8 @@
  * if you like, and it can span multiple lines.
  *
  * @package mod_cmi5launch
- * @copyright  2013 Andrew Downes
+ * @copyright 2024 Megan Bohland
+ * @copyright  Based on work by 2013 Andrew Downes
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -77,7 +78,7 @@ foreach ($cmi5launchs as $cmi5launch) {
             format_string($cmi5launch->name, true));
     }
 
-    if ($course->format == 'weeks' or $course->format == 'topics') {
+    if ($course->format == 'weeks' || $course->format == 'topics') {
         $table->data[] = array($cmi5launch->section, $link);
     } else {
         $table->data[] = array($link);

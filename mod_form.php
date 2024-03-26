@@ -21,7 +21,8 @@
  * visit: http://docs.moodle.org/en/Development:lib/formslib.php
  *
  * @package mod_cmi5launch
- * @copyright  2013 Andrew Downes
+ * @copyright  2023 Bohland
+ * @copyright  Based on work by 2013 Andrew Downes
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -69,25 +70,26 @@ class mod_cmi5launch_mod_form extends moodleform_mod {
         );
 
         // Start required Fields for Activity.
+        /*
         $mform->addElement('text', 'cmi5launchurl', get_string('cmi5launchurl', 'cmi5launch'), array('size' => '64'));
         $mform->setType('cmi5launchurl', PARAM_TEXT);
         $mform->addRule('cmi5launchurl', null, 'required', null, 'client');
         $mform->addRule('cmi5launchurl', get_string('maximumchars', '', 1333), 'maxlength', 1333, 'client');
         $mform->addHelpButton('cmi5launchurl', 'cmi5launchurl', 'cmi5launch');
         $mform->setDefault('cmi5launchurl', 'https://example.com/example-activity/index.html');
-        
-        
+
         $mform->addElement('text', 'cmi5activityid', get_string('cmi5activityid', 'cmi5launch'), array('size' => '64'));
         $mform->setType('cmi5activityid', PARAM_TEXT);
         $mform->addRule('cmi5activityid', null, 'required', null, 'client');
         $mform->addRule('cmi5activityid', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
         $mform->addHelpButton('cmi5activityid', 'cmi5activityid', 'cmi5launch');
         $mform->setDefault('cmi5activityid', 'https://example.com/example-activity');
+        */
         // End required Fields for Activity.
 
         // New local package upload.
 
-        //Ok, this is making an array of filemanager
+        // This is making an array of filemanager.
         $filemanageroptions = array();
         $filemanageroptions['accepted_types'] = array('.zip');
         $filemanageroptions['maxbytes'] = 0;
@@ -105,92 +107,6 @@ class mod_cmi5launch_mod_form extends moodleform_mod {
 
         // Start advanced settings.
         $mform->addElement('header', 'lrsheading', get_string('lrsheading', 'cmi5launch'));
-
-        $mform->addElement(
-            'static',
-            'description',
-            get_string('lrsdefaults', 'cmi5launch'),
-            get_string('lrssettingdescription', 'cmi5launch')
-        );
-
-        // Override default LRS settings.
-        $mform->addElement('advcheckbox', 'overridedefaults', get_string('overridedefaults', 'cmi5launch'));
-        $mform->addHelpButton('overridedefaults', 'overridedefaults', 'cmi5launch');
-
-        // Add LRS endpoint.
-        $mform->addElement(
-            'text',
-            'cmi5launchlrsendpoint',
-            get_string('cmi5launchlrsendpoint', 'cmi5launch'),
-            array('size' => '64')
-        );
-        $mform->setType('cmi5launchlrsendpoint', PARAM_TEXT);
-        $mform->addRule('cmi5launchlrsendpoint', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
-        $mform->addHelpButton('cmi5launchlrsendpoint', 'cmi5launchlrsendpoint', 'cmi5launch');
-        $mform->setDefault('cmi5launchlrsendpoint', $cfgcmi5launch->cmi5launchlrsendpoint);
-        $mform->disabledIf('cmi5launchlrsendpoint', 'overridedefaults');
-
-        // Add LRS Authentication.
-        $authoptions = array(
-            1 => get_string('cmi5launchlrsauthentication_option_0', 'cmi5launch'),
-            2 => get_string('cmi5launchlrsauthentication_option_1', 'cmi5launch'),
-            0 => get_string('cmi5launchlrsauthentication_option_2', 'cmi5launch')
-        );
-        $mform->addElement(
-            'select',
-            'cmi5launchlrsauthentication',
-            get_string('cmi5launchlrsauthentication', 'cmi5launch'),
-            $authoptions
-        );
-        $mform->disabledIf('cmi5launchlrsauthentication', 'overridedefaults');
-        $mform->addHelpButton('cmi5launchlrsauthentication', 'cmi5launchlrsauthentication', 'cmi5launch');
-        $mform->getElement('cmi5launchlrsauthentication')->setSelected($cfgcmi5launch->cmi5launchlrsauthentication);
-
-        $mform->addElement(
-            'static',
-            'description',
-            get_string('cmi5launchlrsauthentication_watershedhelp_label', 'cmi5launch'),
-            get_string('cmi5launchlrsauthentication_watershedhelp', 'cmi5launch')
-        );
-
-        // Add basic authorisation login.
-        $mform->addElement(
-            'text',
-            'cmi5launchlrslogin',
-            get_string('cmi5launchlrslogin', 'cmi5launch'),
-            array('size' => '64')
-        );
-        $mform->setType('cmi5launchlrslogin', PARAM_TEXT);
-        $mform->addRule('cmi5launchlrslogin', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
-        $mform->addHelpButton('cmi5launchlrslogin', 'cmi5launchlrslogin', 'cmi5launch');
-        $mform->setDefault('cmi5launchlrslogin', $cfgcmi5launch->cmi5launchlrslogin);
-        $mform->disabledIf('cmi5launchlrslogin', 'overridedefaults');
-
-        // Add basic authorisation pass.
-        $mform->addElement(
-            'password',
-            'cmi5launchlrspass',
-            get_string('cmi5launchlrspass', 'cmi5launch'),
-            array('size' => '64')
-        );
-        $mform->setType('cmi5launchlrspass', PARAM_TEXT);
-        $mform->addRule('cmi5launchlrspass', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
-        $mform->addHelpButton('cmi5launchlrspass', 'cmi5launchlrspass', 'cmi5launch');
-        $mform->setDefault('cmi5launchlrspass', $cfgcmi5launch->cmi5launchlrspass);
-        $mform->disabledIf('cmi5launchlrspass', 'overridedefaults');
-
-        // Duration.
-        $mform->addElement(
-            'text',
-            'cmi5launchlrsduration',
-            get_string('cmi5launchlrsduration', 'cmi5launch'),
-            array('size' => '64')
-        );
-        $mform->setType('cmi5launchlrsduration', PARAM_TEXT);
-        $mform->addRule('cmi5launchlrsduration', get_string('maximumchars', '', 5), 'maxlength', 5, 'client');
-        $mform->addHelpButton('cmi5launchlrsduration', 'cmi5launchlrsduration', 'cmi5launch');
-        $mform->setDefault('cmi5launchlrsduration', $cfgcmi5launch->cmi5launchlrsduration);
-        $mform->disabledIf('cmi5launchlrsduration', 'overridedefaults');
 
         // Actor account homePage.
         $mform->addElement(
@@ -248,8 +164,8 @@ class mod_cmi5launch_mod_form extends moodleform_mod {
         $mform->addGroupRule(
             'completionverbgroup', array(
                 'cmi5verbid' => array(
-                    array(get_string('maximumchars', '', 255), 'maxlength', 255, 'client')
-                )
+                    array(get_string('maximumchars', '', 255), 'maxlength', 255, 'client'),
+                ),
             )
         );
 
@@ -278,8 +194,8 @@ class mod_cmi5launch_mod_form extends moodleform_mod {
         $mform->addGroupRule(
             'completionexpirygroup', array(
                 'cmi5expiry' => array(
-                    array(get_string('maximumchars', '', 10), 'maxlength', 10, 'client')
-                )
+                    array(get_string('maximumchars', '', 10), 'maxlength', 10, 'client'),
+                ),
             )
         );
 
