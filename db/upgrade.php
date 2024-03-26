@@ -42,6 +42,28 @@ function xmldb_cmi5launch_upgrade($oldversion) {
     global $DB;
     $dbman = $DB->get_manager();
 
+    if ($oldversion < 2024032112) {
+
+        // Define index lmsid (not unique) to be dropped form cmi5launch_sessions.
+        $table = new xmldb_table('cmi5launch_sessions');
+        $indexold = new xmldb_index('lmsid', XMLDB_INDEX_NOTUNIQUE, ['lmsid']);
+
+        // Conditionally launch drop index lmsid.
+        if ($dbman->index_exists($table, $indexold)) {
+            $dbman->drop_index($table, $indexold);
+        }
+        
+        // Define index lmsid (not unique) to be added to cmi5launch_sessions.
+        $indexnew = new xmldb_index('sessionid', XMLDB_INDEX_NOTUNIQUE, ['sessionid']);
+
+        // Conditionally launch add index lmsid.
+        if (!$dbman->index_exists($table, $indexnew)) {
+            $dbman->add_index($table, $indexnew);
+        }
+
+        // Cmi5launch savepoint reached.
+        upgrade_mod_savepoint(true, 2024032112, 'cmi5launch');
+    }
 
     if ($oldversion < 2024030615) {
 

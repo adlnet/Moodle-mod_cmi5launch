@@ -108,7 +108,7 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="lmsid" UNIQUE="false" FIELDS="lmsid"/>
+        <INDEX NAME="sessionid" UNIQUE="false" FIELDS="sessionid"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="cmi5launch_aus" COMMENT="Stores a courses AUs">

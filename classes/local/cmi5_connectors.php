@@ -74,13 +74,15 @@ class cmi5_connectors {
         $databody = $filename->get_content();
         // Sends the stream to the specified URL.
         $result = $this->cmi5launch_send_request_to_cmi5_player_post($databody, $url, $filetype, $tenanttoken);
-
+     
         // Check result and display message if not 200.
         $resulttest = $this->cmi5launch_connectors_error_message($result, "creating the course");
 
         if ($resulttest == true) {
             // Return an array with course info.
             return $result;
+        } else {
+            return false;
         }
     }
 
@@ -464,12 +466,23 @@ class cmi5_connectors {
             $resulttest = $resulttotest;
         }
 
-        if ($resulttest === false || array_key_exists("statusCode", $resulttest) && $resulttest["statusCode"] != 200) {
+        // I think splittin these to return two seperate messages deppennnding on whether player is running is better.
+        // Player cannot return an error if not runnin,
+        if ($resulttest === false ){
 
             echo "<br>";
 
-            echo "Something went wrong " . $type . ". CMI5 Player returned " . var_dump($resulttotest);
+            echo "Something went wrong " . $type . ". CMI5 Player is not communicating. Is it running?";
 
+            echo "<br>";
+
+        }
+        else if( array_key_exists("statusCode", $resulttest) && $resulttest["statusCode"] != 200) {
+
+            echo "<br>";
+
+            echo "Something went wrong " . $type . ". CMI5 Player returned " . $resulttotest["statusCode"] . " error. With message '" 
+                . $resulttotest["message"] . "'." ;
             echo "<br>";
 
             return false;
