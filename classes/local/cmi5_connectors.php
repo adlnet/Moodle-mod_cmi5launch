@@ -120,6 +120,8 @@ class cmi5_connectors {
 
             // Return an array with tenant name and info.
             return $returnedinfo;
+        } else {
+            return false;
         };
     }
 
@@ -151,6 +153,8 @@ class cmi5_connectors {
         if ($resulttest == true) {
 
             return $result;
+        } else {
+            return false;
         }
     }
 
@@ -209,6 +213,8 @@ class cmi5_connectors {
             $registration = $registrationinfo["code"];
 
             return $registration;
+        } else {
+            return false;
         }
     }
 
@@ -238,11 +244,13 @@ class cmi5_connectors {
         $result = $this->cmi5launch_send_request_to_cmi5_player_post($data, $url, $filetype, $username, $password);
 
         // Check result and display message if not 200.
-        $resulttest = $this->cmi5launch_connectors_error_message($result, "retrieving the registration");
+        $resulttest = $this->cmi5launch_connectors_error_message($result, "retrieving the token");
 
         if ($resulttest == true) {
 
             return $result;
+        } else {
+            return false;
         }
     }
 
@@ -271,6 +279,7 @@ class cmi5_connectors {
         $playerurl = $settings['cmi5launchplayerurl'];
         $courseid = $userscourse->courseid;
 
+    
         // Build URL for launch URL request.
         $url = $playerurl . "/api/v1/course/" . $courseid  ."/launch-url/" . $auindex;
 
@@ -303,6 +312,8 @@ class cmi5_connectors {
             $urldecoded = json_decode($result, true);
 
             return $urldecoded;
+        } else {
+            return false;
         }
     }
 
@@ -324,13 +335,14 @@ class cmi5_connectors {
         } else if ("json") {
             $contenttype = "application/json\r\n";
         }
-
+   
         // If number of args is greater than one it is for retrieving tenant info and args are username and password.
         if (count($tokenorpassword) == 2 ) {
 
             $username = $tokenorpassword[0];
             $password = $tokenorpassword[1];
 
+        
             // Use key 'http' even if you send the request to https://...
             // There can be multiple headers but as an array under the ONE header.
             // Content(body) must be JSON encoded here, as that is what CMI5 player accepts.
@@ -344,13 +356,11 @@ class cmi5_connectors {
                 ),
             );
 
-            // The options are here placed into a stream to be sent.
-            $context  = stream_context_create($options);
-
             // Sends the stream to the specified URL and stores results.
             // The false is use_include_path, which we dont want in this case, we want to go to the url.
-            $result = file_get_contents( $url, false, $context );
+            $result = $this->cmi5launch_stream_and_send( $url, $options );
 
+            
             // Else the args are what we need for posting a course.
         } else {
 
@@ -372,12 +382,11 @@ class cmi5_connectors {
                 ),
             );
 
-            // The options are placed into a stream to be sent.
-            $context  = stream_context_create(($options));
+
 
             // Sends the stream to the specified URL and stores results.
             // The false is use_include_path, which we dont want in this case, we want to go to the url.
-            $result = file_get_contents( $url, false, $context );
+            $result = $this->cmi5launch_stream_and_send( $url, $options );
 
         }
 
@@ -406,14 +415,14 @@ class cmi5_connectors {
             ),
         );
 
-        // The options are here placed into a stream to be sent.
-        $context  = stream_context_create(($options));
 
-        // Sends the stream to the specified URL and stores results. False is to not use_include_path, we want to go to the url.
-        $launchresponse = file_get_contents( $url, false, $context );
+        // Sends the stream to the specified URL and stores results.
+        // The false is use_include_path, which we dont want in this case, we want to go to the url.
+        $launchresponse = $this->cmi5launch_stream_and_send( $url, $options );
 
         $sessiondecoded = json_decode($launchresponse, true);
 
+        // Return response.
         return $sessiondecoded;
     }
 
@@ -444,6 +453,8 @@ class cmi5_connectors {
         if ($resulttest == true) {
 
             return $result;
+        } else {
+            return false;
         }
     }
 
@@ -456,7 +467,7 @@ class cmi5_connectors {
      * @param string $type - The type missing to be added to the error message.
      * @return bool
      */
-    public function cmi5launch_connectors_error_message($resulttotest, $type) {
+    public static function cmi5launch_connectors_error_message($resulttotest, $type) {
 
         // Decode result because if it is not 200 then something went wrong
         // If it's a string, decode it.
@@ -476,13 +487,14 @@ class cmi5_connectors {
 
             echo "<br>";
 
+            return false;
         }
         else if( array_key_exists("statusCode", $resulttest) && $resulttest["statusCode"] != 200) {
 
             echo "<br>";
 
-            echo "Something went wrong " . $type . ". CMI5 Player returned " . $resulttotest["statusCode"] . " error. With message '" 
-                . $resulttotest["message"] . "'." ;
+            echo "Something went wrong " . $type . ". CMI5 Player returned " . $resulttest["statusCode"] . " error. With message '" 
+                . $resulttest["message"] . "'." ;
             echo "<br>";
 
             return false;
@@ -491,5 +503,28 @@ class cmi5_connectors {
             // No errors, continue.
             return true;
         }
+    }
+
+    /**
+     * Wrapper function to allow for testing where file_get_contents cannot be overriden.
+     * Also has create_stream as this makes a resource which interfers with testing.
+     * @param mixed $url - the url to be sent to 
+     * @param mixed $use_include_path
+     * @param mixed $context - the data to be sent
+     * @param mixed $offset
+     * @param mixed $maxlen
+     * @return mixed $result - either a string or false.
+     */
+    public function cmi5launch_stream_and_send($options, $url) {
+
+        // The options are placed into a stream to be sent.
+        $context  = stream_context_create(($options));
+
+        // Sends the stream to the specified URL and stores results.
+        // The false is use_include_path, which we dont want in this case, we want to go to the url.
+        $result = file_get_contents( $url, false, $context );
+
+        // Return result.
+        return $result;
     }
 }

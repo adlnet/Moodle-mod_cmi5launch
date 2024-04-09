@@ -166,8 +166,7 @@ if ($exists == false) {
     $userscourse->id = $newid;
 
 } else { // Record exists.
-    echo" cm is $cm->instance";
-    echo" cmi5launch id is $cmi5launch->id";
+
     // We have a record, so we need to retrieve it.
     $userscourse = $DB->get_record('cmi5launch_usercourse', ['courseid'  => $record->courseid, 'userid'  => $USER->id]);
 
