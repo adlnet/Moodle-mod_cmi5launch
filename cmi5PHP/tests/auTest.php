@@ -98,7 +98,11 @@ class auTest extends TestCase
 
     }
 
-
+    /**
+     * Test of AU constructor class
+     * Should instantiate an AU object with no values.
+     * @return void
+     */
     public function testInstantiationWithEmpty()
     {
         $obj = new au($this->emptyStatement);
@@ -122,6 +126,12 @@ class auTest extends TestCase
         }
 
     }
+
+    /**
+     * Test of AU constructor class
+     * Should instantiate an AU object with values.
+     * @return void
+     */
 
     public function testInstantiationWithValues()
     {
