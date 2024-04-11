@@ -38,13 +38,20 @@ class auTest extends TestCase
             'masteryscore',
             'satisfied',
             'launchurl',
-            'sessionid',
             'sessions',
             'progress',
             'noattempt',
             'completed',
             'passed',
-            'masteryScore', 'inprogress', 'launchMethod', 'lmsId', 'moveOn', 'auIndex', 'activityType' 
+            'masteryScore', 
+            'inprogress', 
+            'launchMethod', 
+            'lmsId', 
+            'moveOn', 
+            'auIndex', 
+            'activityType',
+            'moodlecourseid',
+            'userid' 
         );
 
         $this->emptyStatement = array();
@@ -69,23 +76,33 @@ class auTest extends TestCase
             'masteryscore' => 'masteryscore',
             'satisfied' => 'satisfied',
             'launchurl' => 'launchurl',
-            'sessionid' => 'sessionid',
             'sessions' => 'sessions',
             'progress' => 'progress',
             'noattempt' => 'noattempt',
             'completed' => 'completed',
             'passed' => 'passed',
             'inprogress' => 'inprogress',
-            'masteryScore' => 'masteryScore', 'launchMethod' => 'launchMethod', 'lmsId' => 'lmsId', 'moveOn' => 'moveOn', 'auIndex' => 'auIndex', 'activityType' => 'activityType' 
+            'masteryScore' => 'masteryScore', 
+            'launchMethod' => 'launchMethod', 
+            'lmsId' => 'lmsId', 
+            'moveOn' => 'moveOn', 
+            'auIndex' => 'auIndex', 
+            'activityType' => 'activityType',
+            'moodlecourseid' => 'moodlecourseid',
+            'userid' => 'userid'
         );
     }
 
     protected function tearDown(): void
     {
-        //  $this->example = null;
+
     }
 
-
+    /**
+     * Test of AU constructor class
+     * Should instantiate an AU object with no values.
+     * @return void
+     */
     public function testInstantiationWithEmpty()
     {
         $obj = new au($this->emptyStatement);
@@ -109,6 +126,12 @@ class auTest extends TestCase
         }
 
     }
+
+    /**
+     * Test of AU constructor class
+     * Should instantiate an AU object with values.
+     * @return void
+     */
 
     public function testInstantiationWithValues()
     {

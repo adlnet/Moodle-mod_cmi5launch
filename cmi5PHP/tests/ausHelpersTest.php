@@ -122,7 +122,7 @@ class ausHelpersTest extends TestCase
 
     protected function tearDown(): void
     {
-        //  $this->example = null;
+         
     }
 
 
@@ -291,12 +291,21 @@ class ausHelpersTest extends TestCase
     public function testcmi5launch_save_aus()
     {
 
+        // Make a global variable to hold the id's to pretend to be cmi5launch instance id.
+        global $cmi5launch;
+
+        $cmi5launch = new \stdClass();
+        $cmi5launch->id = 1;
+      //  $cmi5launch->id = 1;
+
         // The func should return auids created by the DB when AU's were saved in array format.
         $helper = new au_helpers();
 
         //Lets create 4 aus statement
         for ($i = 0; $i < 3; $i++) {
             $testAus[$i][] = $this->mockStatement2;
+           // $testAus[$i][] = ($this->$cmi5launch);
+        //    $testAus = array_merge($testAus, $cmi5launch);
         }
 
         //So now with this fake 'statement', lets ensure it pulls the correct value which is "correct Retrieval"
