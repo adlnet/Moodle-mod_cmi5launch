@@ -42,7 +42,8 @@ class grade_helpers {
 
     /**
      * Takes in an array of scores and returns the average grade.
-     * @param mixed $scores
+     * @param mixed $scores - either an array of numbers or string of numbers to be converted to array
+     *                      - or a singular int.
      * @return int
      */
     public function cmi5launch_average_grade($scores) {
@@ -51,20 +52,42 @@ class grade_helpers {
 
         // If it comes in as string, convert to array.
         if (is_string($scores)) {
+            
             $scores = json_decode($scores, true);
+            echo"<br>";
+            echo "Scores were a string and are: ";
+            var_dump($scores);
+            echo "<br>";
         }
+
         // If it isn't an array it (array_sum) doesn't work.
         if (!$scores == null && is_array($scores)) {
 
             // Find the average of the scores.
             $averagegrade = (array_sum($scores) / count($scores));
-
+            echo "<br>";
+            echo "Average grade in 1 branch: ";
+            echo $averagegrade;
+            echo "<br>";
         } else if (!$scores == null && !is_array($scores)) {
 
+            echo "<br>";
+            echo "Average grade in 2 branch before it becomes average rade: ";
+            echo $scores;
+            echo "<br>";
             // If it's an int, it's a single value so average is itself.
             $averagegrade = $scores;
+
+            echo "<br>";
+            echo "Average grade in 2 branch: ";
+            echo $averagegrade;
+            echo "<br>";
         } else {
             $averagegrade = 0;
+            echo "<br>";
+            echo "Average grade in 3 branch: ";
+            echo $averagegrade;
+            echo "<br>";
         }
 
         // Now apply intval.

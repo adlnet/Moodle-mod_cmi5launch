@@ -36,3 +36,4 @@ $plugin->cron      = 0;               // Period for cron to check this module (s
 $plugin->component = 'mod_cmi5launch'; // To check on upgrade, that module sits in correct place.
 $plugin->maturity = MATURITY_STABLE;
 $plugin->release = '1.3RC2 (Build: 2016060300)';
+          

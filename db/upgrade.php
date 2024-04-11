@@ -89,9 +89,7 @@ function xmldb_cmi5launch_upgrade($oldversion) {
             $dbman->add_field($table, $fieldmcid);
         }
         }
-
- 
-
+        
         // Cmi5launch savepoint reached.
         upgrade_mod_savepoint(true, 2024030615, 'cmi5launch');
     }
