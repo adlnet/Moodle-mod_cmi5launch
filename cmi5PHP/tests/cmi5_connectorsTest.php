@@ -1047,5 +1047,6 @@ class cmi5_connectorsTest extends TestCase
          $this->assertTrue($result, "Expected retrieved object to be true");
     }
 
+
 }
     
