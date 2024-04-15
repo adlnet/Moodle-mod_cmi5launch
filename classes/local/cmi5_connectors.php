@@ -524,6 +524,11 @@ class cmi5_connectors {
         // The false is use_include_path, which we dont want in this case, we want to go to the url.
         $result = file_get_contents( $url, false, $context );
 
+        echo "<br>";
+        echo " Dumping error message from player: ";
+        var_dump($result);
+        echo "<br>";
+        
         // Return result.
         return $result;
     }
