@@ -358,7 +358,7 @@ class cmi5_connectors {
 
             // Sends the stream to the specified URL and stores results.
             // The false is use_include_path, which we dont want in this case, we want to go to the url.
-            $result = $this->cmi5launch_stream_and_send( $url, $options );
+            $result = $this->cmi5launch_stream_and_send( $options, $url );
 
             
             // Else the args are what we need for posting a course.
@@ -386,7 +386,7 @@ class cmi5_connectors {
 
             // Sends the stream to the specified URL and stores results.
             // The false is use_include_path, which we dont want in this case, we want to go to the url.
-            $result = $this->cmi5launch_stream_and_send( $url, $options );
+            $result = $this->cmi5launch_stream_and_send( $options, $url);
 
         }
 
@@ -418,7 +418,7 @@ class cmi5_connectors {
 
         // Sends the stream to the specified URL and stores results.
         // The false is use_include_path, which we dont want in this case, we want to go to the url.
-        $launchresponse = $this->cmi5launch_stream_and_send( $url, $options );
+        $launchresponse = $this->cmi5launch_stream_and_send( $options, $url );
 
         $sessiondecoded = json_decode($launchresponse, true);
 
@@ -518,7 +518,7 @@ class cmi5_connectors {
     public function cmi5launch_stream_and_send($options, $url) {
 
         // The options are placed into a stream to be sent.
-        $context  = stream_context_create(($options));
+        $context  = stream_context_create($options);
 
         // Sends the stream to the specified URL and stores results.
         // The false is use_include_path, which we dont want in this case, we want to go to the url.

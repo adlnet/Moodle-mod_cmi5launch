@@ -54,10 +54,6 @@ class grade_helpers {
         if (is_string($scores)) {
             
             $scores = json_decode($scores, true);
-            echo"<br>";
-            echo "Scores were a string and are: ";
-            var_dump($scores);
-            echo "<br>";
         }
 
         // If it isn't an array it (array_sum) doesn't work.
@@ -65,29 +61,15 @@ class grade_helpers {
 
             // Find the average of the scores.
             $averagegrade = (array_sum($scores) / count($scores));
-            echo "<br>";
-            echo "Average grade in 1 branch: ";
-            echo $averagegrade;
-            echo "<br>";
+
         } else if (!$scores == null && !is_array($scores)) {
 
-            echo "<br>";
-            echo "Average grade in 2 branch before it becomes average rade: ";
-            echo $scores;
-            echo "<br>";
             // If it's an int, it's a single value so average is itself.
             $averagegrade = $scores;
 
-            echo "<br>";
-            echo "Average grade in 2 branch: ";
-            echo $averagegrade;
-            echo "<br>";
         } else {
             $averagegrade = 0;
-            echo "<br>";
-            echo "Average grade in 3 branch: ";
-            echo $averagegrade;
-            echo "<br>";
+           
         }
 
         // Now apply intval.
@@ -150,21 +132,21 @@ class grade_helpers {
         // Check if record already exists.
         $exists = $DB->record_exists('cmi5launch_usercourse', ['courseid' => $cmi5launch->courseid, 'userid' => $user->id]);
 
-        // If it exists, we want to update it.
+            // If it exists, we want to update it.
         if (!$exists == false) {
 
             // Retrieve the record.
             $userscourse = $DB->get_record('cmi5launch_usercourse', ['courseid' => $cmi5launch->courseid, 'userid' => $user->id]);
 
             // User record may be null if user has not participated in course yet.
-            if (!$userscourse == null) {
+            //if (!$userscourse == null) {
+            // should never be null if exosts? 
+            // Retrieve AU ids.
+            $auids = (json_decode($userscourse->aus));
 
-                // Retrieve AU ids.
-                $auids = (json_decode($userscourse->aus));
-
-                // Array to hold AU scores.
-                $auscores = array();
-                $overallgrade = array();
+            // Array to hold AU scores.
+            $auscores = array();
+            $overallgrade = array();
 
                 // Go through each Au, each Au will be responsible for updating its own session.
                 foreach ($auids as $key => $auid) {
@@ -251,7 +233,7 @@ class grade_helpers {
                 // Update course record.
                 $userscourse->ausgrades = json_encode($auscores);
                 $DB->update_record("cmi5launch_usercourse", $userscourse);
-            }
+         //   }
 
             // Return scores.
             return $overallgrade;
