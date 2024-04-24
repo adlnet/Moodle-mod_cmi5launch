@@ -201,6 +201,7 @@ function deletetestcmi5launch_sessions($ids)
 	$aus = array();
 	for ($i = 0; $i < 5; $i++) {
 	
+		$toaddtostring = strval($i);
 	// Add i to each value so the AUs are unique.
 	$mockvalues = array(
 		'id' => 'id' . $i,
@@ -215,7 +216,7 @@ function deletetestcmi5launch_sessions($ids)
 		'auindex' =>  $i,
 		'parents' => 'parents' . $i,
 		'objectives' => 'objectives' . $i,
-		'description' =>  array(0 => array('description' => $i)),
+		'description' =>  array(0 => array('text' => $i)),
 		'activitytype' => 'activitytype' . $i,
 		'launchmethod' => 'method' . $i,
 		'masteryscore' =>  $i,
@@ -238,6 +239,18 @@ function deletetestcmi5launch_sessions($ids)
 	// Now save the fake aus to the test database
 	$auhelper = new au_helpers();
 	$saveau = $auhelper->get_cmi5launch_save_aus();	
+
+	// Ok what the hack is going on here with saveaus
+	/*echo"<br>";
+	echo " Well let sprint them like the save aus wopuld separate them, ";
+	foreach ($aus as $auobject) {
+		echo "<br>";
+		echo "AU ID: " . $auobject->id;
+		var_dump($auobject);
+		echo"<br>";
+	}
+	echo"<br>";
+*/
 	// Save AUs to test DB and save IDs.
 	$newauids = $saveau($aus);
     
@@ -291,35 +304,35 @@ function deletetestcmi5launch_sessions($ids)
 	for ($i = 0; $i < 5; $i++) {
 
 		$sessionid[] = $i;
-	
+		//$toaddtostring = strval($i);
 	// Add i to each value so the AUs are unique.
 	// Mock values to make sessions.
 	$mockvalues = array(
-		'id' => 'id' + $i,
-		'sessionid' =>  'sessionid' + $i,
-		'userid' => 'userid' + $i,
-		'moodlecourseid' => 'moodlecourseid' + $i,
-		'registrationscoursesausid' => 'registrationscoursesausid' + $i,
-		'tenantname' => 'tenantname' + $i,
-		'createdat' => 'createdat' + $i,
-		'updatedat' => 'updatedat' + $i,
-		'code' => 'code' + $i,
-		'launchtokenid' => 'launchtokenid' + $i,
-		'lastrequesttime' => 'lastrequesttime' + $i,
-		'launchmode' => 'launchmode' + $i,
-		'masteryscore' => 'masteryscore' + $i,
-		'score' => 'score' + $i,
-		'islaunched' => 'islaunched' + $i,
-		'isinitialized' => 'isinitialized' + $i,
-		'duration' => 'duration' + $i,
-		'iscompleted' => 'iscompleted' + $i,
-		'ispassed' => 'ispassed' + $i,
-		'isfailed' => 'isfailed' + $i,
-		'isterminated' => 'isterminated' + $i,
-		'isabandoned' => 'isabandoned' + $i,
-		'progress' => 'progress' + $i,
-		'launchmethod' => 'launchmethod' + $i,
-		'launchurl' => 'launchurl' + $i,
+		'id' => $i,
+		'sessionid' =>  'sessionid' . $i,
+		'userid' => 'userid' . $i,
+		'moodlecourseid' => 'moodlecourseid' . $i,
+		'registrationscoursesausid' => 'registrationscoursesausid' . $i,
+		'tenantname' => 'tenantname' . $i,
+		'createdat' => 'createdat' . $i,
+		'updatedat' => 'updatedat' . $i,
+		'code' => 'code' . $i,
+		'launchtokenid' => 'launchtokenid' . $i,
+		'lastrequesttime' => 'lastrequesttime' . $i,
+		'launchmode' => 'launchmode' . $i,
+		'masteryscore' => 'masteryscore' . $i,
+		'score' => 'score' . $i,
+		'islaunched' => 'islaunched' . $i,
+		'isinitialized' => 'isinitialized' . $i,
+		'duration' => 'duration' . $i,
+		'iscompleted' => 'iscompleted' . $i,
+		'ispassed' => 'ispassed' . $i,
+		'isfailed' => 'isfailed' . $i,
+		'isterminated' => 'isterminated' . $i,
+		'isabandoned' => 'isabandoned' . $i,
+		'progress' => 'progress' . $i,
+		'launchmethod' => 'launchmethod' . $i,
+		'launchurl' => 'launchurl' . $i,
 	);
 		$sessions[] = new session($mockvalues);
 	}
@@ -333,7 +346,7 @@ function deletetestcmi5launch_sessions($ids)
 // Retrieve the launch url.
 $launchurl = 'testurl';
 // And launch method.
-$launchmethod = 'testlaunchmethod';
+$launchmethod = 'testmethod';
 
 
 // Now save the fake sessions to the test database
@@ -342,7 +355,7 @@ $createsession = $sessionhelper->cmi5launch_get_create_session();
 
 	// For each session id in the list, create a session.
 	foreach ($sessionid as $id) {
-		$createsession($sessionid, $launchurl, $launchmethod);
+		$createsession($id, $launchurl, $launchmethod);
 	}
 	// Save AUs to test DB and save IDs.
 	//$newauids = $createsession($aus);

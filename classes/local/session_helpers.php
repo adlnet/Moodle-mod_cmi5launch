@@ -124,6 +124,7 @@ class session_helpers {
         // And userid!
         $newrecord->userid = $USER->id;
 
+      
         // Save record to table.
         $DB->insert_record($table, $newrecord, true);
     }
