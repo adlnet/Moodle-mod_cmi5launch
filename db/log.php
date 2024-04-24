@@ -31,5 +31,5 @@ $logs = array(
     array('module' => 'cmi5launch', 'action' => 'add', 'mtable' => 'cmi5launch', 'field' => 'name'),
     array('module' => 'cmi5launch', 'action' => 'update', 'mtable' => 'cmi5launch', 'field' => 'name'),
     array('module' => 'cmi5launch', 'action' => 'view', 'mtable' => 'cmi5launch', 'field' => 'name'),
-    array('module' => 'cmi5launch', 'action' => 'view all', 'mtable' => 'cmi5launch', 'field' => 'name')
+    array('module' => 'cmi5launch', 'action' => 'view all', 'mtable' => 'cmi5launch', 'field' => 'name'),
 );

@@ -2,9 +2,8 @@
 namespace cmi5Test;
 
 use PHPUnit\Framework\TestCase;
-use Au;
-use Au_Helpers;
-
+use mod_cmi5launch\local\au;
+use mod_cmi5launch\local\au_helpers;
 /**
  * Tests for AuHelpers class.
  *
@@ -14,14 +13,18 @@ use Au_Helpers;
  * @covers \auHelpers
  * @covers \auHelpers::getAuProperties
  */
-class AusHelpersTest extends TestCase
+class ausHelpersTest extends TestCase
 {
-   // private $auProperties, $emptyStatement, $mockStatementValues;
+    private $auProperties, $emptyStatement, $mockStatementValues, $mockStatement2, $returnedAUids;
+
+    public $auidForTest;
 
     protected function setUp(): void
     {
+        // All the properties in an AU object.
         $this->auProperties = array(
             'id',
+            'attempt',
             'url',
             'type',
             'lmsid',
@@ -38,7 +41,6 @@ class AusHelpersTest extends TestCase
             'masteryscore',
             'satisfied',
             'launchurl',
-            'sessionid',
             'sessions',
             'progress',
             'noattempt',
@@ -49,9 +51,49 @@ class AusHelpersTest extends TestCase
 
         $this->emptyStatement = array();
 
-        //Perhaps a good test would be to test the constructor with a statement that has all the properties set.
+        // Based on created AU in program, but with some values removed.
+        $this->mockStatement2 = array(
+            "id" => "https://exampleau",
+            "attempt" => NULL,
+            "url" => "example.html?pages=1&complete=launch",
+            "type" => "au example",
+            "lmsid" => NULL,
+            "grade" => NULL,
+            "scores" => NULL,
+            "title" => array( 0 => array(
+                "lang" => "en-US",
+                "text" => "Example AU")
+            ),
+            "moveOn"=> NULL,
+            "auIndex" => NULL,
+            "parents" => array(),
+            "objectives" => NULL,
+            "description" => array( 0 => array(
+                "lang" => "en-US",
+                "text" => "Example AU lesson description")
+            ),
+            'activitytype' => NULL,
+            'launchmethod' => NULL,
+            'masteryscore' => NULL,
+            'satisfied' => NULL,
+            'launchurl' => NULL,
+            'sessions' => NULL,
+            'progress' => NULL,
+            'noattempt' => NULL,
+            'completed' => NULL,
+            'passed' => NULL,
+            'inprogress' => NULL,
+            'launchMethod' => "AnyWindow",
+            'lmsId' => "https://exampleau/ranomnum/au0",
+            'moveOn' => "CompletedOrPassed",
+            'auIndex' => 0,
+            'activityType' => NULL,
+            'masteryScore' => NULL
+        );
+        // Perhaps a good test would be to test the constructor with a statement that has all the properties set.
         $this->mockStatementValues = array(
             'id' => 'id',
+            'attempt' => 'attempt',
             'url' => 'url',
             'type' => 'type',
             'lmsid' => 'lmsid',
@@ -68,7 +110,6 @@ class AusHelpersTest extends TestCase
             'masteryscore' => 'masteryscore',
             'satisfied' => 'satisfied',
             'launchurl' => 'launchurl',
-            'sessionid' => 'sessionid',
             'sessions' => 'sessions',
             'progress' => 'progress',
             'noattempt' => 'noattempt',
@@ -76,18 +117,19 @@ class AusHelpersTest extends TestCase
             'passed' => 'passed',
             'inprogress' => 'inprogress',
         );
+    
     }
 
     protected function tearDown(): void
     {
-        //  $this->example = null;
+         
     }
 
 
-    //Retrieve Aus parses and returns AUs from large statements from the CMI5 player
-    //So to test, maybe make a statement and ensure the test value is returned? 
-    //Arbitrarily pick a word and put in right place? See if it is returned?
-    public function testRetrieveAus()
+    // Retrieve Aus parses and returns AUs from large statements from the CMI5 player
+    // So to test, maybe make a statement and ensure the test value is returned? 
+    // Arbitrarily pick a word and put in right place? See if it is returned?
+    public function testcmi5launch_retrieve_aus()
     {
     //It's not just returning it, it's splitting it into chuncks~!
 
@@ -197,12 +239,12 @@ class AusHelpersTest extends TestCase
         
         );
 
-       $helper = new Au_Helpers();
+       $helper = new au_helpers();
         //So now with this fake 'statement', lets ensure it pulls the correct value which is "correct Retrieval"
-        $retrieved = $helper->retrieveAus($mockStatement);
+        $retrieved = $helper->cmi5launch_retrieve_aus($mockStatement);
 
    
-        //It should retrieve the mock aus
+        // It should retrieve the mock aus
         $this->assertEquals($shouldBeReturned, $retrieved, "Expected retrieved statement to be equal to mock statement");
         //This is being flaged as risky?
         //Is there a different way to test this?
@@ -217,10 +259,10 @@ class AusHelpersTest extends TestCase
         //Those seem to pass, so take away line 206?
     }
 
-    //Test function that is fed an array of statments and returns an array of aus
-    public function testCreateAus()
+    //Test function that is fed an array of statments and returns an array of aus onjects
+    public function testcmi5launch_create_aus()
     {
-        //Should be enough to pass the mock statement values here, make an array of them first
+        // Should be enough to pass the mock statement values here, make an array of them first
         $testStatements = array();
         
         //Lets create 4 aus statement
@@ -228,15 +270,15 @@ class AusHelpersTest extends TestCase
             $testStatements[$i][] = $this->mockStatementValues;
         }
     
-        $helper = new Au_Helpers();
+        $helper = new au_helpers();
         //So now with this fake 'statement', lets ensure it pulls the correct value which is "correct Retrieval"
-        $auList = $helper->createAus($testStatements);
+        $auList = $helper->cmi5launch_create_aus($testStatements);
         
         //There should be a total of 4 Aus in this array
         $this->assertCount(4, $auList, "Expected retrieved statement to have four aus");
         //And they should all be au objects
         foreach ($auList as $au) {
-            $this->assertInstanceOf(Au::class, $au, "Expected retrieved statement to be an array of aus");
+            $this->assertInstanceOf(au::class, $au, "Expected retrieved statement to be an array of aus");
         }
     }
 
@@ -246,9 +288,74 @@ class AusHelpersTest extends TestCase
     //We just need tothat it saves the correct values and CALLS insert_record
     //Technically this function returns ids, so we can make a stub which just returns ids
     //This will test it is called without messing with the DB
-    public function testSaveAus()
+    public function testcmi5launch_save_aus()
     {
+
+        // Make a global variable to hold the id's to pretend to be cmi5launch instance id.
+        global $cmi5launch;
+
+        $cmi5launch = new \stdClass();
+        $cmi5launch->id = 1;
+      //  $cmi5launch->id = 1;
+
+        // The func should return auids created by the DB when AU's were saved in array format.
+        $helper = new au_helpers();
+
+        //Lets create 4 aus statement
+        for ($i = 0; $i < 3; $i++) {
+            $testAus[$i][] = $this->mockStatement2;
+           // $testAus[$i][] = ($this->$cmi5launch);
+        //    $testAus = array_merge($testAus, $cmi5launch);
+        }
+
+        //So now with this fake 'statement', lets ensure it pulls the correct value which is "correct Retrieval"
+        $returnedAUids = $helper->cmi5launch_save_aus($helper->cmi5launch_create_aus($testAus));
+
+        // First make sure array is returned
+        $this->assertIsArray($returnedAUids, "Expected retrieved statement to be an array");
+
+        // The array should have the same count of ids as AU's passed in
+        $this->assertCount(3, $returnedAUids, "Expected retrieved statement to have three aus");
+        // Now iterate through the returned array and ensure ids were passed back, numeric ids
+        foreach ($returnedAUids as $auId) {
+
+            // what is id?
+          //  echo"auId: $auId";
+            $this->assertIsNumeric($auId, "Expected array to have numeric values");
+        }
+        global $auidForTest;
+        //Save to use in next test?
+        $auidForTest = $returnedAUids;
+        //Do I need to test fail?
+
 
     }   
 
+    public function testcmi5launch_retrieve_aus_from_db()
+    {
+        // Access the global array of ids from above test
+        global $auidForTest;
+
+       // global $auidForTest;
+        $helper = new au_helpers();
+
+        // It takes singular ids, so we will iterate through them
+        foreach ($auidForTest as $auId) {
+            
+            $returnedAu = $helper->cmi5launch_retrieve_aus_from_db($auId);
+            
+            // And the return should be an au object
+            $this->assertInstanceOf(au::class, $returnedAu, "Expected retrieved object to be an au object");
+        }
+
+        // And if it fails it should fail gracefully
+        $badid = 0;
+        $returnedAu = $helper->cmi5launch_retrieve_aus_from_db($badid);
+        
+        // And the return should be a false value
+        $this->assertNotTrue($returnedAu, "Expected retrieved object to be false");
+        //And it should output this error message
+        $this->expectOutputString("<p>Error attempting to get AU data from DB. Check AU id. AU id is: " . $badid . "</p>");
+
+    }   
 }

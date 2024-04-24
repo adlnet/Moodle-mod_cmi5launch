@@ -21,7 +21,8 @@
  * visit: http://docs.moodle.org/en/Development:lib/formslib.php
  *
  * @package mod_cmi5launch
- * @copyright  2013 Andrew Downes
+ * @copyright  2023 Bohland
+ * @copyright  Based on work by 2013 Andrew Downes
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -69,25 +70,26 @@ class mod_cmi5launch_mod_form extends moodleform_mod {
         );
 
         // Start required Fields for Activity.
+        /*
         $mform->addElement('text', 'cmi5launchurl', get_string('cmi5launchurl', 'cmi5launch'), array('size' => '64'));
         $mform->setType('cmi5launchurl', PARAM_TEXT);
         $mform->addRule('cmi5launchurl', null, 'required', null, 'client');
         $mform->addRule('cmi5launchurl', get_string('maximumchars', '', 1333), 'maxlength', 1333, 'client');
         $mform->addHelpButton('cmi5launchurl', 'cmi5launchurl', 'cmi5launch');
         $mform->setDefault('cmi5launchurl', 'https://example.com/example-activity/index.html');
-        
-        
+
         $mform->addElement('text', 'cmi5activityid', get_string('cmi5activityid', 'cmi5launch'), array('size' => '64'));
         $mform->setType('cmi5activityid', PARAM_TEXT);
         $mform->addRule('cmi5activityid', null, 'required', null, 'client');
         $mform->addRule('cmi5activityid', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
         $mform->addHelpButton('cmi5activityid', 'cmi5activityid', 'cmi5launch');
         $mform->setDefault('cmi5activityid', 'https://example.com/example-activity');
+        */
         // End required Fields for Activity.
 
         // New local package upload.
 
-        //Ok, this is making an array of filemanager
+        // This is making an array of filemanager.
         $filemanageroptions = array();
         $filemanageroptions['accepted_types'] = array('.zip');
         $filemanageroptions['maxbytes'] = 0;
@@ -162,8 +164,8 @@ class mod_cmi5launch_mod_form extends moodleform_mod {
         $mform->addGroupRule(
             'completionverbgroup', array(
                 'cmi5verbid' => array(
-                    array(get_string('maximumchars', '', 255), 'maxlength', 255, 'client')
-                )
+                    array(get_string('maximumchars', '', 255), 'maxlength', 255, 'client'),
+                ),
             )
         );
 
@@ -192,8 +194,8 @@ class mod_cmi5launch_mod_form extends moodleform_mod {
         $mform->addGroupRule(
             'completionexpirygroup', array(
                 'cmi5expiry' => array(
-                    array(get_string('maximumchars', '', 10), 'maxlength', 10, 'client')
-                )
+                    array(get_string('maximumchars', '', 10), 'maxlength', 10, 'client'),
+                ),
             )
         );
 

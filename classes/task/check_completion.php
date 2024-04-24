@@ -72,7 +72,7 @@ class check_completion extends \core\task\scheduled_task {
                         $event = \mod_cmi5launch\event\activity_completed::create(array(
                             'objectid' => $cmi5launch->id,
                             'context' => \context_module::instance($cm->id),
-                            'userid' => $enrolment->userid
+                            'userid' => $enrolment->userid,
                         ));
                         $event->add_record_snapshot('course_modules', $cm);
                         $event->add_record_snapshot('cmi5launch', $cmi5launch);

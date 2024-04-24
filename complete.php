@@ -24,6 +24,8 @@
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once('completion_check.php');
 
+require_login($course, false, $cm);
+
 // Return to the course.
 header("Location: ". $CFG->wwwroot.'/course/view.php?id='.$cmi5launch->course);
 
