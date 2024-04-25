@@ -56,11 +56,17 @@ function xmldb_cmi5launch_upgrade($oldversion) {
         // Define index lmsid (not unique) to be added to cmi5launch_sessions.
         $indexnew = new xmldb_index('sessionid', XMLDB_INDEX_NOTUNIQUE, ['sessionid']);
 
-        // Conditionally launch add index lmsid.
-        if (!$dbman->index_exists($table, $indexnew)) {
+        // If table exists
+        // Conditionally launch create table for cmi5launch.
+        if ($dbman->table_exists($table)) {
+            
+            // Conditionally launch add index lmsid.
+            if (!$dbman->index_exists($table, $indexnew)) {
             $dbman->add_index($table, $indexnew);
         }
 
+        }
+        
         // Cmi5launch savepoint reached.
         upgrade_mod_savepoint(true, 2024032112, 'cmi5launch');
     }
@@ -84,10 +90,17 @@ function xmldb_cmi5launch_upgrade($oldversion) {
         // Now cycle through array and remove fields.
         foreach ($tablestoadd as $table) {
         
-        // Conditionally launch add field moodlecourseid.
-        if (!$dbman->field_exists($table, $fieldmcid)) {
-            $dbman->add_field($table, $fieldmcid);
-        }
+            // If the table exists
+            // Conditionally launch add index lmsid.
+            // Conditionally launch create table for cmi5launch.
+            if ($dbman->table_exists($table)) {
+        
+            // Conditionally launch add field moodlecourseid.
+            if (!$dbman->field_exists($table, $fieldmcid)) {
+                $dbman->add_field($table, $fieldmcid);
+            }
+            }
+
         }
         
         // Cmi5launch savepoint reached.
