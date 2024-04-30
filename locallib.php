@@ -33,23 +33,27 @@ require_once("$CFG->dirroot/mod/cmi5launch/lib.php");
 use mod_cmi5launch\local\cmi5_connectors;
 
 // Grade stuff.
-define('GRADE_AUS_CMI5', '0');
-define('GRADE_HIGHEST_CMI5', '1');
-define('GRADE_AVERAGE_CMI5', '2');
-define('GRADE_SUM_CMI5', '3');
+define('MOD_CMI5LAUNCH_AUS_GRADE', '0');
+define('MOD_CMI5LAUNCH_GRADE_HIGHEST', '1');
+define('MOD_CMI5LAUNCH_GRADE_AVERAGE', '2');
+define('MOD_CMI5LAUNCH_GRADE_SUM', '3');
 
-define('HIGHEST_ATTEMPT_CMI5', '0');
-define('AVERAGE_ATTEMPT_CMI5', '1');
-define('FIRST_ATTEMPT_CMI5', '2');
-define('LAST_ATTEMPT_CMI5', '3');
 
-define('CMI5_FORCEATTEMPT_NO', 0);
-define('CMI5_FORCEATTEMPT_ONCOMPLETE', 1);
-define('CMI5_FORCEATTEMPT_ALWAYS', 2);
+define('MOD_CMI5LAUNCH_HIGHEST_ATTEMPT', '0');
+define('MOD_CMI5LAUNCH_AVERAGE_ATTEMPT', '1');
+define('MOD_CMI5LAUNCH_FIRST_ATTEMPT', '2');
+define('MOD_CMI5LAUNCH_LAST_ATTEMPT', '3');
 
-define('CMI5_UPDATE_NEVER', '0');
-define('CMI5_UPDATE_EVERYDAY', '2');
-define('CMI5_UPDATE_EVERYTIME', '3');
+define('MOD_CMI5LAUNCH_FORCEATTEMPT_NO', 0);
+define('MOD_CMI5LAUNCH_FORCEATTEMPT_ONCOMPLETE', 1);
+define('MOD_CMI5LAUNCH_FORCEATTEMPT_ALWAYS', 2);
+
+define('MOD_CMI5LAUNCH_UPDATE_NEVER', '0');
+define('MOD_CMI5LAUNCH_UPDATE_EVERYDAY', '2');
+define('MOD_CMI5LAUNCH_UPDATE_EVERYTIME', '3');
+
+
+
 
 
 
