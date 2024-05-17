@@ -259,44 +259,93 @@ function deletetestcmi5launch_sessions($ids)
   
     } 
 
+	/**
+   * Create fake statements for testing.
+   * @param mixed $amountomake - amount of statements to make.
+   * @return array $statements - array of statements
+   */
+function maketeststatements($amounttomake)
+{
+	// Iterate through amount to make, and use i to make different 'registration ids'
+	// 
+	// Array to hold statements.
+	$statements = array();
+	$statement = array(
+		"more" => "Other stuff",
+		"statements" => array());
+
+		// so the problem is that the statement is coming nested,
+		// even when I make one statement it still is under a 0.
+	for ($i = 0; $i < $amounttomake; $i++) {
+		// Mock values to make statements.
+			// Array to hold the statements.
+
+			// Maybe I need to change the stucture so the $i is first and next to statements instead of now as its nested
+		/*old	
+		$statement['statements'][] = array(
+				$i => array(*/
+				$statement['statements'][$i] = array(
+			//	'id' => 'idune' . $i,
+				'timestamp' => 'timestamp' . $i,
+				'actor' => array (
+					"firstname" => "firstname" . $i,
+					"lastname" => "lastname" . $i,
+					"account" => array (
+						"homePage" => "homePage" . $i,
+						"name" => "name" . $i,
+					),
+				),
+				'verb' => array (
+					"id" => "verbid" . $i,
+					"display" => array(
+						"en" => "verbdisplay" . $i,
+					),
+					)
+				,
+				'object'  => array (
+					"id" => "objectid" . $i,
+					"definition" => array (
+						"name" => "name" . $i,
+						"description" => "description" . $i,
+						"type" => "type" . $i,
+					),
+				),
+				'context'  => array (
+					"context" => "context" . $i,
+					"contexttype" => "contexttype" . $i,
+					"contextparent" => "contextparent" . $i,
+				),
+				"result" => array (
+					"result" => "result" . $i,
+					"score" => array (
+						"raw" => "raw" . $i,
+						"scaled" => "scaled" . $i,
+					),
+				),
+				'stored' => 'stored' . $i,
+				'authority' => array (
+					"authority" => "authority" . $i,
+
+				),
+				'version' => "version" . $i,
+		);
+
+		$statements[] = $statement;
+	}
+
+	// Return array of statements
+	return $statement;
+}
+
   /**
    * Create fake sessions for testing.
    * @param mixed $createdid - id that was created for testing by maketestcmi5launch.
    * @return array $sessionid
    */
-  function maketestsessions ($testcourseid)
+  function maketestsessions ()
   {
 	global $DB, $cmi5launch, $USER;
-/*
-	// Mock values to make sessions.
-	$mockvalues = array(
-		'id' => 'id',
-		'sessionid' => 'sessionid',
-		'userid' => 'userid',
-		'moodlecourseid' => 'moodlecourseid',
-		'registrationscoursesausid' => 'registrationscoursesausid',
-		'tenantname' => 'tenantname',
-		'createdat' => 'createdat',
-		'updatedat' => 'updatedat',
-		'code' => 'code',
-		'launchtokenid' => 'launchtokenid',
-		'lastrequesttime' => 'lastrequesttime',
-		'launchmode' => 'launchmode',
-		'masteryscore' => 'masteryscore',
-		'score' => 'score',
-		'islaunched' => 'islaunched',
-		'isinitialized' => 'isinitialized',
-		'duration' => 'duration',
-		'iscompleted' => 'iscompleted',
-		'ispassed' => 'ispassed',
-		'isfailed' => 'isfailed',
-		'isterminated' => 'isterminated',
-		'isabandoned' => 'isabandoned',
-		'progress' => 'progress',
-		'launchmethod' => 'launchmethod',
-		'launchurl' => 'launchurl',
-	);
-*/
+
 	// Make new sessions, lets make five.
 	$sessions = array();
 	$sessionid = array();
@@ -355,13 +404,14 @@ $createsession = $sessionhelper->cmi5launch_get_create_session();
 
 	// For each session id in the list, create a session.
 	foreach ($sessionid as $id) {
-		$createsession($id, $launchurl, $launchmethod);
+		$newids[] = $createsession($id, $launchurl, $launchmethod);
+		
 	}
 	// Save AUs to test DB and save IDs.
 	//$newauids = $createsession($aus);
     
 	// Return array of session ids
-    return $sessionid;
+    return $newids;
   
     } 
 
@@ -451,6 +501,36 @@ $createsession = $sessionhelper->cmi5launch_get_create_session();
     // MAybe we can return the args as json encoded string?
     return json_encode(func_get_args());
   }
+    // And what should it receive? just the reular arguments?
+  /**
+   * A local file_get_contents to overide the PHP function for testing.
+   * As we do not want to actually get the file, we just want to test the function calling that function.
+   * 
+   */
 
+   // So now all the test has to do is inject THIS which will return as we please
+   function cmi5launch_test_stream_and_send_pass($options, $url)
+  {
+	$returnvalue = json_encode(array(
+		"statusCode" => 200,
+		"Response" => "Successful Post",
+	));
+	// Lets pass in the 'return' value as the option.
+	return $returnvalue;
+  }
+
+   // So now all the test has to do is inject THIS which will return as we please
+   function cmi5launch_test_stream_and_send_fail($options, $url)
+  {
+	// It should be a string! The player returns strings
+	// Error message for stubbed method to return.
+	$errormessage = json_encode(array(
+		"statusCode" => "404",  
+		"error" => "Not Found",
+		"message" => "testmessage" ));
+
+	// Lets pass in the 'return' value as the option.
+	return $errormessage;
+  }
 
 ?>

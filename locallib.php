@@ -52,7 +52,7 @@ define('MOD_CMI5LAUNCH_UPDATE_EVERYDAY', '2');
 define('MOD_CMI5LAUNCH_UPDATE_EVERYTIME', '3');
 
 
-
+ 
 /**
  * Builds a cmi5 launch link for the current module and a given registration
  *

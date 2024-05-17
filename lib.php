@@ -1116,3 +1116,28 @@ function cmi5launch_grade_item_update($cmi5launch, $grades = null) {
     return grade_update('mod/cmi5launch', $cmi5launch->course, 'mod', 'cmi5launch', $cmi5launch->id, 0, $grades, $params);
 }
 
+    /**
+     * Wrapper function to allow for testing where file_get_contents cannot be overriden.
+     * Also has create_stream as this makes a resource which interfers with testing.
+     * @param mixed $url - the url to be sent to 
+     * @param mixed $use_include_path
+     * @param mixed $context - the data to be sent
+     * @param mixed $offset
+     * @param mixed $maxlen
+     * @return mixed $result - either a string or false.
+     */
+    function cmi5launch_stream_and_send($options, $url)
+    {
+
+        // The options are placed into a stream to be sent.
+        $context = stream_context_create($options);
+
+        // Sends the stream to the specified URL and stores results.
+        // The false is use_include_path, which we dont want in this case, we want to go to the url.
+        $result = file_get_contents($url, false, $context);
+
+        // Return result.
+        return $result;
+    }
+  
+

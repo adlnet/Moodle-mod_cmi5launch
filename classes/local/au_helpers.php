@@ -108,10 +108,6 @@ class au_helpers {
             $newrecord->url = $auobject->url;
             $newrecord->type = $auobject->type;
             $title = json_decode(json_encode($auobject->title), true);
-            //echo "<br>";
-            //echo " My dear it does stuff here?";
-            var_dump($title);
-            //echo "<br>";
             $newrecord->title = $title[0]['text'];
             $newrecord->moveon = $auobject->moveOn;
             $newrecord->auindex = $auobject->auIndex;

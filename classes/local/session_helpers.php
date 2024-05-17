@@ -123,10 +123,13 @@ class session_helpers {
         $newrecord->moodlecourseid = $cmi5launch->id;
         // And userid!
         $newrecord->userid = $USER->id;
-
       
         // Save record to table.
-        $DB->insert_record($table, $newrecord, true);
+        $newid = $DB->insert_record($table, $newrecord, true);
+
+        // Return value 
+        return $newid;
+
     }
 
     /**
