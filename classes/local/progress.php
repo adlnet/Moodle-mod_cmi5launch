@@ -374,4 +374,50 @@ class progress {
 
         return $session;
     }
+
+        // An error message catcher.
+    /**
+     * Function to test returns from cmi5 player and display error message if found to be false
+     * // or not 200.
+     * @param mixed $resulttotest - The result to test.
+     * @param string $type - The type missing to be added to the error message.
+     * @return bool
+     */
+    public static function cmi5launch_progress_error_message($resulttotest, $type) {
+
+        // Decode result because if it is not 200 then something went wrong
+        // If it's a string, decode it.
+        if (is_string($resulttotest)) {
+            $resulttest = json_decode($resulttotest, true);
+        } else {
+            $resulttest = $resulttotest;
+        }
+
+        // I think splittin these to return two seperate messages deppennnding on whether player is running is better.
+        // Player cannot return an error if not runnin,
+        if ($resulttest === false ){
+
+            echo "<br>";
+
+            echo "Something went wrong " . $type . ". LRS is not communicating. Is it running?";
+
+            echo "<br>";
+
+            return false;
+        }
+        else if( array_key_exists("statusCode", $resulttest) && $resulttest["statusCode"] != 200) {
+
+            echo "<br>";
+
+            echo "Something went wrong " . $type . ". CMI5 Player returned " . $resulttest["statusCode"] . " error. With message '" 
+                . $resulttest["message"] . "'." ;
+            echo "<br>";
+
+            return false;
+        } else {
+
+            // No errors, continue.
+            return true;
+        }
+    }
 }

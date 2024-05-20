@@ -83,6 +83,11 @@ $string['cmi5launchplayerurl'] = 'cmi5 player URL';
 $string['cmi5launchplayerurl_help'] = 'The url to communicate with cmi5 player, can include port number(e.g. http://player.example.com or http://localhost:63398). Must NOT include a trailing forward slash.';
 $string['cmi5launchplayerurl_default'] = '';
 
+// Cmi5 player root location.
+$string['cmi5launchcontenturl'] = 'cmi5 player URL';
+$string['cmi5launchcontenturl_help'] = 'The url to communicate with cmi5 player, PUBLIC content http://player.example.com or http://localhost:63398). Must NOT include a trailing forward slash.';
+$string['cmi5launchcontenturl_default'] = '';
+
 // Cmi5 player credentials.
 $string['cmi5launchtenantname'] = 'cmi5 player: basic username';
 $string['cmi5launchtenantname_help'] = 'The cmi5 tenant username.';

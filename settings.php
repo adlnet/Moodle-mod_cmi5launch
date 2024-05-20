@@ -92,10 +92,17 @@ if ($ADMIN->fulltree) {
         get_string('cmi5launchuseactoremail_help', 'cmi5launch'),
         1));
 
+
     $settings->add(new admin_setting_configtext_mod_cmi5launch('cmi5launch/cmi5launchplayerurl',
         get_string('cmi5launchplayerurl', 'cmi5launch'),
         get_string('cmi5launchplayerurl_help', 'cmi5launch'),
         get_string('cmi5launchplayerurl_default', 'cmi5launch'), PARAM_URL));
+    /*    
+    $settings->add(new admin_setting_configtext_mod_cmi5launch('cmi5launch/cmi5launchcontenturl',
+        get_string('cmi5launchcontenturl', 'cmi5launch'),
+        get_string('cmi5launchcontenturl_help', 'cmi5launch'),
+        get_string('cmi5launchcontenturl_default', 'cmi5launch'), PARAM_URL));
+*/
 
     $setting = new admin_setting_configtext('cmi5launch/cmi5launchtenantname',
         get_string('cmi5launchtenantname', 'cmi5launch'),

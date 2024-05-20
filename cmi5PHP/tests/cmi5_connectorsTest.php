@@ -1,9 +1,10 @@
 <?php
 namespace cmi5Test;
 
+use mod_cmi5launch\local\cmi5launch_helpers;
 use PHPUnit\Framework\TestCase;
 use mod_cmi5launch\local\cmi5_connectors;
-
+use mod_cmi5launch\test\cmi5TestHelpers;
 require_once( "cmi5TestHelpers.php");
 
 /**
@@ -76,6 +77,9 @@ class cmi5_connectorsTest extends TestCase
      */
     public function testcmi5launch_create_course_pass()
     {
+
+        // Function that will be called in function under test.
+        $testfunction = 'cmi5launch_stream_and_send';
         // To determine the headers.
         $id = 0;
         $tenanttoken = "testtoken";
@@ -103,7 +107,7 @@ class cmi5_connectorsTest extends TestCase
         // the string just needs to be returned as is. We do expect create_course to only call this once.
         $csc->expects($this->once())
             ->method('cmi5launch_send_request_to_cmi5_player_post')
-            ->with('testfilecontents', 'http://test/launch.php/api/v1/course','zip', 'testtoken')
+            ->with($testfunction, 'testfilecontents', 'http://test/launch.php/api/v1/course','zip', 'testtoken')
             ->willReturn($result);
 
         // Call the method under test. 
@@ -123,6 +127,8 @@ class cmi5_connectorsTest extends TestCase
     public function testcmi5launch_create_course_fail_with_message()
     {
 
+         // Function that will be called in function under test.
+         $testfunction = 'cmi5launch_stream_and_send';
         // Message we expect to be output.
         $expectedstring= "<br>Something went wrong creating the course. CMI5 Player returned 404 error. With message 'testmessage'.<br>";
         // Arguments to be passed to the method under test.
@@ -149,7 +155,7 @@ class cmi5_connectorsTest extends TestCase
         // This should enable us to test the method under failing conditions. We do expect create_course to only call this once.
         $csc->expects($this->once())
             ->method('cmi5launch_send_request_to_cmi5_player_post')
-            ->with('testfilecontents', 'http://test/launch.php/api/v1/course', 'zip', 'testtoken')
+            ->with($testfunction, 'testfilecontents', 'http://test/launch.php/api/v1/course', 'zip', 'testtoken')
             ->willReturn($errormessage);
 
         // Call the method under test. 
@@ -168,6 +174,10 @@ class cmi5_connectorsTest extends TestCase
      */
     public function testcmi5launch_create_tenant_pass()
     {
+
+         // Function that will be called in function under test.
+         $testfunction = 'cmi5launch_stream_and_send';
+
         // Arguments to be passed to the method under test.
         $urltosend = "playerwebaddress";
         $username = "testname";
@@ -195,7 +205,7 @@ class cmi5_connectorsTest extends TestCase
         // The string just needs to be returned as is. We do expect create_tenant to only call this once.
         $csc->expects($this->once())
             ->method('cmi5launch_send_request_to_cmi5_player_post')
-            ->with($data, 'playerwebaddress','json', 'testname', 'testpassword') // for tomorrow, is thi failing because with only evaluates strings? Like do we need to string the array out> 
+            ->with($testfunction, $data, 'playerwebaddress','json', 'testname', 'testpassword') // for tomorrow, is thi failing because with only evaluates strings? Like do we need to string the array out> 
             // IRL it returns something that needs to be json decoded, so lets pass somethin that is encoded>
             ->willReturn('{
                 "code": "testtenantname",
@@ -217,6 +227,10 @@ class cmi5_connectorsTest extends TestCase
      */
     public function testcmi5launch_create_tenant_fail()
     {
+
+         // Function that will be called in function under test.
+         $testfunction = 'cmi5launch_stream_and_send';
+
         // Arguments to be passed to the method under test.
         $urltosend = "playerwebaddress";
         $username = "testname";
@@ -244,7 +258,7 @@ class cmi5_connectorsTest extends TestCase
         // This will enable us to test the method under failing conditions. We do expect create_tenant to only call this once.
         $csc->expects($this->once())
             ->method('cmi5launch_send_request_to_cmi5_player_post')
-            ->with($data, 'playerwebaddress', 'json', 'testname', 'testpassword')
+            ->with($testfunction, $data, 'playerwebaddress', 'json', 'testname', 'testpassword')
             ->willReturn($errormessage);
 
         //Call the method under test. 
@@ -279,6 +293,10 @@ class cmi5_connectorsTest extends TestCase
             "code" => "testregistrationcode",
         ));
 
+
+         // Function that will be called in function under test.
+         $testfunction = 'cmi5launch_stream_and_send';
+
         // Mock a cmi5 connector object but only stub ONE method, as we want to test the others.
         $mockedclass = $this->getMockBuilder('mod_cmi5launch\local\cmi5_connectors')
             ->onlyMethods(array('cmi5launch_send_request_to_cmi5_player_get'))
@@ -287,7 +305,7 @@ class cmi5_connectorsTest extends TestCase
         // Mock returns json encoded data, as it would be from the player.
         $mockedclass->expects($this->once())
             ->method('cmi5launch_send_request_to_cmi5_player_get')
-            ->with("Testtoken", $urltosend)
+            ->with($testfunction, "Testtoken", $urltosend)
             ->willReturn($returnvalue);
 
         //Call the method under test. 
@@ -318,6 +336,10 @@ class cmi5_connectorsTest extends TestCase
         // This is the url the stubbed method shopuld receive.
         $urltosend = "http://test/launch.php/api/v1/registration/testregistration";
 
+         // Function that will be called in function under test.
+         $testfunction = 'cmi5launch_stream_and_send';
+
+
         // Mock a cmi5 connector object but only stub ONE method, as we want to test the others.
         $mockedclass = $this->getMockBuilder('mod_cmi5launch\local\cmi5_connectors')
             ->onlyMethods(array('cmi5launch_send_request_to_cmi5_player_get'))
@@ -325,7 +347,7 @@ class cmi5_connectorsTest extends TestCase
 
         $mockedclass->expects($this->once())
             ->method('cmi5launch_send_request_to_cmi5_player_get')
-            ->with("Testtoken", $urltosend)
+            ->with($testfunction, "Testtoken", $urltosend)
             ->willReturn($errormessage);
 
         //Call the method under test. 
@@ -372,6 +394,9 @@ class cmi5_connectorsTest extends TestCase
             "code" => "testregistrationcode",
         ));
 
+         // Function that will be called in function under test.
+         $testfunction = 'cmi5launch_stream_and_send';
+
         // Mock a cmi5 connector object but only stub ONE method, as we want to test the others.
         $mockedclass = $this->getMockBuilder('mod_cmi5launch\local\cmi5_connectors')
             ->onlyMethods(array('cmi5launch_send_request_to_cmi5_player_post'))
@@ -379,7 +404,7 @@ class cmi5_connectorsTest extends TestCase
 
         $mockedclass->expects($this->once())
             ->method('cmi5launch_send_request_to_cmi5_player_post')
-            ->with(json_encode($data), $urltosend, $filetype, "Testtoken")
+            ->with($testfunction, json_encode($data), $urltosend, $filetype, "Testtoken")
             ->willReturn($returnvalue);
 
         //Call the method under test. 
@@ -421,6 +446,9 @@ class cmi5_connectorsTest extends TestCase
         // This is the url the stubbed method shopuld receive.
         $urltosend = "http://test/launch.php/api/v1/registration";
 
+         // Function that will be called in function under test.
+         $testfunction = 'cmi5launch_stream_and_send';
+
         // Mock a cmi5 connector object but only stub ONE method, as we want to test the others.
         $mockedclass = $this->getMockBuilder('mod_cmi5launch\local\cmi5_connectors')
             ->onlyMethods(array('cmi5launch_send_request_to_cmi5_player_post'))
@@ -429,7 +457,7 @@ class cmi5_connectorsTest extends TestCase
         //  Mock returns json encoded data, as it would be from the player.
         $mockedclass->expects($this->once())
             ->method('cmi5launch_send_request_to_cmi5_player_post')
-            ->with(json_encode($data), $urltosend, $filetype, "Testtoken")
+            ->with($testfunction, json_encode($data), $urltosend, $filetype, "Testtoken")
             ->willReturn($errormessage);
 
         //Call the method under test. 
@@ -466,6 +494,8 @@ class cmi5_connectorsTest extends TestCase
         $returnvalue = '{
             "token": "testtoken"
             }';
+         // Function that will be called in function under test.
+         $testfunction = 'cmi5launch_stream_and_send';
 
         // Mock a cmi5 connector object but only stub ONE method, as we want to test the others.
         $mockedclass = $this->getMockBuilder('mod_cmi5launch\local\cmi5_connectors')
@@ -474,7 +504,7 @@ class cmi5_connectorsTest extends TestCase
 
         $mockedclass->expects($this->once())
             ->method('cmi5launch_send_request_to_cmi5_player_post')
-            ->with(json_encode($data), $url, $filetype, $username, $password)
+            ->with($testfunction, json_encode($data), $url, $filetype, $username, $password)
             ->willReturn($returnvalue);
 
             //Call the method under test. 
@@ -510,6 +540,8 @@ class cmi5_connectorsTest extends TestCase
             "tenantId" => $tenantid,
             "audience" => $audience,
         );
+         // Function that will be called in function under test.
+         $testfunction = 'cmi5launch_stream_and_send';
 
 
         // Mock a cmi5 connector object but only stub ONE method, as we want to test the others.
@@ -520,7 +552,7 @@ class cmi5_connectorsTest extends TestCase
         //  Mock returns json encoded data, as it would be from the player.
         $mockedclass->expects($this->once())
             ->method('cmi5launch_send_request_to_cmi5_player_post')
-            ->with(json_encode($data), $url, $filetype, $username, $password)
+            ->with($testfunction, json_encode($data), $url, $filetype, $username, $password)
             ->willReturn($errormessage);
 
         //Call the method under test. 
@@ -572,6 +604,8 @@ class cmi5_connectorsTest extends TestCase
             "launchMethod" => "AnyWindow",
             "url" => "http://testlaunchurl"
         ));
+         // Function that will be called in function under test.
+         $testfunction = 'cmi5launch_stream_and_send';
 
         // Mock a cmi5 connector object but only stub ONE method, as we want to test the others.
         $mockedclass = $this->getMockBuilder('mod_cmi5launch\local\cmi5_connectors')
@@ -581,7 +615,7 @@ class cmi5_connectorsTest extends TestCase
         //  Mock returns json encoded data, as it would be from the player.
         $mockedclass->expects($this->once())
             ->method('cmi5launch_send_request_to_cmi5_player_post')
-            ->with(json_encode($data), $urltosend, $filetype, "Testtoken")
+            ->with($testfunction, json_encode($data), $urltosend, $filetype, "Testtoken")
             ->willReturn(($returnvalue));
 
         // Call the method under test. 
@@ -633,6 +667,9 @@ class cmi5_connectorsTest extends TestCase
         // This is the url the stubbed method shopuld receive.
         $urltosend =  $playerurl . "/api/v1/course/" . "1"  ."/launch-url/" . $auindex;
 
+        // Function that will be called in function under test.
+        $testfunction = 'cmi5launch_stream_and_send';
+
         // Mock a cmi5 connector object but only stub ONE method, as we want to test the other.
         // Create a mock of the send_request class as we don't actually want
         // to create a new course in the player.
@@ -643,7 +680,7 @@ class cmi5_connectorsTest extends TestCase
         // Mock returns json encoded data, as it would be from the player.
         $mockedclass->expects($this->once())
             ->method('cmi5launch_send_request_to_cmi5_player_post')
-            ->with(json_encode($data), $urltosend, $filetype, "Testtoken")
+            ->with($testfunction, json_encode($data), $urltosend, $filetype, "Testtoken")
             ->willReturn($errormessage);
 
         //Call the method under test. 
@@ -662,6 +699,9 @@ class cmi5_connectorsTest extends TestCase
      */
     public function testcmi5launch_send_request_to_cmi5_player_post_with_one_arg()
     {
+        // We send the TEST function to the function under test now!
+        $testfunction = 'cmi5Test\cmi5launch_test_stream_and_send_pass';
+        // Which returns the 'options' parameter passed to it.
         // The player returns a string under normal circumstances.
         $returnvalue = json_encode(array(
             "statusCode" => 200,
@@ -683,37 +723,15 @@ class cmi5_connectorsTest extends TestCase
         // Fake arguments to pass in.
         $filetype = "json";
         $url = "http://test/url.com";
-        $contenttype = "application/json\r\n";
+      
 
         //The arguments to pass in, in this case one, a pretend token.
         $token = "testtoken";
 
-        // Options that should be built in the method, and we need to make sure it goes
-        // to the right branch by matching it.
-        $options = array(
-            'http' => array(
-                'method'  => 'POST',
-                'ignore_errors' => true,
-                'header' => array("Authorization: Bearer ". $token,
-                    "Content-Type: " .$contenttype .
-                    "Accept: " . $contenttype),
-                'content' => ($data),
-            ),
-        );
-            
-        // Mock a cmi5 connector object but only stub ONE method, as we want to test the others.
-        $mockedclass = $this->getMockBuilder('mod_cmi5launch\local\cmi5_connectors')
-            ->onlyMethods(array('cmi5launch_stream_and_send'))
-            ->getMock();
-
-        // Mock returns json encoded data, as it would be from the player.
-        $mockedclass->expects($this->once())
-            ->method('cmi5launch_stream_and_send')
-            ->with($url, $options)
-            ->willReturn($returnvalue) ;
-
-        // Call the method under test.    
-        $test = $mockedclass->cmi5launch_send_request_to_cmi5_player_post($data, $url, $filetype, $token);
+        // Class for function under test.
+        $helper = new cmi5_connectors;
+        // Call the method under test.
+        $test = $helper->cmi5launch_send_request_to_cmi5_player_post($testfunction, $data, $url, $filetype, $token);
 
         // And the return should be a string.
         $this->assertIsString($test);
@@ -728,6 +746,10 @@ class cmi5_connectorsTest extends TestCase
      */
     public function testcmi5launch_send_request_to_cmi5_player_post_with_two_args()
     {
+
+        // We send the TEST function to the function under test now!
+        $testfunction = 'cmi5Test\cmi5launch_test_stream_and_send_pass';
+
         // The player returns a string under normal circumstances.
         $returnvalue = json_encode(array(
             "statusCode" => 200,
@@ -755,31 +777,11 @@ class cmi5_connectorsTest extends TestCase
         $username = "testname";
         $password = "testpassword";
 
-        // Options that should be built in the method, and we need to make sure it goes
-        // to the right branch by matching it.
-        $options = array(
-            'http' => array(
-                'method'  => 'POST',
-                'header' => array('Authorization: Basic '. base64_encode("$username:$password"),
-                    "Content-Type: " .$contenttype .
-                    "Accept: " . $contenttype),
-                'content' => ($data),
-            ),
-        );
-            
-        // Mock a cmi5 connector object but only stub ONE method, as we want to test the others.
-        $mockedclass = $this->getMockBuilder('mod_cmi5launch\local\cmi5_connectors')
-            ->onlyMethods(array('cmi5launch_stream_and_send'))
-            ->getMock();
 
-        // Mock returns json encoded data, as it would be from the player.
-        $mockedclass->expects($this->once())
-            ->method('cmi5launch_stream_and_send')
-            ->with($url, $options)
-            ->willReturn($returnvalue) ;
-
-        // Call the method under test.
-        $test = $mockedclass->cmi5launch_send_request_to_cmi5_player_post($data, $url, $filetype, $username, $password);
+  
+   // This is the SUT?
+        $helper = new cmi5_connectors;
+        $test = $helper->cmi5launch_send_request_to_cmi5_player_post($testfunction, $data, $url, $filetype, $username, $password);
 
         // And the return should be a string.
         $this->assertIsString($test);
@@ -795,6 +797,9 @@ class cmi5_connectorsTest extends TestCase
     public function testcmi5launch_send_request_to_cmi5_player_post_with_get_pass()
     {
 
+        // We send the TEST function to the function under test now!
+        $testfunction = 'cmi5Test\cmi5launch_test_stream_and_send_pass';
+
         // The player returns a string under normal circumstances.
         $returnvalue = json_encode(array(
             "statusCode" => 200,
@@ -805,31 +810,11 @@ class cmi5_connectorsTest extends TestCase
         $token = "testtoken";
         $url = "http://test/url.com";
 
-        // Options that should be built in the method, we build here to pass to mock.
-        $options = array (
-            'http' => array (
-                'method'  => 'GET',
-                'ignore_errors' => true,
-                'header' => array ("Authorization: Bearer ". $token,
-                    "Content-Type: application/json\r\n" .
-                    "Accept: application/json\r\n"),
-            ),
-        );
-            
-        // Mock a cmi5 connector object but only stub ONE method, as we want to test the other.
-        $mockedclass = $this->getMockBuilder('mod_cmi5launch\local\cmi5_connectors')
-            ->onlyMethods(array('cmi5launch_stream_and_send'))
-            ->getMock();
 
-        // Mock returns json encoded data, as it would be from the player.
-        $mockedclass->expects($this->once())
-            ->method('cmi5launch_stream_and_send')
-            ->with($url, $options)
-            ->willReturn($returnvalue) ;
-
-        // Call the method under test.
-        $test = $mockedclass->cmi5launch_send_request_to_cmi5_player_get($token, $url);
-
+        // Get class and the function under test. 
+        $helper = new cmi5_connectors;
+        $test = $helper->cmi5launch_send_request_to_cmi5_player_get($testfunction, $token, $url);
+    
         // And the return should be an array.
         $this->assertIsArray($test);
         // And it should be the same as the return value.
@@ -845,8 +830,11 @@ class cmi5_connectorsTest extends TestCase
      */
     public function testcmi5launch_send_request_to_cmi5_player_post_with_get_fail()
     {
+           // We send the TEST function to the function under test now!
+           $testfunction = 'cmi5Test\cmi5launch_test_stream_and_send_fail';
 
-        // Error message for stubbed method to return.
+
+    // Error message for stubbed method to return.
         $errormessage = array("statusCode" => "404",  "error" => "Not Found","message" => "testmessage" );
 
         //The arguments to pass in, in this case one, a pretend token.
@@ -865,18 +853,19 @@ class cmi5_connectorsTest extends TestCase
             ),
         );
 
+        // What if we run the entire class mocked except the one under test?
+        // would it run in the riht namespace?
+        // AKA OUR test namepspace 
         // Mock a cmi5 connector object but only stub ONE method, as we want to test the other.
-        $mockedclass = $this->getMockBuilder('mod_cmi5launch\local\cmi5_connectors')
-            ->onlyMethods(array('cmi5launch_stream_and_send'))
-            ->getMock();
+       
 
-        // Mock returns json encoded data, as it would be from the player.
-        $mockedclass->expects($this->once())
-            ->method('cmi5launch_stream_and_send')
-            ->with($url, $options)
-            ->willReturn(json_encode($errormessage) ) ;
+                    // This is the SUT?
+        $helper = new cmi5_connectors;
+        $post = $helper->cmi5launch_get_send_request_to_cmi5_player_get();
+    
 
-        $test = $mockedclass->cmi5launch_send_request_to_cmi5_player_get($token, $url);
+        //$test = $mockedclass->cmi5launch_send_request_to_cmi5_player_get($token, $url);
+        $test = $post($testfunction, $token, $url);
 
         // And the return should be an array since the method under test returns player message decoded.
         $this->assertIsArray($test);
@@ -911,6 +900,10 @@ class cmi5_connectorsTest extends TestCase
             "url" => "http://testlaunchurl"
         );
 
+         // We send the TEST function to the function under test now!
+         $testfunction = 'cmi5launch_stream_and_send';
+
+
         // Mock a cmi5 connector object but only stub ONE method, as we want to test the others.
         $mockedclass = $this->getMockBuilder('mod_cmi5launch\local\cmi5_connectors')
             ->onlyMethods(array('cmi5launch_send_request_to_cmi5_player_get'))
@@ -919,7 +912,7 @@ class cmi5_connectorsTest extends TestCase
         //  Mock returns json encoded data, as it would be from the player.
         $mockedclass->expects($this->once())
             ->method('cmi5launch_send_request_to_cmi5_player_get')
-            ->with($token, $urltosend)
+            ->with($testfunction, $token, $urltosend)
             ->willReturn(json_encode($returnvalue));
 
 
@@ -955,6 +948,9 @@ class cmi5_connectorsTest extends TestCase
         $token = $settings['cmi5launchtenanttoken'];
         // This is the url the stubbed method shopuld receive.
         $urltosend =  $playerurl . "/api/v1/session/" . $sessionid;
+ // We send the TEST function to the function under test now!
+ $testfunction = 'cmi5launch_stream_and_send';
+
 
         // Mock a cmi5 connector object but only stub ONE method, as we want to test the others.
         $mockedclass = $this->getMockBuilder('mod_cmi5launch\local\cmi5_connectors')
@@ -964,7 +960,7 @@ class cmi5_connectorsTest extends TestCase
         // Mock returns json encoded data, as it would be from the player.
         $mockedclass->expects($this->once())
             ->method('cmi5launch_send_request_to_cmi5_player_get')
-            ->with($token, $urltosend)
+            ->with($testfunction, $token, $urltosend)
             ->willReturn(json_encode($errormessage));
 
         //Call the method under test. 

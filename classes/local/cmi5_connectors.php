@@ -24,6 +24,8 @@
  namespace mod_cmi5launch\local;
  defined('MOODLE_INTERNAL') || die();
 
+ use mod_cmi5launch\local\cmi5launch_helpers;
+
 class cmi5_connectors {
 
     public function cmi5launch_get_create_tenant() {
@@ -53,6 +55,11 @@ class cmi5_connectors {
 
     }
 
+    public function cmi5launch_get_send_request_to_cmi5_player_get() {
+        return [$this, 'cmi5launch_send_request_to_cmi5_player_get'];
+
+    }
+
     /**
      * Function to create a course.
      * @param mixed $id - tenant id in Moodle.
@@ -72,9 +79,10 @@ class cmi5_connectors {
         $filetype = "zip";
 
         $databody = $filename->get_content();
+
         // Sends the stream to the specified URL.
-        $result = $this->cmi5launch_send_request_to_cmi5_player_post($databody, $url, $filetype, $tenanttoken);
-     
+        $result = $this->cmi5launch_send_request_to_cmi5_player_post('cmi5launch_stream_and_send',$databody, $url, $filetype, $tenanttoken);
+
         // Check result and display message if not 200.
         $resulttest = $this->cmi5launch_connectors_error_message($result, "creating the course");
 
@@ -108,7 +116,7 @@ class cmi5_connectors {
         $data = json_encode($data);
 
         // Sends the stream to the specified URL.
-        $result = $this->cmi5launch_send_request_to_cmi5_player_post($data, $urltosend, $filetype, $username, $password);
+        $result = $this->cmi5launch_send_request_to_cmi5_player_post('cmi5launch_stream_and_send', $data, $urltosend, $filetype, $username, $password);
 
         // Check result and display message if not 200.
         $resulttest = $this->cmi5launch_connectors_error_message($result, "creating the tenant");
@@ -145,7 +153,7 @@ class cmi5_connectors {
         $url = $playerurl . "/api/v1/registration/" . $registration;
 
         // Sends the stream to the specified URL.
-        $result = $this->cmi5launch_send_request_to_cmi5_player_get($token, $url);
+        $result = $this->cmi5launch_send_request_to_cmi5_player_get('cmi5launch_stream_and_send', $token, $url);
 
         // Check result and display message if not 200.
         $resulttest = $this->cmi5launch_connectors_error_message($result, "retrieving the registration");
@@ -198,7 +206,7 @@ class cmi5_connectors {
         $filetype = "json";
 
         // Sends the stream to the specified URL.
-        $result = $this->cmi5launch_send_request_to_cmi5_player_post($data, $url, $filetype, $token);
+        $result = $this->cmi5launch_send_request_to_cmi5_player_post('cmi5launch_stream_and_send', $data, $url, $filetype, $token);
 
         // Check result and display message if not 200.
         $resulttest = $this->cmi5launch_connectors_error_message($result, "retrieving the registration");
@@ -241,7 +249,7 @@ class cmi5_connectors {
         $data = json_encode($data);
 
         // Sends the stream to the specified URL.
-        $result = $this->cmi5launch_send_request_to_cmi5_player_post($data, $url, $filetype, $username, $password);
+        $result = $this->cmi5launch_send_request_to_cmi5_player_post('cmi5launch_stream_and_send', $data, $url, $filetype, $username, $password);
 
         // Check result and display message if not 200.
         $resulttest = $this->cmi5launch_connectors_error_message($result, "retrieving the token");
@@ -300,7 +308,7 @@ class cmi5_connectors {
         // Data needs to be JSON encoded.
         $data = json_encode($data);
         // Sends the stream to the specified URL.
-        $result = $this->cmi5launch_send_request_to_cmi5_player_post($data, $url, $filetype, $token);
+        $result = $this->cmi5launch_send_request_to_cmi5_player_post('cmi5launch_stream_and_send', $data, $url, $filetype, $token);
 
         // Check result and display message if not 200.
         $resulttest = $this->cmi5launch_connectors_error_message($result, "retrieving launch url");
@@ -325,8 +333,10 @@ class cmi5_connectors {
      * @param ...$tokenorpassword is a variable length param. If one is passed, it is $token, if two it is $username and $password.
      * @return - $result is the response from cmi5 player.
      */
-    public function cmi5launch_send_request_to_cmi5_player_post($databody, $url, $filetype, ...$tokenorpassword) {
+    public function cmi5launch_send_request_to_cmi5_player_post($cmi5launch_stream_and_send, $databody, $url, $filetype, ...$tokenorpassword) {
 
+        // Assign passed in function to variable.
+        $stream = $cmi5launch_stream_and_send;
         // Determine content type to be used in header.
         // It is also the same as accepted type.
         $contenttype = $filetype;
@@ -356,10 +366,10 @@ class cmi5_connectors {
                 ),
             );
 
-            // Sends the stream to the specified URL and stores results.
-            // The false is use_include_path, which we dont want in this case, we want to go to the url.
-            $result = $this->cmi5launch_stream_and_send( $options, $url );
-
+            //By calling the function this way, it enables encapsulation of the function and allows for testing.
+            //It is an extra step, but necessary for required PHP Unit testing.
+            $result = call_user_func($stream, $options, $url);
+    
             
             // Else the args are what we need for posting a course.
         } else {
@@ -383,12 +393,11 @@ class cmi5_connectors {
             );
 
 
-
-            // Sends the stream to the specified URL and stores results.
-            // The false is use_include_path, which we dont want in this case, we want to go to the url.
-            $result = $this->cmi5launch_stream_and_send( $options, $url);
-
-        }
+            //By calling the function this way, it enables encapsulation of the function and allows for testing.
+            //It is an extra step, but necessary for required PHP Unit testing.
+            $result = call_user_func($stream, $options, $url);
+    
+    }
 
         // Return response.
         return $result;
@@ -400,7 +409,9 @@ class cmi5_connectors {
      * @param $url - The URL the request will be sent to.
      * @return - $sessionDecoded is the response from cmi5 player.
      */
-    public function cmi5launch_send_request_to_cmi5_player_get($token, $url) {
+    public function cmi5launch_send_request_to_cmi5_player_get($cmi5launch_stream_and_send, $token, $url) {
+        
+        $stream = $cmi5launch_stream_and_send;
         // Use key 'http' even if you send the request to https://...
         // There can be multiple headers but as an array under the ONE header
         // content(body) must be JSON encoded here, as that is what CMI5 player accepts
@@ -415,12 +426,18 @@ class cmi5_connectors {
             ),
         );
 
-
+        //$helper = new cmi5launch_helpers;
+       // $stream = cmi5launch_stream_and_send();
         // Sends the stream to the specified URL and stores results.
         // The false is use_include_path, which we dont want in this case, we want to go to the url.
-        $launchresponse = $this->cmi5launch_stream_and_send( $options, $url );
+        //$launchresponse = cmi5launch_stream_and_send( $options, $url );
 
-        $sessiondecoded = json_decode($launchresponse, true);
+            //By calling the function this way, it enables encapsulation of the function and allows for testing.
+            //It is an extra step, but necessary for required PHP Unit testing.
+            $result = call_user_func($stream, $options, $url);
+    
+            
+        $sessiondecoded = json_decode($result, true);
 
         // Return response.
         return $sessiondecoded;
@@ -445,7 +462,7 @@ class cmi5_connectors {
         $url = $playerurl . "/api/v1/session/" . $sessionid;
 
         // Sends the stream to the specified URL.
-        $result = $this->cmi5launch_send_request_to_cmi5_player_get($token, $url);
+        $result = $this->cmi5launch_send_request_to_cmi5_player_get('cmi5launch_stream_and_send', $token, $url);
 
         // Check result and display message if not 200.
         $resulttest = $this->cmi5launch_connectors_error_message($result, "retrieving session info");
@@ -505,26 +522,5 @@ class cmi5_connectors {
         }
     }
 
-    /**
-     * Wrapper function to allow for testing where file_get_contents cannot be overriden.
-     * Also has create_stream as this makes a resource which interfers with testing.
-     * @param mixed $url - the url to be sent to 
-     * @param mixed $use_include_path
-     * @param mixed $context - the data to be sent
-     * @param mixed $offset
-     * @param mixed $maxlen
-     * @return mixed $result - either a string or false.
-     */
-    public function cmi5launch_stream_and_send($options, $url) {
 
-        // The options are placed into a stream to be sent.
-        $context  = stream_context_create($options);
-
-        // Sends the stream to the specified URL and stores results.
-        // The false is use_include_path, which we dont want in this case, we want to go to the url.
-        $result = file_get_contents( $url, false, $context );
-
-        // Return result.
-        return $result;
-    }
 }
