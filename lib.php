@@ -84,8 +84,9 @@ function cmi5launch_supports($feature) {
         case FEATURE_SHOW_DESCRIPTION:
             return true;
         // Type of module.
-        case FEATURE_MOD_PURPOSE:
-            return MOD_PURPOSE_CONTENT;
+        // This effects how icons are displayed? 
+      //  case FEATURE_MOD_PURPOSE:
+           // return MOD_PURPOSE_CONTENT;
         default:
             return null;
     }
@@ -202,17 +203,24 @@ function cmi5launch_build_lrs_settings(stdClass $cmi5launch) {
 function cmi5launch_delete_instance($id) {
     global $DB;
 
+    // Currently it deletes only the cmi5launch, Do we want it to delete ALL tables? What is it suppossed to do>
+    // Like if it deletes all tables is it expected to delete user data?
+    
     if (! $cmi5launch = $DB->get_record('cmi5launch', array('id' => $id))) {
         return false;
     }
 
+    // FORGET THE HARDCODED, THIS WORKS WITHOUT IT, IT APPEARS TO DELETE EVERYTHIN IN A"COURSE" BUT IF AN ACTIVITY IS DELETED IT DISAPEARS FROM MOODLE
+    //BUT NOT FROM DB. is THIS SUPPOSSED TO DO DB? 
+    
+    ///huh? why is this hardcoded?
     // Determine if there is a record of this (ever) in the cmi5launch_lrs table.
-    $cmi5launchlrsid = $DB->get_field('cmi5launch_lrs', 'id', array('cmi5launchid' => $id), $strictness = IGNORE_MISSING);
+  /*  $cmi5launchlrsid = $DB->get_field('cmi5launch_lrs', 'id', array('cmi5launchid' => $id), $strictness = IGNORE_MISSING);
     if ($cmi5launchlrsid) {
         // If there is, delete it.
         $DB->delete_records('cmi5launch_lrs', array('id' => $cmi5launchlrsid));
     }
-
+*/
     $DB->delete_records('cmi5launch', array('id' => $cmi5launch->id));
 
     return true;
