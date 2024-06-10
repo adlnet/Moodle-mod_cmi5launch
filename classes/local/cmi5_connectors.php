@@ -70,6 +70,7 @@ class cmi5_connectors {
     public function cmi5launch_create_course($id, $tenanttoken, $filename) {
 
         global $DB, $CFG;
+        
         $settings = cmi5launch_settings($id);
 
         // Build URL to import course to.
@@ -101,10 +102,36 @@ class cmi5_connectors {
      * @param $password - password.
      * @param $newtenantname - the name the new tenant will be, retreived from Tenant Name textbox.
      */
-    public function cmi5launch_create_tenant($urltosend, $username, $password, $newtenantname) {
+    public function cmi5launch_create_tenant($newtenantname) {
 
+        global $CFG, $cmi5launchid;
+
+        $settings = cmi5launch_settings($cmi5launchid);
+
+        //$actor = $USER->username;
+        $username = $settings['cmi5launchbasicname'];
+        $playerurl = $settings['cmi5launchplayerurl'];
+        $password = $settings['cmi5launchbasepass'];
         global $CFG;
 
+        // Build URL for launch URL request.
+        $url = $playerurl . "/api/v1/tenant";
+
+        echo "<br>";    
+        echo "basicname: " . $username;
+        echo "<br>";
+
+        echo "<br>";    
+        echo "password: " . $password;
+        echo "<br>";
+
+        echo "<br>";    
+        echo "URL: " . $url;
+        echo "<br>";
+
+        echo "<br>";
+        echo "newtenantname: " . $newtenantname;
+        echo "<br>";
         // The body of the request must be made as array first.
         $data = array(
             'code' => $newtenantname);
@@ -116,7 +143,7 @@ class cmi5_connectors {
         $data = json_encode($data);
 
         // Sends the stream to the specified URL.
-        $result = $this->cmi5launch_send_request_to_cmi5_player_post('cmi5launch_stream_and_send', $data, $urltosend, $filetype, $username, $password);
+        $result = $this->cmi5launch_send_request_to_cmi5_player_post('cmi5launch_stream_and_send', $data, $url, $filetype, $username, $password);
 
         // Check result and display message if not 200.
         $resulttest = $this->cmi5launch_connectors_error_message($result, "creating the tenant");
@@ -125,7 +152,7 @@ class cmi5_connectors {
 
             // Decode returned response into array.
             $returnedinfo = json_decode($result, true);
-
+            echo"It worked";
             // Return an array with tenant name and info.
             return $returnedinfo;
         } else {
