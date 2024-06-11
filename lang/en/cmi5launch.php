@@ -73,10 +73,15 @@ $string['cmi5launchcustomacchp_default'] = 'https://moodle.com';
 
 // Cmi5 grades admin.
 // Start Default LRS Admin Settings.
-$string['cmi5launchgradesettings'] = 'Default values for cmi5 launch link activity settings';
+$string['cmi5launchgradesettings'] = 'Default values ;ppppfor cmi5 launch link activity settings';
 $string['cmi5launchgradesettings_help'] = 'These are site-wide, default values used when creating a new activity. Each activity has the ability to override and provide alternative values.';
 
 $string['othersettings'] = 'Additional settings';
+
+// Cmi5 settings
+
+// Header.
+$string['cmi5launchsettingsheader'] = 'cmi5 player settings';
 
 // Cmi5 player root location.
 $string['cmi5launchplayerurl'] = 'cmi5 player URL';
@@ -89,13 +94,17 @@ $string['cmi5launchcontenturl_help'] = 'The url to communicate with cmi5 player,
 $string['cmi5launchcontenturl_default'] = '';
 
 // Cmi5 player credentials.
-$string['cmi5launchtenantname'] = 'cmi5 player: basic username';
-$string['cmi5launchtenantname_help'] = 'The cmi5 tenant username.';
+$string['cmi5launchbasicname'] = 'cmi5 player: basic username';
+$string['cmi5launchbasicname_help'] = 'The cmi5 base username.';
+$string['cmi5launchbasicname_default'] = '';
+
+$string['cmi5launchtenantname'] = 'cmi5 player: The cmi5 tenant username.';
+$string['cmi5launchtenantname_help'] = ' The tenant name attached to the token. Should only need to be used during initial setup. If for some reason the tenant name is changed a new token will need to be generated.';
 $string['cmi5launchtenantname_default'] = '';
 
-$string['cmi5launchtenantpass'] = 'cmi5 player: basic password';
-$string['cmi5launchtenantpass_help'] = 'The cmi5 tenant password (secret).';
-$string['cmi5launchtenantpass_default'] = '';
+$string['cmi5launchbasepass'] = 'cmi5 player: basic password';
+$string['cmi5launchbasepass_help'] = 'The cmi5 base password (secret).';
+$string['cmi5launchbasepass_default'] = '';
 
 $string['cmi5launchtenanttoken'] = 'cmi5 player: bearer token';
 $string['cmi5launchtenanttoken_help'] = 'The cmi5 tenant bearer token (should be a long string).';
