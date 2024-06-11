@@ -15,44 +15,34 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Class to report on sessions grades.
+ * This page is a setup page to compliment settings and enable a user to commuicate with cmi5 player for tenant issues.
  *
  * @copyright  2023 Megan Bohland
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use mod_cmi5launch\local\au_helpers;
-use mod_cmi5launch\local\session_helpers;
+
 use mod_cmi5launch\local\cmi5_connectors;
 
 ?>
 
 <script>
 
+// Function to go back to settings page.
 function goback(){
    
-    console.log("Going back to settings");
-    // Post it.
-    // Set the form paramters.
-// Set the form paramters.
-let input = document.getElementById('gobackform');
-        input.submit();
+    //REtrieve and submit form
+    let input = document.getElementById('gobackform');
+    input.submit();
     }
 </script>
 
 <?php
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
-//require('header.php');
 require_once($CFG->libdir.'/tablelib.php');
 require_once($CFG->dirroot.'/mod/cmi5launch/locallib.php');
 require_once($CFG->libdir.'/formslib.php');
 require_once($CFG->dirroot. '/reportbuilder/classes/local/report/column.php');
-
-
-
-
-
-//require_login($course, false, $cm);
 
 define('CMI5LAUNCH_REPORT_DEFAULT_PAGE_SIZE', 20);
 define('CMI5LAUNCH_REPORT_ATTEMPTS_ALL_STUDENTS', 0);
@@ -62,106 +52,70 @@ $PAGE->requires->jquery();
 
 global $cmi5launch, $CFG;
 
-//$cmi5launchsettings = cmi5launch_settings($cmi5launch->id);
-
 // External classes and functions.
 $cmi5helper = new cmi5_connectors;
-//$aushelpers = new au_helpers;
-
-//$updatesession = $sessionhelper->cmi5launch_get_update_session();
-//$getaus = $aushelpers->get_cmi5launch_retrieve_aus_from_db();
 $createtenant = $cmi5helper->cmi5launch_get_create_tenant();
-// Activity Module ID.
-//$id = required_param('id', PARAM_INT);
 
-    //Now, retrieve the damned value sent here, 
-// Retrieve the registration and AU ID from view.php.
+// Retrieve the name entered in previous pages prompt. This will be the new tenant name.
     $fromsettings = required_param('variableName', PARAM_TEXT);
- //are we getting anything ?
- echo "<br>";
- echo "From settings: " . $fromsettings . "<br>";
- echo "<br>";
-if ($fromsettings != null) {
 
-    //are we getting anything ?
-    echo "<br>";
-    echo "From settings: " . $fromsettings . "<br>";
-    echo "<br>";
-    // Make the new tenant and grab results.
-    $tenant = $createtenant($fromsettings);
-
-    // The return response should be json and have 'id' and 'code' 
-    $response = $tenant;
-
-    $code = $response['code'];
-    $id = $response['id'];
-
-    echo "Tenant code: " . $code . "<br>";
-    echo "Tenant ID: " . $id . "<br>";
-    // The code is actually the name assign it to settings
-// The question is, can it simply be assigned or does the whole table need updatin?
-//$settings['cmi5launchtenantname'] = $code;
-/*
-@param string $name the key to set
- * @param string $value the value to set (without magic quotes)
- * @param string $plugin (optional) the plugin scope, default null
- * @return bool true or exception
- */
-
-
-    $result = set_config('cmi5launchtenantname', $code, $plugin = 'cmi5launch');
-    if ($result) {
-        echo "Successfully made and saved new tenant";
-        echo "Tenant name: " . $code . "<br>";
-        echo "Tenant ID: " . $id . "<br>";
-           //if fail shoudl we freeze and alert user with a window towith error message
-           $link = "</br>
-           <p id=name >
-               <div class='input-group rounded'>
-                 <button class='btn btn-secondary' name='tenantbutton' onclick='goback()'>
-                   <span class='button-label'>Ok</span>
-                   </button>
-               </div>
-           </p>";
-           echo $link;
-        //Hopefully that worked? Now back to settings
-      //  redirect('/admin/settings.php');
-      $settingurl = new moodle_url($CFG->wwwroot . '/'.'admin/settings.php', array('section' => 'modsettingcmi5launch'));
-      // redirect($CFG->wwwroot . '/' . $CFG->admin . '/settings.php'. '?section=modsettingcmi5launch');
-        redirect($settingurl, 'Successfully made and saved new tenant', 10);
-    
-    } else {
-        echo "Failed to make tenant. Check connection to player and tenant name.";
-        //if fail shoudl we freeze and alert user with a window towith error message
-        $link = "</br>
-        <p id=name >
-            <div class='input-group rounded'>
-              <button class='btn btn-secondary' name='tenantbutton' onclick='goback()'>
-                <span class='button-label'>Ok</span>
-                </button>
-            </div>
-        </p>";
-        echo $link;
-    }
-   
-    // End of file
-}
-else {
-    // Yeah a button acknowleding each instance would be good
-    // and it can just call a different func? Or the same really, heading back to settings@
-    // If there i no tenant name then alert user, when they lick to clear take them back to settings page
-    echo "Tenant name not retrieved or blank. Please try again.";
-    $link = "</br>
+// Button to return to settings page.
+$link = "</br>
     <p id=name >
         <div class='input-group rounded'>
           <button class='btn btn-secondary' name='tenantbutton' onclick='goback()'>
-            <span class='button-label'>OK</span>
+            <span class='button-label'>Ok</span>
             </button>
         </div>
     </p>";
-    echo $link;
-   // $n = "trial";
+// Ensure a name was entered.
+if ($fromsettings != null) {
 
+    // Make the new tenant and grab results.
+    $tenant = $createtenant($fromsettings);
+
+    // The return response should be an array  and have 'id' and 'code' 
+    $response = $tenant;
+
+    //Do we need an if statement for response tyopo?
+    $name = $response['code'];
+    $id = $response['id'];
+
+
+    // maybe if we make the button link thing here and then just echo it we can save on repetitive code.
+    // if we have a response, we can save the tenant name to the settings
+    if ($name != null && $id != null) {
+        // Save the tenant name to the settings
+        $result = set_config('cmi5launchtenantname', $name, $plugin = 'cmi5launch');
+
+
+        if ($result) {
+
+            echo "Successfully made and saved new tenant";
+            echo "Tenant name: " . $name . "<br>";
+            echo "Tenant ID: " . $id . "<br>";
+
+            //Hopefully that worked? Now back to settings
+            $settingurl = new moodle_url($CFG->wwwroot . '/' . 'admin/settings.php', array('section' => 'modsettingcmi5launch'));
+
+        } else {
+            echo "Failed to make tenant. Check connection to player and tenant name.";
+            //if fail shoudl we freeze and alert user with a window towith error message
+
+            echo $link;
+        }
+
+    } else {
+
+        echo "Tenant name not retrieved from player. Check connection.";
+
+        echo $link;
+
+    }
+} else {
+    echo "Tenant name not retrieved or blank. Please try again.";
+
+    echo $link;
 }
 ?>
 

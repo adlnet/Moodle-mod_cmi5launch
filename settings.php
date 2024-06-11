@@ -361,48 +361,6 @@ $warning = "OHNO";
 
     }
 
-    // So what lobals are available to me?
-    global $DB, $CFG, $OUTPUT, $PAGE, $ADMIN, $USER, $SESSION, $cmi5launch, $cm, $course, $context;
-    echo "<br>";
-    echo "What are some of these globals? ";
-    echo "<br>";
-    /*
-    echo "DB: ";
-    var_dump($DB);
-    echo "<br>";
-    echo "CFG: ";
-    var_dump($CFG);
-    echo "<br>";
-    echo "OUTPUT: ";
-    var_dump($OUTPUT);
-    echo "<br>";
-    echo "PAGE: ";
-    var_dump($PAGE);
-    echo "<br>";
-    echo "ADMIN: ";
-    var_dump($ADMIN);
-    echo "<br>";
-    echo "USER: ";
-    var_dump($USER);
-    echo "<br>";
-    echo "SESSION: ";
-    var_dump($SESSION);
-    */
-    echo "<br>";
-    echo "cmi5launch: ";
-    var_dump($cmi5launch);
-    echo "<br>";
-    echo "cm: ";
-    var_dump($cm);
-    echo "<br>";
-    echo "course: ";
-    var_dump($course);
-    echo "<br>";
-    echo "context: ";
-    var_dump($context);
-    echo "<br>";
-    echo "<br>";
-
 
 
 ?>

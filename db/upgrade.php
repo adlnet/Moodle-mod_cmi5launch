@@ -42,6 +42,23 @@ function xmldb_cmi5launch_upgrade($oldversion) {
     global $DB;
     $dbman = $DB->get_manager();
 
+    // Change masteryscore to number type because of decimal
+    if ($oldversion < 2024061115) {
+
+        // Changing type of field masteryscore on table cmi5launch_sessions to int.
+        $tablesessions = new xmldb_table('cmi5launch_sessions');
+        $tableaus = new xmldb_table('cmi5launch_aus');
+        $field = new xmldb_field('masteryscore', XMLDB_TYPE_NUMBER, '10', null, null, null, null, 'launchmode');
+        $field2 = new xmldb_field('masteryscore', XMLDB_TYPE_NUMBER, '10', null, null, null, null, 'activitytype');
+
+        // Launch change of type for field masteryscore in both tables.
+        $dbman->change_field_type($tablesessions, $field);
+        $dbman->change_field_type($tableaus, $field2);
+        // Cmi5launch savepoint reached.
+        upgrade_mod_savepoint(true, 2024061115, 'cmi5launch');
+    }
+
+
     if ($oldversion < 2024032112) {
 
         // Define index lmsid (not unique) to be dropped form cmi5launch_sessions.
