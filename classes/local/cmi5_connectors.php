@@ -117,21 +117,6 @@ class cmi5_connectors {
         // Build URL for launch URL request.
         $url = $playerurl . "/api/v1/tenant";
 
-        echo "<br>";    
-        echo "basicname: " . $username;
-        echo "<br>";
-
-        echo "<br>";    
-        echo "password: " . $password;
-        echo "<br>";
-
-        echo "<br>";    
-        echo "URL: " . $url;
-        echo "<br>";
-
-        echo "<br>";
-        echo "newtenantname: " . $newtenantname;
-        echo "<br>";
         // The body of the request must be made as array first.
         $data = array(
             'code' => $newtenantname);
@@ -152,7 +137,7 @@ class cmi5_connectors {
 
             // Decode returned response into array.
             $returnedinfo = json_decode($result, true);
-            echo"It worked";
+
             // Return an array with tenant name and info.
             return $returnedinfo;
         } else {
@@ -261,9 +246,24 @@ class cmi5_connectors {
      * @param $audience - the name the of the audience using the token,
      * @param #tenantid - the id of the tenant
      */
-    public function cmi5launch_retrieve_token($url, $username, $password, $audience, $tenantid) {
+    public function cmi5launch_retrieve_token($audience, $tenantid) {
 
+        // Honestly the params can be rabbbed through settings right? So I thinks we can change this whole func.
+        // but if it is called, will it need to go tooo secret back page? 
+        // and can we make it same page, like if pthere is no prompt? which is fdiff then null right? Or maybe another page just to be certain.
+        
+        global $CFG, $cmi5launchid;
+
+        $settings = cmi5launch_settings($cmi5launchid);
+
+        //$actor = $USER->username;
+        $username = $settings['cmi5launchbasicname'];
+        $playerurl = $settings['cmi5launchplayerurl'];
+        $password = $settings['cmi5launchbasepass'];
         global $CFG;
+
+        // Build URL for launch URL request.
+        $url = $playerurl . "/api/v1/auth";
 
         // The body of the request must be made as array first.
         $data = array(
@@ -282,8 +282,10 @@ class cmi5_connectors {
         $resulttest = $this->cmi5launch_connectors_error_message($result, "retrieving the token");
 
         if ($resulttest == true) {
-
-            return $result;
+            $resultDecoded = json_decode($result, true);
+            $token = $resultDecoded['token'];
+            
+            return $token;
         } else {
             return false;
         }

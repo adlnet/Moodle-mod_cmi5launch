@@ -42,6 +42,23 @@ function xmldb_cmi5launch_upgrade($oldversion) {
     global $DB;
     $dbman = $DB->get_manager();
 
+    // Change masteryscore to number type because of decimal
+    if ($oldversion < 2024061115) {
+
+        // Changing type of field masteryscore on table cmi5launch_sessions to int.
+        $tablesessions = new xmldb_table('cmi5launch_sessions');
+        $tableaus = new xmldb_table('cmi5launch_aus');
+        $field = new xmldb_field('masteryscore', XMLDB_TYPE_NUMBER, '10', null, null, null, null, 'launchmode');
+        $field2 = new xmldb_field('masteryscore', XMLDB_TYPE_NUMBER, '10', null, null, null, null, 'activitytype');
+
+        // Launch change of type for field masteryscore in both tables.
+        $dbman->change_field_type($tablesessions, $field);
+        $dbman->change_field_type($tableaus, $field2);
+        // Cmi5launch savepoint reached.
+        upgrade_mod_savepoint(true, 2024061115, 'cmi5launch');
+    }
+
+
     if ($oldversion < 2024032112) {
 
         // Define index lmsid (not unique) to be dropped form cmi5launch_sessions.
@@ -56,11 +73,17 @@ function xmldb_cmi5launch_upgrade($oldversion) {
         // Define index lmsid (not unique) to be added to cmi5launch_sessions.
         $indexnew = new xmldb_index('sessionid', XMLDB_INDEX_NOTUNIQUE, ['sessionid']);
 
-        // Conditionally launch add index lmsid.
-        if (!$dbman->index_exists($table, $indexnew)) {
+        // If table exists
+        // Conditionally launch create table for cmi5launch.
+        if ($dbman->table_exists($table)) {
+            
+            // Conditionally launch add index lmsid.
+            if (!$dbman->index_exists($table, $indexnew)) {
             $dbman->add_index($table, $indexnew);
         }
 
+        }
+        
         // Cmi5launch savepoint reached.
         upgrade_mod_savepoint(true, 2024032112, 'cmi5launch');
     }
@@ -84,10 +107,17 @@ function xmldb_cmi5launch_upgrade($oldversion) {
         // Now cycle through array and remove fields.
         foreach ($tablestoadd as $table) {
         
-        // Conditionally launch add field moodlecourseid.
-        if (!$dbman->field_exists($table, $fieldmcid)) {
-            $dbman->add_field($table, $fieldmcid);
-        }
+            // If the table exists
+            // Conditionally launch add index lmsid.
+            // Conditionally launch create table for cmi5launch.
+            if ($dbman->table_exists($table)) {
+        
+            // Conditionally launch add field moodlecourseid.
+            if (!$dbman->field_exists($table, $fieldmcid)) {
+                $dbman->add_field($table, $fieldmcid);
+            }
+            }
+
         }
         
         // Cmi5launch savepoint reached.

@@ -89,7 +89,7 @@
         <FIELD NAME="launchtokenid" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Launchtoken assigned by CMI5 player"/>
         <FIELD NAME="lastrequesttime" TYPE="char" LENGTH="30" NOTNULL="false" SEQUENCE="false" COMMENT="Time a session was last requested. String as that is what is returned from player."/>
         <FIELD NAME="launchmode" TYPE="char" LENGTH="25" NOTNULL="false" SEQUENCE="false" COMMENT="Launch mode, separate from launchmethod. It can be 'Normal', 'Browse', or 'Review"/>
-        <FIELD NAME="masteryscore" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="The amount toward mastery score."/>
+        <FIELD NAME="masteryscore" TYPE="number" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="The amount toward mastery score."/>
         <FIELD NAME="score" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="The score of session (returned from 'result' parameter in statements from LRS)."/>
         <FIELD NAME="islaunched" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Has session been launched?."/>
         <FIELD NAME="isinitialized" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Has session been intialized?."/>
@@ -128,7 +128,7 @@
         <FIELD NAME="objectives" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="AUs objectives."/>
         <FIELD NAME="description" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="AUs description."/>
         <FIELD NAME="activitytype" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Activity type of AU."/>
-        <FIELD NAME="masteryscore" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="The amount it counts toward mastery score."/>
+        <FIELD NAME="masteryscore" TYPE="number" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="The amount it counts toward mastery score."/>
         <FIELD NAME="completed" TYPE="int" LENGTH="1" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="Whether an AU has met completed criteria (0 if false, 1 if true)"/>
         <FIELD NAME="passed" TYPE="int" LENGTH="1" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="Whether an AU has met passed criteria (0 if false, 1 if true)"/>
         <FIELD NAME="inprogress" TYPE="int" LENGTH="1" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="Whether an AU is in progress or not (been started) (0 if false, 1 if true)"/>

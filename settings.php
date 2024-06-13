@@ -57,6 +57,16 @@ function openprompt(){
     }
 
 }
+function totokenpage(){
+
+    console.log("To the make a token page");
+
+    
+        // Post it.
+        $('#settingformtoken').submit();
+    
+
+}
 //TRy this new func
 // Function for popup window
 function openprompt3(){
@@ -275,7 +285,7 @@ $warning = "OHNO";
 
     // Info we need to send?
  //$newtenantname;
-    $link = "</br>
+    $linktotenant = "</br>
     <p id=name >
         <div class='input-group rounded'>
           <button class='btn btn-secondary' type='reset' name='tenantbutton' onclick='openprompt()'>
@@ -284,13 +294,21 @@ $warning = "OHNO";
         </div>
     </p>
       ";
+      $linktotoken = "</br>
+      <p id=name >
+          <div class='input-group rounded'>
+            <button class='btn btn-secondary' type='reset' name='tokenbutton' onclick='totokenpage()'>
+              <span class='button-label'>Generate bearer token</span>
+              </button>
+          </div>
+      </p>
+        ";
       //$link ="<a href='http://www.google.com' target='_parent'><button>Click me !</button></a>";
     
       $setting = new admin_setting_configtext(
         'cmi5launch/cmi5launchtenantname',
         get_string('cmi5launchtenantname', 'cmi5launch'),
-        " " . get_string('cmi5launchtenantname_help', 'cmi5launch') . $link,
-
+        " " . get_string('cmi5launchtenantname_help', 'cmi5launch') . $linktotenant,
         get_string('cmi5launchtenantname_default', 'cmi5launch')
     );
     $settings->add($setting);
@@ -306,7 +324,7 @@ $warning = "OHNO";
 
     $setting = new admin_setting_configtext('cmi5launch/cmi5launchtenanttoken',
         get_string('cmi5launchtenanttoken', 'cmi5launch'),
-        get_string('cmi5launchtenanttoken_help', 'cmi5launch'),
+        get_string('cmi5launchtenanttoken_help', 'cmi5launch') . $linktotoken,
         get_string('cmi5launchtenanttoken_default', 'cmi5launch'));
     $settings->add($setting);
 
@@ -361,52 +379,13 @@ $warning = "OHNO";
 
     }
 
-    // So what lobals are available to me?
-    global $DB, $CFG, $OUTPUT, $PAGE, $ADMIN, $USER, $SESSION, $cmi5launch, $cm, $course, $context;
-    echo "<br>";
-    echo "What are some of these globals? ";
-    echo "<br>";
-    /*
-    echo "DB: ";
-    var_dump($DB);
-    echo "<br>";
-    echo "CFG: ";
-    var_dump($CFG);
-    echo "<br>";
-    echo "OUTPUT: ";
-    var_dump($OUTPUT);
-    echo "<br>";
-    echo "PAGE: ";
-    var_dump($PAGE);
-    echo "<br>";
-    echo "ADMIN: ";
-    var_dump($ADMIN);
-    echo "<br>";
-    echo "USER: ";
-    var_dump($USER);
-    echo "<br>";
-    echo "SESSION: ";
-    var_dump($SESSION);
-    */
-    echo "<br>";
-    echo "cmi5launch: ";
-    var_dump($cmi5launch);
-    echo "<br>";
-    echo "cm: ";
-    var_dump($cm);
-    echo "<br>";
-    echo "course: ";
-    var_dump($course);
-    echo "<br>";
-    echo "context: ";
-    var_dump($context);
-    echo "<br>";
-    echo "<br>";
+    ?>  
+    <form id="settingformtoken" action="../mod/cmi5launch/tokensetup.php" method="get">
+ 
+</form>
 
 
-
-?>
- <form id="settingform" action="../mod/cmi5launch/setup.php" method="get">
+ <form id="settingform" action="../mod/cmi5launch/tenantsetup.php" method="get">
         
         <input id="variableName" name="variableName" type="hidden" value="default">
 

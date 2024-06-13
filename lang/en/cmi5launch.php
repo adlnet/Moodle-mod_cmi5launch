@@ -99,7 +99,7 @@ $string['cmi5launchbasicname_help'] = 'The cmi5 base username.';
 $string['cmi5launchbasicname_default'] = '';
 
 $string['cmi5launchtenantname'] = 'cmi5 player: The cmi5 tenant username.';
-$string['cmi5launchtenantname_help'] = ' The tenant name attached to the token. Should only need to be used during initial setup. If for some reason the tenant name is changed a new token will need to be generated.';
+$string['cmi5launchtenantname_help'] = ' The tenant name attached to the token. Should only need to be used during initial setup. If for some reason the tenant name is changed a new bearer token will need to be generated.';
 $string['cmi5launchtenantname_default'] = '';
 
 $string['cmi5launchbasepass'] = 'cmi5 player: basic password';
@@ -107,7 +107,7 @@ $string['cmi5launchbasepass_help'] = 'The cmi5 base password (secret).';
 $string['cmi5launchbasepass_default'] = '';
 
 $string['cmi5launchtenanttoken'] = 'cmi5 player: bearer token';
-$string['cmi5launchtenanttoken_help'] = 'The cmi5 tenant bearer token (should be a long string).';
+$string['cmi5launchtenanttoken_help'] = 'The cmi5 tenant bearer token (should be a long string).  Should only need to be used during initial setup. If for some reason the tenant name is changed a new bearer token will need to be generated. This cannot be generated if a tenant name has not been made yet.';
 $string['cmi5launchtenanttoken_default'] = '';
 
 // Grading info - MB.
