@@ -99,7 +99,7 @@ $string['cmi5launchbasicname_help'] = 'The cmi5 base username.';
 $string['cmi5launchbasicname_default'] = '';
 
 $string['cmi5launchtenantname'] = 'cmi5 player: The cmi5 tenant username.';
-$string['cmi5launchtenantname_help'] = ' The tenant name attached to the token. Should only need to be used during initial setup. If for some reason the tenant name is changed a new bearer token will need to be generated.';
+$string['cmi5launchtenantname_help'] = ' The tenant name attached to the token. Should only need to be used during initial setup. If for some reason the tenant name is changed a new bearer token will need to be generated. NOTE: changing a tenant name will require cmi5 launch link activites to need to be re-installed. Do not change name mid sessions! Data will be lost.';
 $string['cmi5launchtenantname_default'] = '';
 
 $string['cmi5launchbasepass'] = 'cmi5 player: basic password';

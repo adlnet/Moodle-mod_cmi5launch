@@ -120,7 +120,7 @@ if ($fromsettings != null) {
         }
     } else {
 
-        echo "Failed to make tenant. Check connection to player and tenant name.";
+        echo "Failed to make tenant. Check connection to player and tenant name (cannot reuse old tenant names).";
 
         echo $link;
     }

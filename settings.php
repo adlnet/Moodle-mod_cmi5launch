@@ -37,19 +37,12 @@ use mod_cmi5launch\local\cmi5_connectors;
 ?>
 
 <script>
-      
-      function myFunction() {
-  alert("I am an alert box!");
-}
-
+// Function for popup window.
 function openprompt(){
-
-    console.log("I am in openprompt");
 
     var site = prompt("Please enter the tenant name:", "The cmi5 tenant name. Please enter a name you would like to use");
     if (site != null) {
       // Set the form paramters.
-      // I wonder if I can just submit my own form again
       $('#variableName').val(site);
 
         // Post it.
@@ -59,91 +52,9 @@ function openprompt(){
 }
 function totokenpage(){
 
-    console.log("To the make a token page");
-
-    
         // Post it.
         $('#settingformtoken').submit();
-    
-
-}
-//TRy this new func
-// Function for popup window
-function openprompt3(){
-    //open a prompt box to get new tenant name for cmi5launch. Then we can call createtenant function
-    // Hold tenant name answer
-    var x;
-    var site = prompt("Please enter the tenant name:", "The cmi5 tenant name. Please enter a name you would like to use");
-    if (site != null) {
-        
-       // document.getElementById("name").innerHTML = site;
-//var p1 =encodeURIComponent(site);
-        var dataToSend = "variableName=" + (site);
-
-
-        ////?????
-        var PageToSendTo = "settings.php";
- var MyVariable = "variableData";
- var VariablePlaceholder = "?variableName=";
- var UrlToSend = PageToSendTo + VariablePlaceholder + encodeURIComponent(site);
-
-// Prepare the data to send
-var xhr = new XMLHttpRequest();
-
-xhr.open("POST", "", true);
-xhr.send(dataToSend);
-
-// Create a new XMLHttpRequest object
-//xhr.open("POST", "", true);
-
-// Specify the request method, PHP script URL, and asynchronous
-//xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-
-// Set the content type
-xhr.onreadystatechange = function () {
-    if (xhr.readyState === XMLHttpRequest.DONE) {
-
-        console.log("where its going  " + xhr.responseURL);
-        console.log("staus tect    " + xhr.statusText);
-        // Check if the request is complete
-        if (xhr.status === 200) {
-
-            // Check if the request was successful
-            console.log(xhr.responseText);
-            // Output the response from the PHP script
-        } else {
-            console.error("Error:", xhr.status);
-            // Log an error if the request was unsuccessful
-        }
-
     }
-
-}
-    ;
-//xhr.send(dataToSend);
-// Send the data to the PHP script
-      // // 
-         // test it works and echo it
-      //  console.log(site);
- }
-}
-
-
-// Function for popup window
- function openprompt2(){
-    //open a prompt box to get new tenant name for cmi5launch. Then we can call createtenant function
-    // Hold tenant name answer
-    var x;
-        var site = prompt("Please enter the tenant name:", "The cmi5 tenant name. Please enter a name you would like to use");
-        if (site != null) {
-         
-         document.getElementById("name").innerHTML = site;
-      // // 
-         // test it works and echo it
-      //  console.log(site);
- }
-}
-
 
 </script>
 <?php
@@ -154,43 +65,6 @@ if ($ADMIN->fulltree) {
     require_once($CFG->dirroot . '/mod/cmi5launch/locallib.php');
     require_once($CFG->dirroot . '/mod/cmi5launch/settingslib.php');
 
-    // Varibale to hold answer?
-$nameanswer = "";
-
-
-// Ok let's try to get the answer from the ajax method
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["variableName"])) {
-    $receivedVariable = $_POST["variableName"];
-        echo "<br>";
-    echo" We got it ! it is ! : ". $receivedVariable;   
-    echo " IGOT IT!";
-    // Process the received variable here
-// Check for answer : 
-/////////// maybe come back to htis if (isset($_POST['tenantbutton'])) {
-     
-    // Get the answer
-  //  $.get('myFile.php', js_answer: answer);
-  //  $nameanswer = $_POST['cmi5launchtenantname'];
-    // echo it
- //   echo $_POST["name"];
- $sessionhelper = new cmi5_connectors;
- $maketenant = $sessionhelper->cmi5launch_get_create_tenant();
-
-      //  $pass = $_POST['tenantbutton'];
-
-      echo " What is recieved var : ";
-        echo $receivedVariable;  
- $newtenantname = $maketenant($receivedVariable);
-
-    echo $nameanswer;
-}
-// If it's null dont use it, if its not call func
-if ($nameanswer != null) {
-    // Call func
-    echo" We got it ! it is ! : ". $nameanswer;
-    // $maketenant = $sessionhelper->cmi5launch_get_create_tenant();
-}
- 
     // MB
     // From scorm grading stuff.
     $yesno = array(0 => get_string('no'),
@@ -247,7 +121,6 @@ if ($nameanswer != null) {
         get_string('cmi5launchuseactoremail_help', 'cmi5launch'),
         1));
 
-        // LEt's add a new header to separate cmi5 from lrs
     $settings->add(new admin_setting_heading('cmi5launch/cmi5launchsettings', get_string('cmi5launchsettingsheader', 'cmi5launch'), ''));
 
 
@@ -255,13 +128,6 @@ if ($nameanswer != null) {
         get_string('cmi5launchplayerurl', 'cmi5launch'),
         get_string('cmi5launchplayerurl_help', 'cmi5launch'),
         get_string('cmi5launchplayerurl_default', 'cmi5launch'), PARAM_URL));
-    /*    
-    $settings->add(new admin_setting_configtext_mod_cmi5launch('cmi5launch/cmi5launchcontenturl',
-        get_string('cmi5launchcontenturl', 'cmi5launch'),
-        get_string('cmi5launchcontenturl_help', 'cmi5launch'),
-        get_string('cmi5launchcontenturl_default', 'cmi5launch'), PARAM_URL));
-*/
-
 
     $setting = new admin_setting_configtext('cmi5launch/cmi5launchbasicname',
         get_string('cmi5launchbasicname', 'cmi5launch'),
@@ -276,15 +142,7 @@ if ($nameanswer != null) {
     $settings->add($setting);
 
 
-
-$warning = "OHNO";
-   // $link = "</form><a href=".new moodle_url('/settings.php')." class='btn btn-danger';>Empty all results</a> <strong style='color: red;'>".$warning."</strong>";
-   // $clear_url = new moodle_url('/settings.php');
-    // For form action we will call new tenant or new token
-    // Furthe we can set them as to apperar when made either here or in those funcs being called
-
-    // Info we need to send?
- //$newtenantname;
+    // Buttons.
     $linktotenant = "</br>
     <p id=name >
         <div class='input-group rounded'>
@@ -305,22 +163,28 @@ $warning = "OHNO";
         ";
       //$link ="<a href='http://www.google.com' target='_parent'><button>Click me !</button></a>";
     
-      $setting = new admin_setting_configtext(
-        'cmi5launch/cmi5launchtenantname',
-        get_string('cmi5launchtenantname', 'cmi5launch'),
-        " " . get_string('cmi5launchtenantname_help', 'cmi5launch') . $linktotenant,
-        get_string('cmi5launchtenantname_default', 'cmi5launch')
-    );
-    $settings->add($setting);
-/*
-    echo"<br>";
-    //echo "<script>document.writeln(p1);</script>";
-    //echo"Hey it worked and I cansee receivedVariable " . $receivedVariable; 
-    echo "What is settings? Did we change it>???? ";
-    $toread = $settings['cmi5launchtenantname'];
-    var_dump($toread);
-    echo "<br>";
-*/
+      // Verify there is a tenant name and id. If there is, display it, if not allow them to make one.
+       // Retrieves the string if there or false if not.
+        $tenantname = get_config('cmi5launch', 'cmi5launchtenantname');
+        $tenantid = get_config('cmi5launch', 'cmi5launchtenantid');
+
+        // If niether are false.
+    if ($tenantname != null && $tenantid != null) {
+       
+        $todisplay  = "<b>Tenant name is: " . $tenantname . ". Tenant id is: " . $tenantid . "</b><div><br> The tenant name and ID have been set. They cannot be changed without causing problems with existing cmi5 launch link activities. To change, plugin must be uninstalled and reinstalled.</div> <div><br></div>";
+        $setting = new admin_setting_description('cmi5launchtenantmessage', "cmi5launch tenant name and id:",  $todisplay);
+        $settings->add($setting);
+    
+    } else {
+
+        $setting = new admin_setting_configtext(
+            'cmi5launch/cmi5launchtenantname',
+            get_string('cmi5launchtenantname', 'cmi5launch'),
+            " " . get_string('cmi5launchtenantname_help', 'cmi5launch') . $linktotenant,
+            get_string('cmi5launchtenantname_default', 'cmi5launch')
+        );
+        $settings->add($setting);
+    };
 
     $setting = new admin_setting_configtext('cmi5launch/cmi5launchtenanttoken',
         get_string('cmi5launchtenanttoken', 'cmi5launch'),
@@ -328,19 +192,17 @@ $warning = "OHNO";
         get_string('cmi5launchtenanttoken_default', 'cmi5launch'));
     $settings->add($setting);
 
-/*
-    $editstring = "I am a button";
 
-    $url = new moodle_url("$CFG->wwwroot/my/index.php");
-    $button = $OUTPUT->single_button($url, $editstring);
-    $PAGE->set_button($button);
-    $editstring2 = "I am another button";
+    $setting=
+        new admin_setting_configselect_with_lock(
+            'restore/restore_replace_keep_roles_and_enrolments',
+            new lang_string('setting_keep_roles_and_enrolments', 'backup'),
+            new lang_string('config_keep_roles_and_enrolments', 'backup'),
+            array('value' => 0, 'locked' => 0),
+            array(1 => get_string('yes'), 0 => get_string('no'))
+        );
+    $settings->add($setting);
 
-    $url = new moodle_url("$CFG->wwwroot/my/index.php");
-    $button = $OUTPUT->single_button($url, $editstring2);
-    $PAGE->set_button($button);
-  
-  */
     // MB.
     // Grade stuff I'm bringing over.
         // Default grade settings.

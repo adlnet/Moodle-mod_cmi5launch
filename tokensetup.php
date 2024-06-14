@@ -65,9 +65,6 @@ $gettoken = $cmi5helper->cmi5launch_get_retrieve_token();
      </div>
  </p>";
 
- // Maybe we can have a thing here if fromsettings equals a keyword, say token, call token making stuff.
- // after all it doesn't need input from user. but we should write a catch to warn there is no tenant
- // because it does need a tenant to make a token.
 
  // Before a token can be made, there must be a tenant name and id, so verify these exist, if not throw error.
 
@@ -78,7 +75,7 @@ $gettoken = $cmi5helper->cmi5launch_get_retrieve_token();
 // If niether are false.
 if ($tenantname != null && $tenantid != null) {
 
-    // Make the new tenant and grab results.
+    // Make the new token and grab results.
     $token = $gettoken($tenantname, $tenantid);
 
 // If the token is not false it should be what we need
@@ -92,7 +89,7 @@ if ($tenantname != null && $tenantid != null) {
             echo "<br>";
             echo "Save failed. With result " . $tokenresult . "<br>";
             
-            //if fail shoudl we freeze and alert user with a window towith error message
+            // If fail we freeze and alert user with a window with error message.
             echo $link;
         }else {
         // Assumin the tokenresult is not false, it was saved correctly and we cango back to setting pae.
@@ -103,12 +100,13 @@ if ($tenantname != null && $tenantid != null) {
         }
     }
     else {
+
         echo "Failed to retrieve token from cmi5 player. Check connection with player, ensure tenant name and ID exist, and try again.";
         echo "<br>";
         echo "Token retrieval failed. With result " . $tokenresult . "<br>";
         
-        //if fail shoudl we freeze and alert user with a window towith error message
-        echo $link;
+            // If fail we freeze and alert user with a window with error message.
+            echo $link;
     }
 
 } else {
