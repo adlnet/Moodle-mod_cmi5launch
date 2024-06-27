@@ -44,7 +44,6 @@ class session {
 
         foreach ($statement as $key => $value) {
 
-      
             $this->$key = ($value);
         }
 
