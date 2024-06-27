@@ -17,7 +17,7 @@
 /* For global cmi5 settings  */
 
 /**
- * Defines the version of cmi5launch
+ * Cmi5 settings. Ability to update and change 
  *
  * This code fragment is called by moodle_needs_upgrading() and
  * /admin/index.php
@@ -28,32 +28,22 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
-
-
 defined('MOODLE_INTERNAL') || die;
 
-use mod_cmi5launch\local\cmi5_connectors;
 ?>
 
 <script>
-// Function for popup window.
-function openprompt(){
 
-    var site = prompt("Please enter the tenant name:", "The cmi5 tenant name. Please enter a name you would like to use");
-    if (site != null) {
-      // Set the form paramters.
-      $('#variableName').val(site);
-
-        // Post it.
-        $('#settingform').submit();
-    }
-
-}
-function totokenpage(){
+    function totokenpage(){
 
         // Post it.
         $('#settingformtoken').submit();
+    }
+
+    function tosetup(){
+
+    // Post it.
+    $('#setupform').submit();
     }
 
 </script>
@@ -69,11 +59,14 @@ if ($ADMIN->fulltree) {
     // From scorm grading stuff.
     $yesno = array(0 => get_string('no'),
                    1 => get_string('yes'));
-
+    
     // Default display settings.
     $settings->add(new admin_setting_heading('cmi5launch/cmi5launchlrsfieldset',
         get_string('cmi5launchlrsfieldset', 'cmi5launch'),
         get_string('cmi5launchlrsfieldset_help', 'cmi5launch')));
+
+        // LRS settings 
+    $settings->add(new admin_setting_heading('cmi5launch/cmi5lrssettings', get_string('cmi5lrssettingsheader', 'cmi5launch'), ''));
 
     $settings->add(new admin_setting_configtext_mod_cmi5launch('cmi5launch/cmi5launchlrsendpoint',
         get_string('cmi5launchlrsendpoint', 'cmi5launch'),
@@ -121,87 +114,88 @@ if ($ADMIN->fulltree) {
         get_string('cmi5launchuseactoremail_help', 'cmi5launch'),
         1));
 
+    // The first time user logs in there will be a button for setup.
+    $showbutton = false;
+    // If tenantname or id is false, this is a first time setup we'll have the new button.
+    $tenantid = get_config('cmi5launch', 'cmi5launchtenantid');
+    $tenantname = get_config('cmi5launch', 'cmi5launchtenantname');
+    if ($tenantid == null || $tenantid == false) {
+        $showbutton = true;
+
+    }
     $settings->add(new admin_setting_heading('cmi5launch/cmi5launchsettings', get_string('cmi5launchsettingsheader', 'cmi5launch'), ''));
 
-
-    $settings->add(new admin_setting_configtext_mod_cmi5launch('cmi5launch/cmi5launchplayerurl',
-        get_string('cmi5launchplayerurl', 'cmi5launch'),
-        get_string('cmi5launchplayerurl_help', 'cmi5launch'),
-        get_string('cmi5launchplayerurl_default', 'cmi5launch'), PARAM_URL));
-
-    $setting = new admin_setting_configtext('cmi5launch/cmi5launchbasicname',
-        get_string('cmi5launchbasicname', 'cmi5launch'),
-        get_string('cmi5launchbasicname_help', 'cmi5launch'),
-        get_string('cmi5launchbasicname_default', 'cmi5launch'));
-    $settings->add($setting);
-
-    $setting = new admin_setting_configtext('cmi5launch/cmi5launchbasepass',
-        get_string('cmi5launchbasepass', 'cmi5launch'),
-        get_string('cmi5launchbasepass_help', 'cmi5launch'),
-        get_string('cmi5launchbasepass_default', 'cmi5launch'));
-    $settings->add($setting);
-
-
-    // Buttons.
-    $linktotenant = "</br>
+  // We need to puck a diff thing for this button, we dont want the text baox available
+if ($showbutton) {
+    // show only a button, otherwise reg showing
+    $linktocmi5 = "</br>
     <p id=name >
         <div class='input-group rounded'>
-          <button class='btn btn-secondary' type='reset' name='tenantbutton' onclick='openprompt()'>
-            <span class='button-label'>Generate tenant</span>
+          <button class='btn btn-secondary' type='reset' name='cmi5button' onclick='tosetup()'>
+            <span class='button-label'>Enter cmi5 player info</span>
             </button>
         </div>
     </p>
       ";
-      $linktotoken = "</br>
-      <p id=name >
-          <div class='input-group rounded'>
-            <button class='btn btn-secondary' type='reset' name='tokenbutton' onclick='totokenpage()'>
-              <span class='button-label'>Generate bearer token</span>
-              </button>
-          </div>
-      </p>
-        ";
-      //$link ="<a href='http://www.google.com' target='_parent'><button>Click me !</button></a>";
-    
-      // Verify there is a tenant name and id. If there is, display it, if not allow them to make one.
-       // Retrieves the string if there or false if not.
-        $tenantname = get_config('cmi5launch', 'cmi5launchtenantname');
-        $tenantid = get_config('cmi5launch', 'cmi5launchtenantid');
 
-        // If niether are false.
-    if ($tenantname != null && $tenantid != null) {
-       
-        $todisplay  = "<b>Tenant name is: " . $tenantname . ". Tenant id is: " . $tenantid . "</b><div><br> The tenant name and ID have been set. They cannot be changed without causing problems with existing cmi5 launch link activities. To change, plugin must be uninstalled and reinstalled.</div> <div><br></div>";
-        $setting = new admin_setting_description('cmi5launchtenantmessage', "cmi5launch tenant name and id:",  $todisplay);
-        $settings->add($setting);
-    
+      //use this for the button instead of config text
+      $setting = new admin_setting_description('cmi5launchsetup', "<br><br>First time setup:", $linktocmi5);
+            $settings->add($setting);
+
     } else {
 
+        $settings->add(
+            new admin_setting_configtext_mod_cmi5launch(
+                'cmi5launch/cmi5launchplayerurl',
+                get_string('cmi5launchplayerurl', 'cmi5launch'),
+                get_string('cmi5launchplayerurl_help', 'cmi5launch'),
+                get_string('cmi5launchplayerurl_default', 'cmi5launch'),
+                PARAM_URL
+            )
+        );
+
         $setting = new admin_setting_configtext(
-            'cmi5launch/cmi5launchtenantname',
-            get_string('cmi5launchtenantname', 'cmi5launch'),
-            " " . get_string('cmi5launchtenantname_help', 'cmi5launch') . $linktotenant,
-            get_string('cmi5launchtenantname_default', 'cmi5launch')
+            'cmi5launch/cmi5launchbasicname',
+            get_string('cmi5launchbasicname', 'cmi5launch'),
+            get_string('cmi5launchbasicname_help', 'cmi5launch'),
+            get_string('cmi5launchbasicname_default', 'cmi5launch')
         );
         $settings->add($setting);
-    };
 
-    $setting = new admin_setting_configtext('cmi5launch/cmi5launchtenanttoken',
-        get_string('cmi5launchtenanttoken', 'cmi5launch'),
-        get_string('cmi5launchtenanttoken_help', 'cmi5launch') . $linktotoken,
-        get_string('cmi5launchtenanttoken_default', 'cmi5launch'));
-    $settings->add($setting);
-
-
-    $setting=
-        new admin_setting_configselect_with_lock(
-            'restore/restore_replace_keep_roles_and_enrolments',
-            new lang_string('setting_keep_roles_and_enrolments', 'backup'),
-            new lang_string('config_keep_roles_and_enrolments', 'backup'),
-            array('value' => 0, 'locked' => 0),
-            array(1 => get_string('yes'), 0 => get_string('no'))
+        $setting = new admin_setting_configtext(
+            'cmi5launch/cmi5launchbasepass',
+            get_string('cmi5launchbasepass', 'cmi5launch'),
+            get_string('cmi5launchbasepass_help', 'cmi5launch'),
+            get_string('cmi5launchbasepass_default', 'cmi5launch')
         );
-    $settings->add($setting);
+        $settings->add($setting);
+
+     // Display tenant info
+        $todisplay = "<b>Tenant name is: " . $tenantname . ". Tenant id is: " . $tenantid . "</b><div><br> The tenant name and ID have been set. They cannot be changed without causing problems with existing cmi5 launch link activities. To change, plugin must be uninstalled and reinstalled.</div> <div><br></div>";
+        $setting = new admin_setting_description('cmi5launchtenantmessage', "cmi5launch tenant name and id:", $todisplay);
+        $settings->add($setting);
+
+
+        // Token generate button.
+        $linktotoken = "</br>
+        <p id=name >
+            <div class='input-group rounded'>
+              <button class='btn btn-secondary' type='reset' name='tokenbutton' onclick='totokenpage()'>
+                <span class='button-label'>Generate new bearer token</span>
+                </button>
+            </div>
+        </p>
+          ";
+        $setting = new admin_setting_configtext(
+            'cmi5launch/cmi5launchtenanttoken',
+            get_string('cmi5launchtenanttoken', 'cmi5launch'),
+            get_string('cmi5launchtenanttoken_help', 'cmi5launch') . $linktotoken,
+            get_string('cmi5launchtenanttoken_default', 'cmi5launch')
+        );
+        $settings->add($setting);
+
+    }
+
 
     // MB.
     // Grade stuff I'm bringing over.
@@ -241,7 +235,13 @@ if ($ADMIN->fulltree) {
 
     }
 
-    ?>  
+    ?> 
+    
+    <form id="setupform" action="../mod/cmi5launch/setupform.php" method="get">
+ 
+ </form>
+
+
     <form id="settingformtoken" action="../mod/cmi5launch/tokensetup.php" method="get">
  
 </form>

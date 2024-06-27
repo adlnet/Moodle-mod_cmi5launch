@@ -35,6 +35,9 @@ $string['modulenameplural'] = 'cmi5 launch links';
 $string['modulename_help'] = 'A plug in for Moodle that allows the launch of cmi5 (xAPI) content which is then tracked to a separate LRS.';
 
 // Start Default LRS Admin Settings.
+// Header.
+$string['cmi5lrssettingsheader'] = 'LRS connection settings';
+
 $string['cmi5launchlrsfieldset'] = 'Default values for cmi5 launch link activity settings';
 $string['cmi5launchlrsfieldset_help'] = 'These are site-wide, default values used when creating a new activity. Each activity has the ability to override and provide alternative values.';
 
@@ -99,7 +102,11 @@ $string['cmi5launchbasicname_help'] = 'The cmi5 base username.';
 $string['cmi5launchbasicname_default'] = '';
 
 $string['cmi5launchtenantname'] = 'cmi5 player: The cmi5 tenant username.';
+$string['cmi5launchtenantnamesetup'] = 'Please enter a value for cmi5 tenant name.';
+$string['cmi5launchtenantname'] = 'cmi5 player: The cmi5 tenant username.';
+$string['cmi5launchtenantnamesetup_help'] = ' The tenant name to be used in cmi5 player requests, and attached to the token. Alphanumeric characters and spaces accepted.';
 $string['cmi5launchtenantname_help'] = ' The tenant name attached to the token. Should only need to be used during initial setup. If for some reason the tenant name is changed a new bearer token will need to be generated. NOTE: changing a tenant name will require cmi5 launch link activites to need to be re-installed. Do not change name mid sessions! Data will be lost.';
+
 $string['cmi5launchtenantname_default'] = '';
 
 $string['cmi5launchbasepass'] = 'cmi5 player: basic password';

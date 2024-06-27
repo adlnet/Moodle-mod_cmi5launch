@@ -23,29 +23,22 @@
 
 use mod_cmi5launch\local\cmi5_connectors;
 
-?>
 
-<script>
 
-function goback(){
-   
-    // Retrieve the form and submit it.
-    let input = document.getElementById('gobackform');
-        input.submit();
-    }
-</script>
-
-<?php
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require_once($CFG->libdir.'/tablelib.php');
 require_once($CFG->dirroot.'/mod/cmi5launch/locallib.php');
 require_once($CFG->libdir.'/formslib.php');
 require_once($CFG->dirroot. '/reportbuilder/classes/local/report/column.php');
+// Include our class file
+require_once($CFG->dirroot.'/mod/cmi5launch/classes/local/tenant_form.php');
+// Tell moodle about our page, tell it what the url is.\\
+$PAGE->set_url('/mod/cmi5launch/tenantsetup.php');
+// Tell moodle the context, in this case the site context (it's system wide not a course or course page.)
+$PAGE->set_context(\context_system::instance());
+// Title tells what is on tab
+$PAGE->set_title(title: 'Creating a tenant');
 
-define('CMI5LAUNCH_REPORT_DEFAULT_PAGE_SIZE', 20);
-define('CMI5LAUNCH_REPORT_ATTEMPTS_ALL_STUDENTS', 0);
-define('CMI5LAUNCH_REPORT_ATTEMPTS_STUDENTS_WITH', 1);
-define('CMI5LAUNCH_REPORT_ATTEMPTS_STUDENTS_WITH_NO', 2);
 $PAGE->requires->jquery();
 
 global $cmi5launch, $CFG;
@@ -54,84 +47,88 @@ global $cmi5launch, $CFG;
 $cmi5helper = new cmi5_connectors;
 $createtenant = $cmi5helper->cmi5launch_get_create_tenant();
 
-// Retrieve the name entered in previous page prompt.
-$fromsettings = required_param('variableName', PARAM_TEXT);
+// Instantiate form.
+$mform = new setup_tenant();
 
-// Return link/button to settings page.
- $link = "</br>
- <p id=name >
-     <div class='input-group rounded'>
-       <button class='btn btn-secondary' name='tenantbutton' onclick='goback()'>
-         <span class='button-label'>OK</span>
-         </button>
-     </div>
- </p>";
+// Form processing and displaying is done here.
+if ($mform->is_cancelled()) {
 
- // Maybe we can have a thing here if fromsettings equals a keyword, say token, call token making stuff.
- // after all it doesn't need input from user. but we should write a catch to warn there is no tenant
- // because it does need a tenant to make a token.
+    // If they cancel, redirect back to the setup page.
+    redirect(url: $CFG->wwwroot . '/mod/cmi5launch/setupform.php', message: 'Cancelled');
 
- 
-if ($fromsettings != null) {
+} else if ($fromform = $mform->get_data()) {
 
+    // Retrieve username.
+    $cmi5tenant = $fromform->cmi5tenant;
 
-    // Make the new tenant and grab results.
-    $tenant = $createtenant($fromsettings);
+    if ($cmi5tenant != null) {
 
-    // The return response should be json and have 'id' and 'code' 
-    $response = $tenant;
+        // Make the new tenant and grab results.
+        // here is an aarea that could fail. Should we try catch or is that covered in the creat tenant call?
+        //TODO
+        $tenant = $createtenant($cmi5tenant);
 
-    // Save the code as the tenant name and ID as ID.
-    $name = $response['code'];
-    $id = $response['id'];
+        // The return response should be json and have 'id' and 'code' 
+        $response = $tenant;
 
-    echo "Tenant code: " . $name . "<br>";
-    echo "Tenant ID: " . $id . "<br>";
+        // Save the code as the tenant name and ID as ID.
+        $name = $response['code'];
+        $id = $response['id'];
 
-    // check we have a tenant and is, and save them to db for later retrieval (particularly id)
-    if ($name != null && $id != null) {
+        echo "Tenant code: " . $name . "<br>";
+        echo "Tenant ID: " . $id . "<br>";
+
+        // check we have a tenant and is, and save them to db for later retrieval (particularly id)
+        if ($name != null && $id != null) {
 
 
-        $result = set_config('cmi5launchtenantname', $name, $plugin = 'cmi5launch');
-        
-        // But how can we save the id to DB when this page has no access to cmi5launch
-        // What if te id is saved as a invisible settings? 
-        // Is that a thing?
-        // But do we need an id? Probably not cause like...
-        // It saves over itself and we don't need to keep records do we?
-        // But then we would need to look it up with query right? Might be better to just save it someoien
-        // Lets see if we can just make a setting here!
-        $idresult = set_config('cmi5launchtenantid', $id, $plugin = 'cmi5launch');
+            $result = set_config('cmi5launchtenantname', $name, $plugin = 'cmi5launch');
 
-        if($idresult && $result ){
-            
-            // If result is true then redirect back to settings page.
-            $settingurl = new moodle_url($CFG->wwwroot . '/' . 'admin/settings.php', array('section' => 'modsettingcmi5launch'));
-            
-            redirect($settingurl, 'Successfully made and saved new tenant', 10);
+            $idresult = set_config('cmi5launchtenantid', $id, $plugin = 'cmi5launch');
 
+            if ($idresult && $result) {
+
+                // If result is true then redirect back to settings page.
+                // except now we dont want to redirect to  settings! We want to go to 
+                // The TOKEN setup form
+                // Wait, maybe it should do this automatically? Like they don't need to enter it sine we are making this make it for them, and we don't need them to
+                // press a button on a new form JUST to make a token. Lets do it behind the scenes and they can retrieve it if they want through an 
+                //echo or settings page? 
+//                $settingurl = new moodle_url($CFG->wwwroot . '/' . 'admin/settings.php', array('section' => 'modsettingcmi5launch'));
+                redirect(url: $CFG->wwwroot . '/mod/cmi5launch/tokensetup.php', message: 'Tenant made and saved successfully');
+
+               // redirect($settingurl, 'Successfully made and saved new tenant', 10);
+
+            } else {
+                echo "Failed to save tenant to DB.";
+                echo "<br>";
+                echo "Tenant name: " . $name . " failed to save as setting. With result " . $result . "<br>";
+                //if fail shoudl we freeze and alert user with a window towith error message
+
+                echo $link;
+            }
         } else {
-            echo "Failed to save tenant to DB.";
-            echo "<br>";
-            echo "Tenant name: " . $name . " failed to save as setting. With result " . $result . "<br>";
-            //if fail shoudl we freeze and alert user with a window towith error message
+
+            echo "Failed to make tenant. Check connection to player and tenant name (cannot reuse old tenant names).";
 
             echo $link;
         }
     } else {
 
-        echo "Failed to make tenant. Check connection to player and tenant name (cannot reuse old tenant names).";
+        // If there is no tenant name then alert user, when they click to clear take them back to settings page.
+        echo "Tenant name not retrieved or blank. Please try again.";
 
         echo $link;
+
     }
-} else {
-    
-    // If there is no tenant name then alert user, when they click to clear take them back to settings page.
-    echo "Tenant name not retrieved or blank. Please try again.";
- 
-    echo $link;
 
 }
+;
+echo $OUTPUT->header();
+
+// Display the form.
+$mform->display();
+echo $OUTPUT->footer();
 ?>
 
 

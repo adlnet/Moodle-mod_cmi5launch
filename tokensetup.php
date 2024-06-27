@@ -23,25 +23,21 @@
 
 use mod_cmi5launch\local\cmi5_connectors;
 
-?>
 
-<script>
 
-function goback(){
-   
-    // Retrieve the form and submit it.
-    let input = document.getElementById('gobackform');
-        input.submit();
-    }
-</script>
-
-<?php
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require_once($CFG->libdir.'/tablelib.php');
 require_once($CFG->dirroot.'/mod/cmi5launch/locallib.php');
 require_once($CFG->libdir.'/formslib.php');
 require_once($CFG->dirroot. '/reportbuilder/classes/local/report/column.php');
-
+// Include our class file
+require_once($CFG->dirroot.'/mod/cmi5launch/classes/local/token_form.php');
+// Tell moodle about our page, tell it what the url is.\\
+$PAGE->set_url('/mod/cmi5launch/tokensetup.php');
+// Tell moodle the context, in this case the site context (it's system wide not a course or course page.)
+$PAGE->set_context(\context_system::instance());
+// Title tells what is on tab
+$PAGE->set_title(title: 'Creating a tenant');
 define('CMI5LAUNCH_REPORT_DEFAULT_PAGE_SIZE', 20);
 define('CMI5LAUNCH_REPORT_ATTEMPTS_ALL_STUDENTS', 0);
 define('CMI5LAUNCH_REPORT_ATTEMPTS_STUDENTS_WITH', 1);
@@ -53,18 +49,6 @@ global $cmi5launch, $CFG;
 // External classes and functions.
 $cmi5helper = new cmi5_connectors;
 $gettoken = $cmi5helper->cmi5launch_get_retrieve_token();
-
-
-// Return link/button to settings page.
- $link = "</br>
- <p id=name >
-     <div class='input-group rounded'>
-       <button class='btn btn-secondary' name='tokenbutton' onclick='goback()'>
-         <span class='button-label'>OK</span>
-         </button>
-     </div>
- </p>";
-
 
  // Before a token can be made, there must be a tenant name and id, so verify these exist, if not throw error.
 
@@ -117,6 +101,14 @@ if ($tenantname != null && $tenantid != null) {
     echo $link;
 
 }
+
+
+//whenyou want to out put html use the moodle core output rendereer: often overridden in theme
+echo $OUTPUT->header();
+ 
+// we want to display a form
+$mform = new setup_token();
+echo $OUTPUT->footer();
 ?>
 
 
