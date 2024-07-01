@@ -55,21 +55,30 @@ class progress {
             'since' => $session->createdat,
         );
 
-        $statements = $this->cmi5launch_send_request_to_lrs($data, $session->id);
+        // Try and retrieve statements
+        try {
+            $statements = $this->cmi5launch_send_request_to_lrs($data, $session->id);
+/*
+            if ($statements === false || $statements == null) {
+                throw new \Exception ("No statements found.");
+            }
+            */
+            // The results come back as nested array under more then statements. We only want statements, and we want them unique.
+            $statement = array_chunk($statements["statements"], 1);
 
-        // The results come back as nested array under more then statements. We only want statements, and we want them unique.
-        $statement = array_chunk($statements["statements"], 1);
+            $length = count($statement);
 
-        $length = count($statement);
+            for ($i = 0; $i < $length; $i++) {
 
-        for ($i = 0; $i < $length; $i++) {
+                // This separates the larger statement into the separate sessions and verbs.
+                $current = ($statement[$i]);
+                array_push($result, array($registrationid => $current));
+            }
 
-            // This separates the larger statement into the separate sessions and verbs.
-            $current = ($statement[$i]);
-            array_push($result, array($registrationid => $current));
+            return $result;
+        } catch (\Throwable $e) {
+            echo 'Trouble retrieving statements from LRS. Caught exception: ',  $e->getMessage(), "\n";
         }
-
-        return $result;
     }
 
     /**
@@ -109,11 +118,18 @@ class progress {
 
         // Sends the stream to the specified URL and stores results.
         // The false is use_include_path, which we dont want in this case, we want to go to the url.
-        $result = file_get_contents($url, false, $context);
+       try {
+            $result = file_get_contents($url, false, $context);
+            
+            $resultdecoded = json_decode($result, true);
+            return $resultdecoded;
+        } catch (\Throwable $e) {
+            echo 'Unable to communicate with LRS. Caught exception: ',  $e->getMessage(), "\n";
+            echo "<br>";
+            echo " Check LRS is up, username and password are correct, and LRS endpoint is correct.";
+        }
 
-        $resultdecoded = json_decode($result, true);
-
-        return $resultdecoded;
+        
     }
 
     /**
