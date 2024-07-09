@@ -23,7 +23,25 @@
 
 namespace mod_cmi5launch\local;
 
+/**
+ * An exception handler to use in AU cases when many different exceptions for data errors may be thrown. 
+ * @param mixed $errno
+ * @param mixed $errstr
+ * @param mixed $errfile
+ * @param mixed $errline
+ * @throws \mod_cmi5launch\local\nullException
+ * @return never
+ */
+function exception_au(\Throwable $exception)
+{
+    // echo"Error stirn ---  $errstr";
+    // echo"Error number ---  $errno";
+    echo " EHAT?";
+    // Maybe we can construct the new errors here. This would allow the error personalization? And keep main code clean
 
+    throw new fieldException('Error OVER: ' . $exception->getMessage(), 0);
+    //  exit;
+}
     function array_chunk_warning($errno, $errstr, $errfile, $errline)
     {
         // echo"Error stirn ---  $errstr";

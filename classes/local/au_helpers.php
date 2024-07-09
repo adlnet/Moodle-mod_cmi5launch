@@ -139,6 +139,7 @@ class au_helpers {
         global $DB, $USER, $cmi5launch;
         $table = "cmi5launch_aus";
         $newid = "";
+        $newrecord = "";
         // An array to hold the created ids.
         $auids = array();
         // Array of all items in new record, this will be useful for 
@@ -146,24 +147,23 @@ class au_helpers {
         $newrecorditems = array('id', 'attempt', 'auid', 'launchmethod', 'lmsid', 'url', 'type', 'title', 'moveon', 'auindex', 'parents', 'objectives', 'description', 'activitytype', 'masteryscore', 'completed', 'passed', 'inprogress', 'noattempt', 'satisfied', 'moodlecourseid');
 
         set_error_handler('mod_cmi5launch\local\sifting_data_warning', E_WARNING);
-        
+        set_exception_handler('mod_cmi5launch\local\exception_au');
+        $currentrecord = 1;
         //Check it's not null.
         if ($auobjectarray == null) {
-            throw new nullException('Cannot save AU information. AU object array is: ' . $auobjectarray, 0);
+            throw new nullException('Cannot save AU information. AU object array is: null' , 0);
 
         } else {
             // For each AU in array build a new record and save it.
             // Because of so many nested variables this needs to be done manually.
             foreach ($auobjectarray as $auobject) {
-
+                
                 // I suppose another thing that could o wrong is the retrieval or subsequent encoding of these items.
                 // Sooo maybe wrap hte whole thing in a try/cath?
 // Can we make an exception that points to whos is missing? Like title vs id? 
                 // Now here we need an exception catchy thing, because theres no way to know WHAT wmight be good 
                 try {
-                    set_error_handler('mod_cmi5launch\local\sifting_data_warning', E_WARNING);
-        
-                    // Make a newrecord to save.
+                   // Make a newrecord to save.
                     $newrecord = new \stdClass();
 
                     $newrecord->userid = $USER->id;
@@ -191,23 +191,32 @@ class au_helpers {
                     // And HERE we can add the moodlecourseid.
                     $newrecord->moodlecourseid = $cmi5launch->id;
 
-                    // What could go wrong here? The record is not saved? The record is not saved correctly?
+                   // echo" What are the newrecords? " . var_dump($auobject->moveOn) . "\n";
+                   
+               // What could go wrong here? The record is not saved? The record is not saved correctly?
                     // Save the record and get the new id.
                     $newid = $DB->insert_record($table, $newrecord, true);
                     // Save new id to list to pass back.
                     $auids[] = $newid;
+                    $currentrecord++;
+                //    echo" What are the newrecords? " . print_r($newrecord) . "\n";
 
                     // Thats right, the error handler is throwing the exception, not the code under test, so catch ANY error
                     // A type error cn also be thrown here, throwable catches it, so we either need to set an exception handler as well
                     // or catch throwable
-                    
+
+                    // The set exception handler catches exceptionas that SLIP by,
+                    // so maybe DONT make it throwable and  catch type errror
                 } catch (\Throwable $e) {
                
                     // Maybe we can construct the new errors here. This would allow the error personalization? And keep main code clean
                     // maybe the catch is just what is suppossed to happen when the 
                     //error is thrown, any additional stuff
                     //the current new record is
-                    echo "Cannot save to DB. Stopped at record with ID number " . print_r($newid) . ".";
+                  //  echo "New idis ";
+                  
+                    // Its plus one because it would be the recor that couldnt save, so the last id would be the the previous one that went throuh
+                    echo "Cannot save to DB. Stopped at record with ID number " . ($currentrecord) . ".";
 
                     // ok so what is e?
                    // echo"Error stirn ---  " . $e->getMessage();
@@ -229,10 +238,11 @@ class au_helpers {
                     // yup I'm a dummy....
                     echo " One of the fields is incorrect. Check data for field '$missing'. " . $e->getMessage() . "\n";
                     // exit;
+                  
                 }
             }
 
-
+            restore_exception_handler();
             restore_error_handler();
             return $auids;
         }
@@ -250,13 +260,15 @@ class au_helpers {
 
         $check = $DB->record_exists( 'cmi5launch_aus', ['id' => $auid], '*', IGNORE_MISSING);
 
+
         // If check is negative, the record does not exist. It should so throw error.
         // Moodle will throw the error, but we want to pass this message back ot user.
         if (!$check) {
 
-            echo "<p>Error attempting to get AU data from DB. Check AU id. AU id is: " . $auid ."</p>";
+            throw new nullException("Error attempting to get AU data from DB. Check AU id. AU id is: " . $auid ."</p>", 0);
+          //  echo "<p>Error attempting to get AU data from DB. Check AU id. AU id is: " . $auid ."</p>";
 
-            return false;
+           // return false;
         } else {
 
             $auitem = $DB->get_record('cmi5launch_aus',  array('id' => $auid));
