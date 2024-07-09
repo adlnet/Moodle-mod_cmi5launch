@@ -610,6 +610,8 @@ function cmi5launch_process_new_package($cmi5launch) {
 
         $record->courseid = $returnedinfo["id"];
 
+        // TEST
+    $test = "";
         // Create url for sending to when requesting launch url for course.
         $playerurl = $settings['cmi5launchplayerurl'];
 
@@ -618,7 +620,17 @@ function cmi5launch_process_new_package($cmi5launch) {
         $record->launchurl = $url;
 
         // Retrieve AUs and save to table.
-        $aus = ($retrieveaus($returnedinfo));
+        //TEST
+        try {
+            $aus = ($retrieveaus($test));
+                } catch (Exception $e) {
+            echo 'Caught exception: ',  $e->getMessage(), "\n";
+        // stop
+        
+        }
+        
+        
+        //$aus = ($retrieveaus($returnedinfo));
         $record->aus = (json_encode($aus));
 
 

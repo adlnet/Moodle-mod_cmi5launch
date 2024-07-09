@@ -1,6 +1,8 @@
 <?php
 namespace cmi5Test;
 
+use mod_cmi5launch\local\nullException;
+use mod_cmi5launch\local\fieldException;
 use PHPUnit\Framework\TestCase;
 use mod_cmi5launch\local\au;
 use mod_cmi5launch\local\au_helpers;
@@ -15,7 +17,7 @@ use mod_cmi5launch\local\au_helpers;
  */
 class ausHelpersTest extends TestCase
 {
-    private $auProperties, $emptyStatement, $mockStatementValues, $mockStatement2, $returnedAUids;
+    private $auProperties, $emptyStatement, $mockStatementValues, $mockStatement2, $mockStatementExcept, $mockStatementExcept2, $returnedAUids;
 
     public $auidForTest;
 
@@ -78,7 +80,87 @@ class ausHelpersTest extends TestCase
             'masteryscore' => NULL,
             'satisfied' => NULL,
             'launchurl' => NULL,
-            'sessionid' => NULL,
+            
+            'sessions' => NULL,
+            'progress' => NULL,
+            'noattempt' => NULL,
+            'completed' => NULL,
+            'passed' => NULL,
+            'inprogress' => NULL,
+            'launchMethod' => "AnyWindow",
+            'lmsId' => "https://exampleau/ranomnum/au0",
+            'moveOn' => "CompletedOrPassed",
+            'auIndex' => 0,
+            'activityType' => NULL,
+            'masteryScore' => NULL
+        );
+
+        // Based on created AU in program, but with some values removed.
+        // For instance title is an empty array
+        $this->mockStatementExcept = array(
+            "id" => "https://exampleau",
+            "attempt" => NULL,
+            "url" => "example.html?pages=1&complete=launch",
+            "type" => "au example",
+            "lmsid" => NULL,
+            "grade" => NULL,
+            "scores" => NULL,
+            "title" => array()
+            ,
+            "moveOn"=> NULL,
+            "auIndex" => NULL,
+            "parents" => array(),
+            "objectives" => NULL,
+            "description" => array( 0 => array(
+                "lang" => "en-US",
+                "text" => "Example AU lesson description")
+            ),
+            'activitytype' => NULL,
+            'launchmethod' => NULL,
+            'masteryscore' => NULL,
+            'satisfied' => NULL,
+            'launchurl' => NULL,
+            
+            'sessions' => NULL,
+            'progress' => NULL,
+            'noattempt' => NULL,
+            'completed' => NULL,
+            'passed' => NULL,
+            'inprogress' => NULL,
+            'launchMethod' => "AnyWindow",
+            'lmsId' => "https://exampleau/ranomnum/au0",
+            'moveOn' => "CompletedOrPassed",
+            'auIndex' => 0,
+            'activityType' => NULL,
+            'masteryScore' => NULL
+        );
+        // Based on created AU in program, but with some values removed.
+        $this->mockStatementExcept2 = array(
+            "id" => "https://exampleau",
+            "attempt" => NULL,
+            "url" => "example.html?pages=1&complete=launch",
+            "type" => "au example",
+            "lmsid" => NULL,
+            "grade" => NULL,
+            "scores" => NULL,
+            "title" => array( 0 => array(
+                "lang" => "en-US",
+                "text" => "Example AU")
+            ),
+            "moveOn"=> NULL,
+            "auIndex" => NULL,
+            "parents" => array(),
+            "objectives" => NULL,
+            "description" => array( 0 => array(
+                "lang" => "en-US",
+                "text" => "Example AU lesson description")
+            ),
+            'activitytype' => NULL,
+            'launchmethod' => NULL,
+            'masteryscore' => NULL,
+            'satisfied' => NULL,
+            
+            
             'sessions' => NULL,
             'progress' => NULL,
             'noattempt' => NULL,
@@ -112,7 +194,7 @@ class ausHelpersTest extends TestCase
             'masteryscore' => 'masteryscore',
             'satisfied' => 'satisfied',
             'launchurl' => 'launchurl',
-            'sessionid' => 'sessionid',
+      
             'sessions' => 'sessions',
             'progress' => 'progress',
             'noattempt' => 'noattempt',
@@ -262,6 +344,42 @@ class ausHelpersTest extends TestCase
         //Those seem to pass, so take away line 206?
     }
 
+    //Lets try testing so it throws excrption if thhe array doesn't have the right keys
+
+
+    // To test the exception we need to test the riht output (from the exception) is generated,
+    // We cannot test ther 'caught' exception because it is thrown by the overriden error handler. So test that it shows the riht output
+    public function testcmi5launch_retrieve_aus_exception()
+    {
+    //It's not just returning it, it's splitting it into chuncks~!
+
+        // Note this is an innnnnncorrect statement, cut off before 'aus'.
+        $mockStatement = array(
+            "createdAt" => "2023-06-26T18:36:15.000Z",
+            "id"=> 000,
+            "lmsId"=> "https://example",
+            "metadata" => array( 
+            ));
+ 
+
+        //This is the expected output messager
+        $expectedMessage = "Cannot retrieve AUs. Error found when trying to parse them from course creation: " .
+                "Please check the connection to player or course format and try again. \n"
+                . 'Cannot parse array. Error: Undefined array key "aus"' . "\n";
+       $helper = new au_helpers();
+      
+        //So now with this fake 'statement', lets ensure it pulls the correct value which is "correct Retrieval"
+        $retrieved = $helper->cmi5launch_retrieve_aus($mockStatement);
+
+        // If the right message is displayed the try/catch wworked!
+        $this->expectOutputString($expectedMessage);
+
+    }
+
+
+
+
+
     //Test function that is fed an array of statments and returns an array of aus onjects
     public function testcmi5launch_create_aus()
     {
@@ -283,6 +401,22 @@ class ausHelpersTest extends TestCase
         foreach ($auList as $au) {
             $this->assertInstanceOf(au::class, $au, "Expected retrieved statement to be an array of aus");
         }
+    }
+    //Test function that is fed an array of statments and returns an array of aus onjects
+    public function testcmi5launch_create_aus_exception()
+    {
+
+        // If we pass a null value in, it should throw an exception immedietely
+        $testStatements = null;
+        
+        $this->expectException(nullException::class);
+        $this->expectExceptionMessage('Cannot retrieve AU information. AU statements from DB are: ' . null);
+    
+        $helper = new au_helpers();
+        //So now with this fake 'statement', lets ensure it pulls the correct value which is "correct Retrieval"
+        $helper->cmi5launch_create_aus($testStatements);
+        
+    
     }
 
     //This one is going to be tricky, it saves to a DB! I know test php can have TEST DBs, but is that setup here?
@@ -333,6 +467,96 @@ class ausHelpersTest extends TestCase
 
 
     }   
+
+    //This one is going to be tricky, it saves to a DB! I know test php can have TEST DBs, but is that setup here?
+    //And how to freaking test THAT?
+    //Well, actually we don't need to test it goes to the DB, THAT was the job of the person who invented insert_record
+    //We just need tothat it saves the correct values and CALLS insert_record
+    //Technically this function returns ids, so we can make a stub which just returns ids
+    //This will test it is called without messing with the DB
+    public function testcmi5launch_save_aus_exceptions()
+    {
+
+        // Make a global variable to hold the id's to pretend to be cmi5launch instance id.
+        global $cmi5launch;
+
+        $cmi5launch = new \stdClass();
+        $cmi5launch->id = 1;
+      //  $cmi5launch->id = 1;
+
+        // The func should return auids created by the DB when AU's were saved in array format.
+        $helper = new au_helpers();
+
+        // LEts try to pass in a value that an't be grabbed or encoded and see what happens? 
+
+        //Lets create 4 aus statement
+       
+            // This one has a null title
+            $testAus[0][] = $this->mockStatementExcept;
+            
+           // $testAus[$i][] = ($this->$cmi5launch);
+        //    $testAus = array_merge($testAus, $cmi5launch);
+        
+    // These may be exceptions, buut they are thrown by ERROR handlers, therefore the SUT under test wont throw the error itself
+// We need to tes toutput
+    //$this->expectException(fieldException::class);
+      //  $this->expectExceptionMessage("Cannot save to DB. Stopped at record with ID number 1. One of the fields is incorrect. Check data for field 'title'. Error: Undefined array key 0");
+    
+      // The expected is built bby the two messages knowing 'title' is an empty array.
+      $expected = "Cannot save to DB. Stopped at record with ID number " . 1 . "."
+        . " One of the fields is incorrect. Check data for field 'title'. Error: Undefined array key 0\n";
+        //So now with this fake 'statement', lets ensure it pulls the correct value which is "correct Retrieval"
+        $returnedAUids = $helper->cmi5launch_save_aus($helper->cmi5launch_create_aus($testAus));
+            // If the right message is displayed the try/catch wworked!
+        $this->expectOutputString($expected);
+     
+
+    }   
+
+        //This one is going to be tricky, it saves to a DB! I know test php can have TEST DBs, but is that setup here?
+    //And how to freaking test THAT?
+    //Well, actually we don't need to test it goes to the DB, THAT was the job of the person who invented insert_record
+    //We just need tothat it saves the correct values and CALLS insert_record
+    //Technically this function returns ids, so we can make a stub which just returns ids
+    //This will test it is called without messing with the DB
+    public function testcmi5launch_save_aus_exceptions_2()
+    {
+
+        // Make a global variable to hold the id's to pretend to be cmi5launch instance id.
+        global $cmi5launch;
+
+        $cmi5launch = new \stdClass();
+        $cmi5launch->id = 1;
+      //  $cmi5launch->id = 1;
+
+        // The func should return auids created by the DB when AU's were saved in array format.
+        $helper = new au_helpers();
+
+        // LEts try to pass in a value that an't be grabbed or encoded and see what happens? 
+
+        //Lets create 4 aus statement
+       
+            // This one is correct. We want to test that it gets the SECOND statement number
+            // as a test
+            $testAus[0][] = $this->mockStatementValues;
+            // This one has a missing launch url conplteley
+            $testAus[1][] = $this->mockStatementExcept2;
+           // $testAus[$i][] = ($this->$cmi5launch);
+        //    $testAus = array_merge($testAus, $cmi5launch);
+ 
+           // The expected is built bby the two messages knowing 'title' is an empty array.
+      $expected = "Cannot save to DB. Stopped at record with ID number " . 1 . "."
+      . " One of the fields is incorrect. Check data for field 'launchurl'. Error: Undefined array key 0\n";
+  
+        //So now with this fake 'statement', lets ensure it pulls the correct value which is "correct Retrieval"
+        $returnedAUids = $helper->cmi5launch_save_aus($helper->cmi5launch_create_aus($testAus));
+            // If the right message is displayed the try/catch wworked!
+            $this->expectOutputString($expected);
+    
+        //Do I need to test fail?
+
+
+    }  
 
     public function testcmi5launch_retrieve_aus_from_db()
     {
