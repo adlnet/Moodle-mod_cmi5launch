@@ -4,19 +4,19 @@ namespace cmi5Test;
 use mod_cmi5launch\local\nullException;
 use PHPUnit\Framework\TestCase;
 use mod_cmi5launch\local\au;
-use mod_cmi5launch\local\errorOver;
+use mod_cmi5launch\local\errorover;
 
-require_once(dirname(dirname(dirname(__FILE__))) . 'cmi5lPHP\tests\errorOver.php');
+require_once(dirname(dirname(dirname(__FILE__))) . 'cmi5lPHP\tests\errorover.php');
 /**
  * Tests for AuHelpers class.
  *
  * @copyright 2023 Megan Bohland
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
- * @covers \errorOver
- * @covers \errorOver::array_chunk_warning
+ * @covers \errorover
+ * @covers \errorover::array_chunk_warning
  */
-class errorOverTest extends TestCase
+class erroroverTest extends TestCase
 {
 
     /**
@@ -29,7 +29,7 @@ class errorOverTest extends TestCase
         $this->expectException(nullException::class);
 
         //can we just call it?
-     // is this necessary?   errorOver::array_chunk_warning(E_WARNING, "This is a test error", "testfile.php", 1);
+     // is this necessary?   errorover::array_chunk_warning(E_WARNING, "This is a test error", "testfile.php", 1);
 
 
     }
