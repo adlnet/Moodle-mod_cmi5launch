@@ -1,6 +1,8 @@
 <?php
 namespace cmi5Test;
 
+use mod_cmi5launch\local\nullException;
+use mod_cmi5launch\local\fieldException;
 use PHPUnit\Framework\TestCase;
 use mod_cmi5launch\local\au;
 use mod_cmi5launch\local\au_helpers;
@@ -15,43 +17,14 @@ use mod_cmi5launch\local\au_helpers;
  */
 class ausHelpersTest extends TestCase
 {
-    private $auProperties, $emptyStatement, $mockStatementValues, $mockStatement2, $returnedAUids;
+    private  $mockstatementvalues, $mockStatement2, $mockStatementExcept, $mockStatementExcept2, $returnedAUids;
 
     public $auidForTest;
 
     protected function setUp(): void
     {
-        // All the properties in an AU object.
-        $this->auProperties = array(
-            'id',
-            'attempt',
-            'url',
-            'type',
-            'lmsid',
-            'grade',
-            'scores',
-            'title',
-            'moveon',
-            'auindex',
-            'parents',
-            'objectives',
-            'description',
-            'activitytype',
-            'launchmethod',
-            'masteryscore',
-            'satisfied',
-            'launchurl',
-            'sessions',
-            'progress',
-            'noattempt',
-            'completed',
-            'passed',
-            'inprogress',
-        );
 
-        $this->emptyStatement = array();
-
-        // Based on created AU in program, but with some values removed.
+        // Based on created AU in program.
         $this->mockStatement2 = array(
             "id" => "https://exampleau",
             "attempt" => NULL,
@@ -63,9 +36,68 @@ class ausHelpersTest extends TestCase
             "title" => array( 0 => array(
                 "lang" => "en-US",
                 "text" => "Example AU")
+            ),   
+            "parents" => array(),
+            "objectives" => NULL,
+            "description" => array( 0 => array(
+                "lang" => "en-US",
+                "text" => "Example AU lesson description")
             ),
-            "moveOn"=> NULL,
-            "auIndex" => NULL,
+            'satisfied' => NULL,
+            'sessions' => NULL,
+            'progress' => NULL,
+            'noattempt' => NULL,
+            'completed' => NULL,
+            'passed' => NULL,
+            'inprogress' => NULL,
+            'launchMethod' => "AnyWindow",
+            'lmsId' => "https://exampleau/ranomnum/au0",
+            'moveOn' => "CompletedOrPassed",
+            'auIndex' => 0,
+            'activityType' => NULL,
+            'masteryScore' => NULL
+        );
+
+        // Based on created AU in program, but with some values changed.
+        // For instance title is an empty array
+        $this->mockStatementExcept = array(
+            "id" => "https://exampleau",
+            "attempt" => NULL,
+            "url" => "example.html?pages=1&complete=launch",
+            "type" => "au example",
+            "grade" => NULL,
+            "scores" => NULL,
+            "title" => array()
+            ,
+            "parents" => array(),
+            "objectives" => NULL,
+            "description" => array( 0 => array(
+                "lang" => "en-US",
+                "text" => "Example AU lesson description")
+            ),
+            'satisfied' => NULL,
+            'sessions' => NULL,
+            'progress' => NULL,
+            'noattempt' => NULL,
+            'completed' => NULL,
+            'passed' => NULL,
+            'inprogress' => NULL,
+            'launchMethod' => "AnyWindow",
+            'lmsId' => "https://exampleau/ranomnum/au0",
+            'auIndex' => 0,
+            'activityType' => NULL,
+            'masteryScore' => NULL
+        );
+        // Based on created AU in program, but with some values changed. Here title is a string.
+        $this->mockStatementExcept2 = array(
+            "id" => "https://exampleau",
+            "attempt" => NULL,
+            "url" => "example.html?pages=1&complete=launch",
+            "type" => "au example",
+            "lmsid" => NULL,
+            "grade" => NULL,
+            "scores" => NULL,
+            "title" => array( "title "),
             "parents" => array(),
             "objectives" => NULL,
             "description" => array( 0 => array(
@@ -76,7 +108,6 @@ class ausHelpersTest extends TestCase
             'launchmethod' => NULL,
             'masteryscore' => NULL,
             'satisfied' => NULL,
-            'launchurl' => NULL,
             'sessions' => NULL,
             'progress' => NULL,
             'noattempt' => NULL,
@@ -91,7 +122,7 @@ class ausHelpersTest extends TestCase
             'masteryScore' => NULL
         );
         // Perhaps a good test would be to test the constructor with a statement that has all the properties set.
-        $this->mockStatementValues = array(
+        $this->mockstatementvalues = array(
             'id' => 'id',
             'attempt' => 'attempt',
             'url' => 'url',
@@ -117,7 +148,6 @@ class ausHelpersTest extends TestCase
             'passed' => 'passed',
             'inprogress' => 'inprogress',
         );
-    
     }
 
     protected function tearDown(): void
@@ -126,14 +156,11 @@ class ausHelpersTest extends TestCase
     }
 
 
-    // Retrieve Aus parses and returns AUs from large statements from the CMI5 player
-    // So to test, maybe make a statement and ensure the test value is returned? 
-    // Arbitrarily pick a word and put in right place? See if it is returned?
+    // Retrieve Aus parses and returns AUs from large statements from the CMI5 player.
+    // So to test, we will make a statement and ensure the test value is returned.
     public function testcmi5launch_retrieve_aus()
     {
-    //It's not just returning it, it's splitting it into chuncks~!
-
-        //Fake values to return
+        // Fake values to return.
         $mockStatement = array(
             "createdAt" => "2023-06-26T18:36:15.000Z",
             "id"=> 000,
@@ -186,9 +213,10 @@ class ausHelpersTest extends TestCase
             )
         );
  
-        //This is the value that should be returned, basically, an array holding all the aus separately
-        $shouldBeReturned = array (
-        //First au, nestled in array
+        // This is the value that should be returned, basically, an array holding all the aus separately.
+        $shouldbereturned = array (
+
+        //First au, nestled in array.
         0 => array  ( 
             0 => array (
                 "activityType" => null,
@@ -212,7 +240,7 @@ class ausHelpersTest extends TestCase
                 "url" => "index.html?pages=1&complete=launch",
             )
         ),
-        //second au nestled in array    
+        // Second au nestled in array.    
         1 =>  array (
             0 => array (
                 "activityType" => null,
@@ -236,59 +264,150 @@ class ausHelpersTest extends TestCase
                 "url"=> "index.html?pages=2&complete=launch"
                 ),
             )
-        
         );
 
        $helper = new au_helpers();
-        //So now with this fake 'statement', lets ensure it pulls the correct value which is "correct Retrieval"
+        
+        // So now with this fake 'statement', lets ensure it pulls the correct value which is "correct retrieval".
         $retrieved = $helper->cmi5launch_retrieve_aus($mockStatement);
 
-   
         // It should retrieve the mock aus
-        $this->assertEquals($shouldBeReturned, $retrieved, "Expected retrieved statement to be equal to mock statement");
-        //This is being flaged as risky?
-        //Is there a different way to test this?
-        //Maybe we 'expect' two properties since 2 aus  were passed in?
-        //I mean we aren't testing 'chunked?' so....?
+        $this->assertEquals($shouldbereturned, $retrieved, "Expected retrieved statement to be equal to mock statement");
 
-        //It DOES return as array
+        // It returns as array.
         $this->assertIsArray($retrieved, "Expected retrieved statement to be an array");
-        //And it returns two in array? Since we passed in two?
+        // And it returns two in array?
         $this->assertCount(2, $retrieved, "Expected retrieved statement to have two aus");
-        //TODO MB
-        //Those seem to pass, so take away line 206?
     }
 
-    //Test function that is fed an array of statments and returns an array of aus onjects
+    //Lets try testing so it throws excrption if thhe array doesn't have the right keys
+
+    // We cannot test 'caught' exception because it is thrown by the overriden error handler, not the SUT.
+    // To test the exception we need to test the right output (from the exception) is generated,
+    public function testcmi5launch_retrieve_aus_exception()
+    {
+        // Note this is an incorrect statement, cut off before 'aus'.
+        $mockStatement = array(
+            "createdAt" => "2023-06-26T18:36:15.000Z",
+            "id"=> 000,
+            "lmsId"=> "https://example",
+            "metadata" => array( 
+            ));
+
+        // This is the expected output message.
+        $expectedMessage = "Cannot retrieve AUs. Error found when trying to parse them from course creation: " .
+                "Please check the connection to player or course format and try again. \n"
+                . 'Cannot parse array. Error: Undefined array key "aus"' . "\n";
+       $helper = new au_helpers();
+      
+        // Call function under test.
+        $retrieved = $helper->cmi5launch_retrieve_aus($mockStatement);
+
+        // If the right message is displayed the try/catch wworked!
+        $this->expectOutputString($expectedMessage);
+    }
+
+
+    // Test function that is fed an array of statments and returns an array of aus objects.
     public function testcmi5launch_create_aus()
     {
-        // Should be enough to pass the mock statement values here, make an array of them first
-        $testStatements = array();
+        // Should be enough to pass the mock statement values here, make an array of them first.
+        $teststatements = array();
         
-        //Lets create 4 aus statement
+        //Lets create 4 aus statement.
         for ($i = 0; $i < 4; $i++) {
-            $testStatements[$i][] = $this->mockStatementValues;
+            $teststatements[$i][] = $this->mockstatementvalues;
         }
     
         $helper = new au_helpers();
-        //So now with this fake 'statement', lets ensure it pulls the correct value which is "correct Retrieval"
-        $auList = $helper->cmi5launch_create_aus($testStatements);
+        // So now with this fake 'statement', lets ensure it pulls the correct value which is "correct Retrieval"
+        $auList = $helper->cmi5launch_create_aus($teststatements);
         
-        //There should be a total of 4 Aus in this array
+        // There should be a total of 4 Aus in this array.
         $this->assertCount(4, $auList, "Expected retrieved statement to have four aus");
-        //And they should all be au objects
+        // And they should all be au objects.
         foreach ($auList as $au) {
             $this->assertInstanceOf(au::class, $au, "Expected retrieved statement to be an array of aus");
         }
     }
 
-    //This one is going to be tricky, it saves to a DB! I know test php can have TEST DBs, but is that setup here?
-    //And how to freaking test THAT?
-    //Well, actually we don't need to test it goes to the DB, THAT was the job of the person who invented insert_record
-    //We just need tothat it saves the correct values and CALLS insert_record
-    //Technically this function returns ids, so we can make a stub which just returns ids
-    //This will test it is called without messing with the DB
-    public function testcmi5launch_save_aus()
+    // Test function creat aus null exception.
+    public function testcmi5launch_create_aus_exception()
+    {
+
+        // If we pass a null value in, it should throw an exception immedietely
+        $teststatements = null;
+        
+        $this->expectException(nullException::class);
+        $this->expectExceptionMessage('Cannot retrieve AU information. AU statements from DB are: ' . null);
+    
+        $helper = new au_helpers();
+
+        // Pass null to SUT.
+        $helper->cmi5launch_create_aus($teststatements);
+    }
+
+  
+
+    // test saving aus with exceptions. 
+    public function testcmi5launch_save_aus_exceptions()
+    {
+        // Make a global variable to hold the id's to pretend to be cmi5launch instance id.
+        global $cmi5launch;
+
+        $cmi5launch = new \stdClass();
+        $cmi5launch->id = 1;
+
+        // The func should return auids created by the DB when AU's were saved in array format.
+        $helper = new au_helpers();
+
+       
+        // Pass in a statement with something wrong. This one has a null title.
+        $testAus[0][] = $this->mockStatementExcept;
+        
+        // Because this exception is thrown by the error handler, not the SUT, test the output to ensure right exception was thrown.
+        $expected = "Cannot save to DB. Stopped at record with ID number " . 1 . "."
+        . " One of the fields is incorrect. Check data for field 'title'. Error: Undefined array key 0\n";
+        
+        // Call function under test.
+        $returnedAUids = $helper->cmi5launch_save_aus($helper->cmi5launch_create_aus($testAus));
+            // If the right message is displayed the try/catch wworked!
+        $this->expectOutputString($expected);
+    }   
+
+
+    // Test saving aus with exceptions, a different exception.
+    public function testcmi5launch_save_aus_exceptions_2()
+    {
+        // Make a global variable to hold the id's to pretend to be cmi5launch instance id.
+        global $cmi5launch;
+
+        $cmi5launch = new \stdClass();
+        $cmi5launch->id = 1;
+
+        // The func should return auids created by the DB when AU's were saved in array format.
+        $helper = new au_helpers();
+
+        // This first statement is correct. We want to test that it gets the SECOND statement number,
+        $testAus[0][] = $this->mockStatement2;
+        // This one has 'title' as string instead of array.
+        $testAus[1][] = $this->mockStatementExcept2;
+
+        // The expected is built by the two messages knowing 'title' is a string.
+        $expected = "Cannot save to DB. Stopped at record with ID number " . 2 . "."
+        . " One of the fields is incorrect. Check data for field 'title'. Cannot access offset of type string on string\n";
+
+        // Call the function to throw the exception.
+        $returnedAUids = $helper->cmi5launch_save_aus($helper->cmi5launch_create_aus($testAus));
+        
+        // Because this exception is thrown by the error handler, not the SUT, test the output to ensure right exception was thrown.
+        $this->expectOutputString($expected);
+    
+    }  
+
+
+    // Test saving aus with exceptions, a (null) exception.
+    public function testcmi5launch_save_aus_exceptions_test_null()
     {
 
         // Make a global variable to hold the id's to pretend to be cmi5launch instance id.
@@ -296,7 +415,33 @@ class ausHelpersTest extends TestCase
 
         $cmi5launch = new \stdClass();
         $cmi5launch->id = 1;
-      //  $cmi5launch->id = 1;
+
+        $helper = new au_helpers();
+
+        // A test statement with a null value.
+        $testAus = null;
+
+        // Catch the exception.
+        $this->expectException(nullException::class);
+        $this->expectExceptionMessage('Cannot save AU information. AU object array is: null' . null);
+
+        // The expected is built bby the two messages knowing 'title' is an empty array.
+        $expected = "Cannot save to DB. Stopped at record with ID number " . 1 . "."
+        . " One of the fields is incorrect. Check data for field 'title'. Error: Undefined array key 0\n";
+        //So now with this fake 'statement', lets ensure it pulls the correct value which is "correct Retrieval"
+        $returnedAUids = $helper->cmi5launch_save_aus($testAus);
+            
+    }   
+
+    // Test saving aus, this function returns ids, so we can make a stub which just returns ids.
+    // This will test it is called without messing with the DB.
+    public function testcmi5launch_save_aus()
+    {
+        // Make a global variable to hold the id's to pretend to be cmi5launch instance id.
+        global $cmi5launch, $auidForTest;
+
+        $cmi5launch = new \stdClass();
+        $cmi5launch->id = 1;
 
         // The func should return auids created by the DB when AU's were saved in array format.
         $helper = new au_helpers();
@@ -304,8 +449,6 @@ class ausHelpersTest extends TestCase
         //Lets create 4 aus statement
         for ($i = 0; $i < 3; $i++) {
             $testAus[$i][] = $this->mockStatement2;
-           // $testAus[$i][] = ($this->$cmi5launch);
-        //    $testAus = array_merge($testAus, $cmi5launch);
         }
 
         //So now with this fake 'statement', lets ensure it pulls the correct value which is "correct Retrieval"
@@ -316,46 +459,63 @@ class ausHelpersTest extends TestCase
 
         // The array should have the same count of ids as AU's passed in
         $this->assertCount(3, $returnedAUids, "Expected retrieved statement to have three aus");
+        
         // Now iterate through the returned array and ensure ids were passed back, numeric ids
         foreach ($returnedAUids as $auId) {
 
-            // what is id?
-          //  echo"auId: $auId";
             $this->assertIsNumeric($auId, "Expected array to have numeric values");
         }
-        global $auidForTest;
-        //Save to use in next test?
+
+        // Is this not savin?
+     //   echo "Returned AU ids: " . var_dump($returnedAUids) . "\n";
+
         $auidForTest = $returnedAUids;
-        //Do I need to test fail?
-
-
-    }   
-
+    } 
+    // Test retrieving an AU from the DB with a correct value.
     public function testcmi5launch_retrieve_aus_from_db()
     {
-        // Access the global array of ids from above test
+        // ok, what if we saved ere the retrieved
+       // Access the global array of ids from above test
         global $auidForTest;
 
        // global $auidForTest;
         $helper = new au_helpers();
 
+        // Save new aus to db to pull. 
+        //Lets create 4 aus statement
+        for ($i = 0; $i < 3; $i++) {
+            $testAus[$i][] = $this->mockStatement2;
+        }
+
+        //So now with this fake 'statement', lets ensure it pulls the correct value which is "correct Retrieval"
+        $returnedAUids = $helper->cmi5launch_save_aus($helper->cmi5launch_create_aus($testAus));
+
+        //and what is here?
+      //  echo"au id for test: " . var_dump($auidForTest) . "\n";
         // It takes singular ids, so we will iterate through them
-        foreach ($auidForTest as $auId) {
+        foreach ($returnedAUids as $auId) {
             
             $returnedAu = $helper->cmi5launch_retrieve_aus_from_db($auId);
             
             // And the return should be an au object
             $this->assertInstanceOf(au::class, $returnedAu, "Expected retrieved object to be an au object");
         }
+    }   
 
-        // And if it fails it should fail gracefully
+
+    // Test retrieving an AU from the DB with a null value and thrown exception.
+    public function testcmi5launch_retrieve_aus_from_db_null_exception()
+    {
+        $helper = new au_helpers();
+
+        // And if it fails it should fail gracefully, throwin the correct exception.
         $badid = 0;
+
+        // Catch the exception.
+        $this->expectException(nullException::class);
+        $this->expectExceptionMessage("Error attempting to get AU data from DB. Check AU id. AU id is: " . $badid ."</p>" . null);
+    
         $returnedAu = $helper->cmi5launch_retrieve_aus_from_db($badid);
-        
-        // And the return should be a false value
-        $this->assertNotTrue($returnedAu, "Expected retrieved object to be false");
-        //And it should output this error message
-        $this->expectOutputString("<p>Error attempting to get AU data from DB. Check AU id. AU id is: " . $badid . "</p>");
 
     }   
 }

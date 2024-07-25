@@ -1,6 +1,7 @@
 <?php
 namespace cmi5Test;
 
+use mod_cmi5launch\local\nullException;
 use PHPUnit\Framework\TestCase;
 use mod_cmi5launch\local\au;
 
@@ -14,12 +15,12 @@ use mod_cmi5launch\local\au;
  */
 class auTest extends TestCase
 {
-    private $auProperties, $emptyStatement, $mockStatementValues;
+    private $auproperties, $emptystatement, $mockstatementvalues;
 
     protected function setUp(): void
     {
         // All the properties in an AU object.
-        $this->auProperties = array(
+        $this->auproperties = array(
             'id',
             'attempt',
             'url',
@@ -54,10 +55,10 @@ class auTest extends TestCase
             'userid' 
         );
 
-        $this->emptyStatement = array();
+        $this->emptystatement = array();
 
-        // Perhaps a good test would be to test the constructor with a statement that has all the properties set.
-        $this->mockStatementValues = array(
+        // A good test would be to test the constructor with a statement that has all the properties set.
+        $this->mockstatementvalues = array(
             'id' => 'id',
             'attempt' => 'attempt',
             'url' => 'url',
@@ -105,16 +106,15 @@ class auTest extends TestCase
      */
     public function testInstantiationWithEmpty()
     {
-        $obj = new au($this->emptyStatement);
+        // Make an AU object with no values.
+        $obj = new au($this->emptystatement);
 
-        // Is an AU object?
+        // Assert its an AU object.
         $this->assertInstanceOf(au::class, $obj);
 
-        //It is saying AU is not transversable
-        //Implementing traversable in AU is breaking the code,
-        //Make sure the AU object does not have any 'extra' properties, only the amount passed in
-        $expectedAmount = count($this->auProperties);
-        //could typecasting the object as an array help? dirty fix
+        // It is saying AU is not transversable. Implementing traversable in AU is breaking the code, typecast the object as array for dirty fix.
+        // Make sure the AU object does not have any 'extra' properties, only the amount passed in
+        $expectedAmount = count($this->auproperties);
         $auArray = (array) $obj;
         $this->assertCount($expectedAmount, $auArray, "AU has $expectedAmount properties");
 
@@ -124,7 +124,6 @@ class auTest extends TestCase
             $this->assertArrayHasKey($property, $auArray, "$property exists");
             $this->assertNull($value, "$property empty");
         }
-
     }
 
     /**
@@ -132,19 +131,16 @@ class auTest extends TestCase
      * Should instantiate an AU object with values.
      * @return void
      */
-
     public function testInstantiationWithValues()
     {
-        $obj = new au($this->mockStatementValues);
+        $obj = new au($this->mockstatementvalues);
 
-        // Is an AU object?
+        // Assert it's an AU object?
         $this->assertInstanceOf(au::class, $obj);
-        
-        //It is saying AU is not transversable
-        //Implementing traversable in AU is breaking the code,
-        //Make sure the AU object does not have any 'extra' properties, only the amount passed in
-        $expectedAmount = count($this->auProperties);
-        //could typecasting the object as an array help? dirty fix
+     
+        // It is saying AU is not transversable. Implementing traversable in AU is breaking the code, typecast the object as array for dirty fix.
+        // Make sure the AU object does not have any 'extra' properties, only the amount passed in
+        $expectedAmount = count($this->auproperties);
         $auArray = (array) $obj;
         $this->assertCount($expectedAmount, $auArray, "AU has $expectedAmount properties");
 
@@ -155,4 +151,41 @@ class auTest extends TestCase
             $this->assertEquals($property, $value, "$value does not equal $property");
         }
     }
+
+    /**
+     * Test of AU constructor class exceptions. This one tests if statement is null.
+     * @return void
+     */
+    public function testInstantiation_except_null()
+    {
+        // Null statement to send and trigger exception.
+        $nullstatement = null;
+
+        // Expected message
+          // Catch the exception.
+          $this->expectException(nullException::class);
+          $this->expectExceptionMessage("Statement to build AU is null or not an array/object." );
+      
+        $obj = new au($nullstatement);
+
+    }
+
+    /**
+     * Test of AU constructor class exceptions. This one tests if statement passed in is not an array.
+     * @return void
+     */
+    public function testInstantiation_except_nonarray()
+    {
+        // Null statement to send and trigger exception.
+        $nullstatement = "string";
+
+          // Catch the exception.
+          $this->expectException(nullException::class);
+          $this->expectExceptionMessage("Statement to build AU is null or not an array/object." );
+      
+        $obj = new au($nullstatement);
+
+    }
+
+    
 }

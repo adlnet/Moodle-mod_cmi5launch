@@ -156,6 +156,8 @@ if ($exists == false) {
     // Retrieve AU ids for this user/course.
     $aus = json_decode($record->aus);
 
+    // We should not even be able to et here if these are false on record
+    
     $auids = $saveaus($createaus($aus));
     $userscourse->aus = (json_encode($auids));
 

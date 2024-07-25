@@ -610,6 +610,8 @@ function cmi5launch_process_new_package($cmi5launch) {
 
         $record->courseid = $returnedinfo["id"];
 
+        // TEST
+    $test = "";
         // Create url for sending to when requesting launch url for course.
         $playerurl = $settings['cmi5launchplayerurl'];
 
@@ -617,7 +619,8 @@ function cmi5launch_process_new_package($cmi5launch) {
         $url = $playerurl . "/api/v1/" . $record->courseid . "/launch-url/";
         $record->launchurl = $url;
 
-        // Retrieve AUs and save to table.
+   
+        
         $aus = ($retrieveaus($returnedinfo));
         $record->aus = (json_encode($aus));
 
@@ -1098,10 +1101,10 @@ function cmi5launch_grade_item_update($cmi5launch, $grades = null) {
         // Calculate grade based on grade type, and update rawgrade (a param of grade item).
         switch($gradetype){
 
-            // 'MOD_CMI5LAUNCH_AUS_GRADE' = '0'.
-            // 'MOD_CMI5LAUNCH_GRADE_HIGHEST' = '1'.
-            // 'MOD_CMI5LAUNCH_GRADE_AVERAGE', =  '2'.
-            // 'MOD_CMI5LAUNCH_GRADE_SUM', = '3'.
+            // 'GRADE_AUS_CMI5' = '0'.
+            // 'GRADE_HIGHEST_CMI5' = '1'.
+            // 'GRADE_AVERAGE_CMI5', =  '2'.
+            // 'GRADE_SUM_CMI5', = '3'.
 
             case 1:
                 foreach ($grades as $key => $grade) {
