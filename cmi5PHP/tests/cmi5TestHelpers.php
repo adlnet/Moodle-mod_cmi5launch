@@ -532,5 +532,11 @@ $createsession = $sessionhelper->cmi5launch_get_create_session();
 	// Lets pass in the 'return' value as the option.
 	return $errormessage;
   }
+  	// should I have it throw an error? would that work, or would that take the erorr out of SUT?
+     // So now all the test has to do is inject THIS which will return as we please
+	 function cmi5launch_test_stream_and_send_excep($options, $url)
+	 {
+	   throw new \Exception('test error');
+	 }
 
 ?>

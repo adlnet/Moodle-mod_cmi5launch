@@ -347,42 +347,7 @@ class ausHelpersTest extends TestCase
         $helper->cmi5launch_create_aus($teststatements);
     }
 
-    // Test saving aus, this function returns ids, so we can make a stub which just returns ids.
-    // This will test it is called without messing with the DB.
-    public function testcmi5launch_save_aus()
-    {
-        // Make a global variable to hold the id's to pretend to be cmi5launch instance id.
-        global $cmi5launch, $auidForTest;
-
-        $cmi5launch = new \stdClass();
-        $cmi5launch->id = 1;
-
-        // The func should return auids created by the DB when AU's were saved in array format.
-        $helper = new au_helpers();
-
-        //Lets create 4 aus statement
-        for ($i = 0; $i < 3; $i++) {
-            $testAus[$i][] = $this->mockStatement2;
-        }
-
-        //So now with this fake 'statement', lets ensure it pulls the correct value which is "correct Retrieval"
-        $returnedAUids = $helper->cmi5launch_save_aus($helper->cmi5launch_create_aus($testAus));
-
-        // First make sure array is returned
-        $this->assertIsArray($returnedAUids, "Expected retrieved statement to be an array");
-
-        // The array should have the same count of ids as AU's passed in
-        $this->assertCount(3, $returnedAUids, "Expected retrieved statement to have three aus");
-        
-        // Now iterate through the returned array and ensure ids were passed back, numeric ids
-        foreach ($returnedAUids as $auId) {
-
-            $this->assertIsNumeric($auId, "Expected array to have numeric values");
-        }
-
-
-        $auidForTest = $returnedAUids;
-    }   
+  
 
     // test saving aus with exceptions. 
     public function testcmi5launch_save_aus_exceptions()
@@ -468,18 +433,67 @@ class ausHelpersTest extends TestCase
             
     }   
 
+    // Test saving aus, this function returns ids, so we can make a stub which just returns ids.
+    // This will test it is called without messing with the DB.
+    public function testcmi5launch_save_aus()
+    {
+        // Make a global variable to hold the id's to pretend to be cmi5launch instance id.
+        global $cmi5launch, $auidForTest;
 
+        $cmi5launch = new \stdClass();
+        $cmi5launch->id = 1;
+
+        // The func should return auids created by the DB when AU's were saved in array format.
+        $helper = new au_helpers();
+
+        //Lets create 4 aus statement
+        for ($i = 0; $i < 3; $i++) {
+            $testAus[$i][] = $this->mockStatement2;
+        }
+
+        //So now with this fake 'statement', lets ensure it pulls the correct value which is "correct Retrieval"
+        $returnedAUids = $helper->cmi5launch_save_aus($helper->cmi5launch_create_aus($testAus));
+
+        // First make sure array is returned
+        $this->assertIsArray($returnedAUids, "Expected retrieved statement to be an array");
+
+        // The array should have the same count of ids as AU's passed in
+        $this->assertCount(3, $returnedAUids, "Expected retrieved statement to have three aus");
+        
+        // Now iterate through the returned array and ensure ids were passed back, numeric ids
+        foreach ($returnedAUids as $auId) {
+
+            $this->assertIsNumeric($auId, "Expected array to have numeric values");
+        }
+
+        // Is this not savin?
+     //   echo "Returned AU ids: " . var_dump($returnedAUids) . "\n";
+
+        $auidForTest = $returnedAUids;
+    } 
     // Test retrieving an AU from the DB with a correct value.
     public function testcmi5launch_retrieve_aus_from_db()
     {
-        // Access the global array of ids from above test
+        // ok, what if we saved ere the retrieved
+       // Access the global array of ids from above test
         global $auidForTest;
 
        // global $auidForTest;
         $helper = new au_helpers();
 
+        // Save new aus to db to pull. 
+        //Lets create 4 aus statement
+        for ($i = 0; $i < 3; $i++) {
+            $testAus[$i][] = $this->mockStatement2;
+        }
+
+        //So now with this fake 'statement', lets ensure it pulls the correct value which is "correct Retrieval"
+        $returnedAUids = $helper->cmi5launch_save_aus($helper->cmi5launch_create_aus($testAus));
+
+        //and what is here?
+      //  echo"au id for test: " . var_dump($auidForTest) . "\n";
         // It takes singular ids, so we will iterate through them
-        foreach ($auidForTest as $auId) {
+        foreach ($returnedAUids as $auId) {
             
             $returnedAu = $helper->cmi5launch_retrieve_aus_from_db($auId);
             

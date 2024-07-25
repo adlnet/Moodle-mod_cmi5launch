@@ -619,18 +619,9 @@ function cmi5launch_process_new_package($cmi5launch) {
         $url = $playerurl . "/api/v1/" . $record->courseid . "/launch-url/";
         $record->launchurl = $url;
 
-        // Retrieve AUs and save to table.
-        //TEST
-        try {
-            $aus = ($retrieveaus($test));
-                } catch (Exception $e) {
-            echo 'Caught exception: ',  $e->getMessage(), "\n";
-        // stop
+   
         
-        }
-        
-        
-        //$aus = ($retrieveaus($returnedinfo));
+        $aus = ($retrieveaus($returnedinfo));
         $record->aus = (json_encode($aus));
 
 

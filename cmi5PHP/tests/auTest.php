@@ -164,7 +164,7 @@ class auTest extends TestCase
         // Expected message
           // Catch the exception.
           $this->expectException(nullException::class);
-          $this->expectExceptionMessage("Statement to build AU is null or not an array." );
+          $this->expectExceptionMessage("Statement to build AU is null or not an array/object." );
       
         $obj = new au($nullstatement);
 
@@ -181,9 +181,11 @@ class auTest extends TestCase
 
           // Catch the exception.
           $this->expectException(nullException::class);
-          $this->expectExceptionMessage("Statement to build AU is null or not an array." );
+          $this->expectExceptionMessage("Statement to build AU is null or not an array/object." );
       
         $obj = new au($nullstatement);
 
     }
+
+    
 }

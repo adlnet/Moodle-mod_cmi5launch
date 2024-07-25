@@ -38,10 +38,10 @@ class au {
     public function __construct($statement) {
 
         // What can go wrong here? It could be that a statement is null
-        // or that the statement is not an array.
-        if (is_null($statement) || !is_array($statement)) {
+        // or that the statement is not an array or not an object.
+        if (is_null($statement) || (!is_array($statement) && !is_object($statement) )) {
             
-            throw new nullException('Statement to build AU is null or not an array.', 0);
+            throw new nullException('Statement to build AU is null or not an array/object.', 0);
         }
         // If it is an array, create the object.
         foreach ($statement as $key => $value) {

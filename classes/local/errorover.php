@@ -160,3 +160,40 @@ class fieldException extends \Exception
       //  $this->getTraceAsString();
     }
 }
+/**
+ * Define a custom exception class, this will make pour tests meaningful
+ * from php webpage: "Custom exception classes can allow you to write tests that prove your exceptions
+    *  are meaningful. Usually testing exceptions, you either assert the message equals
+*something in which case you can't change the message format without refactoring,
+*or not make any assertions at all in which case you can get misleading messages
+*later down the line. Especially if your $e->getMessage is something complicated
+*like a var_dump'ed context array."
+ */
+class playerException extends \Exception
+{
+    // Redefine the exception so message isn't optional
+    // I want an exception that takkkes what is missing and adds it to messsssage? 
+    // Is this possivlbe? 
+    public function __construct($message, $code = 0, Throwable $previous = null) {
+        // some code
+
+        // Ah maybe here is where I can differentiate them
+        $playermessage = "Player communication error. Something went wrong " . $message;
+        // make sure everything is assigned properly
+        parent::__construct($playermessage, $code, $previous);
+    }
+
+   
+    // custom string representation of object (what is returned with echo)
+    public function __toString(): string {
+        return __CLASS__ . ": [{$this->code}]: {$this->message}\n";
+        // maybe here?
+    }
+
+    public function customFunction() {
+        echo "  This error to string            :";
+      //  $this->getTraceAsString();
+    }
+}
+
+// If all my exceptions are the same, just diff names, are they necessary? Do any of my try/catches really differentiate? 

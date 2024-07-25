@@ -5,6 +5,8 @@ use mod_cmi5launch\local\cmi5launch_helpers;
 use PHPUnit\Framework\TestCase;
 use mod_cmi5launch\local\cmi5_connectors;
 use mod_cmi5launch\test\cmi5TestHelpers;
+use mod_cmi5launch\local\playerException;
+
 require_once( "cmi5TestHelpers.php");
 
 /**
@@ -33,7 +35,7 @@ class cmi5_connectorsTest extends TestCase
     {
         global $DB, $cmi5launch, $cmi5launchid;
 
-        // Mke a fake cmi5 launch record.
+        // Make a fake cmi5 launch record.
         $cmi5launchid = maketestcmi5launch();
 
     }
@@ -51,7 +53,8 @@ class cmi5_connectorsTest extends TestCase
     {
         global $DB, $cmi5launch, $cmi5launchid, $USER, $testcourseid, $cmi5launchsettings;
 
-          $cmi5launchsettings = array("cmi5launchtenanttoken" => "Testtoken", "cmi5launchplayerurl" => "http://test/launch.php", "cmi5launchcustomacchp" => "http://testhomepage.com");
+        $cmi5launchsettings = array("cmi5launchtenanttoken" => "Testtoken", "cmi5launchplayerurl" => "http://test/launch.php", "cmi5launchcustomacchp" => "http://testhomepage.com",
+            "cmi5launchbasicname" => 'testname', "cmi5launchbasepass" => "testpassword");
 
 
         // Override global variable and function so that it returns test data.
@@ -129,9 +132,8 @@ class cmi5_connectorsTest extends TestCase
 
          // Function that will be called in function under test.
          $testfunction = 'cmi5launch_stream_and_send';
-        // Message we expect to be output.
-        $expectedstring= "<br>Something went wrong creating the course. CMI5 Player returned 404 error. With message 'testmessage'.<br>";
-        // Arguments to be passed to the method under test.
+
+         // Arguments to be passed to the method under test.
         $id = 0;
         $tenanttoken = "testtoken";
         // Error message for stubbed method to return.
@@ -143,7 +145,10 @@ class cmi5_connectorsTest extends TestCase
                 return "testfilecontents";
             }
         };
-
+        $test = false;
+             // Expected exceptions
+             $exceptionmessage = "Player communication error. Something went wrong creating the course. CMI5 Player returned 404 error. With message 'testmessage'." ;
+            
         // Mock a cmi5 connector object but only stub ONE method, as we want to test the other methods.
         // Create a mock of the send_request class as we don't actually want
         // to create a new course in the player.
@@ -158,16 +163,77 @@ class cmi5_connectorsTest extends TestCase
             ->with($testfunction, 'testfilecontents', 'http://test/launch.php/api/v1/course', 'zip', 'testtoken')
             ->willReturn($errormessage);
 
-        // Call the method under test. 
-        $returnedresult =$csc->cmi5launch_create_course($id, $tenanttoken, $filename);
+       // 
 
-        // Result should be debug echo string and false.
-        $this->assertNotTrue($returnedresult, "Expected retrieved object to be false");
-        //And it should output this error message
-        $this->expectOutputString($expectedstring);
+            // Wait, i bet this is being thrown in the cmi5 connectors error message func and so we need to catch
+            // the correct output not an exception
+            $this->expectExceptionMessage($exceptionmessage);
+            $this->expectException(playerException::class);
+        
+            // Call the method under test. 
+        $returnedresult = $csc->cmi5launch_create_course($id, $tenanttoken, $filename);
+   
     }
 
+    /**
+     * Test of the cmi5launch_create_course method with a failed response from the player.
+      * This one tests if resulttest is false. This path shouldnt be able to be reached but is here to test the failsafe. 
+     * @return void
+     */
+    public function testcmi5launch_create_course_fail_with_exception()
+    {
 
+         // Function that will be called in function under test.
+         $testfunction = 'cmi5launch_stream_and_send';
+
+         // Arguments to be passed to the method under test.
+        $id = 0;
+        $tenanttoken = "testtoken";
+        // Error message for stubbed method to return.
+        $errormessage = array("statusCode" => "404",  "error" => "Not Found","message" => "testmessage" );
+        
+        //If we make filename an object with it's own get_content method, we can stub it out.
+        $filename = new class { 
+            public function get_content() {
+                return "testfilecontents";
+            }
+        };
+        $test = false;
+             // Expected exceptions
+             $exceptionmessage = "Player communication error. Something went wrong creating the course." ;
+            
+        // Mock a cmi5 connector object but only stub ONE method, as we want to test the other methods.
+        // Create a mock of the send_request class as we don't actually want
+        // to create a new course in the player.
+        $csc = $this->getMockBuilder('mod_cmi5launch\local\cmi5_connectors')
+            ->onlyMethods(array('cmi5launch_send_request_to_cmi5_player_post', 'cmi5launch_connectors_error_message'))
+            ->getMock();
+
+        // We will have the mock return a fake message as if the player had a problem with request.
+        // This should enable us to test the method under failing conditions. We do expect create_course to only call this once.
+        $csc->expects($this->once())
+            ->method('cmi5launch_send_request_to_cmi5_player_post')
+            ->with($testfunction, 'testfilecontents', 'http://test/launch.php/api/v1/course', 'zip', 'testtoken')
+            ->willReturn($errormessage);
+   
+            // The string just needs to be returned as is. We do expect create_tenant to only call this once.
+        $csc->expects($this->once())
+        ->method('cmi5launch_connectors_error_message')
+         ->with($errormessage, 'creating the course') // for tomorrow, is thi failing because with only evaluates strings? Like do we need to string the array out> 
+        // IRL it returns something that needs to be json decoded, so lets pass somethin that is encoded>
+        ->willReturn(false);
+
+       // 
+
+            // Wait, i bet this is being thrown in the cmi5 connectors error message func and so we need to catch
+            // the correct output not an exception
+            $this->expectExceptionMessage($exceptionmessage);
+            $this->expectException(playerException::class);
+        
+            // Call the method under test. 
+        $returnedresult = $csc->cmi5launch_create_course($id, $tenanttoken, $filename);
+   
+    }
     /**
      * Test of the cmi5launch_create_tenant method with a successful response from the player.
      * @return void
@@ -179,20 +245,62 @@ class cmi5_connectorsTest extends TestCase
          $testfunction = 'cmi5launch_stream_and_send';
 
         // Arguments to be passed to the method under test.
-        $urltosend = "playerwebaddress";
-        $username = "testname";
-        $password = "testpassword";
-        $newtenantname = "testtenantname";
-        $data = array ('code' => 'testtenantname');
+        $newtenantname = "newtenantname";
+        $data = array ('code' => 'newtenantname');
+        // Encode data as it will be encoded when sent to player
+        $data = json_encode($data);
+       
+       // Message for stubbed method to return.
+        $returnvalue = json_encode(array("statusCode" => "200",  "code" => "newtenantname","id" => "9" ) );
+        
+        // Mock a cmi5 connector object but only stub ONE method, as we want to test the other methods.
+        // Create a mock of the send_request class as we don't actually want
+        // to create a new tenant.
+        $csc = $this->getMockBuilder('mod_cmi5launch\local\cmi5_connectors')
+            ->onlyMethods(array('cmi5launch_send_request_to_cmi5_player_post'))
+            ->getMock();
+
+        // We will have the mock return a basic string, as it's not under test.
+        // The string just needs to be returned as is. We do expect create_tenant to only call this once.
+        $csc->expects($this->once())
+            ->method('cmi5launch_send_request_to_cmi5_player_post')
+            ->with($testfunction, $data, 'http://test/launch.php/api/v1/tenant','json', 'testname', 'testpassword') // for tomorrow, is thi failing because with only evaluates strings? Like do we need to string the array out> 
+            // IRL it returns something that needs to be json decoded, so lets pass somethin that is encoded>
+            ->willReturn($returnvalue);
+
+             
+        //Call the method under test. 
+        $result =$csc->cmi5launch_create_tenant( $newtenantname);
+
+    
+        // And the return should be a string (the original method returns what the player sends back json-decoded or FALSE)
+        $this->assertIsString($result);
+        $this->assertEquals( $returnvalue, $result);
+    
+    }
+
+
+    /**
+     * Test of the cmi5launch_create_tenant method with a failed response from the player. Should trigger an exception.
+     * @return void
+     */
+    public function testcmi5launch_create_tenant_fail()
+    {
+
+         // Function that will be called in function under test.
+         $testfunction = 'cmi5launch_stream_and_send';
+
+        // Arguments to be passed to the method under test.
+    
+        $newtenantname = "newtenantname";
+        $data = array ('code' => 'newtenantname');
         // Encode data as it will be encoded when sent to player
         $data = json_encode($data);
 
-        // This is the expected return value.
-        $returnvalue = array(
-            "code" => "testtenantname",
-            "id" => 9
-        );
-
+    
+        // Message for stubbed method to return.
+        $errormessage = array("statusCode" => "400",  "message" => "website not found","id" => "9" );
+        
 
         // Mock a cmi5 connector object but only stub ONE method, as we want to test the other methods.
         // Create a mock of the send_request class as we don't actually want
@@ -205,71 +313,81 @@ class cmi5_connectorsTest extends TestCase
         // The string just needs to be returned as is. We do expect create_tenant to only call this once.
         $csc->expects($this->once())
             ->method('cmi5launch_send_request_to_cmi5_player_post')
-            ->with($testfunction, $data, 'playerwebaddress','json', 'testname', 'testpassword') // for tomorrow, is thi failing because with only evaluates strings? Like do we need to string the array out> 
+            ->with($testfunction, $data, 'http://test/launch.php/api/v1/tenant','json', 'testname', 'testpassword') // for tomorrow, is thi failing because with only evaluates strings? Like do we need to string the array out> 
             // IRL it returns something that needs to be json decoded, so lets pass somethin that is encoded>
-            ->willReturn('{
-                "code": "testtenantname",
-                "id": 9
-                }'
-            );
+            ->willReturn($errormessage);
 
+            // Expected exceptions
+             $exceptionmessage = "Player communication error. Something went wrong retrieving the registration information. CMI5 Player returned 400 error. With message 'website not found'." ;
+         
+
+            // the correct output not an exception
+            $this->expectExceptionMessage($exceptionmessage);
+            $this->expectException(playerException::class);
+        
         //Call the method under test. 
-        $result =$csc->cmi5launch_create_tenant($urltosend, $username, $password, $newtenantname);
-
-        // And the return should be a string (the original method returns what the player sends back json-decoded or FALSE)
-        $this->assertIsArray($result);
-        $this->assertEquals( $returnvalue, $result);
+        $result =$csc->cmi5launch_create_tenant( $newtenantname);
+    
     }
 
+
     /**
-     * Test of the cmi5launch_create_tenant method with a error response from the player.
+     * Test of the cmi5launch_create_tenant method with a failed response from the player. Should trigger an exception.
+     * This one tests if resulttest is false. This path shouldnt be able to be reached but is here to test the failsafe. 
      * @return void
      */
-    public function testcmi5launch_create_tenant_fail()
+    public function testcmi5launch_create_tenant_fail_2()
     {
 
          // Function that will be called in function under test.
          $testfunction = 'cmi5launch_stream_and_send';
 
         // Arguments to be passed to the method under test.
-        $urltosend = "playerwebaddress";
-        $username = "testname";
-        $password = "testpassword";
-        $newtenantname = "testtenantname";
-        $data = array ('code' => 'testtenantname');
+    
+        $newtenantname = "newtenantname";
+        $data = array ('code' => 'newtenantname');
         // Encode data as it will be encoded when sent to player
         $data = json_encode($data);
 
-        // The expected error message to be output.
-        $expectedstring= "<br>Something went wrong creating the tenant. CMI5 Player returned 404 error. With message 'testmessage'.<br>";
+    
+        // Message for stubbed method to return.
+        $errormessage = array("statusCode" => "400",  "message" => "website not found","id" => "9" );
+        
 
-        // Error message for stubbed method to return.
-        $errormessage = array("statusCode" => "404",  "error" => "Not Found","message" => "testmessage" );
-            
-        // Mock a cmi5 connector object but only stub ONE method, as we want to test the others.
+        // Mock a cmi5 connector object but only stub ONE method, as we want to test the other methods.
         // Create a mock of the send_request class as we don't actually want
-        // to create a new course in the player.
+        // to create a new tenant.
         $csc = $this->getMockBuilder('mod_cmi5launch\local\cmi5_connectors')
-            ->onlyMethods(array('cmi5launch_send_request_to_cmi5_player_post'))
+            ->onlyMethods(array('cmi5launch_send_request_to_cmi5_player_post','cmi5launch_connectors_error_message'))
             ->getMock();
 
-
-        // We will have the mock return a fake message as if the player had a problem with request.
-        // This will enable us to test the method under failing conditions. We do expect create_tenant to only call this once.
+        // We will have the mock return a basic string, as it's not under test.
+        // The string just needs to be returned as is. We do expect create_tenant to only call this once.
         $csc->expects($this->once())
             ->method('cmi5launch_send_request_to_cmi5_player_post')
-            ->with($testfunction, $data, 'playerwebaddress', 'json', 'testname', 'testpassword')
+            ->with($testfunction, $data, 'http://test/launch.php/api/v1/tenant','json', 'testname', 'testpassword') // for tomorrow, is thi failing because with only evaluates strings? Like do we need to string the array out> 
+            // IRL it returns something that needs to be json decoded, so lets pass somethin that is encoded>
             ->willReturn($errormessage);
+            // We will have the mock return a basic string, as it's not under test.
+        // The string just needs to be returned as is. We do expect create_tenant to only call this once.
+        $csc->expects($this->once())
+        ->method('cmi5launch_connectors_error_message')
+        ->with($errormessage, "creating the tenant") // for tomorrow, is thi failing because with only evaluates strings? Like do we need to string the array out> 
+        // IRL it returns something that needs to be json decoded, so lets pass somethin that is encoded>
+        ->willReturn(false);
 
+            // Expected exceptions
+             $exceptionmessage = "Player communication error. Something went wrong creating the tenant." ;
+         
+
+            // the correct output not an exception
+            $this->expectExceptionMessage($exceptionmessage);
+            $this->expectException(playerException::class);
+        
         //Call the method under test. 
-        $result =$csc->cmi5launch_create_tenant($urltosend, $username, $password, $newtenantname);
-
-        // Result should be debug echo string and false
-        $this->assertNotTrue($result, "Expected retrieved object to be false");
-        // And it should output this error message
-        $this->expectOutputString($expectedstring);
+        $result =$csc->cmi5launch_create_tenant( $newtenantname);
+    
     }
-
     /**
      * * Test the retrieve_registration method with a successful response from the player.
      * @return void
@@ -327,7 +445,7 @@ class cmi5_connectorsTest extends TestCase
         $errormessage = array("statusCode" => "404",  "error" => "Not Found","message" => "testmessage" );
         
         // The expected error message to be output.
-        $expectedstring= "<br>Something went wrong retrieving the registration. CMI5 Player returned 404 error. With message 'testmessage'.<br>";
+      //  $expectedstring= "<br>Something went wrong retrieving the registration. CMI5 Player returned 404 error. With message 'testmessage'.<br>";
 
         // The arguments to be passed to the method under test. 
         $id = 0;
@@ -350,13 +468,68 @@ class cmi5_connectorsTest extends TestCase
             ->with($testfunction, "Testtoken", $urltosend)
             ->willReturn($errormessage);
 
+        // Expected exceptions
+        $exceptionmessage = "Player communication error. Something went wrong retrieving the registration. CMI5 Player returned 404 error. With message 'testmessage'" ;
+
+        // Expected exceptions and messages
+        $this->expectExceptionMessage($exceptionmessage);
+        $this->expectException(playerException::class);
+    
         //Call the method under test. 
         $result = $mockedclass->cmi5launch_retrieve_registration_with_get($registration, $id);
 
-        // Result should be debug echo string and false
-        $this->assertNotTrue($result, "Expected retrieved object to be false");
-        //And it should output this error message
-        $this->expectOutputString($expectedstring);
+        }
+
+    /**
+     * * Test the retrieve_registration method with a failed response from the player.
+           * This one tests if resulttest is false. This path shouldnt be able to be reached but is here to test the failsafe. 
+     * @return void
+     */
+    public function testcmi5launch_retrieve_registration_with_get_fail_2()
+    {
+        // Error message for stubbed method to return.
+        $errormessage = array("statusCode" => "404",  "error" => "Not Found","message" => "testmessage" );
+        
+        // The expected error message to be output.
+      //  $expectedstring= "<br>Something went wrong retrieving the registration. CMI5 Player returned 404 error. With message 'testmessage'.<br>";
+
+        // The arguments to be passed to the method under test. 
+        $id = 0;
+        $registration = "testregistration";
+
+        // This is the url the stubbed method shopuld receive.
+        $urltosend = "http://test/launch.php/api/v1/registration/testregistration";
+
+         // Function that will be called in function under test.
+         $testfunction = 'cmi5launch_stream_and_send';
+
+
+        // Mock a cmi5 connector object but only stub ONE method, as we want to test the others.
+        $mockedclass = $this->getMockBuilder('mod_cmi5launch\local\cmi5_connectors')
+            ->onlyMethods(array('cmi5launch_send_request_to_cmi5_player_get', 'cmi5launch_connectors_error_message'))
+            ->getMock();
+
+        $mockedclass->expects($this->once())
+            ->method('cmi5launch_send_request_to_cmi5_player_get')
+            ->with($testfunction, "Testtoken", $urltosend)
+            ->willReturn($errormessage);
+
+
+        $mockedclass->expects($this->once())
+        ->method('cmi5launch_connectors_error_message')
+        ->with($errormessage, "retrieving the registration")
+        ->willReturn(false);
+
+        // Expected exceptions
+        $exceptionmessage = "Player communication error. Something went wrong retrieving the registration information." ;
+
+        // Expected exceptions and messages
+        $this->expectExceptionMessage($exceptionmessage);
+        $this->expectException(playerException::class);
+    
+        //Call the method under test. 
+        $result = $mockedclass->cmi5launch_retrieve_registration_with_get($registration, $id);
+
         }
 
     /**
@@ -416,17 +589,72 @@ class cmi5_connectorsTest extends TestCase
     }
 
     /**
-     * * Test the retrieve_registration_with_post method with a failed response from the player.
+     * * Test the retrieve_registration_with_post method with a failed response from the player. Should throw exception.
+     * This one tests if resulttest is false. This path shouldnt be able to be reached but is here to test the failsafe. 
+     * @return void
+     */
+    public function testcmi5launch_retrieve_registration_with_post_fail_2()
+    {
+        // Error message for stubbed method to return.
+        $errormessage = array("statusCode" => "404",  "error" => "Not Found","message" => "testmessage" );
+        // The arguments to be passed to the method under test. 
+        $id = 0;
+        $courseid = 1;
+        $filetype = "json";
+
+        // The data to be passed to the mocked method.
+        $data = array(
+            "courseId" => $courseid, 
+            "actor" => array(
+                "account" =>  array (
+                    "homePage" => "http://testhomepage.com",
+                    "name" => "testname"
+                ),
+            ),
+        );
+
+        // This is the url the stubbed method shopuld receive.
+        $urltosend = "http://test/launch.php/api/v1/registration";
+
+         // Function that will be called in function under test.
+         $testfunction = 'cmi5launch_stream_and_send';
+
+        // Mock a cmi5 connector object but only stub ONE method, as we want to test the others.
+        $mockedclass = $this->getMockBuilder('mod_cmi5launch\local\cmi5_connectors')
+            ->onlyMethods(array('cmi5launch_send_request_to_cmi5_player_post', 'cmi5launch_connectors_error_message'))
+            ->getMock();
+
+        //  Mock returns json encoded data, as it would be from the player.
+        $mockedclass->expects($this->once())
+            ->method('cmi5launch_send_request_to_cmi5_player_post')
+            ->with($testfunction, json_encode($data), $urltosend, $filetype, "Testtoken")
+            ->willReturn($errormessage);
+
+
+        $mockedclass->expects($this->once())
+        ->method('cmi5launch_connectors_error_message')
+        ->with($errormessage, "retrieving the registration")
+        ->willReturn(false);
+
+   // Expected exceptions
+     $exceptionmessage = "Player communication error. Something went wrong retrieving the registration information." ;
+
+     // Expected exceptions and messages
+     $this->expectExceptionMessage($exceptionmessage);
+     $this->expectException(playerException::class);
+ 
+    //Call the method under test. 
+    $result = $mockedclass->cmi5launch_retrieve_registration_with_post($courseid, $id);
+
+    }
+    /**
+     * * Test the retrieve_registration_with_post method with a failed response from the player. Should throw exception.
      * @return void
      */
     public function testcmi5launch_retrieve_registration_with_post_fail()
     {
         // Error message for stubbed method to return.
         $errormessage = array("statusCode" => "404",  "error" => "Not Found","message" => "testmessage" );
-
-        // The expected error message to be output.
-        $expectedstring= "<br>Something went wrong retrieving the registration. CMI5 Player returned 404 error. With message 'testmessage'.<br>";
-
         // The arguments to be passed to the method under test. 
         $id = 0;
         $courseid = 1;
@@ -460,15 +688,17 @@ class cmi5_connectorsTest extends TestCase
             ->with($testfunction, json_encode($data), $urltosend, $filetype, "Testtoken")
             ->willReturn($errormessage);
 
-        //Call the method under test. 
-        $result = $mockedclass->cmi5launch_retrieve_registration_with_post($courseid, $id);
+   // Expected exceptions
+     $exceptionmessage = "Player communication error. Something went wrong retrieving the registration. CMI5 Player returned 404 error. With message 'testmessage'" ;
 
-        // Result should be debug echo string and false
-        $this->assertNotTrue($result, "Expected retrieved object to be false");
-        //And it should output this error message
-        $this->expectOutputString($expectedstring);
+     // Expected exceptions and messages
+     $this->expectExceptionMessage($exceptionmessage);
+     $this->expectException(playerException::class);
+ 
+    //Call the method under test. 
+    $result = $mockedclass->cmi5launch_retrieve_registration_with_post($courseid, $id);
+
     }
-
 
     /**
      * * Test the retrieve_token method with a successful response from the player.
@@ -476,14 +706,19 @@ class cmi5_connectorsTest extends TestCase
      */
     public function testcmi5launch_retrieve_token_pass()
     {
+        global $CFG, $cmi5launchid;
+
+        $settings = cmi5launch_settings($cmi5launchid);
         // Arguments to be passed to the method under test.
-        $url = "http://test/launch.php";
-        $username = "testname";
+        //$url = "http://test/launch.php";
+       // $username = "testname";
         $filetype = "json";
-        $password = "testpassword";
+        //$password = "testpassword";
         $audience = "testaudience";
         $tenantid = 0;
-
+        $username = $settings['cmi5launchbasicname'];
+        $url = $settings['cmi5launchplayerurl'] . "/api/v1/auth";
+        $password = $settings['cmi5launchbasepass'];
         // The data to be passed to the mocked method.
         $data = array(
             "tenantId" => $tenantid,
@@ -491,9 +726,10 @@ class cmi5_connectorsTest extends TestCase
         );
 
         // The player returns a json string.
-        $returnvalue = '{
-            "token": "testtoken"
-            }';
+        $returnvalue = "testtoken";
+
+        $playervalue = array("statusCode" => "200",  "token" => "testtoken","message" => "testmessage" );
+
          // Function that will be called in function under test.
          $testfunction = 'cmi5launch_stream_and_send';
 
@@ -505,10 +741,10 @@ class cmi5_connectorsTest extends TestCase
         $mockedclass->expects($this->once())
             ->method('cmi5launch_send_request_to_cmi5_player_post')
             ->with($testfunction, json_encode($data), $url, $filetype, $username, $password)
-            ->willReturn($returnvalue);
+            ->willReturn(json_encode($playervalue));
 
             //Call the method under test. 
-            $result = $mockedclass->cmi5launch_retrieve_token($url, $username, $password, $audience, $tenantid);
+            $result = $mockedclass->cmi5launch_retrieve_token($audience, $tenantid);
 
             // And the return should be a string (the original method returns what the player sends back or FALSE.
             $this->assertIsString($result);
@@ -521,18 +757,21 @@ class cmi5_connectorsTest extends TestCase
      */
     public function testcmi5launch_retrieve_token_fail()
     {
+        global $CFG, $cmi5launchid;
+        $settings = cmi5launch_settings($cmi5launchid);
+
         // Error message for stubbed method to return.
         $errormessage = array("statusCode" => "404",  "error" => "Not Found","message" => "testmessage" );
 
-        // The expected error message to be output.
-        $expectedstring= "<br>Something went wrong retrieving the token. CMI5 Player returned 404 error. With message 'testmessage'.<br>";
-
         // Arguments to be passed to the method under test.
-        $url = "http://test/launch.php";
-        $username = "testname";
-        $password = "testpassword";
+        $url = $settings['cmi5launchplayerurl'] . '/api/v1/auth';
+
         $audience = "testaudience";
         $tenantid = 0;
+        
+        //$actor = $USER->username;
+        $username = $settings['cmi5launchbasicname'];
+        $password = $settings['cmi5launchbasepass'];
 
         // The data to be passed to the mocked method.
         $filetype = "json";
@@ -555,13 +794,80 @@ class cmi5_connectorsTest extends TestCase
             ->with($testfunction, json_encode($data), $url, $filetype, $username, $password)
             ->willReturn($errormessage);
 
-        //Call the method under test. 
-        $result = $mockedclass->cmi5launch_retrieve_token($url, $username, $password, $audience, $tenantid);
+             // Expected exceptions
+     $exceptionmessage = "Player communication error. Something went wrong retrieving the tenant token. CMI5 Player returned 404 error. With message 'testmessage'" ;
 
-        // Result should be debug echo string and false.
-        $this->assertNotTrue($result, "Expected retrieved object to be false");
-        // And it should output this error message.
-        $this->expectOutputString($expectedstring);
+     // Expected exceptions and messages
+     $this->expectExceptionMessage($exceptionmessage);
+     $this->expectException(playerException::class);
+ 
+
+        //Call the method under test. 
+        $result = $mockedclass->cmi5launch_retrieve_token($audience, $tenantid);
+
+        }
+
+            /**
+     * * Test the retrieve_token method with a failed response from the player.
+     * This one tests if resulttest is false. This path shouldnt be able to be reached but is here to test the failsafe. 
+     * @return void
+     */
+    public function testcmi5launch_retrieve_token_fail_2()
+    {
+        global $CFG, $cmi5launchid;
+        $settings = cmi5launch_settings($cmi5launchid);
+
+        // Error message for stubbed method to return.
+        $errormessage = array("statusCode" => "404",  "error" => "Not Found","message" => "testmessage" );
+
+        // Arguments to be passed to the method under test.
+        $url = $settings['cmi5launchplayerurl'] . '/api/v1/auth';
+
+        $audience = "testaudience";
+        $tenantid = 0;
+        
+        //$actor = $USER->username;
+        $username = $settings['cmi5launchbasicname'];
+        $password = $settings['cmi5launchbasepass'];
+
+        // The data to be passed to the mocked method.
+        $filetype = "json";
+        $data = array(
+            "tenantId" => $tenantid,
+            "audience" => $audience,
+        );
+         // Function that will be called in function under test.
+         $testfunction = 'cmi5launch_stream_and_send';
+
+
+        // Mock a cmi5 connector object but only stub ONE method, as we want to test the others.
+        $mockedclass = $this->getMockBuilder('mod_cmi5launch\local\cmi5_connectors' )
+            ->onlyMethods(array('cmi5launch_send_request_to_cmi5_player_post', 'cmi5launch_connectors_error_message'))
+            ->getMock();
+
+        //  Mock returns json encoded data, as it would be from the player.
+        $mockedclass->expects($this->once())
+            ->method('cmi5launch_send_request_to_cmi5_player_post')
+            ->with($testfunction, json_encode($data), $url, $filetype, $username, $password)
+            ->willReturn($errormessage);
+
+            //  Mock returns json encoded data, as it would be from the player.
+        $mockedclass->expects($this->once())
+        ->method('cmi5launch_connectors_error_message')
+        ->with($errormessage, 'retrieving the tenant token.')
+        ->willReturn(false);
+            
+    // Expected exceptions
+     $exceptionmessage = "Player communication error. Something went wrong retrieving the tenant token." ;
+
+     // Expected exceptions and messages
+     $this->expectExceptionMessage($exceptionmessage);
+     $this->expectException(playerException::class);
+ 
+
+        //Call the method under test. 
+        $result = $mockedclass->cmi5launch_retrieve_token($audience, $tenantid);
+
         }
 
     /**
@@ -683,13 +989,93 @@ class cmi5_connectorsTest extends TestCase
             ->with($testfunction, json_encode($data), $urltosend, $filetype, "Testtoken")
             ->willReturn($errormessage);
 
+
+        // Expected exceptions
+        $exceptionmessage = "Player communication error. Something went wrong retrieving the launch url from player. CMI5 Player returned 404 error. With message 'testmessage'" ;
+
+        // Expected exceptions and messages
+        $this->expectExceptionMessage($exceptionmessage);
+        $this->expectException(playerException::class);
+
         //Call the method under test. 
         $result = $mockedclass->cmi5launch_retrieve_url($id, $auindex);
 
-        // Result should be debug echo string and false
-        $this->assertNotTrue($result, "Expected retrieved object to be false");
-        //And it should output this error message
-        $this->expectOutputString($expectedstring);
+        
+    }
+
+        /**
+     * * Test the retrieve_url (launchurl) method with a failed response from the player.
+     * This one tests if resulttest is false. This path shouldnt be able to be reached but is here to test the failsafe. 
+     * @return void
+     */
+    public function testcmi5launch_retrieve_url_fail_2()
+    {
+        global $cmi5launchid;
+        
+        // Error message for stubbed method to return.
+        $errormessage = array("statusCode" => "404",  "error" => "Not Found","message" => "testmessage" );
+
+        // The id to be passed to method under test. 
+        $id = $cmi5launchid;
+        $auindex = 1;
+        $filetype = "json";
+        
+        //Retrieve settings like the method under test will.
+        $settings = cmi5launch_settings($id);
+        $playerurl = $settings['cmi5launchplayerurl'];
+
+        $returnurl = "https://testmoodle.com";
+        $registrationid = "testregistrationid";
+
+        // The data to be passed to the mocked method.
+        $data = array(
+            'actor' => array(
+                'account' => array(
+                    "homePage" => "http://testhomepage.com",
+                    "name" => "testname",
+                ),
+            ),
+            'returnUrl' => $returnurl,
+            'reg' => $registrationid,
+        );
+
+        // This is the url the stubbed method shopuld receive.
+        $urltosend =  $playerurl . "/api/v1/course/" . "1"  ."/launch-url/" . $auindex;
+
+        // Function that will be called in function under test.
+        $testfunction = 'cmi5launch_stream_and_send';
+
+        // Mock a cmi5 connector object but only stub ONE method, as we want to test the other.
+        // Create a mock of the send_request class as we don't actually want
+        // to create a new course in the player.
+        $mockedclass = $this->getMockBuilder('mod_cmi5launch\local\cmi5_connectors')
+            ->onlyMethods(array('cmi5launch_send_request_to_cmi5_player_post', 'cmi5launch_connectors_error_message'))
+            ->getMock();
+
+        // Mock returns json encoded data, as it would be from the player.
+        $mockedclass->expects($this->once())
+            ->method('cmi5launch_send_request_to_cmi5_player_post')
+            ->with($testfunction, json_encode($data), $urltosend, $filetype, "Testtoken")
+            ->willReturn($errormessage);
+
+
+        //  Mock returns json encoded data, as it would be from the player.
+        $mockedclass->expects($this->once())
+        ->method('cmi5launch_connectors_error_message')
+        ->with($errormessage, 'retrieving the launch url from player.')
+        ->willReturn(false);
+            
+        // Expected exceptions
+        $exceptionmessage = "Player communication error. Something went wrong retrieving the launch url from player." ;
+
+        // Expected exceptions and messages
+        $this->expectExceptionMessage($exceptionmessage);
+        $this->expectException(playerException::class);
+
+        //Call the method under test. 
+        $result = $mockedclass->cmi5launch_retrieve_url($id, $auindex);
+
+        
     }
 
     /**
@@ -728,16 +1114,79 @@ class cmi5_connectorsTest extends TestCase
         //The arguments to pass in, in this case one, a pretend token.
         $token = "testtoken";
 
+             // Expected exceptions
+             $exceptionmessage = "Player communication error. Error communicating with player, sending a POST request." ;
+
+             // Expected exceptions and messages
+          //   $this->expectExceptionMessage($exceptionmessage);
+         //    $this->expectException(playerException::class);
+     
         // Class for function under test.
         $helper = new cmi5_connectors;
         // Call the method under test.
         $test = $helper->cmi5launch_send_request_to_cmi5_player_post($testfunction, $data, $url, $filetype, $token);
+
+        // If the right message is displayed the try/catch wworked!
+        $this->expectOutputString($exceptionmessage);
+
+    }
+
+        /**
+     * Test the send_request_to_cmi5_player_post method with one arg. 
+     * Test the thrown exception.
+     * @return void
+     */
+    public function testcmi5launch_send_request_to_cmi5_player_post_with_one_arg_fail()
+    {
+        // We send the TEST function to the function under test now!
+        $testfunction = 'cmi5Test\cmi5launch_test_stream_and_send_excep';
+        // Which returns the 'options' parameter passed to it.
+        // The player returns a string under normal circumstances.
+        $returnvalue = json_encode(array(
+            "statusCode" => 200,
+            "Response" => "Successful Post",
+        ));
+    
+        // The data to be passed to the mocked method.
+        $data = array(
+            'actor' => array(
+                'account' => array(
+                    "homePage" => "http://testhomepage.com",
+                    "name" => "testname",
+                ),
+            ),
+            'returnUrl' => 'returnurl',
+            'reg' => 'registrationid',
+        );
+
+        // Fake arguments to pass in.
+        $filetype = "json";
+        $url = "http://test/url.com";
+      
+
+        //The arguments to pass in, in this case one, a pretend token.
+        $token = "testtoken";
+
+     // Expected exceptions
+     $exceptionmessage = "Player communication error. Something went wrong communicating with player, sending or crafting a POST request: " ;
+
+
+        // Expected exceptions and messages
+        $this->expectExceptionMessage($exceptionmessage);
+        $this->expectException(playerException::class);
+
+        // Class for function under test.
+        $helper = new cmi5_connectors;
+        // Call the method under test.
+        // Note: by not sending an actual function, this will cause an exception and allow testing of try/catch and error override.
+        $test = $helper->cmi5launch_send_request_to_cmi5_player_post('testfunction', $data, $url, $filetype, $token);
 
         // And the return should be a string.
         $this->assertIsString($test);
         // And it should be the same as the return value.
         $this->assertEquals($test, $returnvalue);
     }
+
 
     /**
      * * Test the send_request_to_cmi5_player_post method with two args. 
@@ -789,12 +1238,67 @@ class cmi5_connectorsTest extends TestCase
         $this->assertEquals($test, $returnvalue);
     }
 
+
+    /**
+     * * Test the send_request_to_cmi5_player_post method with two args. 
+     * This is what is used to retrieve info like tenant info.
+     * @return void
+     */
+    public function testcmi5launch_send_request_to_cmi5_player_post_with_two_args_fail()
+    {
+
+        // We send the TEST function to the function under test now!
+        $testfunction = 'cmi5Test\cmi5launch_test_stream_and_send_pass';
+
+        // The player returns a string under normal circumstances.
+        $returnvalue = json_encode(array(
+            "statusCode" => 200,
+            "Response" => "Successful Post",
+        ));
+    
+        // The data to be passed to the mocked method.
+        $data = array(
+            'actor' => array(
+                'account' => array(
+                    "homePage" => "http://testhomepage.com",
+                    "name" => "testname",
+                ),
+            ),
+            'returnUrl' => 'returnurl',
+            'reg' => 'registrationid',
+        );
+
+        // Fake arguments to pass in.
+        $filetype = "json";
+        $url = "http://test/url.com";
+        $contenttype = "application/json\r\n";
+
+        //The arguments to pass in, in this case one, a pretend username and password.
+        $username = "testname";
+        $password = "testpassword";
+
+       // Expected exceptions
+       $exceptionmessage = "Player communication error. Something went wrong communicating with player, sending or crafting a POST request: " ;
+
+
+       // Expected exceptions and messages
+       $this->expectExceptionMessage($exceptionmessage);
+       $this->expectException(playerException::class);
+
+       // Class for function under test.
+        $helper = new cmi5_connectors;
+        $test = $helper->cmi5launch_send_request_to_cmi5_player_post('testfunction', $data, $url, $filetype, $username, $password);
+
+   
+    }
+
+
     /**
      * * Test the send_request_to_cmi5_player_get
      * This is what is used to retrieve info like tenant info.
      * @return void
      */
-    public function testcmi5launch_send_request_to_cmi5_player_post_with_get_pass()
+    public function testcmi5launch_send_request_to_cmi5_player_with_get_pass()
     {
 
         // We send the TEST function to the function under test now!
@@ -816,7 +1320,7 @@ class cmi5_connectorsTest extends TestCase
         $test = $helper->cmi5launch_send_request_to_cmi5_player_get($testfunction, $token, $url);
     
         // And the return should be an array.
-        $this->assertIsArray($test);
+        $this->assertIsString($test);
         // And it should be the same as the return value.
         $this->assertEquals($test, json_decode($returnvalue, true) );
 
@@ -828,10 +1332,10 @@ class cmi5_connectorsTest extends TestCase
      * This is meant to fail, we want it to act as if the player is unreachable
      * @return void
      */
-    public function testcmi5launch_send_request_to_cmi5_player_post_with_get_fail()
+    public function testcmi5launch_send_request_to_cmi5_player_with_get_fail()
     {
            // We send the TEST function to the function under test now!
-           $testfunction = 'cmi5Test\cmi5launch_test_stream_and_send_fail';
+           $testfunction = 'cmi5Test\cmi5launch_test_stream_and_send_excep';
 
 
     // Error message for stubbed method to return.
@@ -852,32 +1356,32 @@ class cmi5_connectorsTest extends TestCase
                     "Accept: application/json\r\n"),
             ),
         );
+          // Expected exceptions
+              $exceptionmessage = "Player communication error. Something went wrong communicating with player, sending or crafting a GET request: " ;
 
-        // What if we run the entire class mocked except the one under test?
-        // would it run in the riht namespace?
-        // AKA OUR test namepspace 
-        // Mock a cmi5 connector object but only stub ONE method, as we want to test the other.
-       
+
+            // Expected exceptions and messages
+            $this->expectExceptionMessage($exceptionmessage);
+            $this->expectException(playerException::class);
 
                     // This is the SUT?
         $helper = new cmi5_connectors;
-        $post = $helper->cmi5launch_get_send_request_to_cmi5_player_get();
+        $get = $helper->cmi5launch_get_send_request_to_cmi5_player_get();
     
 
         //$test = $mockedclass->cmi5launch_send_request_to_cmi5_player_get($token, $url);
-        $test = $post($testfunction, $token, $url);
+        $test = $get($testfunction, $token, $url);
 
-        // And the return should be an array since the method under test returns player message decoded.
-        $this->assertIsArray($test);
-        // And it should be the same as the return value.
-        $this->assertEquals($test, $errormessage);
+       
     }
 
+
+    
     /**
      * * Test the retrieve_session method with a successful response from the player.
      * @return void
      */
-    public function testcmi5launch_session_info_from_player_pass()
+    public function testcmi5launch_retrieve_session_info_from_player_pass()
     {
         global $cmi5launchid;
 
@@ -894,11 +1398,11 @@ class cmi5_connectorsTest extends TestCase
         $urltosend =  $playerurl . "/api/v1/session/" . $sessionid;
 
         // The player returns a string, but the mocked method returns an array.
-        $returnvalue = array(
+        $returnvalue = json_encode(array(
             "statusCode" => 200,
             "launchMethod" => "AnyWindow",
             "url" => "http://testlaunchurl"
-        );
+        ));
 
          // We send the TEST function to the function under test now!
          $testfunction = 'cmi5launch_stream_and_send';
@@ -913,7 +1417,7 @@ class cmi5_connectorsTest extends TestCase
         $mockedclass->expects($this->once())
             ->method('cmi5launch_send_request_to_cmi5_player_get')
             ->with($testfunction, $token, $urltosend)
-            ->willReturn(json_encode($returnvalue));
+            ->willReturn(($returnvalue));
 
 
         //Call the method under test. 
@@ -921,23 +1425,24 @@ class cmi5_connectorsTest extends TestCase
 
         // And the return should be an array (the original method returns what the player sends back json-decoded or FALSE)
         $this->assertIsString($result);
-        $this->assertEquals($result, json_encode($returnvalue));
+        $this->assertEquals($result,($returnvalue));
     }
 
     /**
      * * Test the retrieve_session (launchurl) method with a failed response from the player.
      * @return void
      */
-    public function testcmi5launch_session_info_from_player_fail()
+    public function testcmi5launch_retrieve_session_info_from_player_fail()
     {
         global $cmi5launchid;
 
         // Error message for stubbed method to return.
-        $errormessage = array("statusCode" => "404",  "error" => "Not Found","message" => "testmessage" );
+        $errormessage = json_encode(
+            array("statusCode" => "404",  
+            "error" => "Not Found",
+            "message" => "testmessage" ));
 
-        // The expected error message to be output.
-        $expectedstring= "<br>Something went wrong retrieving session info. CMI5 Player returned 404 error. With message 'testmessage'.<br>";
-        
+    
         // The id to be passed to method under test. 
         $id = $cmi5launchid;
 
@@ -948,8 +1453,9 @@ class cmi5_connectorsTest extends TestCase
         $token = $settings['cmi5launchtenanttoken'];
         // This is the url the stubbed method shopuld receive.
         $urltosend =  $playerurl . "/api/v1/session/" . $sessionid;
- // We send the TEST function to the function under test now!
- $testfunction = 'cmi5launch_stream_and_send';
+
+        // We send the TEST function to the function under test now!
+        $testfunction = 'cmi5launch_stream_and_send';
 
 
         // Mock a cmi5 connector object but only stub ONE method, as we want to test the others.
@@ -961,15 +1467,79 @@ class cmi5_connectorsTest extends TestCase
         $mockedclass->expects($this->once())
             ->method('cmi5launch_send_request_to_cmi5_player_get')
             ->with($testfunction, $token, $urltosend)
-            ->willReturn(json_encode($errormessage));
+            ->willReturn($errormessage);
 
-        //Call the method under test. 
+     // Expected exceptions
+     $exceptionmessage = "Player communication error. Something went wrong retrieving the session information. CMI5 Player returned 404 error. With message 'testmessage'." ;
+
+
+          // Expected exceptions and messages
+          $this->expectExceptionMessage($exceptionmessage);
+          $this->expectException(playerException::class);
+
+              //Call the method under test. 
         $result = $mockedclass->cmi5launch_retrieve_session_info_from_player($sessionid, $id);
+       
+    }
 
-        // Result should be debug echo string and false
-        $this->assertNotTrue($result, "Expected retrieved object to be false");
-        //And it should output this error message
-        $this->expectOutputString($expectedstring);
+        /**
+     * * Test the retrieve_session (launchurl) method with a failed response from the player.
+     * This one tests if resulttest is false. This path shouldnt be able to be reached but is here to test the failsafe. 
+     * @return void
+     */
+    public function testcmi5launch_retrieve_session_info_from_player_fail_excep()
+    {
+        global $cmi5launchid;
+
+        // Error message for stubbed method to return.
+        $errormessage = array("statusCode" => "404",  "error" => "Not Found","message" => "testmessage" );
+
+        // The expected error message to be output.
+        $expectedstring= "<br>Something went wrong retrieving session information. CMI5 Player returned 404 error. With message 'testmessage'.<br>";
+        
+        // The id to be passed to method under test. 
+        $id = $cmi5launchid;
+
+        //Retrieve settings like the method under test will.
+        $settings = cmi5launch_settings($id);
+        $playerurl = $settings['cmi5launchplayerurl'];
+        $sessionid = "testsessionid";
+        $token = $settings['cmi5launchtenanttoken'];
+        // This is the url the stubbed method shopuld receive.
+        $urltosend =  $playerurl . "/api/v1/session/" . $sessionid;
+
+        // We send the TEST function to the function under test now!
+        $testfunction = 'cmi5launch_stream_and_send';
+
+
+        // Mock a cmi5 connector object but only stub ONE method, as we want to test the others.
+        $mockedclass = $this->getMockBuilder('mod_cmi5launch\local\cmi5_connectors')
+            ->onlyMethods(array('cmi5launch_send_request_to_cmi5_player_get', 'cmi5launch_connectors_error_message'))
+            ->getMock();
+
+        // Mock returns json encoded data, as it would be from the player.
+        $mockedclass->expects($this->once())
+            ->method('cmi5launch_send_request_to_cmi5_player_get')
+            ->with($testfunction, $token, $urltosend)
+            ->willReturn(($errormessage));
+  
+            //  Mock returns json encoded data, as it would be from the player.
+            $mockedclass->expects($this->once())
+            ->method('cmi5launch_connectors_error_message')
+            ->with($errormessage, 'retrieving the session information.')
+            ->willReturn(false);
+     
+        // Expected exceptions
+        $exceptionmessage = "Player communication error. Something went wrong retrieving the session information." ;
+
+
+          // Expected exceptions and messages
+          $this->expectExceptionMessage($exceptionmessage);
+          $this->expectException(playerException::class);
+
+              //Call the method under test. 
+        $result = $mockedclass->cmi5launch_retrieve_session_info_from_player($sessionid, $id);
+       
     }
 
     /**
@@ -984,16 +1554,22 @@ class cmi5_connectorsTest extends TestCase
         $response = false;
         $type = "retreiving 'item'";
 
+        $helper = new cmi5_connectors;
+        $error = $helper->cmi5launch_get_connectors_error_message();
+    
+
         // The expected error message to be output.
-        $errormessage ="<br>Something went wrong " . $type . ". CMI5 Player is not communicating. Is it running?<br>";
+        $exceptionmessage ="Something went wrong " . $type . ". CMI5 Player is not communicating. Is it running?";
+
+       
+          // Expected exceptions and messages
+          $this->expectExceptionMessage($exceptionmessage);
+          $this->expectException(playerException::class);
 
         // Call the method under test.
-        $result = cmi5_connectors::cmi5launch_connectors_error_message($response, $type);
+        $result = $error($response, $type);
 
-        // Result should be debug echo string and false
-        $this->assertNotTrue($result, "Expected retrieved object to be false");
-        //And it should output this error message
-        $this->expectOutputString($errormessage);
+       
     }
 
     /**
@@ -1009,15 +1585,19 @@ class cmi5_connectorsTest extends TestCase
         $response = array("statusCode" => "404",  "error" => "Not Found","message" => "testmessage" );
 
         // The expected error message to be output.
-        $expectedstring ="<br>Something went wrong " . $type . ". CMI5 Player returned "  . $response['statusCode'] . " error. With message '" . $response['message'] . "'.<br>";
+        $exceptionmessage="Something went wrong " . $type . " CMI5 Player returned "  . $response['statusCode'] . " error. With message '" . $response['message'] . "'.";
+        
+        $helper = new cmi5_connectors;
+        $error = $helper->cmi5launch_get_connectors_error_message();
+    
+
+        // Expected exceptions and messages
+        $this->expectExceptionMessage($exceptionmessage);
+        $this->expectException(playerException::class);
 
         // Call the method under test.
-        $result = cmi5_connectors::cmi5launch_connectors_error_message($response, $type);
-    
-         // Result should be debug echo string and false
-         $this->assertNotTrue($result, "Expected retrieved object to be false");
-         //And it should output this error message
-         $this->expectOutputString($expectedstring);    
+        $result = $error($response, $type);
+       
     }
 
     /**
@@ -1036,8 +1616,11 @@ class cmi5_connectorsTest extends TestCase
         "Response" => "Successful Post",
          ));
 
+         $helper = new cmi5_connectors;
+         $error = $helper->cmi5launch_get_connectors_error_message();
+     
         // Call the method under test.
-        $result = cmi5_connectors::cmi5launch_connectors_error_message($response, $type);
+        $result = $error($response, $type);
     
          // Result should be debug echo string and false
          $this->assertTrue($result, "Expected retrieved object to be true");

@@ -26,6 +26,7 @@ namespace mod_cmi5launch\local;
 use mod_cmi5launch\local\au;
 use mod_cmi5launch\local\errorover;
 
+global $CFG;
 // Include the errorover (error override) funcs.
 require_once ($CFG->dirroot . '/mod/cmi5launch/classes/local/errorover.php');
 
@@ -53,6 +54,8 @@ class au_helpers {
     public function cmi5launch_retrieve_aus($returnedinfo) {
         
        $resultchunked = "";
+       
+     
        // Use our own more specific error handler, to give better info tto user.
        set_error_handler('mod_cmi5launch\local\array_chunk_warning', E_WARNING);
         
@@ -244,10 +247,12 @@ class au_helpers {
             $auitem = $DB->get_record('cmi5launch_aus',  array('id' => $auid));
 
             $au = new au($auitem);
+
+            // Return our new list of AU.
+            return $au;
         }
 
-        // Return our new list of AU.
-        return $au;
+        
     }
 
 }
