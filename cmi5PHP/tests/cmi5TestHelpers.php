@@ -10,7 +10,7 @@ use mod_cmi5launch\local\session_helpers;
 use PHPUnit\Framework\TestCase;
 
 require_once(__DIR__ . '/../../classes/local/au_helpers.php');
-require_once(__DIR__ . '/../../classes/local/session_helpers.php');
+//require_once(__DIR__ . '/../../classes/local/session_helpers.php');
 
 
 /**
@@ -56,6 +56,7 @@ function maketestcmi5launch()
 
   $newid = $DB->insert_record('cmi5launch', $cmi5launch);
 
+
   return $newid;
 
 }
@@ -81,6 +82,10 @@ function deletetestcmi5launch_usercourse($ids)
 {
 	global $DB, $cmi5launch;
 
+	// if id is int
+	if (!is_array($ids)) {
+		$ids = array($ids);
+	}
 	foreach ($ids as $id) {
 		// Delete the cmi5launch record
 		$DB->delete_records('cmi5launch_usercourse', array('id' => $id));
@@ -95,7 +100,10 @@ function deletetestcmi5launch_usercourse($ids)
 function deletetestcmi5launch_aus($ids)
 {
   global $DB, $cmi5launch;
-
+  // if id is int
+  if (!is_array($ids)) {
+	$ids = array($ids);
+  }
   foreach ($ids as $id) {
 	// Delete the cmi5launch record
 	$DB->delete_records('cmi5launch_aus', array('id' => $id));
@@ -111,6 +119,11 @@ function deletetestcmi5launch_aus($ids)
 function deletetestcmi5launch_sessions($ids)
 {
   global $DB, $cmi5launch;
+
+  // if id is int
+  if (!is_array($ids)) {
+	$ids = array($ids);
+  }
 
   foreach ($ids as $id) {
 	// Delete the cmi5launch record
@@ -233,6 +246,10 @@ function deletetestcmi5launch_sessions($ids)
 		'moodlecourseid' => 'moodlecourseid' . $i,
 		'userid' => 'userid' . $i
 	);
+	
+		// maybe if we put the sessions here then we can skip the whole resaving thing
+	$testcoursesessionids = maketestsessions();
+	$mockvalues['sessions'] = $testcoursesessionids;
 		$aus[] = new au($mockvalues);
 	}
 
@@ -240,20 +257,12 @@ function deletetestcmi5launch_sessions($ids)
 	$auhelper = new au_helpers();
 	$saveau = $auhelper->get_cmi5launch_save_aus();	
 
-	// Ok what the hack is going on here with saveaus
-	/*echo"<br>";
-	echo " Well let sprint them like the save aus wopuld separate them, ";
-	foreach ($aus as $auobject) {
-		echo "<br>";
-		echo "AU ID: " . $auobject->id;
-		var_dump($auobject);
-		echo"<br>";
-	}
-	echo"<br>";
-*/
+	
+
+
 	// Save AUs to test DB and save IDs.
 	$newauids = $saveau($aus);
-    
+	
 	// Return array of AU ids
     return $newauids;
   
@@ -352,10 +361,13 @@ function maketeststatements($amounttomake)
 
 	for ($i = 0; $i < 5; $i++) {
 
-		$sessionid[] = $i;
+		
 		//$toaddtostring = strval($i);
 	// Add i to each value so the AUs are unique.
 	// Mock values to make sessions.
+
+	// For some bizarre reason, retrieve sessions from db goes on SESSION id not ID?!?!??
+	// THIS IS the problem? 
 	$mockvalues = array(
 		'id' => $i,
 		'sessionid' =>  'sessionid' . $i,
@@ -384,6 +396,7 @@ function maketeststatements($amounttomake)
 		'launchurl' => 'launchurl' . $i,
 	);
 		$sessions[] = new session($mockvalues);
+		$sessionid[] = ('sessionid' . $i);
 	}
 	// Pass in the au index to retrieve a launchurl and session id.
 //$urldecoded = $cmi5launchretrieveurl($cmi5launch->id, $auindex);
@@ -397,21 +410,25 @@ $launchurl = 'testurl';
 // And launch method.
 $launchmethod = 'testmethod';
 
-
 // Now save the fake sessions to the test database
+// Ok so tomorrow make this so there are sessions actually creatd. 
 $sessionhelper = new session_helpers();
-$createsession = $sessionhelper->cmi5launch_get_create_session();	
-
+//$createsession = $sessionhelper->cmi5launch_create_session();	
 	// For each session id in the list, create a session.
-	foreach ($sessionid as $id) {
-		$newids[] = $createsession($id, $launchurl, $launchmethod);
+	foreach ($sessions as $session) {
+		// LEts test if it can retrieve here
+		$newid = $sessionhelper->cmi5launch_create_session($session->id, $launchurl, $launchmethod);
+		$newids[] = $newid;
+		//$sessionid[] = $session;
+
 		
+	
 	}
 	// Save AUs to test DB and save IDs.
 	//$newauids = $createsession($aus);
     
 	// Return array of session ids
-    return $newids;
+    return $sessionid;
   
     } 
 
@@ -419,31 +436,63 @@ $createsession = $sessionhelper->cmi5launch_get_create_session();
 	 * Heeelper func that assigns the sessions made to the aus for testing purposes. 
 	 * @param mixed $auids
 	 * @param mixed $sessionids
-	 * @return void
+	 * @return array
 	 */
     function assign_sessions_to_aus($auids, $sessionids){
 
+		// What they are saying is the SESSIONS arent in the table so lets chekc why that may be
+		global $DB;
         // HElper function to assign sessions to aus
         $au_helpers = new au_helpers();
 		$retrieve_aus = $au_helpers->get_cmi5launch_retrieve_aus_from_db();
 		$save_aus = $au_helpers->get_cmi5launch_save_aus();
 
+		
 		//Array to holdd newly created AUs
 		$newaus = array();
 		// First populate the aus with the sessions
         foreach ($auids as $auid ){
-            // Assiging the sessions to the aus
+           
+			$check = $DB->record_exists( 'cmi5launch_aus', ['id' => $auid], '*', IGNORE_MISSING);
+
+
+			if (!$check) {
+				// If check is negative, the record does not exist. Throw error.
+				echo "<p>Error attempting to get AU data from DB. Check AU id.</p>";
+			}
+			// Assiging the sessions to the aus
 			$au = $retrieve_aus($auid);
 
-			// Now the AU will have properties and we want to assign the sessionid array to the 'sessions'  property
-			$au->sessions = $sessionids;
+			// I bet an argument one string being array is in the au itself
 
-			$newaus[] = $au;
+
+		// Tomorrow: no that isnt it. Something else is throwin the problem. 
+			// Now the AU will have properties and we want to assign the sessionid array to the 'sessions'  property
+			$au->sessions = json_encode($sessionids);
+ // Update AU in table with new info.
+
+ //echo au here nd check what sessons itr and if id mathces
+
+
+ 
+
+			// Save the AU back to the DB.
+			$success = $DB->update_record('cmi5launch_aus', $au);
+			
+
+
+ $newaus[] = $au;
         }
 
+		// AHA! They are whole damn aus
 		// now save the new aus back to db
-		$save_aus($newaus);
-    }
+		// we dont need to sve twice!!!
+		// $save_aus($newaus);
+		// Save us is to make new aus we need to save them back to DB
+		  // Now update to table.
+		//return $newauids;
+	
+	}
 
 		/**
 	 * Heeelper func that assigns the aus made to the course(s) for testing purposes. 
@@ -458,6 +507,7 @@ $createsession = $sessionhelper->cmi5launch_get_create_session();
 		// Mooonday- there are no course helpers so just call the course, assign the auids
 		// and then save ther course with DB calls
 
+
 		// Retreive the courses
 		// Imust have copied below from the func above, it doesn't seem relevant
         $au_helpers = new au_helpers();
@@ -466,21 +516,117 @@ $createsession = $sessionhelper->cmi5launch_get_create_session();
 
 		//Array to holdd newly created AUs
 		$newaus = array();
+
+		// if its an int
+		if (!is_array($courseids)){
+			$courseids = array($courseids);
+		}
 		// First populate the aus with the sessions
         foreach ($courseids as $courseid ){
             
 			// Get the course
 			$record = $DB->get_record('cmi5launch_usercourse', array('id' => $courseid));
 
+			// somewhere between thie au ids above and being encoded below its effin uop
 			// Assigning the sessions to the aus
-			$record->aus == $auids;
-			
+			// Its like its not assigning it. 
+
+			// AHA What is auids here? 
+		
+			$record->aus = json_encode($auids);
+
 			// Save the course back to the db.
-			$DB->update_record('cmi5launch_usercourse', $record);
+			$success = $DB->update_record('cmi5launch_usercourse', $record);
         }
 
     }
+// New class
+class session_helpers2
+{
+	    /**
+     * Creates a session record in DB.
+     * @param mixed $sessionid - the session id
+     * @param mixed $launchurl - the launch url
+     * @param mixed $launchmethod - the launch method
+     * @return void
+     */
+    public function cmi5launch_create_sessio6n($sessionid, $launchurl, $launchmethod) {
 
+        global $DB, $CFG, $cmi5launch, $USER;
+
+        $table = "cmi5launch_sessions";
+
+        // Make a new record to save.
+        $newrecord = new \stdClass();
+        // Because of many nested properties, needs to be done manually.
+        $newrecord->sessionid = $sessionid;
+        $newrecord->launchurl = $launchurl;
+        $newrecord->tenantname = $USER->username;
+        $newrecord->launchmethod = $launchmethod;
+        // I think here is where we eed to implement : moodlecourseid
+        $newrecord->moodlecourseid = $cmi5launch->id;
+        // And userid!
+        $newrecord->userid = $USER->id;
+      
+        // Save record to table.
+        $newid = $DB->insert_record($table, $newrecord, true);
+      
+        // Return value 
+        return $newid;
+
+    }
+		 // So now all the test has to do is inject THIS which will return as we please
+	 // We will inject the damn func! // inject this one!
+function updatesessione($sessionid, $cmi5launchid, $user)
+{
+	global $DB, $cmi5launch, $USER;
+
+	// Make new sessions, lets make five.
+	$sessions = array();
+	$sessionids = array();
+
+	
+		$sessionids[] = $sessionid;
+		//$toaddtostring = strval($i);
+	// Add i to each value so the AUs are unique.
+	// Mock values to make sessions.
+	$mockvalues = array(
+		'id' => $sessionid,
+		'sessionid' =>  'sessionid' . $sessionid,
+		'userid' => 'userid' . $sessionid,
+		'moodlecourseid' => 'moodlecourseid' . $sessionid,
+		'registrationscoursesausid' => 'registrationscoursesausid' . $sessionid,
+		'tenantname' => 'tenantname' . $sessionid,
+		'createdat' => 'createdat' . $sessionid,
+		'updatedat' => 'updatedat' . $sessionid,
+		'code' => 'code' . $sessionid,
+		'launchtokenid' => 'launchtokenid' . $sessionid,
+		'lastrequesttime' => 'lastrequesttime' . $sessionid,
+		'launchmode' => 'launchmode' . $sessionid,
+		'masteryscore' => 'masteryscore' . $sessionid,
+		'score' => 'score' . $sessionid,
+		'islaunched' => 'islaunched' . $sessionid,
+		'isinitialized' => 'isinitialized' . $sessionid,
+		'duration' => 'duration' . $sessionid,
+		'iscompleted' => 'iscompleted' . $sessionid,
+		'ispassed' => 'ispassed' . $sessionid,
+		'isfailed' => 'isfailed' . $sessionid,
+		'isterminated' => 'isterminated' . $sessionid,
+		'isabandoned' => 'isabandoned' . $sessionid,
+		'progress' => 'progress' . $sessionid,
+		'launchmethod' => 'launchmethod' . $sessionid,
+		'launchurl' => 'launchurl' . $sessionid,
+	);
+		$newsession = new session($mockvalues);
+
+		echo " Ive been calllled";
+		return $newsession;
+	}
+	
+	}
+
+
+  
 
 /*
   function get_file_get_contents() {

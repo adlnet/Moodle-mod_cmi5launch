@@ -71,7 +71,7 @@ class session_helpers {
 
         // Get updates from cmi5player.
         // This is sessioninfo from CMI5 player.
-        $sessioninfo = $getsessioninfo($sessionid, $cmi5id);
+        $sessioninfo = json_decode($getsessioninfo($sessionid, $cmi5id), true);
 
         // Update session.
         foreach ($sessioninfo as $key => $value) {
@@ -126,7 +126,7 @@ class session_helpers {
       
         // Save record to table.
         $newid = $DB->insert_record($table, $newrecord, true);
-
+      
         // Return value 
         return $newid;
 

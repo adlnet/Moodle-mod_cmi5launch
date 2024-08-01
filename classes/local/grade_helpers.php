@@ -26,17 +26,28 @@ namespace mod_cmi5launch\local;
 defined('MOODLE_INTERNAL') || die();
 
 use mod_cmi5launch\local\session_helpers;
+use mod_cmi5launch\local\au_helpers;
 
-class grade_helpers {
-    public function get_cmi5launch_check_user_grades_for_updates() {
+
+class grade_helpers
+{
+    public function get_cmi5launch_update_au_for_user_grades()
+    {
+        return [$this, 'cmi5launch_update_au_for_user_grades'];
+    }
+
+    public function get_cmi5launch_check_user_grades_for_updates()
+    {
         return [$this, 'cmi5launch_check_user_grades_for_updates'];
     }
 
-    public function get_cmi5launch_highest_grade() {
+    public function get_cmi5launch_highest_grade()
+    {
         return [$this, 'cmi5launch_highest_grade'];
     }
 
-    public function get_cmi5launch_average_grade() {
+    public function get_cmi5launch_average_grade()
+    {
         return [$this, 'cmi5launch_average_grade'];
     }
 
@@ -46,13 +57,14 @@ class grade_helpers {
      *                      - or a singular int.
      * @return int
      */
-    public function cmi5launch_average_grade($scores) {
+    public function cmi5launch_average_grade($scores)
+    {
 
         global $cmi5launch, $USER, $DB;
 
         // If it comes in as string, convert to array.
         if (is_string($scores)) {
-            
+
             $scores = json_decode($scores, true);
         }
 
@@ -69,7 +81,7 @@ class grade_helpers {
 
         } else {
             $averagegrade = 0;
-           
+
         }
 
         // Now apply intval.
@@ -83,7 +95,8 @@ class grade_helpers {
      * @param mixed $scores
      * @return int
      */
-    public function cmi5launch_highest_grade($scores) {
+    public function cmi5launch_highest_grade($scores)
+    {
 
         global $cmi5launch, $USER, $DB;
 
@@ -117,11 +130,87 @@ class grade_helpers {
      * @param array $user - the user whose grades are being updated.
      * @return array
      */
-    public function cmi5launch_check_user_grades_for_updates($user) {
+    public function cmi5launch_check_user_grades_for_updates($user)
+    {
 
         global $cmi5launch, $USER, $DB;
 
+        // what is cmi5launch here in actual func?
+       
+    // Set error and exception handler to catch and override the default PHP error messages, to make messages more user friendly.
+    set_error_handler('mod_cmi5launch\local\grade_warning', E_WARNING);
+    set_exception_handler('mod_cmi5launch\local\exception_grade');
+
+        // Check if record already exists.
+        $exists = $DB->record_exists('cmi5launch_usercourse', ['courseid' => $cmi5launch->courseid, 'userid' => $user->id]);
+
+        try {
+            // If it exists, we want to update it.
+            if (!$exists == false) {
+
+                // Retrieve the record.
+                $userscourse = $DB->get_record('cmi5launch_usercourse', ['courseid' => $cmi5launch->courseid, 'userid' => $user->id]);
+                
+                $auids = json_decode($userscourse->aus);
+
+
+      
+                // Update the AUs
+                $returnedinfo = $this->cmi5launch_update_au_for_user_grades($auids, $user);
+            
+                // Array to hold AU scores.
+                $auscores = $returnedinfo[0];
+                $overallgrade = $returnedinfo[1];
+
+                // Update course record.
+                $userscourse->ausgrades = json_encode($auscores);
+                $DB->update_record("cmi5launch_usercourse", $userscourse);
+                //echo" 1 branch";
+                // Restore default hadlers.
+                restore_exception_handler();
+                restore_error_handler();
+                // Return scores.
+                return $overallgrade;
+
+            } else {
+          
+                // Should we return SOMEthing>
+                $nograde = array(0 => 'No grades to update. No record for user found in this course.');
+                // Do nothing, there is no record for this user in this course.
+                // Restore default hadlers.
+            restore_exception_handler();
+            restore_error_handler();
+                return $nograde;
+
+            }
+        } catch (\Throwable $e) {
+         
+            // If there is an error, return the error.
+            echo" Error in updating or checking user grades. Report this error to system administrator: ". $e->getMessage(); 
+            // Restore default hadlers.
+            restore_exception_handler();
+            restore_error_handler();
+            return $e;
+        }
+    }
+
+    /*
+     *  Go through each Au, each Au will be responsible for updating its own session.
+     * @param mixed $auid
+     * @return au|bool
+     */
+    public function cmi5launch_update_au_for_user_grades($auids, $user)
+    {
+        global $cmi5launch, $USER, $DB;
+
+        echo " HELLO I SHOULDN'T BE HERE?";
+        
         $cmi5launchsettings = cmi5launch_settings($cmi5launch->id);
+
+        // Array to hold AU scores.
+        $auscores = array();
+        $overallgrade = array();
+
 
         // Bring in functions and classes.
         $sessionhelper = new session_helpers;
@@ -129,120 +218,99 @@ class grade_helpers {
         // Functions from other classes.
         $updatesession = $sessionhelper->cmi5launch_get_update_session();
 
-        // Check if record already exists.
-        $exists = $DB->record_exists('cmi5launch_usercourse', ['courseid' => $cmi5launch->courseid, 'userid' => $user->id]);
+        // Go through each Au, each Au will be responsible for updating its own session.
+        foreach ($auids as $key => $auid) {
+           
+          
+            // Array to hold session scores for update.
+            $sessiongrades = array();
 
-            // If it exists, we want to update it.
-        if (!$exists == false) {
+            // This uses the auid to pull the right record from the aus table.
+            $aurecord = $DB->get_record('cmi5launch_aus', ['id' => $auid]);
 
-            // Retrieve the record.
-            $userscourse = $DB->get_record('cmi5launch_usercourse', ['courseid' => $cmi5launch->courseid, 'userid' => $user->id]);
+            // When it is null it is because the user has not launched the AU yet.
+            if (!$aurecord == null || false) {
 
-            // User record may be null if user has not participated in course yet.
-            //if (!$userscourse == null) {
-            // should never be null if exosts? 
-            // Retrieve AU ids.
-            $auids = (json_decode($userscourse->aus));
+                // Check if there are sessions.
+                if (!$aurecord->sessions == null) {
 
-            // Array to hold AU scores.
-            $auscores = array();
-            $overallgrade = array();
+                    // Retrieve session ids for this course. There may be more than one session.
+                    $sessions = json_decode($aurecord->sessions, true);
+                
+                    // Iterate through each session.
+                    foreach ($sessions as $sessionid) {
 
-                // Go through each Au, each Au will be responsible for updating its own session.
-                foreach ($auids as $key => $auid) {
+                        // Using current session id, retrieve session from DB.
+                        $session = $DB->get_record('cmi5launch_sessions', ['sessionid' => $sessionid]);
 
-                    // Array to hold session scores for update.
-                    $sessiongrades = array();
+                        // the update session is call the ission
+                        // we need to moick IT
 
-                    // This uses the auid to pull the right record from the aus table.
-                    $aurecord = $DB->get_record('cmi5launch_aus', ['id' => $auid]);
+                        // Retrieve new info (if any) from CMI5 player and LRS on session.
+                        $session = $updatesession($sessionid, $cmi5launch->id, $user);
 
-                    // When it is null it is because the user has not launched the AU yet.
-                    if (!$aurecord == null || false) {
-
-                        // Check if there are sessions.
-                        if (!$aurecord->sessions == null) {
-
-                            // Retrieve session ids for this course. There may be more than one session.
-                            $sessions = json_decode($aurecord->sessions, true);
-
-                            // Iterate through each session.
-                            foreach ($sessions as $sessionid) {
-
-                                // Using current session id, retrieve session from DB.
-                                $session = $DB->get_record('cmi5launch_sessions', ['sessionid' => $sessionid]);
-
-                                // Retrieve new info (if any) from CMI5 player and LRS on session.
-                                $session = $updatesession($sessionid, $cmi5launch->id, $user);
-
-                                // Now if the session is complete, passed, or terminated, we want to update the AU.
-                                // These come in order, so the last one is the current status, so update on each one,
-                                // overwrite as you go, and the last one if final.
-                                if ($session->iscompleted == 1) {
-                                    // 0 is no 1 is yes, these are from players
-                                    $aurecord->completed = 1;
-                                }
-                                if ($session->ispassed == 1) {
-                                    // 0 is no 1 is yes, these are from players
-                                    $aurecord->passed = 1;
-                                }
-                                if ($session->isterminated == 1) {
-                                    // 0 is no 1 is yes, these are from players
-                                    $aurecord->terminated = 1;
-                                }
-
-                                // Add the session grade to array.
-                                $sessiongrades[] = $session->score;
-                            }
-                            // Save the session scores to AU, it is ok to overwrite.
-                            $aurecord->scores = json_encode($sessiongrades, JSON_NUMERIC_CHECK);
-
-                            // Determine gradetype and use it to save overall grade to AU.
-                            $gradetype = $cmi5launchsettings["grademethod"];
-
-                            switch ($gradetype) {
-
-                                // GRADE_AUS_CMI5 = 0.
-                                // GRADE_HIGHEST_CMI5 = 1.
-                                // GRADE_AVERAGE_CMI5 =  2.
-                                // GRADE_SUM_CMI5 = 3.
-
-                                case 1:
-                                    $aurecord->grade = $this->cmi5launch_highest_grade($sessiongrades);
-                                    break;
-                                case 2:
-                                    $aurecord->grade = $this->cmi5launch_average_grade($sessiongrades);
-                                    break;
-                                default:
-                                    echo "Gradetype not found.";
-                            }
-
-                            // Save AU scores to corresponding title.
-                            $auscores[$aurecord->lmsid] = array ($aurecord->title => $aurecord->scores);
-
-                            // Save an overall grade to array to be passed out to grade_update.
-                            $overallgrade[] = $aurecord->grade;
-
-                            // Save Au title and their scores to AU.
-                            // Save updates to DB.
-                            $aurecord = $DB->update_record('cmi5launch_aus', $aurecord);
+                        // Now if the session is complete, passed, or terminated, we want to update the AU.
+                        // These come in order, so the last one is the current status, so update on each one,
+                        // overwrite as you go, and the last one if final.
+                        if ($session->iscompleted == 1) {
+                            // 0 is no 1 is yes, these are from players
+                            $aurecord->completed = 1;
                         }
+                        if ($session->ispassed == 1) {
+                            // 0 is no 1 is yes, these are from players
+                            $aurecord->passed = 1;
+                        }
+                        if ($session->isterminated == 1) {
+                            // 0 is no 1 is yes, these are from players
+                            $aurecord->terminated = 1;
+                        }
+
+                        // Add the session grade to array.
+                        $sessiongrades[] = $session->score;
                     }
+                    // Save the session scores to AU, it is ok to overwrite.
+                    $aurecord->scores = json_encode($sessiongrades, JSON_NUMERIC_CHECK);
+
+                    // Determine gradetype and use it to save overall grade to AU.
+                    $gradetype = $cmi5launchsettings["grademethod"];
+
+                    switch ($gradetype) {
+
+                        // GRADE_AUS_CMI5 = 0.
+                        // GRADE_HIGHEST_CMI5 = 1.
+                        // GRADE_AVERAGE_CMI5 =  2.
+                        // GRADE_SUM_CMI5 = 3.
+
+                        case 1:
+                            $aurecord->grade = $this->cmi5launch_highest_grade($sessiongrades);
+                            break;
+                        case 2:
+                            $aurecord->grade = $this->cmi5launch_average_grade($sessiongrades);
+                            break;
+                        default:
+                            echo "Gradetype not found.";
+                    }
+
+                    // Save AU scores to corresponding title.
+                    $auscores[$aurecord->lmsid] = array($aurecord->title => $aurecord->scores);
+
+                    // Save an overall grade to array to be passed out to grade_update.
+                    $overallgrade[] = $aurecord->grade;
+
+
+                    // Save Au title and their scores to AU.
+                    // Save updates to DB.
+                    $aurecord = $DB->update_record('cmi5launch_aus', $aurecord);
+
                 }
-
-                // Update course record.
-                $userscourse->ausgrades = json_encode($auscores);
-                $DB->update_record("cmi5launch_usercourse", $userscourse);
-         //   }
-
-            // Return scores.
-            return $overallgrade;
-
-        } else {
-
-            // Do nothing, there is no record for this user in this course.
-            return false;
-
+            }
         }
+
+                    //Array to hold answer
+                    $toreturn = array(0 => $auscores, 1 => $overallgrade);
+                    // we need to return auscores and overallgrade.
+
+                    return $toreturn;
     }
+
 }

@@ -42,6 +42,34 @@ function exception_au(\Throwable $exception)
     throw new fieldException('Error OVER: ' . $exception->getMessage(), 0);
     //  exit;
 }
+/**
+ * An exception handler to use in AU cases when many different exceptions for data errors may be thrown. 
+ * @param mixed $errno
+ * @param mixed $errstr
+ * @param mixed $errfile
+ * @param mixed $errline
+ * @throws \mod_cmi5launch\local\nullException
+ * @return never
+ */
+function exception_grade(\Throwable $exception)
+{
+   
+    throw new nullException('Error in checking user grades: ' . $exception->getMessage(), 0);
+    //  exit;
+}
+
+function sifting_data_warning($errno, $errstr, $errfile, $errline)
+{
+   //  echo"Error stirn ---  $errstr";
+  //   echo"Error number ---  $errno";
+//echo"Error errfile ---  $errfile";
+  //   echo"Error errline ---  $errline";
+    // Maybe we can construct the new errors here. This would allow the error personalization? And keep main code clean
+
+    throw new fieldException('Error: ' . $errstr, 0);
+    //  exit;
+}
+
     function array_chunk_warning($errno, $errstr, $errfile, $errline)
     {
         // echo"Error stirn ---  $errstr";
@@ -54,7 +82,7 @@ function exception_au(\Throwable $exception)
     }
 
     /// Ok, this i a different error handler
-    function sifting_data_warning($errno, $errstr, $errfile, $errline)
+    function grade_warning($errno, $errstr, $errfile, $errline)
     {
        //  echo"Error stirn ---  $errstr";
       //   echo"Error number ---  $errno";
@@ -62,7 +90,7 @@ function exception_au(\Throwable $exception)
       //   echo"Error errline ---  $errline";
         // Maybe we can construct the new errors here. This would allow the error personalization? And keep main code clean
 
-        throw new fieldException('Error: ' . $errstr, 0);
+        throw new nullException('Error in checking user grades: ' . $errstr, 0);
         //  exit;
     }
 

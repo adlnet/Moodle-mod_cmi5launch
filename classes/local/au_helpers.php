@@ -25,6 +25,8 @@ namespace mod_cmi5launch\local;
 
 use mod_cmi5launch\local\au;
 use mod_cmi5launch\local\errorover;
+use mod_cmi5launch\local\session_helpers;
+
 
 global $CFG;
 // Include the errorover (error override) funcs.
@@ -32,50 +34,59 @@ require_once ($CFG->dirroot . '/mod/cmi5launch/classes/local/errorover.php');
 
 defined('MOODLE_INTERNAL') || die();
 
-class au_helpers {
-    public function get_cmi5launch_retrieve_aus() {
+class au_helpers
+{
+    public function get_cmi5launch_retrieve_aus()
+    {
         return [$this, 'cmi5launch_retrieve_aus'];
     }
-    public function get_cmi5launch_create_aus() {
+    public function get_cmi5launch_create_aus()
+    {
         return [$this, 'cmi5launch_create_aus'];
     }
-    public function get_cmi5launch_save_aus() {
+    public function get_cmi5launch_save_aus()
+    {
         return [$this, 'cmi5launch_save_aus'];
     }
-    public function get_cmi5launch_retrieve_aus_from_db() {
+    public function get_cmi5launch_retrieve_aus_from_db()
+    {
         return [$this, 'cmi5launch_retrieve_aus_from_db'];
     }
 
+    public function get_cmi5launch_update_au_for_user_grades()
+    {
+        return [$this, 'cmi5launch_update_au_for_user_grades'];
+    }
     /**
      * Parses and retrieves AUs from the returned info from CMI5 player.
      * @param mixed $returnedinfo
      * @return array
      */
-    public function cmi5launch_retrieve_aus($returnedinfo) {
-        
-       $resultchunked = "";
-       
-     
-       // Use our own more specific error handler, to give better info tto user.
-       set_error_handler('mod_cmi5launch\local\array_chunk_warning', E_WARNING);
-        
+    public function cmi5launch_retrieve_aus($returnedinfo)
+    {
+
+        $resultchunked = "";
+
+
+        // Use our own more specific error handler, to give better info tto user.
+        set_error_handler('mod_cmi5launch\local\array_chunk_warning', E_WARNING);
+
         // The results come back as nested array under more then just AUs.
         // We only want the info pertaining to the AU. However, if the wrong info is passed array_chunk will through an exception.
         try {
             $resultchunked = array_chunk($returnedinfo["metadata"]["aus"], 1, );
-        } 
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
 
             echo "Cannot retrieve AUs. Error found when trying to parse them from course creation: " .
                 "Please check the connection to player or course format and try again. \n"
                 . $e->getMessage() . "\n";
 
             //exit;
-        } 
+        }
 
         // Restore the error handler.
         restore_error_handler();
-        
+
         return $resultchunked;
     }
 
@@ -94,7 +105,7 @@ class au_helpers {
         // We should not be able to get here but what if null is pulled from record and passed in?
         // So in case it is given null.
         if ($austatements == null) {
-            
+
             throw new nullException('Cannot retrieve AU information. AU statements from DB are: ' . $austatements, 0);
 
         } else {
@@ -120,11 +131,12 @@ class au_helpers {
      * @param mixed $auobjectarray
      * @return array
      */
-    public function cmi5launch_save_aus($auobjectarray) {
+    public function cmi5launch_save_aus($auobjectarray)
+    {
         // Add userid to the record.
         global $DB, $USER, $cmi5launch;
         $table = "cmi5launch_aus";
-        
+
         // An array to hold the created ids.
         $auids = array();
 
@@ -138,20 +150,21 @@ class au_helpers {
         // Set error and exception handler to catch and override the default PHP error messages, to make messages more user friendly.
         set_error_handler('mod_cmi5launch\local\sifting_data_warning', E_WARNING);
         set_exception_handler('mod_cmi5launch\local\exception_au');
-        
+
         //Check it's not null.
         if ($auobjectarray == null) {
 
-            throw new nullException('Cannot save AU information. AU object array is: null' , 0);
+            throw new nullException('Cannot save AU information. AU object array is: null', 0);
 
         } else {
+
             // For each AU in array build a new record and save it.
             // Because of so many nested variables this needs to be done manually.
             foreach ($auobjectarray as $auobject) {
-                
+
                 // A try statement to catch any errors that may be thrown.
                 try {
-                   // Make a newrecord to save.
+                    // Make a newrecord to save.
                     $newrecord = new \stdClass();
 
                     // Assign the values to the new record.
@@ -162,7 +175,10 @@ class au_helpers {
                     $newrecord->lmsid = json_decode(json_encode($auobject->lmsId, true));
                     $newrecord->url = $auobject->url;
                     $newrecord->type = $auobject->type;
-                    $title = json_decode(json_encode($auobject->title), true);
+                  
+                    //apparently thi covoluted methid is becessary shceck php unit tests MB
+                      $title = json_decode(json_encode($auobject->title), true);
+                   // $title = $auobject->title;
                     $newrecord->title = $title[0]['text'];
                     $newrecord->moveon = $auobject->moveOn;
                     $newrecord->auindex = $auobject->auIndex;
@@ -179,20 +195,21 @@ class au_helpers {
                     $newrecord->satisfied = $auobject->satisfied;
                     $newrecord->moodlecourseid = $cmi5launch->id;
 
+                   
                     // Save the record and get the new id.
                     $newid = $DB->insert_record($table, $newrecord, true);
-                    
+
                     // Save new id to list to pass back.
                     $auids[] = $newid;
-                    
+
                     // This is for troubleshooting, so we know where the error is.
                     $currentrecord++;
-               
+
                     // The set exception handler catches exceptionas that SLIP by,
                     // so maybe DONT make it throwable and  catch type errror
                 } catch (\Throwable $e) {
-               
-                
+
+
                     echo "Cannot save to DB. Stopped at record with ID number " . ($currentrecord) . ".";
 
                     // This is the tricky part, we need to find out which field is missing. But because the error is thrown ON the field, we need to do some
@@ -202,7 +219,7 @@ class au_helpers {
 
                     // Get the last ley of array
                     $lastkey = array_key_last($items);
-                    
+
                     // Heres thhe tricky part, the lastkey here is somewhere in the array we earlier made and the NEXT one would be the one that threw the error.
                     // So now we can grab the key after the last one.
                     $key = array_search($lastkey, $newrecorditems) + 1;
@@ -218,33 +235,34 @@ class au_helpers {
             // Restore default hadlers.
             restore_exception_handler();
             restore_error_handler();
-           
+
             return $auids;
         }
     }
-    
+
 
     /**
      * Retrieves AU info from DB, converts to AU object, and returns it.
      * @param mixed $auid
      * @return au|bool
      */
-    public function cmi5launch_retrieve_aus_from_db($auid) {
+    public function cmi5launch_retrieve_aus_from_db($auid)
+    {
 
         global $DB;
 
-        $check = $DB->record_exists( 'cmi5launch_aus', ['id' => $auid], '*', IGNORE_MISSING);
+        $check = $DB->record_exists('cmi5launch_aus', ['id' => $auid], '*', IGNORE_MISSING);
 
 
         // If check is negative, the record does not exist. It should also throw error.
         // Moodle will throw the error, but we want to pass this message back ot user.
         if (!$check) {
 
-            throw new nullException("Error attempting to get AU data from DB. Check AU id. AU id is: " . $auid ."</p>", 0);
+            throw new nullException("Error attempting to get AU data from DB. Check AU id. AU id is: " . $auid . "</p>", 0);
 
         } else {
 
-            $auitem = $DB->get_record('cmi5launch_aus',  array('id' => $auid));
+            $auitem = $DB->get_record('cmi5launch_aus', array('id' => $auid));
 
             $au = new au($auitem);
 
@@ -252,7 +270,6 @@ class au_helpers {
             return $au;
         }
 
-        
-    }
 
+    }
 }

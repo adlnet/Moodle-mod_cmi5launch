@@ -210,7 +210,7 @@ $table->head = array(
 $auscores = array();
 
 // Query CMI5 player for updated registration info.
-$registrationinfofromcmi5 = $getregistrationinfo($registrationid, $cmi5launch->id);
+$registrationinfofromcmi5 = json_decode($getregistrationinfo($registrationid, $cmi5launch->id), true);
 
 // Take only info about AUs out of registrationinfofromcmi5.
 $ausfromcmi5 = array_chunk($registrationinfofromcmi5["metadata"]["moveOn"]["children"], 1, true);
