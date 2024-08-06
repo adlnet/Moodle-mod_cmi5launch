@@ -27,7 +27,6 @@
  use mod_cmi5launch\local\cmi5launch_helpers;
 // Include the errorover (error override) funcs.
 require_once ($CFG->dirroot . '/mod/cmi5launch/classes/local/errorover.php');
-
 class cmi5_connectors {
 
     public function cmi5launch_get_create_tenant() {

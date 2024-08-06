@@ -2,13 +2,9 @@
 
 namespace cmi5Test;
 
-use Exception;
 use mod_cmi5launch\local\grade_helpers;
 use mod_cmi5launch\local\nullException;
-use mod_cmi5launch\local\fieldException;
 use PHPUnit\Framework\TestCase;
-use mod_cmi5launch\local\cmi5_connectors;
-
 
 require_once( "cmi5TestHelpers.php");
 
@@ -34,23 +30,10 @@ class grade_helpersTest extends TestCase
     {
         global $DB, $cmi5launch, $cmi5launchid, $USER, $testcourseid, $testcourseausids, $testcoursesessionids, $cmi5launchsettings;
 
-        // Delete the test record.
-      //  deletetestcmi5launch($cmi5launchid);
-
-        // Delete the test course.
-       // deletetestcmi5launch_usercourse($cmi5launchid);
-
-        // Delete the test AUs.
-     //   deletetestcmi5launch_aus($testcourseausids);
-
-        // Delete the test sessions.
-      //  deletetestcmi5launch_sessions($testcoursesessionids);
-
-      
+  
         
         // Restore overridden global variable.
         unset($GLOBALS['USER']);
-      //  unset($GLOBALS['DB']);
         unset($GLOBALS['cmi5launchsettings']);
         unset($GLOBALS['cmi5launch']);
         unset($GLOBALS['cmi5launchid']);
@@ -67,7 +50,24 @@ class grade_helpersTest extends TestCase
         // Make a fake cmi5 launch record.
         $cmi5launchid = maketestcmi5launch();
 
-        $cmi5launchsettings = array("cmi5launchtenanttoken" => "Testtoken", "cmi5launchplayerurl" => "http://test/launch.php", "cmi5launchcustomacchp" => "http://testhomepage.com");
+        // Assign the new id as the cmi5launch id.
+        $cmi5launch->id = $cmi5launchid;
+        // Update db
+        $DB->update_record('cmi5launch', $cmi5launch);
+        // Gradetypes for ref
+        // GRADE_AUS_CMI5 = 0.
+        // GRADE_HIGHEST_CMI5 = 1.
+        // GRADE_AVERAGE_CMI5 =  2.
+        // GRADE_SUM_CMI5 = 3.
+        $cmi5launchsettings = array(
+            "cmi5launchlrsendpoint" => "Test LRS point", 
+            "cmi5launchlrslogin" => "Test LRS login",
+            "cmi5launchlrspass" => "Test LRS password",
+            "cmi5launchtenanttoken" => "Testtoken", 
+            "cmi5launchplayerurl" => "http://test/launch.php", 
+            "cmi5launchcustomacchp" => "http://testhomepage.com",
+            "grademethod" => 1
+        );
 
         // Override global variable and function so that it returns test data.
         $USER = new \stdClass();
@@ -75,22 +75,20 @@ class grade_helpersTest extends TestCase
         $USER->id = 10;
 
         // Make test course, AUs and sessions.
-       $testcourseid = maketestcourse($cmi5launchid);
+        $testcourseid = maketestcourse($cmi5launchid);
         $testcourseausids = maketestaus($testcourseid);
         $testcoursesessionids = maketestsessions();
 
         // Assign the sessions to AUs.
         $newaus = assign_sessions_to_aus($testcourseausids, $testcoursesessionids);
 
-     //what are the testcourseauids here>
-       
         // Assign the AUs to the course.
         assign_aus_to_courses($testcourseid, $testcourseausids);
-         }
+        }
 
     protected function tearDown(): void
     {
-        
+
     }
 
 
@@ -106,10 +104,9 @@ class grade_helpersTest extends TestCase
         // Scores as an array.
         $scoresarray = array (1,2,3,4,5);
 
-         // Scores as a (json_encoded) string.
-         $scoresstring = json_encode($scoresarray);
+        // Scores as a (json_encoded) string.
+        $scoresstring = json_encode($scoresarray);
 
-  
         // So the average of either should be.
         $average = 3;
 
@@ -133,6 +130,7 @@ class grade_helpersTest extends TestCase
         $this->assertIsInt($resultarray);
         
     }
+
     /*
     * Test of the cmi5launch_average_grade method.
     * This takes scores and averages them.
@@ -141,7 +139,6 @@ class grade_helpersTest extends TestCase
     */
    public function testcmi5launch_average_grade_singular()
    {
-      
         // Scores as an array.
         $scoresarray = array (0 => 3);
 
@@ -359,9 +356,8 @@ class grade_helpersTest extends TestCase
     
     }
      /*
-    * Test of the cmi5launch_highest_grade method.
-    * This takes scores and returns the highest one of them.
-    * // We need to test with scores being a 0 and string and int.
+    * Test of the cmi5launch_check_user_grades_for_updates method.
+    * Parses and retrieves AUs and their sessions from the returned info from CMI5 player and LRS and updates them.
     * @return void
     */
     public function testcmi5launch_check_user_grades_for_updates()
@@ -377,14 +373,8 @@ class grade_helpersTest extends TestCase
 
          $auids = json_decode($userscourse->aus);
 
-        // So the systems under test does a lot, may need refactoring
-        // But we will need the testcourseid and userid to get the"usercourse"
-         // Ah the user course has aus in it and the function grabs them, then for each au grabs their session
-         // huhthese should be refactored into smaller functions.   
-        // well then again it already is a lot of calls so maybe its fine
-        // I dunno, my brain says its frisday
 
-        // Array to return
+        // Array to return.
         $returnvalue = array(0 => array(
             "lmsid" => array(
                 "Title of AU" => 80, 
@@ -397,20 +387,19 @@ class grade_helpersTest extends TestCase
                 ),
     );
 
-        // so lets start by pretending to call finction under test 
-        // I have to start somewhere
         // Mock a cmi5 connector object but only stub ONE method, as we want to test the others.
         $mockedclass = $this->getMockBuilder('mod_cmi5launch\local\grade_helpers')
             ->onlyMethods(array('cmi5launch_update_au_for_user_grades'))
             ->getMock();
 
-     
-        // Ok, the arrgs ar the same, the name is the same. What is YES! its not calling the mocked class!!!!!
+            $sessionhelper = new \mod_cmi5launch\local\session_helpers;;
+
         //  Mock returns json encoded data, as it would be from the player.
         $mockedclass->expects($this->once())
             ->method('cmi5launch_update_au_for_user_grades')
-            ->with($auids, $USER)
+            ->with($sessionhelper, $auids, $USER)
             ->willReturn($returnvalue);
+       
         // Bring in functions and classes.
         $gradehelper = new grade_helpers;
 
@@ -419,17 +408,16 @@ class grade_helpersTest extends TestCase
 
         $result = $checkusergrades($USER);
 
-        // it should return only the overall grade, the other grades being for updating the records in DB.
+        // It should return only the overall grade, the other grades being for updating the records in DB.
         $this->assertEquals($returnvalue[1], $result);
-        // IT should be an array
+        // It should be an array.
         $this->assertIsArray($result);
-
 
     }
 
-      /*
-    * Test of the cmi5launch_highest_grade method.
-    * This one tests if their are no rades for updates
+    /*
+    * Test of the cmi5launch_check_user_grades_for_updates method.
+    * This one tests if their are no grades for updates.
     * @return void
     */
     public function testcmi5launch_check_user_grades_for_updates_no_grade()
@@ -439,22 +427,7 @@ class grade_helpersTest extends TestCase
         // If we pass it the wrong user id then it cant find the usercourse and we can test that path.
         $USER->id = 100;
         $cmi5launchsettings = cmi5launch_settings($cmi5launch->id);
-         // Retrieve the record.
-     //    $userscourse = $DB->get_record('cmi5launch_usercourse', ['courseid' => $cmi5launch->courseid, 'userid' => $USER->id]);
-
-        // $auids = json_decode($userscourse->aus);
-
-        // So the systems under test does a lot, may need refactoring
-        // But we will need the testcourseid and userid to get the"usercourse"
-         // Ah the user course has aus in it and the function grabs them, then for each au grabs their session
-         // huhthese should be refactored into smaller functions.   
-        // well then again it already is a lot of calls so maybe its fine
-        // I dunno, my brain says its frisday
-
-        // so lets start by pretending to call finction under test 
-        // I have to start somewhere
-        // Mock a cmi5 connector object but only stub ONE method, as we want to test the others.
-   
+    
         // Bring in functions and classes.
         $gradehelper = new grade_helpers;
 
@@ -465,14 +438,14 @@ class grade_helpersTest extends TestCase
         
         $result = $checkusergrades($USER);
 
-        // it should return only the overall grade, the other grades being for updating the records in DB.
+        // It should return only the overall grade, the other grades being for updating the records in DB.
         $this->assertEquals($returnvalue, $result[0]);
-        // IT should be an array
+        // It should be an array.
         $this->assertIsArray($result);
 
     }
       /*
-    * Test of the cmi5launch_highest_grade method.
+    * Test of the cmi5launch_check_user_grades_for_update.
     * This one tests if something goes wrong, and throws an exception
     * @return void
     */
@@ -481,98 +454,269 @@ class grade_helpersTest extends TestCase
         global $cmi5launch, $USER, $DB, $testcourseid, $cmi5launchsettings;
 
         $cmi5launchsettings = cmi5launch_settings($cmi5launch->id);
-         // Retrieve the record.
-         $userscourse = $DB->get_record('cmi5launch_usercourse', ['courseid' => $cmi5launch->courseid, 'userid' => $USER->id]);
+         
+        // Retrieve the record.
+        $userscourse = $DB->get_record('cmi5launch_usercourse', ['courseid' => $cmi5launch->courseid, 'userid' => $USER->id]);
 
-  $auids = json_decode($userscourse->aus);
+        $auids = json_decode($userscourse->aus);
 
-        // $auids = json_decode($userscourse->aus);
-     // so lets start by pretending to call finction under test 
-        // I have to start somewhere
         // Mock a cmi5 connector object but only stub ONE method, as we want to test the others.
         $mockedclass = $this->getMockBuilder('mod_cmi5launch\local\grade_helpers')
             ->onlyMethods(array('cmi5launch_update_au_for_user_grades'))
             ->getMock();
-
-            // If it returns null this should throw a null error exception. 
+            $sessionhelper = new \mod_cmi5launch\local\session_helpers;
         $mockedclass->expects($this->once())
             ->method('cmi5launch_update_au_for_user_grades')
-            ->with($auids, $USER)
+            ->with($sessionhelper, $auids, $USER)
             ->willReturn(null);
      
         // Functions from other classes.
         $checkusergrades = $mockedclass->get_cmi5launch_check_user_grades_for_updates();
 
-     // Expected exceptions
+        // Expected exceptions.
         $expected = " Error in updating or checking user grades. Report this error to system administrator: Error in checking user grades: Trying to access array offset on null";
-
-  
-     // Expected exceptions and messages
  
         $result = $checkusergrades($USER);
 
-         // Because this exception is thrown by the error handler, not the SUT, test the output to ensure right exception was thrown.
-     $this->expectOutputString($expected);
+        // Because this exception is thrown by the error handler, not the SUT, test the output to ensure right exception was thrown.
+        $this->expectOutputString($expected);
 
     }
 
-          /*
+    /*
     * Test of the cmi5launch_update_au_for_user_grades method.
- 
+    * This one tests if the grades are returned highest.
     * @return void
     */
-    public function testcmi5launch_update_au_for_user_grades()
+    public function testcmi5launch_update_au_for_user_grades_highest()
     {
         global $cmi5launch, $USER, $DB, $testcourseid, $cmi5launchsettings;
-       // global $session_helper;
+        
         $cmi5launchsettings = cmi5launch_settings($cmi5launch->id);
-         // Retrieve the record.
-         $userscourse = $DB->get_record('cmi5launch_usercourse', ['courseid' => $cmi5launch->courseid, 'userid' => $USER->id]);
+        
+        // GRADE_AUS_CMI5 = 0.
+        // GRADE_HIGHEST_CMI5 = 1.
+        // GRADE_AVERAGE_CMI5 =  2.
+        // GRADE_SUM_CMI5 = 3.
+        $cmi5launchsettings["grademethod"] = 1;
+        
+        // Retrieve the record.
+        $userscourse = $DB->get_record('cmi5launch_usercourse', ['courseid' => $cmi5launch->courseid, 'userid' => $USER->id]);
 
-         
-            // The problem is that AUS needs to be an array of numbers and ita
-            // an actual au 
+         // Call the TEST version of session helpers to pass.
+         $sessionhelper = new \cmi5Test\session_helpers;
+   
          $auids = json_decode($userscourse->aus);
 
-        // So the systems under test does a lot, may need refactoring
-        // But we will need the testcourseid and userid to get the"usercourse"
-         // Ah the user course has aus in it and the function grabs them, then for each au grabs their session
-         // huhthese should be refactored into smaller functions.   
-        // well then again it already is a lot of calls so maybe its fine
-        // I dunno, my brain says its frisday
-
-        // Session to return to return
-        $returnvalue = new \stdClass();
-            $returnvalue->iscompleted = 1;
-            $returnvalue->ispassed = 1;
-            $returnvalue->isterminated = 1;
-            $returnvalue->score = 80;
-
-        // so lets start by pretending to call finction under test 
-        // I have to start somewhere
-        // Mock a cmi5 connector object but only stub ONE method, as we want to test the others.
-   
-        $mockedclass = $this->getMockBuilder('mod_cmi5launch\local\grade_helpers')
-            ->addMethods(array('cmi5launch_get_update_session'))
-            ->getMock();
-
-        //  Mock returns json encoded data, as it would be from the player.
-        $mockedclass->expects($this->once())
-            ->method('cmi5launch_get_update_session');
-            //->with($auids, $USER)
-           // ->willReturn($returnvalue);
-     
-     
-            // Bring in functions and classes.
+        // Bring in functions and classes.
         $gradehelper = new grade_helpers;
 
         // Functions from other classes.
-        $updateau = $mockedclass->get_cmi5launch_update_au_for_user_grades();
+        $updateau = $gradehelper->get_cmi5launch_update_au_for_user_grades();
 
-        $result = $updateau($auids, $USER);
-                 // Because this exception is thrown by the error handler, not the SUT, test the output to ensure right exception was thrown.
-     $this->expectOutputString("test");
+        $result = $updateau($sessionhelper, $auids, $USER);
+        // Result should be an array.
+        $this->assertIsArray($result);
+        
+        // And it is an array of two parts, one for the lmsid, and within it, the title and score of that title.
+        // And the second, the overall grade of ALL the aus (lmsids).
+        $this->assertArrayHasKey(0, $result);
+        // The lmsid and title will have different number endings but should all contain the same base string,
+        $lmsid = $result[0];
+        $this->assertIsArray($lmsid);
+
+        $this->assertStringStartsWith('lmsid', array_key_first($lmsid));
+
+        // Now finagle to get the title array
+        $title = $result[0][array_key_first($lmsid)];
+        
+        // Shouild be an array where the title is key and the value is score
+        $this->assertIsArray($title);
+        $this->assertStringStartsWith('The title text', array_key_first($title));
+        // And finally the value of the 'title' is a json string equalling all the session scores, in this case we 
+        // made five and each was 80.
+        $scoresshouldbe = "[80,80,80,80,80]";
+        $this->assertEquals($scoresshouldbe, $title[array_key_first($title)]);
+      
+        // And finally the overall grade which in this instance is the highest of all the scores, or just 80.
+        $this->assertArrayHasKey(1, $result);
+        $this->assertEquals(80, $result[1]);
     }
+
+
+          /*
+    * Test of the cmi5launch_update_au_for_user_grades method.
+    * This one tests if the grades are returned averaged.
+    * @return void
+    */
+    public function testcmi5launch_update_au_for_user_grades_average()
+    {
+        global $cmi5launch, $USER, $DB, $testcourseid, $cmi5launchsettings;
+
+        $cmi5launchsettings = cmi5launch_settings($cmi5launch->id);
+        
+        // Gradetype for reference.
+        // GRADE_AUS_CMI5 = 0.
+        // GRADE_HIGHEST_CMI5 = 1.
+        // GRADE_AVERAGE_CMI5 =  2.
+        // GRADE_SUM_CMI5 = 3.
+        $cmi5launchsettings["grademethod"] = 2;
+        
+        // Retrieve the record.
+        $userscourse = $DB->get_record('cmi5launch_usercourse', ['courseid' => $cmi5launch->courseid, 'userid' => $USER->id]);
+
+        // Implement the duplicate of session helper to pass through. 
+        $sessionhelper = new \cmi5Test\session_helpers;
+            
+        $auids = json_decode($userscourse->aus);
+
+        // Bring in functions and classes.
+        $gradehelper = new grade_helpers;
+
+        // Functions from other classes.
+        $updateau = $gradehelper->get_cmi5launch_update_au_for_user_grades();
+
+        $result = $updateau($sessionhelper, $auids, $USER);
+    
+        $this->assertIsArray($result);
+     
+        // And it is an array of two parts, one for the lmsid, and within it, the title and score of that title
+        // and the second, the overall grade of ALL the aus (lmsids).
+        $this->assertArrayHasKey(0, $result);
+        // The lmsid and title will have different number endings but should all contain the same base string,
+        $lmsid = $result[0];
+        $this->assertIsArray($lmsid);
+
+        $this->assertStringStartsWith('lmsid', array_key_first($lmsid));
+
+        // Now finagle to get the title array.
+        $title = $result[0][array_key_first($lmsid)];
+        
+        // Should be an array where the title is key and the value is score.
+        $this->assertIsArray($title);
+        $this->assertStringStartsWith('The title text', array_key_first($title));
+      
+        // And finally the value of the 'title' is a json string equalling all the session scores, in this case we 
+        // made five and each was 80.
+        $scoresshouldbe = "[80,80,80,80,80]";
+        $this->assertEquals($scoresshouldbe, $title[array_key_first($title)]);
+      
+        // And finally the overall grade which in this instance is the average to all the scores, or just 80.
+        $this->assertArrayHasKey(1, $result);
+        
+        $this->assertEquals(80, $result[1]);
+    }
+
+
+    /*
+    * Test of the cmi5launch_update_au_for_user_grades method.
+    * Tests the function if there is a bad gradetype selected (this shouldn't ever happen).
+    * @return void
+    */
+    public function testcmi5launch_update_au_for_user_grades_bad_gradetype()
+    {
+        global $cmi5launch, $USER, $DB, $testcourseid, $cmi5launchsettings;
+        
+        $cmi5launchsettings = cmi5launch_settings($cmi5launch->id);
+        
+        // Gradetype for ref, passing in invalid value.
+        // GRADE_AUS_CMI5 = 0.
+        // GRADE_HIGHEST_CMI5 = 1.
+        // GRADE_AVERAGE_CMI5 =  2.
+        // GRADE_SUM_CMI5 = 3.
+        $cmi5launchsettings["grademethod"] = 6;
+        
+        // Retrieve the record.
+        $userscourse = $DB->get_record('cmi5launch_usercourse', ['courseid' => $cmi5launch->courseid, 'userid' => $USER->id]);
+
+        // Implement the duplicate of session helper to pass through function.
+        $sessionhelper = new \cmi5Test\session_helpers;
+
+        $auids = json_decode($userscourse->aus);
+
+        // Bring in functions and classes.
+        $gradehelper = new grade_helpers;
+
+        // Functions from other classes.
+        $updateau = $gradehelper->get_cmi5launch_update_au_for_user_grades();
+
+        $result = $updateau($sessionhelper, $auids, $USER);
+                
+        // There will be five of these, one for each au.
+        $this->expectOutputString("Gradetype not found.Gradetype not found.Gradetype not found.Gradetype not found.Gradetype not found.");
+                    
+        $this->assertIsArray($result);
+        
+        // And it is an array of two parts, one for the lmsid, and within it, the title and score of that title
+        // and the second, the overall grade of ALL the aus (lmsids).
+        $this->assertArrayHasKey(0, $result);
+        // The lmsid and title will have different number endings but should all contain the same base string,
+        $lmsid = $result[0];
+        $this->assertIsArray($lmsid);
+
+        $this->assertStringStartsWith('lmsid', array_key_first($lmsid));
+
+        // Now finagle to get the title array
+        $title = $result[0][array_key_first($lmsid)];
+        
+        // Shouild be an array where the title is key and the value is score.
+        $this->assertIsArray($title);
+        $this->assertStringStartsWith('The title text', array_key_first($title));
+        
+        // And the value of the 'title' is a json string equalling all the session scores, in this case we 
+        // made five and each was 80.
+        $scoresshouldbe = "[80,80,80,80,80]";
+        $this->assertEquals($scoresshouldbe, $title[array_key_first($title)]);
+        
+        // And finally the overall grade in this instance will still be 80, because that is the saved value and hasnt been changed.
+        $this->assertArrayHasKey(1, $result);
+        
+        $this->assertEquals(80, $result[1]);
+    }
+
+
+    /*
+    * Test of the cmi5launch_update_au_for_user_grades method.
+    // Testing when exception is thrown
+    * @return void
+    */
+    public function testcmi5launch_update_au_for_user_grades_excep()
+    {
+        global $cmi5launch, $USER, $DB, $testcourseid, $cmi5launchsettings;
+
+        $cmi5launchsettings = cmi5launch_settings($cmi5launch->id);
+        
+        // Gradetype for reference.
+        // GRADE_AUS_CMI5 = 0.
+        // GRADE_HIGHEST_CMI5 = 1.
+        // GRADE_AVERAGE_CMI5 =  2.
+        // GRADE_SUM_CMI5 = 3.
+        $cmi5launchsettings["grademethod"] = 1;
+        
+        // Implement the duplicate of session helper to pass through function.
+        $sessionhelper = new \cmi5Test\session_helpers;
+        
+        // By passing the auid as a string the function should throw an exception.
+        $auids = "Throw an error";
+
+            // Bring in functions and classes.
+        $gradehelper = new grade_helpers;
+        
+        // Functions from other classes.
+        $updateau = $gradehelper->get_cmi5launch_update_au_for_user_grades();
+            
+        // The expected is built bby the two messages knowing 'title' is an empty array.
+        $expected = "Error in updating or checking user grades. Report this error to system administrator: Error in checking user grades:";
+        
+        // Catch the exception.
+        $this->expectException(nullException::class);
+        $this->expectExceptionMessage($expected);
+
+        
+        $result = $updateau($sessionhelper, $auids, $USER);
+  
+    }
+
 
 }
     

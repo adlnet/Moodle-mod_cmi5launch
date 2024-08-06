@@ -31,6 +31,7 @@ use mod_cmi5launch\local\session_helpers;
 global $CFG;
 // Include the errorover (error override) funcs.
 require_once ($CFG->dirroot . '/mod/cmi5launch/classes/local/errorover.php');
+//require 'errorover.php';
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -166,7 +167,7 @@ class au_helpers
                 try {
                     // Make a newrecord to save.
                     $newrecord = new \stdClass();
-
+                   
                     // Assign the values to the new record.
                     $newrecord->userid = $USER->id;
                     $newrecord->attempt = $auobject->attempt;
@@ -195,7 +196,6 @@ class au_helpers
                     $newrecord->satisfied = $auobject->satisfied;
                     $newrecord->moodlecourseid = $cmi5launch->id;
 
-                   
                     // Save the record and get the new id.
                     $newid = $DB->insert_record($table, $newrecord, true);
 

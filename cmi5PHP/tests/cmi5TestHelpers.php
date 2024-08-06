@@ -5,7 +5,7 @@ use mod_cmi5launch\local\course;
 use mod_cmi5launch\local\au;
 use mod_cmi5launch\local\au_helpers;
 use mod_cmi5launch\local\session;
-use mod_cmi5launch\local\session_helpers;
+//use mod_cmi5launch\local\session_helpers;
 
 use PHPUnit\Framework\TestCase;
 
@@ -221,10 +221,10 @@ function deletetestcmi5launch_sessions($ids)
 		'attempt' =>  $i,
 		'url' => 'url' . $i,
 		'type' => 'type' . $i,
-		'lmsid' => 'lmsid' . $i,
+		'lmsId' => 'lmsid' . $i,
 		'grade' => 'grade' . $i,
 		'scores' => 'scores' . $i,
-		'title' => array(0 => array('text' => $i)),
+		'title' => array(0 => array('text' => 'The title text ' . $i)),
 		'moveon' => 'moveon' . $i,
 		'auindex' =>  $i,
 		'parents' => 'parents' . $i,
@@ -250,7 +250,12 @@ function deletetestcmi5launch_sessions($ids)
 		// maybe if we put the sessions here then we can skip the whole resaving thing
 	$testcoursesessionids = maketestsessions();
 	$mockvalues['sessions'] = $testcoursesessionids;
-		$aus[] = new au($mockvalues);
+	
+	
+	$newau = new au($mockvalues);
+
+	
+		$aus[] = $newau;
 	}
 
 	// Now save the fake aus to the test database
@@ -258,7 +263,6 @@ function deletetestcmi5launch_sessions($ids)
 	$saveau = $auhelper->get_cmi5launch_save_aus();	
 
 	
-
 
 	// Save AUs to test DB and save IDs.
 	$newauids = $saveau($aus);
@@ -455,7 +459,6 @@ $sessionhelper = new session_helpers();
            
 			$check = $DB->record_exists( 'cmi5launch_aus', ['id' => $auid], '*', IGNORE_MISSING);
 
-
 			if (!$check) {
 				// If check is negative, the record does not exist. Throw error.
 				echo "<p>Error attempting to get AU data from DB. Check AU id.</p>";
@@ -475,6 +478,8 @@ $sessionhelper = new session_helpers();
 
 
  
+ // what is au record?
+
 
 			// Save the AU back to the DB.
 			$success = $DB->update_record('cmi5launch_aus', $au);
@@ -540,90 +545,7 @@ $sessionhelper = new session_helpers();
         }
 
     }
-// New class
-class session_helpers2
-{
-	    /**
-     * Creates a session record in DB.
-     * @param mixed $sessionid - the session id
-     * @param mixed $launchurl - the launch url
-     * @param mixed $launchmethod - the launch method
-     * @return void
-     */
-    public function cmi5launch_create_sessio6n($sessionid, $launchurl, $launchmethod) {
 
-        global $DB, $CFG, $cmi5launch, $USER;
-
-        $table = "cmi5launch_sessions";
-
-        // Make a new record to save.
-        $newrecord = new \stdClass();
-        // Because of many nested properties, needs to be done manually.
-        $newrecord->sessionid = $sessionid;
-        $newrecord->launchurl = $launchurl;
-        $newrecord->tenantname = $USER->username;
-        $newrecord->launchmethod = $launchmethod;
-        // I think here is where we eed to implement : moodlecourseid
-        $newrecord->moodlecourseid = $cmi5launch->id;
-        // And userid!
-        $newrecord->userid = $USER->id;
-      
-        // Save record to table.
-        $newid = $DB->insert_record($table, $newrecord, true);
-      
-        // Return value 
-        return $newid;
-
-    }
-		 // So now all the test has to do is inject THIS which will return as we please
-	 // We will inject the damn func! // inject this one!
-function updatesessione($sessionid, $cmi5launchid, $user)
-{
-	global $DB, $cmi5launch, $USER;
-
-	// Make new sessions, lets make five.
-	$sessions = array();
-	$sessionids = array();
-
-	
-		$sessionids[] = $sessionid;
-		//$toaddtostring = strval($i);
-	// Add i to each value so the AUs are unique.
-	// Mock values to make sessions.
-	$mockvalues = array(
-		'id' => $sessionid,
-		'sessionid' =>  'sessionid' . $sessionid,
-		'userid' => 'userid' . $sessionid,
-		'moodlecourseid' => 'moodlecourseid' . $sessionid,
-		'registrationscoursesausid' => 'registrationscoursesausid' . $sessionid,
-		'tenantname' => 'tenantname' . $sessionid,
-		'createdat' => 'createdat' . $sessionid,
-		'updatedat' => 'updatedat' . $sessionid,
-		'code' => 'code' . $sessionid,
-		'launchtokenid' => 'launchtokenid' . $sessionid,
-		'lastrequesttime' => 'lastrequesttime' . $sessionid,
-		'launchmode' => 'launchmode' . $sessionid,
-		'masteryscore' => 'masteryscore' . $sessionid,
-		'score' => 'score' . $sessionid,
-		'islaunched' => 'islaunched' . $sessionid,
-		'isinitialized' => 'isinitialized' . $sessionid,
-		'duration' => 'duration' . $sessionid,
-		'iscompleted' => 'iscompleted' . $sessionid,
-		'ispassed' => 'ispassed' . $sessionid,
-		'isfailed' => 'isfailed' . $sessionid,
-		'isterminated' => 'isterminated' . $sessionid,
-		'isabandoned' => 'isabandoned' . $sessionid,
-		'progress' => 'progress' . $sessionid,
-		'launchmethod' => 'launchmethod' . $sessionid,
-		'launchurl' => 'launchurl' . $sessionid,
-	);
-		$newsession = new session($mockvalues);
-
-		echo " Ive been calllled";
-		return $newsession;
-	}
-	
-	}
 
 
   
@@ -684,5 +606,129 @@ function updatesessione($sessionid, $cmi5launchid, $user)
 	 {
 	   throw new \Exception('test error');
 	 }
+
+	 // Ok lets make a new strea_helpers to override the other and enable testing
+	 // New class
+class session_helpers
+{
+	public function cmi5launch_get_create_session() {
+        return [$this, 'cmi5launch_create_session'];
+    }
+
+    public function cmi5launch_get_update_session() {
+        return [$this, 'cmi5launch_update_sessions'];
+    }
+
+    public function cmi5launch_get_retrieve_sessions_from_db() {
+        return [$this, 'cmi5launch_retrieve_sessions_from_db'];
+    }
+
+    /**
+     * Gets updated session information from CMI5 player
+     * @param mixed $sessionid - the session id
+     * @param mixed $cmi5id - cmi5 instance id
+     * @return 
+     */
+    public function cmi5launch_update_sessions($sessionid, $cmi5id, $user) {
+
+		
+		// Ok, lets make sure we are calling THIS one
+		// And not the other one
+	//	echo "Calling from duplicate class!";
+        $returnvalue = new \stdClass();
+            $returnvalue->iscompleted = 1;
+            $returnvalue->ispassed = 1;
+            $returnvalue->isterminated = 1;
+			
+				$returnvalue->score = 80;
+			
+           // $returnvalue->score = 80;
+        return $returnvalue;
+    }
+
+    /**
+     * Creates a session record in DB.
+     * @param mixed $sessionid - the session id
+     * @param mixed $launchurl - the launch url
+     * @param mixed $launchmethod - the launch method
+     * @return void
+     */
+    public function cmi5launch_create_session($sessionid, $launchurl, $launchmethod) {
+
+        global $DB, $CFG, $cmi5launch, $USER;
+
+        $table = "cmi5launch_sessions";
+
+        // Make a new record to save.
+        $newrecord = new \stdClass();
+        // Because of many nested properties, needs to be done manually.
+        $newrecord->sessionid = $sessionid;
+        $newrecord->launchurl = $launchurl;
+        $newrecord->tenantname = $USER->username;
+        $newrecord->launchmethod = $launchmethod;
+        // I think here is where we eed to implement : moodlecourseid
+        $newrecord->moodlecourseid = $cmi5launch->id;
+        // And userid!
+        $newrecord->userid = $USER->id;
+      
+        // Save record to table.
+        $newid = $DB->insert_record($table, $newrecord, true);
+      
+        // Return value 
+        return $newid;
+
+    }
+
+    /**
+     * Retrieves session from DB
+     * @param mixed $sessionid - the session id
+     * @return session
+     */
+    public function cmi5launch_retrieve_sessions_from_db($sessionid) {
+
+        global $DB, $CFG;
+
+        $check = $DB->record_exists('cmi5launch_sessions', ['sessionid' => $sessionid], '*', IGNORE_MISSING);
+
+        // If check is negative, the record does not exist. Throw error.
+        if (!$check) {
+
+            echo "<p>Error attempting to get session data from DB. Check session id.</p>";
+            echo "<pre>";
+            var_dump($sessionid);
+            echo "</pre>";
+
+        } else {
+
+            $sessionitem = $DB->get_record('cmi5launch_sessions',  array('sessionid' => $sessionid));
+
+            $session = new session($sessionitem);
+
+        }
+
+        // Return new session object.
+        return $session;
+    }
+
+}
+
+// To pass to the test and cause exception 
+class session_helpers2
+{
+	  /**
+     * Gets updated session information from CMI5 player and throw exception
+     * @param mixed $sessionid - the session id
+     * @param mixed $cmi5id - cmi5 instance id
+     * @return 
+     */
+    public function cmi5launch_update_sessions($sessionid, $cmi5id, $user) {
+
+           // $returnvalue->score = 80;
+        return null;
+    }
+}
+
+
+
 
 ?>

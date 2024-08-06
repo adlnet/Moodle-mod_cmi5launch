@@ -80,19 +80,19 @@ function sifting_data_warning($errno, $errstr, $errfile, $errline)
         throw new nullException('Cannot parse array. Error: ' . $errstr, 0);
         //  exit;
     }
+        /// Ok, this i a different error handler
+        function grade_warning($errno, $errstr, $errfile, $errline)
+        {
+           //  echo"Error stirn ---  $errstr";
+          //   echo"Error number ---  $errno";
+    //echo"Error errfile ---  $errfile";
+          //   echo"Error errline ---  $errline";
+            // Maybe we can construct the new errors here. This would allow the error personalization? And keep main code clean
+    
+            throw new nullException('Error in checking user grades: ' . $errstr, 0);
+            //  exit;
+        }
 
-    /// Ok, this i a different error handler
-    function grade_warning($errno, $errstr, $errfile, $errline)
-    {
-       //  echo"Error stirn ---  $errstr";
-      //   echo"Error number ---  $errno";
-//echo"Error errfile ---  $errfile";
-      //   echo"Error errline ---  $errline";
-        // Maybe we can construct the new errors here. This would allow the error personalization? And keep main code clean
-
-        throw new nullException('Error in checking user grades: ' . $errstr, 0);
-        //  exit;
-    }
 
 /**
  * Define a custom exception class, this will make pour tests meaningful
