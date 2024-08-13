@@ -45,6 +45,12 @@ class progress {
      * @return array
      */
     public function cmi5launch_request_statements_from_lrs($registrationid, $session) {
+        
+
+        // Set error and exception handler to catch and override the default PHP error messages, to make messages more user friendly.
+        set_error_handler('mod_cmi5launch\local\progresslrs_warning', E_WARNING);
+        set_exception_handler('mod_cmi5launch\local\exception_progresslrs');
+
         // Array to hold result.
         $result = array();
 
@@ -55,14 +61,10 @@ class progress {
             'since' => $session->createdat,
         );
 
-        // Try and retrieve statements
+        // Try and retrieve statements.
         try {
-            $statements = $this->cmi5launch_send_request_to_lrs($data, $session->id);
-/*
-            if ($statements === false || $statements == null) {
-                throw new \Exception ("No statements found.");
-            }
-            */
+            $statements = $this->cmi5launch_send_request_to_lrs('cmi5launch_stream_and_send', $data, $session->id);
+
             // The results come back as nested array under more then statements. We only want statements, and we want them unique.
             $statement = array_chunk($statements["statements"], 1);
 
@@ -75,9 +77,21 @@ class progress {
                 array_push($result, array($registrationid => $current));
             }
 
+            // Restore default handlers.
+            restore_exception_handler();
+            restore_error_handler();
+            
             return $result;
+        
         } catch (\Throwable $e) {
-            echo 'Trouble retrieving statements from LRS. Caught exception: ',  $e->getMessage(), "\n";
+        
+            // Restore default hadlers.
+            restore_exception_handler();
+            restore_error_handler();
+        
+            // If there is an error, return the error.
+            throw new nullException('Trouble retrieving statements from LRS. Caught exception: '. $e->getMessage()); 
+        
         }
     }
 
@@ -87,18 +101,32 @@ class progress {
      * @param mixed $id
      * @return mixed
      */
-    public function cmi5launch_send_request_to_lrs($data, $id) {
+    public function cmi5launch_send_request_to_lrs($cmi5launch_stream_and_send, $data, $id) {
 
         $settings = cmi5launch_settings($id);
 
-        // Url to request statements from.
-        $url = $settings['cmi5launchlrsendpoint'] . "statements";
-        // Build query with data above.
-        $url = $url . '?' . http_build_query($data, "", '&', PHP_QUERY_RFC1738);
+     // Assign passed in function to variable.
+     $stream = $cmi5launch_stream_and_send;
+        // Make sure LRS settings are there.
+        try {
+            // Url to request statements from.
+            $url = $settings['cmi5launchlrsendpoint'] . "statements";
+            // Build query with data above.
+            $url = $url . '?' . http_build_query($data, "", '&', PHP_QUERY_RFC1738);
 
-        // LRS username and password.
-        $user = $settings['cmi5launchlrslogin'];
-        $pass = $settings['cmi5launchlrspass'];
+            // LRS username and password.
+            $user = $settings['cmi5launchlrslogin'];
+            $pass = $settings['cmi5launchlrspass'];
+        }
+        catch (\Throwable $e) {
+
+           // Throw exception if settings are missing.
+           Throw new nullException('Unable to retrieve LRS settings. Caught exception: '. $e->getMessage() . " Check LRS settings are correct.");
+        }
+
+        // Set error and exception handler to catch and override the default PHP error messages, to make messages more user friendly.
+        set_error_handler('mod_cmi5launch\local\progresslrsreq_warning', E_WARNING);
+        set_exception_handler('mod_cmi5launch\local\exception_progresslrsreq');
 
         // Use key 'http' even if you send the request to https://...
         // There can be multiple headers but as an array under the ONE header.
@@ -113,23 +141,29 @@ class progress {
                 ),
             ),
         );
-        // The options are here placed into a stream to be sent.
-        $context = stream_context_create($options);
 
-        // Sends the stream to the specified URL and stores results.
-        // The false is use_include_path, which we dont want in this case, we want to go to the url.
        try {
-            $result = file_get_contents($url, false, $context);
-            
-            $resultdecoded = json_decode($result, true);
-            return $resultdecoded;
-        } catch (\Throwable $e) {
-            echo 'Unable to communicate with LRS. Caught exception: ',  $e->getMessage(), "\n";
-            echo "<br>";
-            echo " Check LRS is up, username and password are correct, and LRS endpoint is correct.";
-        }
+           //By calling the function this way, it enables encapsulation of the function and allows for testing.
+                //It is an extra step, but necessary for required PHP Unit testing.
+                $result = call_user_func($stream, $options, $url);
 
+            // Decode result.
+            $resultdecoded = json_decode($result, true);
+            
+            // Restore default hadlers.
+            restore_exception_handler();
+            restore_error_handler();
+                  
+            return $resultdecoded;
         
+        } catch (\Throwable $e) {
+            
+            // Restore default hadlers.
+            restore_exception_handler();
+            restore_error_handler();
+
+            throw new nullException('Unable to communicate with LRS. Caught exception: ' . $e->getMessage() . " Check LRS is up, username and password are correct, and LRS endpoint is correct.", 0);
+        }
     }
 
     /**
@@ -139,9 +173,22 @@ class progress {
      * @return mixed - actor
      */
     public function cmi5launch_retrieve_actor($resultarray, $registrationid) {
+  
+        // If it fails to parse array it should throw an error, this shouldn't stop execution, but catch so we can send a better message to user. 
+        try {
+            // Actor should be in statement.
+            $actor = $resultarray[$registrationid][0]["actor"]["account"]["name"];
+            
+            return $actor;
 
-        $actor = $resultarray[$registrationid][0]["actor"]["account"]["name"];
-        return $actor;
+        } catch (\Throwable $e) {
+            
+            // If there is an error, echo the error.
+
+            echo('Unable to retrieve actor name from LRS. Caught exception: '. $e->getMessage());
+            
+            return "(Actor name not retrieved)";
+        }    
     }
 
     /**
@@ -150,31 +197,41 @@ class progress {
      * @param mixed $registrationid - the registration id
      * @return mixed - verb
      */
-    public function cmi5launch_retrieve_verbs($resultarray, $registrationid) {
+    public function cmi5launch_retrieve_verb($resultarray, $registrationid)
+    {
 
-        // Some verbs do not have an easy to display 'language' option, we need to check if 'display' is present.
-        $verbinfo = $resultarray[$registrationid][0]["verb"];
-        $display = array_key_exists("display", $verbinfo);
+        // Encase the whole thing in a try catch block to catch any errors.
+        // If an array key isn't there it will throw a warning. It will not stop execution but catching it will enable us to send better error messages.
 
-        // If it is null then there is no display, so go by verb id.
-        if (!$display) {
-            // Retrieve id.
-            $verbid = $resultarray[$registrationid][0]["verb"]["id"];
+        try {
+            // Some verbs do not have an easy to display 'language' option, we need to check if 'display' is present.
+            $verbinfo = $resultarray[$registrationid][0]["verb"];
+            $display = array_key_exists("display", $verbinfo);
 
-            // Splits id in two on 'verbs/', we want the end which is the actual verb.
-            $split = explode('verbs/', $verbid);
-            $verb = $split[1];
+            // If it is null then there is no display, so go by verb id.
+            if (!$display) {
+                // Retrieve id.
+                $verbid = $resultarray[$registrationid][0]["verb"]["id"];
 
-        } else {
-            // If it is not null then there is a language easy to read version of verb display, such as 'en' or 'en-us'.
-            $verblang = $resultarray[$registrationid][0]["verb"]["display"];
-            // Retrieve the language.
-            $lang = array_key_first($verblang);
-            // Use it to retrieve verb.
-            $verb = [$verblang][0][$lang];
+                // Splits id in two on 'verbs/', we want the end which is the actual verb.
+                $split = explode('verbs/', $verbid);
+                $verb = $split[1];
+
+            } else {
+                // If it is not null then there is a language easy to read version of verb display, such as 'en' or 'en-us'.
+                $verblang = $resultarray[$registrationid][0]["verb"]["display"];
+                // Retrieve the language.
+                $lang = array_key_first($verblang);
+                // Use it to retrieve verb.
+                $verb = [$verblang][0][$lang];
+            }
+
+            return $verb;
+        } catch (\Throwable $e) {
+            // If there is an error, echo the error.
+            echo('Unable to retrieve verb from LRS. Caught exception: '. $e->getMessage());
+            return "(Verb not retrieved)";
         }
-
-        return $verb;
     }
 
     /**
@@ -189,66 +246,58 @@ class progress {
     public function cmi5launch_retrieve_object_name($resultarray, $registrationid) {
 
         global $CFG;
+        // Encase the whole thing in a try catch block to catch any errors.
+        // If an array key isn't there it will throw a warning. It will not stop execution but catching it will enable us to send better error messages.
+        try {
 
-        // First find the object, it should always be second level of statement (so third level array).
-        if (array_key_exists("object", $resultarray[$registrationid][0])) {
+            // First find the object, it should always be second level of statement (so third level array).
+            if (array_key_exists("object", $resultarray[$registrationid][0])) {
 
-            if (array_key_exists("definition", $resultarray[$registrationid][0]["object"])) {
+                if (array_key_exists("definition", $resultarray[$registrationid][0]["object"])) {
+    
+                    // If 'definition' exists, check if 'name' does.
+                    if (array_key_exists("name", $resultarray[$registrationid][0]["object"]["definition"])) {
 
-                // If 'definition' exists, check if 'name' does.
-                if (array_key_exists("name", $resultarray[$registrationid][0]["object"]["definition"])) {
+                        // Retrieve the name.
+                        $objectarray = $resultarray[$registrationid][0]["object"]["definition"]["name"];
 
-                    // Retrieve the name.
-                    $objectarray = $resultarray[$registrationid][0]["object"]["definition"]["name"];
-
-                    // There may be more than one languages string to choose from. First we want to
-                    // select the language that matches the language of the course, then if not available, the first key.
-                    // System language setting.
-                    $language = $CFG->lang;
-                    if (array_key_exists($language, $objectarray)) {
-                        $object = $objectarray[$language];
-                    } else {
-                        $defaultlanguage = array_key_first($objectarray);
-                        $object = $objectarray[$defaultlanguage];
+                        // There may be more than one languages string to choose from. First we want to
+                        // select the language that matches the language of the course, then if not available, the first key.
+                        // System language setting.
+                        $language = $CFG->lang;
+                   
+                        if (array_key_exists($language, $objectarray)) {
+                            $object = $objectarray[$language];
+                
+                        } else {
+                            $defaultlanguage = array_key_first($objectarray);
+                            $object = $objectarray[$defaultlanguage];
+                        
+                        }
+                        return $object;
                     }
+
+                } else if (array_key_exists("id", $resultarray[$registrationid][0]["object"])) {
+                 
+                    // If name is missing check for id.
+                    // Retrieve id.
+                    $object = $resultarray[$registrationid][0]["object"]["id"];
+                  
                     return $object;
+
+                } else {
+                  
+                    return "(Object name not retrieved/there is no object in this statement)";
                 }
 
-            } else if (array_key_exists("id", $resultarray[$registrationid][0]["object"])) {
-
-                // If name is missing check for id.
-                // Retrieve id.
-                $object = $resultarray[$registrationid][0]["object"]["id"];
-                return $object;
-
             } else {
-
-                // If both name and id are missing throw error.
-                $this->cmi5launch_statement_retrieval_error("Object name and id ");
+                
+                return "(Object name not retrieved/there is no object in this statement)";
             }
-
-        } else {
-
-            $this->cmi5launch_statement_retrieval_error("Object ");
-        }
-    }
-
-    /**
-     *  Error message for statment retrieval to mark if something is missing
-     * @param mixed $missingitem - the missing item(s)
-     * @return void
-     */
-    public function cmi5launch_statement_retrieval_error($missingitem) {
-
-        global $CFG;
-
-        // If admin debugging is enabled.
-        if ($CFG->debugdeveloper) {
-
-            // Print that it is missing.
-            echo "<br>";
-            echo $missingitem . "is missing from this statement.";
-            echo "<br>";
+        } catch (\Throwable $e) {
+            // If there is an error, echo the error.
+            echo('Unable to retrieve object name from LRS. Caught exception: '. $e->getMessage());
+            return "(Object name not retrieved)";
         }
     }
 
@@ -260,20 +309,28 @@ class progress {
      */
     public function cmi5launch_retrieve_timestamp($resultarray, $registrationid) {
 
-        // Verify this statement has a 'timestamp' param.
-        if (array_key_exists("timestamp", $resultarray[$registrationid][0])) {
+         // Encase the whole thing in a try catch block to catch any errors.
+        // If an array key isn't there it will throw a warning. It will not stop execution but catching it will enable us to send better error messages.
+        try {
+            // Verify this statement has a 'timestamp' param.
+            if (array_key_exists("timestamp", $resultarray[$registrationid][0])) {
 
-            $date = new \DateTime($resultarray[$registrationid][0]["timestamp"], new \DateTimeZone('US/Eastern'));
+                $date = new \DateTime($resultarray[$registrationid][0]["timestamp"], new \DateTimeZone('US/Eastern'));
 
-            $date->setTimezone(new \DateTimeZone('America/New_York'));
+                $date->setTimezone(new \DateTimeZone('America/New_York'));
 
-            $date = $date->format('d-m-Y' . " " . 'h:i a');
+                $date = $date->format('d-m-Y' . " " . 'h:i a');
 
-            return $date;
+                return $date;
 
-        } else {
+            } else {
 
-            $this->cmi5launch_statement_retrieval_error("Timestamp ");
+                return "(Timestamp not retrieved or not present in statement)";
+            }
+        } catch (\Throwable $e) {
+            // If there is an error, echo the error.
+            echo('Unable to retrieve timestamp from LRS. Caught exception: '. $e->getMessage());
+            return "(Timestamp not retrieved)";
         }
     }
 
@@ -293,40 +350,48 @@ class progress {
         // Variable to hold score.
         $score = null;
 
-        // Verify this statement has a 'result' param.
-        if (array_key_exists("result", $resultarray[$registrationid][0])) {
+         // Encase the whole thing in a try catch block to catch any errors.
+        // If an array key isn't there it will throw a warning. It will not stop execution but catching it will enable us to send better error messages.
+        try {
+            // Verify this statement has a 'result' param.
+            if (array_key_exists("result", $resultarray[$registrationid][0])) {
 
-            // If it exists, retrieve it.
-            $resultinfo = $resultarray[$registrationid][0]["result"];
+                // If it exists, retrieve it.
+                $resultinfo = $resultarray[$registrationid][0]["result"];
 
-            $score = array_key_exists("score", $resultinfo);
+                // If it is null then the item in question doesn't exist in this statement.
+                if (array_key_exists("score", $resultinfo)) {
 
-            // If it is null then the item in question doesn't exist in this statement.
-            if ($score) {
+                    $score = $resultarray[$registrationid][0]["result"]["score"];
+;
+                    // Raw score preferred to scaled.
+                    if (array_key_exists("raw", $score)) {
 
-                $score = $resultarray[$registrationid][0]["result"]["score"];
+                        $returnscore = $score["raw"];
+                        
+                        return $returnscore;
 
-                // Raw score preferred to scaled.
-                if ($score["raw"]) {
-
-                    $returnscore = $score["raw"];
-                    return $returnscore;
-                } else if ($score["scaled"]) {
-
-                    $returnscore = round($score["scaled"], 2);
-                    return $returnscore;
+                    } else if (array_key_exists("scaled", $score))  {
+                    
+                        $returnscore = round($score["scaled"], 2);
+                        
+                        return $returnscore;
+                    }
                 }
+                else {
+                 
+                    return "(Score not retrieved or not present in statement)";
+                }
+            } else {
+          
+                return "(Score not retrieved or not present in statement)";
             }
-        } else {
-
-            // If admin debugging is enabled.
-            if ($CFG->debugdeveloper) {
-
-                // Print that it is missing.
-                echo "<br>";
-                echo 'No score in statement with id ' .$resultarray[$registrationid][0]['id'];
-                echo "<br>";
-            }
+        } catch (\Throwable $e) {
+            
+            // If there is an error, echo the error.
+            echo('Unable to retrieve score from LRS. Caught exception: '. $e->getMessage());
+            
+            return "(Score not retrieved)";
         }
     }
 
@@ -345,95 +410,73 @@ class progress {
         // Array to hold score and be returned.
         $returnscore = 0;
 
-        $resultdecoded = $this->cmi5launch_request_statements_from_lrs($registrationid, $session);
+        // Wrap in a try catch block to catch any errors.
+        try {
+            $resultdecoded = $this->cmi5launch_request_statements_from_lrs($registrationid, $session);
+            
+            // We need to sort the statements by finding their session id
+            // parse through array 'ext' to find the one holding session id.
+            foreach ($resultdecoded as $singlestatement) {
 
-        // We need to sort the statements by finding their session id
-        // parse through array 'ext' to find the one holding session id.
-        foreach ($resultdecoded as $singlestatement) {
+                $code = $session->code;
+                $currentsessionid = "";
 
-            $code = $session->code;
-            $currentsessionid = "";
-            $ext = $singlestatement[$registrationid][0]["context"]["extensions"];
-            foreach ($ext as $key => $value) {
+                // what is first array key in statement? It is the registration id.
+        
+                //// There should always be an extension but in case. 
+                try {
+                    $ext = $singlestatement[$registrationid][0]["context"]["extensions"];
 
-                // If key contains "sessionid" in string.
-                if (str_contains($key, "sessionid")) {
-                    $currentsessionid = $value;
-                }
-            }
+                    foreach ($ext as $key => $value) {
 
-            // Now if code equals currentsessionid, this is a statement pertaining to this session.
-            if ($code === $currentsessionid) {
+                        // If key contains "sessionid" in string.
+                        if (str_contains($key, "sessionid")) {
 
-                $actor = $this->cmi5launch_retrieve_actor($singlestatement, $registrationid);
-                $verb = $this->cmi5launch_retrieve_verbs($singlestatement, $registrationid);
-                $object = $this->cmi5launch_retrieve_object_name($singlestatement, $registrationid);
-                $date = $this->cmi5launch_retrieve_timestamp($singlestatement, $registrationid);
-                $score = $this->cmi5launch_retrieve_score($singlestatement, $registrationid);
-
-                // If a session has more than one score, we only want the highest.
-                if (!$score == null && $score > $returnscore) {
-
-                    $returnscore = $score;
+                            $currentsessionid = $value;
+                        }
+                    }
+                } catch (\Throwable $e) {
+                    // If there is an error, echo the error.
+                    echo('Unable to retrieve session id from LRS. Caught exception: '. $e->getMessage() . ". There may not be an extension key in statement.");
                 }
 
-                // Update to return.
-                $progressupdate[] = "$actor $verb $object on $date";
+                // Now if code equals currentsessionid, this is a statement pertaining to this session.
+                if ($code === $currentsessionid) {
+
+                    $actor = $this->cmi5launch_retrieve_actor($singlestatement, $registrationid);
+                    $verb = $this->cmi5launch_retrieve_verb($singlestatement, $registrationid);
+                    $object = $this->cmi5launch_retrieve_object_name($singlestatement, $registrationid);
+                    $date = $this->cmi5launch_retrieve_timestamp($singlestatement, $registrationid);
+                    $score = $this->cmi5launch_retrieve_score($singlestatement, $registrationid);
+
+                    // If a session has more than one score, we only want the highest.
+                    if (!$score == null && $score > $returnscore) {
+
+                        $returnscore = $score;
+                    }
+
+                    // Update to return.
+                    $progressupdate[] = "$actor $verb $object on $date";                   
+
+                }
 
             }
 
-        }
+            $session->progress = json_encode($progressupdate);
 
-        $session->progress = json_encode($progressupdate);
+            $session->score = $returnscore;
 
-        $session->score = $returnscore;
+            return $session;
 
-        return $session;
-    }
-
-        // An error message catcher.
-    /**
-     * Function to test returns from cmi5 player and display error message if found to be false
-     * // or not 200.
-     * @param mixed $resulttotest - The result to test.
-     * @param string $type - The type missing to be added to the error message.
-     * @return bool
-     */
-    public static function cmi5launch_progress_error_message($resulttotest, $type) {
-
-        // Decode result because if it is not 200 then something went wrong
-        // If it's a string, decode it.
-        if (is_string($resulttotest)) {
-            $resulttest = json_decode($resulttotest, true);
-        } else {
-            $resulttest = $resulttotest;
-        }
-
-        // I think splittin these to return two seperate messages deppennnding on whether player is running is better.
-        // Player cannot return an error if not runnin,
-        if ($resulttest === false ){
-
-            echo "<br>";
-
-            echo "Something went wrong " . $type . ". LRS is not communicating. Is it running?";
-
-            echo "<br>";
-
-            return false;
-        }
-        else if( array_key_exists("statusCode", $resulttest) && $resulttest["statusCode"] != 200) {
-
-            echo "<br>";
-
-            echo "Something went wrong " . $type . ". CMI5 Player returned " . $resulttest["statusCode"] . " error. With message '" 
-                . $resulttest["message"] . "'." ;
-            echo "<br>";
-
-            return false;
-        } else {
-
-            // No errors, continue.
-            return true;
+        } catch (\Throwable $e) {
+            
+            // If there is an error, echo the error.
+            echo('Unable to retrieve statements from LRS. Caught exception: '. $e->getMessage());
+            
+            
+            return "(Statements not retrieved)";
         }
     }
+
+ 
 }

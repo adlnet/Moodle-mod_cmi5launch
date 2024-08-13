@@ -705,7 +705,7 @@ class grade_helpersTest extends TestCase
         // Functions from other classes.
         $updateau = $gradehelper->get_cmi5launch_update_au_for_user_grades();
             
-        // The expected is built bby the two messages knowing 'title' is an empty array.
+        // The expected is built by the two messages knowing 'title' is an empty array.
         $expected = "Error in updating or checking user grades. Report this error to system administrator: Error in checking user grades:";
         
         // Catch the exception.

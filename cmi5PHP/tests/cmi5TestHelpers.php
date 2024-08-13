@@ -127,7 +127,7 @@ function deletetestcmi5launch_sessions($ids)
 
   foreach ($ids as $id) {
 	// Delete the cmi5launch record
-	$DB->delete_records('cmi5launch_sessions', array('id' => $id));
+	$DB->delete_records('cmi5launch_sessions', array('sessionid' => $id));
   }
 
 }
@@ -173,43 +173,6 @@ function deletetestcmi5launch_sessions($ids)
   {
 	global $DB, $cmi5launch, $USER;
 
-	// Mock values to make AUs.
-	/*
-	$mockvalues = array(
-		'id' => 'id',
-		'attempt' => 'attempt',
-		'url' => 'url',
-		'type' => 'type',
-		'lmsid' => 'lmsid',
-		'grade' => 'grade',
-		'scores' => 'scores',
-		'title' => array(0 => array('text' => 'title')),
-		'moveon' => 'moveon',
-		'auindex' => 'auindex',
-		'parents' => 'parents',
-		'objectives' => 'objectives',
-		'description' => array(0 => array('text' => 'description')),
-		'activitytype' => 'activitytype',
-		'launchmethod' => 'launchmethod',
-		'masteryscore' => 'masteryscore',
-		'satisfied' => 'satisfied',
-		'launchurl' => 'launchurl',
-		'sessions' => 'sessions',
-		'progress' => 'progress',
-		'noattempt' => 'noattempt',
-		'completed' => 'completed',
-		'passed' => 'passed',
-		'inprogress' => 'inprogress',
-		'masteryScore' => 'masteryScore', 
-		'launchMethod' => 'launchMethod', 
-		'lmsId' => 'lmsId', 
-		'moveOn' => 'moveOn', 
-		'auIndex' => 'auIndex', 
-		'activityType' => 'activityType',
-		'moodlecourseid' => 'moodlecourseid',
-		'userid' => 'userid'
-	);
-*/
 	// Make new AUs, lets make five.
 	$aus = array();
 	for ($i = 0; $i < 5; $i++) {
@@ -273,10 +236,313 @@ function deletetestcmi5launch_sessions($ids)
     } 
 
 	/**
-   * Create fake statements for testing.
-   * @param mixed $amountomake - amount of statements to make.
-   * @return array $statements - array of statements
-   */
+ * Create fake statement values for testing.
+ * @param mixed $amountomake - amount of statements to make.
+ * @return array $statements - array of statements
+ */
+function maketeststatementsvalues($amounttomake, $registrationid)
+{
+	for($i = 0; $i < $amounttomake; $i++)
+	{
+		// Mock statements that should be returned.
+		$statementvalues[] = array(
+			$registrationid => array(
+				// They are nested under 0 since array_chunk is used.
+				0 => array(
+					'timestamp' => '2024-' . $i . '0-00T00:00:00.000Z' ,
+					'actor' => array (
+						"firstname" => "firstname" . $i,
+						"lastname" => "lastname" . $i,
+						"account" => array (
+							"homePage" => "homePage" . $i,
+							"name" => "actorname" . $i,
+						),
+					),
+					'verb' => array (
+						"id" => "verbs/verbid" . $i,
+						"display" => array(
+							"en" => ("verbdisplay" . $i),
+						),
+					),
+					'object'  => array (
+						"id" => "objectid" . $i,
+						"definition" => array (
+							"name" => array (
+
+								"en" => 'objectname' . $i),
+							"description" => "description" . $i,
+							"type" => "type" . $i,
+						),
+					),
+					'context'  => array (
+						"context" => "context" . $i,
+						"contexttype" => "contexttype" . $i,
+						"contextparent" => "contextparent" . $i,
+						"extensions" => array (
+							"extensions" => "extensions" . $i,
+							"sessionid" => "code" . $i,
+						),
+					),
+					"result" => array (
+						"result" => "result" . $i,
+						"score" => array (
+							"raw" => 80 + $i,
+							"scaled" =>  $i,
+						),
+					),
+					'stored' => 'stored' . $i,
+					'authority' => array (
+						"authority" => "authority" . $i,
+
+					),
+					'version' => "version" . $i,
+					'code' => 'code' . $i,
+					'progress' => 'progress' . $i,
+					'score' => 'score' . $i,
+				),
+			)    
+		); 
+	}
+	
+	// Return the statement values.
+	return $statementvalues;
+}
+
+	/**
+ * Create fake statement values for testing.
+ * This one has no 'display' key in the verb.
+ *  It also has a scaled score for testing in testcmi5launch_retrieve_score_scaled_score
+ * @param mixed $amountomake - amount of statements to make.
+ * @return array $statements - array of statements
+ */
+function maketeststatementsvaluesnodisplay($amounttomake, $registrationid)
+{
+	for($i = 0; $i < $amounttomake; $i++)
+	{
+		// Mock statements that should be returned.
+		$statementvalues[] = array(
+			$registrationid => array(
+				// They are nested under 0 since array_chunk is used.
+				0 => array(
+					'timestamp' => 'timestamp' . $i,
+					'actor' => array (
+						"firstname" => "firstname" . $i,
+						"lastname" => "lastname" . $i,
+						"account" => array (
+							"homePage" => "homePage" . $i,
+							"name" => "name" . $i,
+						),
+					),
+					'verb' => array (
+						"id" => "verbs/verbid" . $i,
+					),
+					'version' => "version" . $i,
+					
+					"result" => array (
+						"result" => "result" . $i,
+						"score" => array (
+							"scaled" =>  $i,
+						),
+				),
+			)    
+		));
+	}
+
+	// Return the statement values.
+	return $statementvalues;
+}
+
+	/**
+ * Create fake statement values for testing.
+ * This one has no object key.
+ * // It also has no result and is used in testcmi5launch_retrieve_result_no_result
+ * @param mixed $amountomake - amount of statements to make.
+ * @return array $statements - array of statements
+ */
+function maketeststatementsvaluesnoobject($amounttomake, $registrationid)
+{
+	for($i = 0; $i < $amounttomake; $i++)
+	{
+		// Mock statements that should be returned.
+		$statementvalues[] = array(
+			$registrationid => array(
+				// They are nested under 0 since array_chunk is used.
+				0 => array(
+					'timestamp' => 'timestamp' . $i,),
+			)    
+		); 
+	}
+
+	// Return the statement values.
+	return $statementvalues;
+}
+
+	/**
+ * Create fake statement values for testing.
+ * This one has no object definition key but does have an id.
+ * // This also has no timestamp so it can be used for testing in testcmi5launch_retrieve_timestamp_no_time
+ * // And no score in 'result' to be use in testin testcmi5launch_retrieve_score_no_score.
+ * @param mixed $amountomake - amount of statements to make.
+ * @return array $statements - array of statements
+ */
+function maketeststatementsvaluesnoobjectdef($amounttomake, $registrationid)
+{
+	for($i = 0; $i < $amounttomake; $i++)
+	{
+		// Mock statements that should be returned.
+		$statementvalues[] = array(
+			$registrationid => array(
+				// They are nested under 0 since array_chunk is used.
+				0 => array(
+					'object'  => array (
+						"id" => "objectid" . $i),
+				
+					"result" => array (),
+			)    
+		)); 
+	}
+
+	// Return the statement values.
+	return $statementvalues;
+}
+
+	/**
+ * Create fake statement values for testing.
+ * This one has no object/def/name key..
+ * @param mixed $amountomake - amount of statements to make.
+ * @return array $statements - array of statements
+ */
+function maketeststatementsvaluesnoobjectname($amounttomake, $registrationid)
+{
+	for($i = 0; $i < $amounttomake; $i++)
+	{
+		// Mock statements that should be returned.
+		$statementvalues[] = array(
+			$registrationid => array(
+				// They are nested under 0 since array_chunk is used.
+				0 => array(
+					'timestamp' => 'timestamp' . $i,),
+					'object'  => array (
+						"id" => "objectid" . $i,
+						"definition" => array (
+							
+							"description" => "description" . $i,
+							"type" => "type" . $i,
+						),
+					
+				),
+			)    
+		); 
+	}
+
+	// Return the statement values.
+	return $statementvalues;
+}
+
+	/**
+ * Create fake statement values for testing.
+ * This one has an object but nothing in it	.
+ * @param mixed $amountomake - amount of statements to make.
+ * @return array $statements - array of statements
+ */
+function maketeststatementsvaluesnoobjectid($amounttomake, $registrationid)
+{
+	for($i = 0; $i < $amounttomake; $i++)
+	{
+		// Mock statements that should be returned.
+		$statementvalues[] = array(
+			$registrationid => array(
+				// They are nested under 0 since array_chunk is used.
+				0 => array(
+					'timestamp' => 'timestamp' . $i,
+					'object'  => array ()
+					)
+			)    
+		); 
+	}
+
+	// Return the statement values.
+	return $statementvalues;
+}
+
+
+	/**
+ * Create fake statement values for testing.
+ * This one has no matching lanuage string.
+ * @param mixed $amountomake - amount of statements to make.
+ * @return array $statements - array of statements
+ */
+function maketeststatementsvaluenomatchinglang($amounttomake, $registrationid)
+{
+	for($i = 0; $i < $amounttomake; $i++)
+	{
+		// Mock statements that should be returned.
+		$statementvalues[] = array(
+			$registrationid => array(
+				// They are nested under 0 since array_chunk is used.
+				0 => array(
+					'timestamp' => 'timestamp' . $i,
+					'object'  => array (
+						"id" => "objectid" . $i,
+						"definition" => array (
+							"name" => array(
+								"fr" => "fr" . $i,
+								"es" => "name" . $i,
+							),
+							"description" => "description" . $i,
+							"type" => "type" . $i,
+						),
+					
+				),
+			) )   
+		); 
+	}
+
+	// Return the statement values.
+	return $statementvalues;
+}
+
+	/**
+ * Create fake statement values for testing.
+ * This one has a matching lanuage value.
+ * @param mixed $amountomake - amount of statements to make.
+ * @return array $statements - array of statements
+ */
+function maketeststatementsvaluematchinglang($amounttomake, $registrationid)
+{
+	for($i = 0; $i < $amounttomake; $i++)
+	{
+		// Mock statements that should be returned.
+		$statementvalues[] = array(
+			$registrationid => array(
+				// They are nested under 0 since array_chunk is used.
+				0 => array(
+					'timestamp' => '2024-' . $i . '0-00T00:00:00.000Z',
+					'object'  => array (
+						"id" => "objectid" . $i,
+						"definition" => array (
+							"name" => array(
+								"en" => "en-us" . $i,
+								"es" => "name" . $i,
+							),
+							"description" => "description" . $i,
+							"type" => "type" . $i,
+						),
+					
+				),
+			))    
+		); 
+	}
+
+	// Return the statement values.
+	return $statementvalues;
+}
+
+/**
+ * Create fake statements for testing.
+ * @param mixed $amountomake - amount of statements to make.
+ * @return array $statements - array of statements
+ */
 function maketeststatements($amounttomake)
 {
 	// Iterate through amount to make, and use i to make different 'registration ids'
@@ -294,58 +560,63 @@ function maketeststatements($amounttomake)
 			// Array to hold the statements.
 
 			// Maybe I need to change the stucture so the $i is first and next to statements instead of now as its nested
-		/*old	
-		$statement['statements'][] = array(
-				$i => array(*/
-				$statement['statements'][$i] = array(
-			//	'id' => 'idune' . $i,
-				'timestamp' => 'timestamp' . $i,
-				'actor' => array (
-					"firstname" => "firstname" . $i,
-					"lastname" => "lastname" . $i,
-					"account" => array (
-						"homePage" => "homePage" . $i,
-						"name" => "name" . $i,
-					),
+		$newstatement = array(
+			'timestamp' => '2024-' . $i . '0-00T00:00:00.000Z' ,
+			'actor' => array (
+				"firstname" => "firstname" . $i,
+				"lastname" => "lastname" . $i,
+				"account" => array (
+					"homePage" => "homePage" . $i,
+					"name" => "actorname" . $i,
 				),
-				'verb' => array (
-					"id" => "verbid" . $i,
-					"display" => array(
-						"en" => "verbdisplay" . $i,
-					),
-					)
-				,
-				'object'  => array (
-					"id" => "objectid" . $i,
-					"definition" => array (
-						"name" => "name" . $i,
-						"description" => "description" . $i,
-						"type" => "type" . $i,
-					),
+			),
+			'verb' => array (
+				"id" => "verbs/verbid" . $i,
+				"display" => array(
+					"en" => ("verbdisplay" . $i),
 				),
-				'context'  => array (
-					"context" => "context" . $i,
-					"contexttype" => "contexttype" . $i,
-					"contextparent" => "contextparent" . $i,
-				),
-				"result" => array (
-					"result" => "result" . $i,
-					"score" => array (
-						"raw" => "raw" . $i,
-						"scaled" => "scaled" . $i,
-					),
-				),
-				'stored' => 'stored' . $i,
-				'authority' => array (
-					"authority" => "authority" . $i,
+			),
+			'object'  => array (
+				"id" => "objectid" . $i,
+				"definition" => array (
+					"name" => array (
 
+						"en" => 'objectname' . $i),
+					"description" => "description" . $i,
+					"type" => "type" . $i,
 				),
-				'version' => "version" . $i,
+			),
+			'context'  => array (
+				"context" => "context" . $i,
+				"contexttype" => "contexttype" . $i,
+				"contextparent" => "contextparent" . $i,
+				"extensions" => array (
+					"extensions" => "extensions" . $i,
+					"sessionid" => "code" . $i,
+				),
+			),
+			"result" => array (
+				"result" => "result" . $i,
+				"score" => array (
+					"raw" => 80 + $i,
+					"scaled" =>  $i,
+				),
+			),
+			'stored' => 'stored' . $i,
+			'authority' => array (
+				"authority" => "authority" . $i,
+
+			),
+			'version' => "version" . $i,
+			'code' => 'code' . $i,
+			'progress' => 'progress' . $i,
+			'score' => 'score' . $i,
 		);
 
-		$statements[] = $statement;
+		$statements[] = $newstatement;
 	}
 
+	$statement['statements'] = $statements;
 	// Return array of statements
 	return $statement;
 }
@@ -365,16 +636,13 @@ function maketeststatements($amounttomake)
 
 	for ($i = 0; $i < 5; $i++) {
 
-		
-		//$toaddtostring = strval($i);
-	// Add i to each value so the AUs are unique.
-	// Mock values to make sessions.
 
 	// For some bizarre reason, retrieve sessions from db goes on SESSION id not ID?!?!??
 	// THIS IS the problem? 
 	$mockvalues = array(
 		'id' => $i,
-		'sessionid' =>  'sessionid' . $i,
+		// Can't save string to    DB.
+		'sessionid' =>  $i,
 		'userid' => 'userid' . $i,
 		'moodlecourseid' => 'moodlecourseid' . $i,
 		'registrationscoursesausid' => 'registrationscoursesausid' . $i,
@@ -400,30 +668,24 @@ function maketeststatements($amounttomake)
 		'launchurl' => 'launchurl' . $i,
 	);
 		$sessions[] = new session($mockvalues);
-		$sessionid[] = ('sessionid' . $i);
+		$sessionid[] = ( $i);
 	}
-	// Pass in the au index to retrieve a launchurl and session id.
-//$urldecoded = $cmi5launchretrieveurl($cmi5launch->id, $auindex);
 
-// Retrieve and store session id in the aus table.
-//$sessionid = intval($urldecoded['id']);
+	// Retrieve the launch url.
+	$launchurl = 'testurl';
+	// And launch method.
+	$launchmethod = 'testmethod';
 
-
-// Retrieve the launch url.
-$launchurl = 'testurl';
-// And launch method.
-$launchmethod = 'testmethod';
-
-// Now save the fake sessions to the test database
-// Ok so tomorrow make this so there are sessions actually creatd. 
-$sessionhelper = new session_helpers();
-//$createsession = $sessionhelper->cmi5launch_create_session();	
-	// For each session id in the list, create a session.
-	foreach ($sessions as $session) {
-		// LEts test if it can retrieve here
-		$newid = $sessionhelper->cmi5launch_create_session($session->id, $launchurl, $launchmethod);
-		$newids[] = $newid;
-		//$sessionid[] = $session;
+	// Now save the fake sessions to the test database
+	// Ok so tomorrow make this so there are sessions actually creatd. 
+	$sessionhelper = new session_helpers();
+	//$createsession = $sessionhelper->cmi5launch_create_session();	
+		// For each session id in the list, create a session.
+		foreach ($sessions as $session) {
+			// LEts test if it can retrieve here
+			$newid = $sessionhelper->cmi5launch_create_session($session->id, $launchurl, $launchmethod);
+			$newids[] = $newid;
+			//$sessionid[] = $session;
 
 		
 	
@@ -437,7 +699,7 @@ $sessionhelper = new session_helpers();
     } 
 
 	/**
-	 * Heeelper func that assigns the sessions made to the aus for testing purposes. 
+	 * Helper func that assigns the sessions made to the aus for testing purposes. 
 	 * @param mixed $auids
 	 * @param mixed $sessionids
 	 * @return array
@@ -472,14 +734,6 @@ $sessionhelper = new session_helpers();
 		// Tomorrow: no that isnt it. Something else is throwin the problem. 
 			// Now the AU will have properties and we want to assign the sessionid array to the 'sessions'  property
 			$au->sessions = json_encode($sessionids);
- // Update AU in table with new info.
-
- //echo au here nd check what sessons itr and if id mathces
-
-
- 
- // what is au record?
-
 
 			// Save the AU back to the DB.
 			$success = $DB->update_record('cmi5launch_aus', $au);
@@ -489,13 +743,6 @@ $sessionhelper = new session_helpers();
  $newaus[] = $au;
         }
 
-		// AHA! They are whole damn aus
-		// now save the new aus back to db
-		// we dont need to sve twice!!!
-		// $save_aus($newaus);
-		// Save us is to make new aus we need to save them back to DB
-		  // Now update to table.
-		//return $newauids;
 	
 	}
 
@@ -545,36 +792,27 @@ $sessionhelper = new session_helpers();
         }
 
     }
-
-
-
-  
-
-/*
-  function get_file_get_contents() {
-    return ['file_get_contents'];
-}
-*/
- global $file_get_contents;
-  // Ok lets make a file_et_contents for this namespace, we know it should return a json string?
-  // And what should it receive? just the reular arguments?
-  /**
-   * A local file_get_contents to overide the PHP function for testing.
-   * As we do not want to actually get the file, we just want to test the function calling that function.
-   * 
-   */
-  function file_get_contents($url, $use_include_path = false, $context = null, $offset = 0, $maxlen = null)
+   // So now all the test has to do is inject THIS which will return as we please
+   function cmi5launch_test_stream_and_send_pass_lrs($options, $url)
   {
-    // Do we wamt to test whats passed in as well? pr ois that not necessary?
-    // MAybe we can return the args as json encoded string?
-    return json_encode(func_get_args());
+		// Make a fake statement to return from the mock.
+		$statement = maketeststatements(1);
+        
+		// Lets pass in the 'return' value as the option.
+		// Encode because it would be a string comiiiiing from LRS.
+		return json_encode($statement);
   }
-    // And what should it receive? just the reular arguments?
-  /**
-   * A local file_get_contents to overide the PHP function for testing.
-   * As we do not want to actually get the file, we just want to test the function calling that function.
-   * 
-   */
+
+     // So now all the test has to do is inject THIS which will return as we please
+	 function cmi5launch_test_stream_and_send_excep_lrs($options, $url)
+	 {
+		   // Make a fake statement to return from the mock.
+		   $statement = maketeststatements(1);
+		   
+		   // Lets pass in the 'return' value as the option.
+		   // Encode because it would be a string comiiiiing from LRS.
+		   return json_encode($statement);
+	 }
 
    // So now all the test has to do is inject THIS which will return as we please
    function cmi5launch_test_stream_and_send_pass($options, $url)
