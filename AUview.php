@@ -36,7 +36,7 @@ global $cmi5launch, $USER;
 $auhelper = new au_helpers;
 $sessionhelper = new session_helpers;
 $retrievesession = $sessionhelper->cmi5launch_get_retrieve_sessions_from_db();
-$updatesession = $sessionhelper->cmi5launch_get_update_session();
+//$updatesession = $sessionhelper->cmi5launch_get_update_session();
 $retrieveaus = $auhelper->get_cmi5launch_retrieve_aus_from_db();
 
 // MB - Not currently using events, but may in future.
@@ -149,8 +149,8 @@ if (!$au->sessions == null) {
     foreach ($sessionids as $key => $sessionid) {
 
         // Get the session from DB with session id.
-        $session = $retrievesession($sessionid);
-
+        $session = $DB->get_record('cmi5launch_sessions', array('sessionid' => $sessionid));
+               
         // Array to hold data for table.
         $sessioninfo = array();
 

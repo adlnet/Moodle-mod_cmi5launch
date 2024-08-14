@@ -202,6 +202,10 @@ class grade_helpers
 
         $cmi5launchsettings = cmi5launch_settings($cmi5launch->id);
 
+        // Instantiate progress and cmi5_connectors class to pass.
+        $progress = new progress;
+        $cmi5 = new cmi5_connectors;
+        
         // Set error and exception handler to catch and override the default PHP error messages, to make messages more user friendly.
         set_error_handler('mod_cmi5launch\local\grade_warning', E_WARNING);
         set_exception_handler('mod_cmi5launch\local\exception_grade');
@@ -241,7 +245,7 @@ class grade_helpers
                             $session = $DB->get_record('cmi5launch_sessions', ['sessionid' => $sessionid]);
 
                             // Retrieve new info (if any) from CMI5 player and LRS on session.
-                            $session = $updatesession($sessionid, $cmi5launch->id, $user);
+                            $session = $updatesession($progress, $cmi5, $sessionid, $cmi5launch->id, $user);
 
                             // Now if the session is complete, passed, or terminated, we want to update the AU.
                             // These come in order, so the last one is the current status, so update on each one,

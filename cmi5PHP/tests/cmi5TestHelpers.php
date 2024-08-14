@@ -867,7 +867,7 @@ class session_helpers
      * @param mixed $cmi5id - cmi5 instance id
      * @return 
      */
-    public function cmi5launch_update_sessions($sessionid, $cmi5id, $user) {
+    public function cmi5launch_update_sessions2($sessionid, $cmi5id, $user) {
 
 		
 		// Ok, lets make sure we are calling THIS one
@@ -947,26 +947,63 @@ class session_helpers
         // Return new session object.
         return $session;
     }
-
 }
+	// MAke a new  progress class for overriding
+	// New class
+class progress{
 
-// To pass to the test and cause exception 
-class session_helpers2
-{
-	  /**
-     * Gets updated session information from CMI5 player and throw exception
-     * @param mixed $sessionid - the session id
-     * @param mixed $cmi5id - cmi5 instance id
-     * @return 
-     */
-    public function cmi5launch_update_sessions($sessionid, $cmi5id, $user) {
-
-           // $returnvalue->score = 80;
-        return null;
+	public function cmi5launch_get_retrieve_statements() {
+        return [$this, 'cmi5launch_retrieve_statements'];
     }
+
+public function	 cmi5launch_retrieve_statements($registrationid, $session) {
+
+		global $DB, $CFG, $cmi5launch, $USER;
+		// We need session objects to test the progress class
+        // Make a fake session object.
+		$sessionlrs = $session;
+         
+		// Change the session to have some new values from LRS.
+        $sessionlrs->isterminated = 1;
+        $sessionlrs->launchurl = "http://test.com";
+		
+		return $sessionlrs;
+		
+	}
+
 }
 
+	// MAke a new  cmi5 connectors class for overriding
+	// New class
+	class cmi5_connectors{
+		public function cmi5launch_get_session_info() {
+			return [$this, 'cmi5launch_retrieve_session_info_from_player'];
+		}
 
+		public function	 cmi5launch_retrieve_session_info_from_player($sessionid, $id) {
 
+			global $DB, $CFG, $cmi5launch, $USER;
+		// We need session objects to test the progress class
+        // Make a fake session object.
+        $sessionids = maketestsessions();
+		
+		// We just need one session to test this.
+		$sessionid = $sessionids[0];
 
+		// Get the session from DB with session id.
+		$sessioncmi5 = $DB->get_record('cmi5launch_sessions',  array('sessionid' => $sessionid));
+
+		// Change the session from cmi5 to have some new values. 
+        $sessioncmi5->score = 100;
+        $sessioncmi5->iscompleted = 1;
+        $sessioncmi5->ispassed = 1;
+        $sessioncmi5->launchmethod = "ownWindow";
+		// Change the session to have some new values from to match lrs values.
+		$sessioncmi5->isterminated = 1;
+		$sessioncmi5->launchurl = "http://test.com";
+
+		return json_encode($sessioncmi5);
+		}
+	
+	}
 ?>

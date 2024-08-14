@@ -36,7 +36,7 @@ function exception_au(\Throwable $exception)
 {
     // echo"Error stirn ---  $errstr";
     // echo"Error number ---  $errno";
-    echo " EHAT?";
+
     // Maybe we can construct the new errors here. This would allow the error personalization? And keep main code clean
 
     throw new fieldException('Error OVER: ' . $exception->getMessage(), 0);
@@ -76,9 +76,10 @@ function progresslrsreq_warning($errno, $errstr, $errfile, $errline)
   //   echo"Error errline ---  $errline";
     // Maybe we can construct the new errors here. This would allow the error personalization? And keep main code clean
 
-    throw new nullException('Unable to communicate with LRS. Caught exception: ' . $exception->getMessage() . " Check LRS is up, username and password are correct, and LRS endpoint is correct.", 0);
+    throw new nullException('Unable to communicate with LRS. Caught exception: ' . $errstr. " Check LRS is up, username and password are correct, and LRS endpoint is correct.", 0);
     //  exit;
 }
+
 /**
  * An exception handler to use in AU cases when many different exceptions for data errors may be thrown. 
  * @param mixed $errno
@@ -120,6 +121,34 @@ function exception_progresslrs(\Throwable $exception)
     throw new nullException('Error in retrieving statements from LRS ' . $exception->getMessage(), 0);
     //  exit;
 }
+
+/**
+ * An exception handler to use in AU cases when many different exceptions for data errors may be thrown. 
+ * @param mixed $errno
+ * @param mixed $errstr
+ * @param mixed $errfile
+ * @param mixed $errline
+ * @throws \mod_cmi5launch\local\nullException
+ * @return never
+ */
+function session_warning(\Throwable $exception)
+{
+   
+    throw new nullException('Unable to communicate with LRS. Caught exception: ' . $exception->getMessage() . " Check LRS is up, username and password are correct, and LRS endpoint is correct.", 0);
+    //  exit;
+}
+function sesssion_exception($errno, $errstr, $errfile, $errline)
+{
+   //  echo"Error stirn ---  $errstr";
+  //   echo"Error number ---  $errno";
+//echo"Error errfile ---  $errfile";
+  //   echo"Error errline ---  $errline";
+    // Maybe we can construct the new errors here. This would allow the error personalization? And keep main code clean
+
+    throw new nullException('Error in retrieving statements from LRS ' . $errstr, 0);
+    //  exit;
+}
+
 function sifting_data_warning($errno, $errstr, $errfile, $errline)
 {
    //  echo"Error stirn ---  $errstr";
