@@ -230,6 +230,8 @@ function deletetestcmi5launch_sessions($ids)
 	// Save AUs to test DB and save IDs.
 	$newauids = $saveau($aus);
 	
+	// Delete testcoursesessionids.
+	deletetestcmi5launch_sessions($testcoursesessionids);
 	// Return array of AU ids
     return $newauids;
   
@@ -867,7 +869,7 @@ class session_helpers
      * @param mixed $cmi5id - cmi5 instance id
      * @return 
      */
-    public function cmi5launch_update_sessions2($sessionid, $cmi5id, $user) {
+    public function cmi5launch_update_sessions($sessionid, $cmi5id, $user) {
 
 		
 		// Ok, lets make sure we are calling THIS one

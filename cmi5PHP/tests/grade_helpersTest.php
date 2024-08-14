@@ -84,11 +84,15 @@ class grade_helpersTest extends TestCase
 
         // Assign the AUs to the course.
         assign_aus_to_courses($testcourseid, $testcourseausids);
+
+        // Delete testcoursesessionids.
+        deletetestcmi5launch_sessions($testcoursesessionids);
         }
 
     protected function tearDown(): void
     {
-
+        global $sessionids;
+        deletetestcmi5launch_sessions($sessionids);
     }
 
 

@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Prints an AUs session information annd allows start of new one.
+ * Prints an AUs session information and allows start of new one.
  * @copyright  2023 Megan Bohland
  * @copyright  Based on work by 2013 Andrew Downes
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -36,7 +36,6 @@ global $cmi5launch, $USER;
 $auhelper = new au_helpers;
 $sessionhelper = new session_helpers;
 $retrievesession = $sessionhelper->cmi5launch_get_retrieve_sessions_from_db();
-//$updatesession = $sessionhelper->cmi5launch_get_update_session();
 $retrieveaus = $auhelper->get_cmi5launch_retrieve_aus_from_db();
 
 // MB - Not currently using events, but may in future.
@@ -154,16 +153,23 @@ if (!$au->sessions == null) {
         // Array to hold data for table.
         $sessioninfo = array();
 
-        // Retrieve createdAt and format.
-        $date = new DateTime($session->createdat, new DateTimeZone('US/Eastern'));
-        $date->setTimezone(new DateTimeZone('America/New_York'));
-        $sessioninfo[] = $date->format('D d M Y H:i:s');
+      
+        if ($session->createdat != null) {
 
-        // Retrieve lastRequestTime and format.
-        $date = new DateTime($session->lastrequesttime, new DateTimeZone('US/Eastern'));
-        $date->setTimezone(new DateTimeZone('America/New_York'));
-        $sessioninfo[] = $date->format('D d M Y H:i:s');
+            // Retrieve createdAt and format.
+            $date = new DateTime($session->createdat, new DateTimeZone('US/Eastern'));
+            $date->setTimezone(new DateTimeZone('America/New_York'));
+            // date_timezone_set($date, new DateTimeZone('America/New_York'));
+            $sessioninfo[] = $date->format('D d M Y H:i:s');
+        }
 
+        if ($session->lastrequesttime != null) {
+
+            // Retrieve lastRequestTime and format.
+            $date = new DateTime($session->lastrequesttime, new DateTimeZone('US/Eastern'));
+            $date->setTimezone(new DateTimeZone('America/New_York'));
+            $sessioninfo[] = $date->format('D d M Y H:i:s');
+        }
         // Add progress to table.
         $sessioninfo[] = ("<pre>" . implode("\n ", json_decode($session->progress) ) . "</pre>");
 

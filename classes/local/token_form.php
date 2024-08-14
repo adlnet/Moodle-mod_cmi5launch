@@ -32,9 +32,6 @@ class setup_token extends moodleform {
         // A common convention is to store it in a variable, such as `$mform`.
         $mform = $this->_form; // Don't forget the underscore!
 
-        // Elements are diff inputs in form
-
-
         // Add elements to your form. Second arg is the name of element
         $mform->addElement('text', 'cmi5token', get_string('cmi5launchtenanttoken', 'cmi5launch'));
         // Set type of element.

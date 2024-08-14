@@ -15,9 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Lets see if this works. making an ovrride error class, or several
+ * Error class with overridden functions for error and warning handling.
  *
- * @copyright  2023 Megan Bohland
+ * @copyright  2024 Megan Bohland
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -34,16 +34,11 @@ namespace mod_cmi5launch\local;
  */
 function exception_au(\Throwable $exception)
 {
-    // echo"Error stirn ---  $errstr";
-    // echo"Error number ---  $errno";
-
-    // Maybe we can construct the new errors here. This would allow the error personalization? And keep main code clean
-
-    throw new fieldException('Error OVER: ' . $exception->getMessage(), 0);
-    //  exit;
+    throw new nullException('Error OVER: ' . $exception->getMessage(), 0);
 }
+
 /**
- * An exception handler to use in AU cases when many different exceptions for data errors may be thrown. 
+ * An exception handler to use in grade cases when many different exceptions for data errors may be thrown. 
  * @param mixed $errno
  * @param mixed $errstr
  * @param mixed $errfile
@@ -53,31 +48,23 @@ function exception_au(\Throwable $exception)
  */
 function exception_grade(\Throwable $exception)
 {
-   
     throw new nullException('Error in checking user grades: ' . $exception->getMessage(), 0);
-    //  exit;
 }
-function progress_warning($errno, $errstr, $errfile, $errline)
-{
-   //  echo"Error stirn ---  $errstr";
-  //   echo"Error number ---  $errno";
-//echo"Error errfile ---  $errfile";
-  //   echo"Error errline ---  $errline";
-    // Maybe we can construct the new errors here. This would allow the error personalization? And keep main code clean
-    echo " unable to get name ";
-   // throw new nullException('Unable to communicate with LRS. Caught exception: ' . $exception->getMessage() . " Check LRS is up, username and password are correct, and LRS endpoint is correct.", 0);
-    //  exit;
-}
+
+/**
+ * An error handler to use in progress cases when many different exceptions for data errors may be thrown. 
+ * @param mixed $errno
+ * @param mixed $errstr
+ * @param mixed $errfile
+ * @param mixed $errline
+ * @throws \mod_cmi5launch\local\nullException
+ * @return never
+ */
 function progresslrsreq_warning($errno, $errstr, $errfile, $errline)
 {
-   //  echo"Error stirn ---  $errstr";
-  //   echo"Error number ---  $errno";
-//echo"Error errfile ---  $errfile";
-  //   echo"Error errline ---  $errline";
-    // Maybe we can construct the new errors here. This would allow the error personalization? And keep main code clean
 
     throw new nullException('Unable to communicate with LRS. Caught exception: ' . $errstr. " Check LRS is up, username and password are correct, and LRS endpoint is correct.", 0);
-    //  exit;
+
 }
 
 /**
@@ -93,19 +80,21 @@ function exception_progresslrsreq(\Throwable $exception)
 {
    
     throw new nullException('Unable to communicate with LRS. Caught exception: ' . $exception->getMessage() . " Check LRS is up, username and password are correct, and LRS endpoint is correct.", 0);
-    //  exit;
 }
+/**
+ * A warning handler to use in AU cases when many different exceptions for data errors may be thrown. 
+ * @param mixed $errno
+ * @param mixed $errstr
+ * @param mixed $errfile
+ * @param mixed $errline
+ * @throws \mod_cmi5launch\local\nullException
+ * @return never
+ */
 function progresslrs_warning($errno, $errstr, $errfile, $errline)
 {
-   //  echo"Error stirn ---  $errstr";
-  //   echo"Error number ---  $errno";
-//echo"Error errfile ---  $errfile";
-  //   echo"Error errline ---  $errline";
-    // Maybe we can construct the new errors here. This would allow the error personalization? And keep main code clean
-
     throw new nullException('Error in retrieving statements from LRS ' . $errstr, 0);
-    //  exit;
 }
+
 /**
  * An exception handler to use in AU cases when many different exceptions for data errors may be thrown. 
  * @param mixed $errno
@@ -119,6 +108,20 @@ function exception_progresslrs(\Throwable $exception)
 {
    
     throw new nullException('Error in retrieving statements from LRS ' . $exception->getMessage(), 0);
+}
+
+/**
+ * A warning handler to use in AU cases when many different exceptions for data errors may be thrown. 
+ * @param mixed $errno
+ * @param mixed $errstr
+ * @param mixed $errfile
+ * @param mixed $errline
+ * @throws \mod_cmi5launch\local\nullException
+ * @return never
+ */
+function sifting_data_warning($errno, $errstr, $errfile, $errline)
+{
+    throw new nullException('Error: ' . $errstr, 0);
     //  exit;
 }
 
@@ -131,58 +134,25 @@ function exception_progresslrs(\Throwable $exception)
  * @throws \mod_cmi5launch\local\nullException
  * @return never
  */
-function session_warning(\Throwable $exception)
-{
-   
-    throw new nullException('Unable to communicate with LRS. Caught exception: ' . $exception->getMessage() . " Check LRS is up, username and password are correct, and LRS endpoint is correct.", 0);
-    //  exit;
-}
-function sesssion_exception($errno, $errstr, $errfile, $errline)
-{
-   //  echo"Error stirn ---  $errstr";
-  //   echo"Error number ---  $errno";
-//echo"Error errfile ---  $errfile";
-  //   echo"Error errline ---  $errline";
-    // Maybe we can construct the new errors here. This would allow the error personalization? And keep main code clean
-
-    throw new nullException('Error in retrieving statements from LRS ' . $errstr, 0);
-    //  exit;
-}
-
-function sifting_data_warning($errno, $errstr, $errfile, $errline)
-{
-   //  echo"Error stirn ---  $errstr";
-  //   echo"Error number ---  $errno";
-//echo"Error errfile ---  $errfile";
-  //   echo"Error errline ---  $errline";
-    // Maybe we can construct the new errors here. This would allow the error personalization? And keep main code clean
-
-    throw new fieldException('Error: ' . $errstr, 0);
-    //  exit;
-}
-
     function array_chunk_warning($errno, $errstr, $errfile, $errline)
     {
-        // echo"Error stirn ---  $errstr";
-        // echo"Error number ---  $errno";
-
-        // Maybe we can construct the new errors here. This would allow the error personalization? And keep main code clean
-
         throw new nullException('Cannot parse array. Error: ' . $errstr, 0);
-        //  exit;
     }
-        /// Ok, this i a different error handler
-        function grade_warning($errno, $errstr, $errfile, $errline)
-        {
-           //  echo"Error stirn ---  $errstr";
-          //   echo"Error number ---  $errno";
-    //echo"Error errfile ---  $errfile";
-          //   echo"Error errline ---  $errline";
-            // Maybe we can construct the new errors here. This would allow the error personalization? And keep main code clean
-    
-            throw new nullException('Error in checking user grades: ' . $errstr, 0);
-            //  exit;
-        }
+
+/**
+ * An grade handler to use in AU cases when many different exceptions for data errors may be thrown. 
+ * @param mixed $errno
+ * @param mixed $errstr
+ * @param mixed $errfile
+ * @param mixed $errline
+ * @throws \mod_cmi5launch\local\nullException
+ * @return never
+ */
+    function grade_warning($errno, $errstr, $errfile, $errline)
+    {
+
+        throw new nullException('Error in checking user grades: ' . $errstr, 0);
+    }
 
 
 /**
@@ -213,72 +183,7 @@ class nullException extends \Exception
         echo "A custom function for this type of exception\n";
     }
 }
-/**
- * Define a custom exception class, this will make pour tests meaningful
- * from php webpage: "Custom exception classes can allow you to write tests that prove your exceptions
-    *  are meaningful. Usually testing exceptions, you either assert the message equals
-*something in which case you can't change the message format without refactoring,
-*or not make any assertions at all in which case you can get misleading messages
-*later down the line. Especially if your $e->getMessage is something complicated
-*like a var_dump'ed context array."
- */
-class missingException extends \Exception
-{
-    // Redefine the exception so message isn't optional
-    // I want an exception that takkkes what is missing and adds it to messsssage? 
-    // Is this possivlbe? 
-    public function __construct($message, $code = 0, Throwable $previous = null) {
-        // some code
 
-        // make sure everything is assigned properly
-        parent::__construct($message, $code, $previous);
-    }
-
-   
-    // custom string representation of object (what is returned with echo)
-    public function __toString(): string {
-        return __CLASS__ . ": [{$this->code}]: {$this->message}\n";
-        // maybe here?
-    }
-
-    public function customFunction() {
-        echo "  This error to string            :";
-      //  $this->getTraceAsString();
-    }
-}
-/**
- * Define a custom exception class, this will make pour tests meaningful
- * from php webpage: "Custom exception classes can allow you to write tests that prove your exceptions
-    *  are meaningful. Usually testing exceptions, you either assert the message equals
-*something in which case you can't change the message format without refactoring,
-*or not make any assertions at all in which case you can get misleading messages
-*later down the line. Especially if your $e->getMessage is something complicated
-*like a var_dump'ed context array."
- */
-class fieldException extends \Exception
-{
-    // Redefine the exception so message isn't optional
-    // I want an exception that takkkes what is missing and adds it to messsssage? 
-    // Is this possivlbe? 
-    public function __construct($message, $code = 0, Throwable $previous = null) {
-        // some code
-
-        // make sure everything is assigned properly
-        parent::__construct($message, $code, $previous);
-    }
-
-   
-    // custom string representation of object (what is returned with echo)
-    public function __toString(): string {
-        return __CLASS__ . ": [{$this->code}]: {$this->message}\n";
-        // maybe here?
-    }
-
-    public function customFunction() {
-        echo "  This error to string            :";
-      //  $this->getTraceAsString();
-    }
-}
 /**
  * Define a custom exception class, this will make pour tests meaningful
  * from php webpage: "Custom exception classes can allow you to write tests that prove your exceptions
@@ -314,5 +219,3 @@ class playerException extends \Exception
       //  $this->getTraceAsString();
     }
 }
-
-// If all my exceptions are the same, just diff names, are they necessary? Do any of my try/catches really differentiate? 

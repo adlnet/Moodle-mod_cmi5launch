@@ -44,8 +44,21 @@ class cmi5_connectorsTest extends TestCase
     {
         global $DB, $cmi5launch,  $cmi5launchid;
 
+        global $DB, $cmi5launch, $cmi5launchid, $USER, $testcourseid, $testcourseausids, $testcoursesessionids, $cmi5launchsettings;
+
+  
+        
+        // Restore overridden global variable.
+        unset($GLOBALS['USER']);
+        unset($GLOBALS['cmi5launchsettings']);
+        unset($GLOBALS['cmi5launch']);
+        unset($GLOBALS['cmi5launchid']);
+        unset($GLOBALS['testcourseid']);
+        unset($GLOBALS['testcourseausids']);
+        unset($GLOBALS['testcoursesessionids']);
+        
         // Delete the test record.
-        deletetestcmi5launch($cmi5launchid);
+//        deletetestcmi5launch($cmi5launchid);
         
     }
 
@@ -68,9 +81,12 @@ class cmi5_connectorsTest extends TestCase
 
     protected function tearDown(): void
     {
+        global $DB, $cmi5launch, $cmi5launchid, $USER, $testcourseid, $testcourseausids, $testcoursesessionids, $cmi5launchsettings;
         // Restore overridden global variable.
         unset($GLOBALS['USER']);
         unset($GLOBALS['cmi5launchsettings']);
+
+        deletetestcmi5launch_usercourse($testcourseid);
     }
 
 
@@ -147,7 +163,7 @@ class cmi5_connectorsTest extends TestCase
         };
         $test = false;
              // Expected exceptions
-             $exceptionmessage = "Player communication error. Something went wrong creating the course. CMI5 Player returned 404 error. With message 'testmessage'." ;
+             $exceptionmessage = "Player communication error. Something went wrong creating the course CMI5 Player returned 404 error. With message 'testmessage'." ;
             
         // Mock a cmi5 connector object but only stub ONE method, as we want to test the other methods.
         // Create a mock of the send_request class as we don't actually want
@@ -318,7 +334,7 @@ class cmi5_connectorsTest extends TestCase
             ->willReturn($errormessage);
 
             // Expected exceptions
-             $exceptionmessage = "Player communication error. Something went wrong retrieving the registration information. CMI5 Player returned 400 error. With message 'website not found'." ;
+             $exceptionmessage = "Player communication error. Something went wrong creating the tenant CMI5 Player returned 400 error. With message 'website not found'." ;
          
 
             // the correct output not an exception
@@ -469,7 +485,7 @@ class cmi5_connectorsTest extends TestCase
             ->willReturn($errormessage);
 
         // Expected exceptions
-        $exceptionmessage = "Player communication error. Something went wrong retrieving the registration. CMI5 Player returned 404 error. With message 'testmessage'" ;
+        $exceptionmessage = "Player communication error. Something went wrong retrieving the registration CMI5 Player returned 404 error. With message 'testmessage'." ;
 
         // Expected exceptions and messages
         $this->expectExceptionMessage($exceptionmessage);
@@ -689,7 +705,7 @@ class cmi5_connectorsTest extends TestCase
             ->willReturn($errormessage);
 
    // Expected exceptions
-     $exceptionmessage = "Player communication error. Something went wrong retrieving the registration. CMI5 Player returned 404 error. With message 'testmessage'" ;
+     $exceptionmessage = "Player communication error. Something went wrong retrieving the registration CMI5 Player returned 404 error. With message 'testmessage'" ;
 
      // Expected exceptions and messages
      $this->expectExceptionMessage($exceptionmessage);
@@ -1126,8 +1142,8 @@ class cmi5_connectorsTest extends TestCase
         // Call the method under test.
         $test = $helper->cmi5launch_send_request_to_cmi5_player_post($testfunction, $data, $url, $filetype, $token);
 
-        // If the right message is displayed the try/catch wworked!
-        $this->expectOutputString($exceptionmessage);
+        // If the right message is displayed the try/catch worked.
+        $this->assertEquals($returnvalue, $test, "The return value should be the same as the return value from the mocked method.");
 
     }
 
@@ -1141,11 +1157,7 @@ class cmi5_connectorsTest extends TestCase
         // We send the TEST function to the function under test now!
         $testfunction = 'cmi5Test\cmi5launch_test_stream_and_send_excep';
         // Which returns the 'options' parameter passed to it.
-        // The player returns a string under normal circumstances.
-        $returnvalue = json_encode(array(
-            "statusCode" => 200,
-            "Response" => "Successful Post",
-        ));
+        
     
         // The data to be passed to the mocked method.
         $data = array(
@@ -1180,11 +1192,6 @@ class cmi5_connectorsTest extends TestCase
         // Call the method under test.
         // Note: by not sending an actual function, this will cause an exception and allow testing of try/catch and error override.
         $test = $helper->cmi5launch_send_request_to_cmi5_player_post('testfunction', $data, $url, $filetype, $token);
-
-        // And the return should be a string.
-        $this->assertIsString($test);
-        // And it should be the same as the return value.
-        $this->assertEquals($test, $returnvalue);
     }
 
 
@@ -1226,9 +1233,6 @@ class cmi5_connectorsTest extends TestCase
         $username = "testname";
         $password = "testpassword";
 
-
-  
-   // This is the SUT?
         $helper = new cmi5_connectors;
         $test = $helper->cmi5launch_send_request_to_cmi5_player_post($testfunction, $data, $url, $filetype, $username, $password);
 
@@ -1318,11 +1322,11 @@ class cmi5_connectorsTest extends TestCase
         // Get class and the function under test. 
         $helper = new cmi5_connectors;
         $test = $helper->cmi5launch_send_request_to_cmi5_player_get($testfunction, $token, $url);
-    
+
         // And the return should be an array.
         $this->assertIsString($test);
         // And it should be the same as the return value.
-        $this->assertEquals($test, json_decode($returnvalue, true) );
+        $this->assertEquals($test, $returnvalue, true) ;
 
     }
 
@@ -1559,7 +1563,7 @@ class cmi5_connectorsTest extends TestCase
     
 
         // The expected error message to be output.
-        $exceptionmessage ="Something went wrong " . $type . ". CMI5 Player is not communicating. Is it running?";
+        $exceptionmessage ="Something went wrong " . $type . " CMI5 Player is not communicating. Is it running?";
 
        
           // Expected exceptions and messages

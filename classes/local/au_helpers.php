@@ -155,6 +155,10 @@ class au_helpers
         //Check it's not null.
         if ($auobjectarray == null) {
 
+              // Restore default hadlers.
+              restore_exception_handler();
+              restore_error_handler();
+              
             throw new nullException('Cannot save AU information. AU object array is: null', 0);
 
         } else {
@@ -229,6 +233,9 @@ class au_helpers
 
                     // Now use the found missing value to give feedback to user.
                     echo " One of the fields is incorrect. Check data for field '$missing'. " . $e->getMessage() . "\n";
+                    // Restore default hadlers.
+                    restore_exception_handler();
+                    restore_error_handler();
                 }
             }
 
