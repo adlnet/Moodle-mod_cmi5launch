@@ -271,8 +271,9 @@ foreach ($auids as $key => $auid) {
                 // Cycle through them looking to see if any were passed and/or completed.
                 foreach ($sessions as $key => $value) {
 
-                    $ausession = $getsessioninfo($value);
-
+                    // Get the session from DB with session id.
+                    $ausession = $DB->get_record('cmi5launch_sessions', array('sessionid' => $value));
+                                
                     if ($ausession->iscompleted == "1") {
                         $completedfound = true;
                     }

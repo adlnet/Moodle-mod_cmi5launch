@@ -21,7 +21,12 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+ 
 namespace mod_cmi5launch\local;
+// Include the errorover (error override) funcs.
+require_once ($CFG->dirroot . '/mod/cmi5launch/classes/local/errorover.php');
+
+
 defined('MOODLE_INTERNAL') || die();
 
 class session {
@@ -41,6 +46,13 @@ class session {
 
     // Constructs sessions. Is fed array and where array key matches property, sets the property.
     public function __construct($statement) {
+
+        // What can go wrong here? It could be that a statement is null
+        // or that the statement is not an array or not an object.
+        if (is_null($statement) || (!is_array($statement) && !is_object($statement) )) {
+            
+            throw new nullException('Statement to build session is null or not an array/object.', 0);
+        }
 
         foreach ($statement as $key => $value) {
 
