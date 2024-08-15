@@ -80,7 +80,7 @@ echo $OUTPUT->header();
 
     <script>
 
-        function key_tst(registration) {
+        function key_test(registration) {
 
             if (event.keyCode === 13 || event.keyCode === 32) {
                 mod_cmi5launch_launchexperience(registration);

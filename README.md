@@ -10,8 +10,6 @@ A plug in for Moodle that enables tracking for cmi5 content.This polugin acts as
 
 Users can upload the cmi5 content as a Moodle activity. It also integrates with Moodles Gradebook API for grading purposes. 
 
-
-
 ### Thanks
 
 
