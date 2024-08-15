@@ -78,9 +78,22 @@ class session_helpers {
             $sessioninfo = json_decode($getsessioninfo($sessionid, $cmi5launchid), true);
             // Update session.
             foreach ($sessioninfo as $key => $value) {
+
+                // Is the problem key value is not matching due to caps?
                 // We don't want to overwrite ids.
                 // If the property exists and it's not id or sessionid, set it to lowercase and
                 // encode value if it is array. (DB needs properties in lowercase, but player returns camelcase).
+                
+             
+                    // If it's an array, encode it so it can be saved to DB.
+                    if (is_array($value)) {
+                        $value = json_encode($value);
+                    }
+
+                    if (is_string($key)) {
+                        $key = mb_convert_case($key, MB_CASE_LOWER, "UTF-8");
+                    }
+                   
                 if (property_exists($session, $key) && $key != 'id' && $key != 'sessionid') {
 
                     // If it's an array, encode it so it can be saved to DB.
@@ -151,6 +164,13 @@ class session_helpers {
 
             // Save record to table.
             $newid = $DB->insert_record($table, $newrecord, true);
+
+            // Instantiate progress and cmi5_connectors class to pass.
+            $progress = new progress;
+            $cmi5 = new cmi5_connectors;
+            
+            // Retrieve new info (if any) from CMI5 player and LRS on session.
+            $session = $this->cmi5launch_update_sessions($progress, $cmi5, $sessionid, $cmi5launch->id, $USER);
 
             // Restore default handlers.
             restore_exception_handler();

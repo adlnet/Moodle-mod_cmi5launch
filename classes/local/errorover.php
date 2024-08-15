@@ -100,6 +100,21 @@ function custom_warning($errno, $errstr, $errfile, $errline)
 }
 
 /**
+ * An warning handler to use to post better warnings to users for troubleshooting. 
+ * @param mixed $errno
+ * @param mixed $errstr
+ * @param mixed $errfile
+ * @param mixed $errline
+ * @throws \mod_cmi5launch\local\nullException
+ * @return never
+ */
+function custom_warningview($errno, $errstr, $errfile, $errline)
+{
+    
+    throw new customException('error on main view page.  Report this to system administrator: <br> '. $errstr .' at '. $errfile .' on ' .$errline, 0);
+
+}
+/**
  * An exception handler to use in AU cases when many different exceptions for data errors may be thrown. 
  * @param mixed $errno
  * @param mixed $errstr

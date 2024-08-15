@@ -160,7 +160,6 @@ if (!$au->sessions == null) {
             // Array to hold data for table.
             $sessioninfo = array();
 
-
             if ($session->createdat != null) {
 
                 // Retrieve createdAt and format.
