@@ -1,8 +1,6 @@
 <?php
 namespace cmi5Test;
-
 use mod_cmi5launch\local\nullException;
-use mod_cmi5launch\local\fieldException;
 use PHPUnit\Framework\TestCase;
 use mod_cmi5launch\local\au;
 use mod_cmi5launch\local\au_helpers;

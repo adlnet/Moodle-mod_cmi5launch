@@ -27,7 +27,6 @@
  use mod_cmi5launch\local\cmi5launch_helpers;
 // Include the errorover (error override) funcs.
 require_once ($CFG->dirroot . '/mod/cmi5launch/classes/local/errorover.php');
-
 class cmi5_connectors {
 
     public function cmi5launch_get_create_tenant() {
@@ -505,8 +504,11 @@ class cmi5_connectors {
             // Return response.
             return $result;
 
-        }catch(\Throwable $e) {
-
+        }catch(\Throwable $e) {  
+            
+            // Restore default hadlers.
+            restore_exception_handler();
+            restore_error_handler();
             //
             throw new playerException("communicating with player, sending or crafting a POST request: " . $e);
         }
@@ -615,7 +617,7 @@ class cmi5_connectors {
         if ($resulttest === false ){
 
            
-            $errormessage =  $type . ". CMI5 Player is not communicating. Is it running?";
+            $errormessage =  $type . " CMI5 Player is not communicating. Is it running?";
 
             throw new playerException($errormessage);
         }

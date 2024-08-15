@@ -49,6 +49,9 @@ $gradetype = $cmi5launchsettings["grademethod"];
 // External classes and functions.
 $sessionhelper = new session_helpers;
 $aushelpers = new au_helpers;
+// Instantiate progress and cmi5_connectors to pass.
+$progress = new \mod_cmi5launch\local\progress;
+$cmi5connectors = new \mod_cmi5launch\local\cmi5_connectors;
 
 $updatesession = $sessionhelper->cmi5launch_get_update_session();
 $getaus = $aushelpers->get_cmi5launch_retrieve_aus_from_db();
@@ -178,7 +181,7 @@ if ($aurecord->sessions != null || false) {
     // There may be more than one session.
     foreach ($sessions as $sessionid) {
 
-        $session = $updatesession($sessionid, $cmi5launch->id, $user);
+        $session = $updatesession($progress, $cmi5, $sessionid, $cmi5launch->id, $user);
         // Add score to array for AU.
         $sessionscores[] = $session->score;
 

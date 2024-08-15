@@ -22,7 +22,7 @@
  */
 
 
-// NEeded for moodle pae. sets up loabl
+// Needed for moodle page.
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 
 // Tell moodle about our page, tell it what the url is.\\
@@ -51,13 +51,7 @@ $playername = get_config('cmi5launch', 'cmi5launchbasicname');
 $playerpass = get_config('cmi5launch', 'cmi5launchbasepass');
 
 $playerpass = null;
-echo "<br>";
-echo"Settings are: ";
-echo $playerurl . " ";
-echo "<br>";
-echo $playername;
-echo "<br>";
-echo $playerpass;
+
 // If the settings are not set, then display the first form.
 if(!$playerurl || !$playername || !$playerpass){
 
