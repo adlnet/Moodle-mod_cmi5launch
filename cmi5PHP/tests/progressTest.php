@@ -79,11 +79,11 @@ class cmi5_progressTest extends TestCase
 
     protected function tearDown(): void
     {
-        global $sessionids;
+        global $sessionids, $testcourseid, $cmi5launchsettings;
         // Restore overridden global variable.
         unset($GLOBALS['USER']);
         unset($GLOBALS['cmi5launchsettings']);
-
+        deletetestcmi5launch_usercourse($testcourseid);
         deletetestcmi5launch_sessions($sessionids);
     }
 
@@ -974,9 +974,6 @@ class cmi5_progressTest extends TestCase
         {
             global $CFG, $DB, $sessionids;
 
-            // First create a fake session to pass to the function.
-            $sessions = maketestsessions();
-
             // Retrieve a sessionid, we'll just use the first one.
             $sessionid = $sessionids[1];
       
@@ -1039,9 +1036,6 @@ class cmi5_progressTest extends TestCase
     {
         global $CFG, $DB, $sessionids;
 
-        // First create a fake session to pass to the function.
-        $sessions = maketestsessions();
-
         // Retrieve a sessionid, we'll just use the first one.
         $sessionid = $sessionids[1];
   
@@ -1102,9 +1096,6 @@ class cmi5_progressTest extends TestCase
         
     {
         global $CFG, $DB, $sessionids;
-
-        // First create a fake session to pass to the function.
-        $sessions = maketestsessions();
 
         // Retrieve a sessionid, we'll just use the first one.
         $sessionid = $sessionids[1];

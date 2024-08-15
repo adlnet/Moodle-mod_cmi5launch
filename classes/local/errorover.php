@@ -68,6 +68,24 @@ function progresslrsreq_warning($errno, $errstr, $errfile, $errline)
 }
 
 /**
+ * An warning handler to use to post better warnings to users for troubleshooting. 
+ * @param mixed $errno
+ * @param mixed $errstr
+ * @param mixed $errfile
+ * @param mixed $errline
+ * @throws \mod_cmi5launch\local\nullException
+ * @return never
+ */
+function custom_warningAU($errno, $errstr, $errfile, $errline)
+{
+    echo "Error loading session table on AUview page. Report this to system administrator: <br> $errstr at $errfile on $errline: Check that session information is present in DB and session id is correct.";
+    
+    exit;
+
+}
+
+
+/**
  * An exception handler to use in AU cases when many different exceptions for data errors may be thrown. 
  * @param mixed $errno
  * @param mixed $errstr
@@ -216,6 +234,45 @@ class playerException extends \Exception
 
     public function customFunction() {
         echo "  This error to string            :";
+      //  $this->getTraceAsString();
+    }
+}
+
+/**
+ * Define a custom exception class, this will make pour tests meaningful
+ * This is a catchall custom
+ * from php webpage: "Custom exception classes can allow you to write tests that prove your exceptions
+    *  are meaningful. Usually testing exceptions, you either assert the message equals
+*something in which case you can't change the message format without refactoring,
+*or not make any assertions at all in which case you can get misleading messages
+*later down the line. Especially if your $e->getMessage is something complicated
+*like a var_dump'ed context array."
+ */
+class customException extends \Exception
+{
+    // Redefine the exception so message isn't optional
+    // I want an exception that takkkes what is missing and adds it to messsssage? 
+    // Is this possivlbe? 
+    public function __construct($message, $code = 0, Throwable $previous = null) {
+        // some code
+
+        // Ah maybe here is where I can differentiate them
+        $playermessage = "Caught error. Something went wrong " . $message;
+        // make sure everything is assigned properly
+        parent::__construct($playermessage, $code, $previous);
+
+        echo"$playermessage";
+    }
+
+   
+    // custom string representation of object (what is returned with echo)
+    public function __toString(): string {
+        return __CLASS__ . ": [{$this->code}]: {$this->message}\n";
+        // maybe here?
+    }
+
+    public function customFunction() {
+    //    echo "  This error to string            :";
       //  $this->getTraceAsString();
     }
 }

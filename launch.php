@@ -56,7 +56,7 @@ $sessionhelper = new session_helpers;
 $savesession = $sessionhelper->cmi5launch_get_create_session();
 $cmi5launchretrieveurl = $connectors->cmi5launch_get_retrieve_url();
 $retrieveaus = $auhelper->get_cmi5launch_retrieve_aus_from_db();
-
+/*
 // Retrieve registration id and au index (from AUview.php).
 $fromauview = required_param('launchform_registration', PARAM_TEXT);
 
@@ -65,7 +65,8 @@ $idandstatus = explode(",", $fromauview);
 
 // Retrieve AU OR session id.
 $id = array_shift($idandstatus);
-
+*/
+$id = required_param('launchform_registration', PARAM_TEXT);
 // Reload cmi5 instance.
 $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
 

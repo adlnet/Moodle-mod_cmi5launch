@@ -22,11 +22,16 @@
  */
 
 use mod_cmi5launch\local\session_helpers;
+use mod_cmi5launch\local\customException;
 use mod_cmi5launch\local\au_helpers;
-
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require('header.php');
 require_once("$CFG->dirroot/lib/outputcomponents.php");
+
+
+// Include the errorover (error override) funcs.
+require_once ($CFG->dirroot . '/mod/cmi5launch/classes/local/errorover.php');
+
 
 require_login($course, false, $cm);
 
@@ -99,12 +104,10 @@ echo $OUTPUT->header();
     </script>
 <?php
 
+// Is this all necessary? Cant the data come through on its own
+
 // Retrieve the registration and AU ID from view.php.
-$fromview = required_param('AU_view', PARAM_TEXT);
-// Break it into array (AU is first index).
-$fromview = explode(",", $fromview);
-// Retrieve AU ID.
-$auid = array_shift($fromview);
+$auid = required_param('AU_view', PARAM_TEXT);
 
 // First thing check for updates.
 cmi5launch_update_grades($cmi5launch, $USER->id);
@@ -121,65 +124,78 @@ $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
 // Reload user course instance.
 $userscourse = $DB->get_record('cmi5launch_usercourse', ['courseid'  => $record->courseid, 'userid'  => $USER->id]);
 
-// Retrieve the registration id.
-$regid = $userscourse->registrationid;
-
 // If it is null there have been no previous sessions.
 if (!$au->sessions == null) {
 
-    // Array to hold info for table population.
-    $tabledata = array();
+    try{
 
-    // Build table.
-    $table = new html_table();
-    $table->id = 'cmi5launch_auSessionTable';
-    $table->caption = get_string('modulenameplural', 'cmi5launch');
-    $table->head = array(
-    get_string('cmi5launchviewfirstlaunched', 'cmi5launch'),
-    get_string('cmi5launchviewlastlaunched', 'cmi5launch'),
-    get_string('cmi5launchviewprogress', 'cmi5launch'),
-    get_string('cmi5launchviewgradeheader', 'cmi5launch'),
-    );
+        // Set error and exception handler to catch and override the default PHP error messages, to make messages more user friendly.
+        set_error_handler('mod_cmi5launch\local\custom_warningAU', E_WARNING);
+        set_exception_handler('mod_cmi5launch\local\custom_warningAU');
 
-    // Retrieve session ids.
-    $sessionids = json_decode($au->sessions);
+        // Array to hold info for table population.
+        $tabledata = array();
 
-    // Iterate through each session by id.
-    foreach ($sessionids as $key => $sessionid) {
+        // Build table.
+        $table = new html_table();
+        $table->id = 'cmi5launch_auSessionTable';
+        $table->caption = get_string('modulenameplural', 'cmi5launch');
+        $table->head = array(
+        get_string('cmi5launchviewfirstlaunched', 'cmi5launch'),
+        get_string('cmi5launchviewlastlaunched', 'cmi5launch'),
+        get_string('cmi5launchviewprogress', 'cmi5launch'),
+        get_string('cmi5launchviewgradeheader', 'cmi5launch'),
+        );
 
-        // Get the session from DB with session id.
-        $session = $DB->get_record('cmi5launch_sessions', array('sessionid' => $sessionid));
-               
-        // Array to hold data for table.
-        $sessioninfo = array();
 
-      
-        if ($session->createdat != null) {
+        // Retrieve session ids.
+        $sessionids = json_decode($au->sessions);
 
-            // Retrieve createdAt and format.
-            $date = new DateTime($session->createdat, new DateTimeZone('US/Eastern'));
-            $date->setTimezone(new DateTimeZone('America/New_York'));
-            // date_timezone_set($date, new DateTimeZone('America/New_York'));
-            $sessioninfo[] = $date->format('D d M Y H:i:s');
-        }
+        // Iterate through each session by id.
+        foreach ($sessionids as $key => $sessionid) {
 
-        if ($session->lastrequesttime != null) {
+            // Get the session from DB with session id.
+            $session = $DB->get_record('cmi5launch_sessions', array('sessionid' => $sessionid));
 
-            // Retrieve lastRequestTime and format.
-            $date = new DateTime($session->lastrequesttime, new DateTimeZone('US/Eastern'));
-            $date->setTimezone(new DateTimeZone('America/New_York'));
-            $sessioninfo[] = $date->format('D d M Y H:i:s');
-        }
-        // Add progress to table.
-        $sessioninfo[] = ("<pre>" . implode("\n ", json_decode($session->progress) ) . "</pre>");
+            // Array to hold data for table.
+            $sessioninfo = array();
 
-        // Add score to table.
-        $sessioninfo[] = $session->score;
-        // Add score to array for AU.
-        $sessionscores[] = $session->score;
 
-        // Add to be fed to table.
-        $tabledata[] = $sessioninfo;
+            if ($session->createdat != null) {
+
+                // Retrieve createdAt and format.
+                $date = new DateTime($session->createdat, new DateTimeZone('US/Eastern'));
+                $date->setTimezone(new DateTimeZone('America/New_York'));
+                // date_timezone_set($date, new DateTimeZone('America/New_York'));
+                $sessioninfo[] = $date->format('D d M Y H:i:s');
+            }
+
+            if ($session->lastrequesttime != null) {
+
+                // Retrieve lastRequestTime and format.
+                $date = new DateTime($session->lastrequesttime, new DateTimeZone('US/Eastern'));
+                $date->setTimezone(new DateTimeZone('America/New_York'));
+                $sessioninfo[] = $date->format('D d M Y H:i:s');
+            }
+            // Add progress to table.
+            $sessioninfo[] = ("<pre>" . implode("\n ", json_decode($session->progress)) . "</pre>");
+
+            // Add score to table.
+            $sessioninfo[] = $session->score;
+            // Add score to array for AU.
+            $sessionscores[] = $session->score;
+
+            // Add to be fed to table.
+            $tabledata[] = $sessioninfo;
+        } 
+    } catch (Exception $e) {
+
+        // Restore default hadlers.
+        restore_exception_handler();
+        restore_error_handler();
+
+        // Throw an exception.
+        throw new customException('loading session table on AUview page. Report this to system administrator: ' . $e->getMessage() . 'Check that session information is present in DB and session id is correct.' , 0);
     }
 
     // Write table.
@@ -188,17 +204,17 @@ if (!$au->sessions == null) {
 
     // Update AU in table with new info.
     $DB->update_record('cmi5launch_aus', $au);
+
+    // Restore default hadlers.
+    restore_exception_handler();
+    restore_error_handler();
 }
 
-// Build the new session link.
-$newsession = "true";
-// Create a string to pass the auid and new session info to next page (launch.php).
-$infofornextpage = $auid . "," . $newsession;
-
+// Pass the auid and new session info to next page (launch.php).
 // New attempt button.
 echo "<p tabindex=\"0\"onkeyup=\"key_test('"
-    . $infofornextpage . "')\"id='cmi5launch_newattempt'><button onclick=\"mod_cmi5launch_launchexperience('"
-    . $infofornextpage
+    . $auid . "')\"id='cmi5launch_newattempt'><button onclick=\"mod_cmi5launch_launchexperience('"
+    . $auid
     . "')\" style=\"cursor: pointer;\">"
     . get_string('cmi5launch_attempt', 'cmi5launch')
     . "</button></p>";
