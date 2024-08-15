@@ -83,7 +83,21 @@ function custom_warningAU($errno, $errstr, $errfile, $errline)
     exit;
 
 }
+/**
+ * An warning handler to use to post better warnings to users for troubleshooting. 
+ * @param mixed $errno
+ * @param mixed $errstr
+ * @param mixed $errfile
+ * @param mixed $errline
+ * @throws \mod_cmi5launch\local\nullException
+ * @return never
+ */
+function custom_warning($errno, $errstr, $errfile, $errline)
+{
+    
+    throw new customException('Error launching experience.  Report this to system administrator: <br> '. $errstr .' at '. $errfile .' on ' .$errline, 0);
 
+}
 
 /**
  * An exception handler to use in AU cases when many different exceptions for data errors may be thrown. 
