@@ -69,12 +69,12 @@ if ($mform->is_cancelled()) {
         $tenant = $createtenant($cmi5tenant);
 
         // The return response should be json and have 'id' and 'code' 
-        $response = $tenant;
+        $response = json_decode($tenant, true);
 
         // Save the code as the tenant name and ID as ID.
         $name = $response['code'];
         $id = $response['id'];
-
+https://github.com/aaiirr123/Moodle-mod_cmi5launch.git
         echo "Tenant code: " . $name . "<br>";
         echo "Tenant ID: " . $id . "<br>";
 
