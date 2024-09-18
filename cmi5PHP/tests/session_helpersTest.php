@@ -185,17 +185,36 @@ class session_helpersTest extends TestCase
 	{
 		global $DB, $cmi5launch, $cmi5launchid, $sessionids, $USER;
 
+		
 		// Fake values. 
 		$sessionid = '100';
 		$launchurl = "http://test.com";
 		$launchmethod = "ownWindow";
 		$tenantname = $USER->username;
 
+		// We need to make a fake session for the mocked function to return.
+		 // Make a new record to save.
+		 $mockedsession = new \stdClass();
+		 // Because of many nested properties, needs to be done manually.
+		 $mockedsession->sessionid = $sessionid;
+		 $mockedsession->launchurl = $launchurl;
+		 $mockedsession->tenantname = $USER->username;
+		 $mockedsession->launchmethod = $launchmethod;
+		 // I think here is where we eed to implement : moodlecourseid
+		 $mockedsession->moodlecourseid = $cmi5launch->id;
+		 // And userid!
+		 $mockedsession->userid = $USER->id;
+		
 		// New session_helpers from mod_cmi5launch
 		$helpers = new \mod_cmi5launch\local\session_helpers();
 
+		// Create a mock since we need to mock the update session function.
+		$mock = $this->getMockBuilder($helpers::class)
+                     ->onlyMethods(['cmi5launch_update_sessions']) // Specify only the allowed method
+                     ->getMock();
+
 		// Result of the function.
-		$resultid = $helpers->cmi5launch_create_session($sessionid, $launchurl, $launchmethod);
+		$resultid = $mock->cmi5launch_create_session($sessionid, $launchurl, $launchmethod);
 
 		// Returns a new id.
 		$this->assertIsInt($resultid, "Result should be an int.");
