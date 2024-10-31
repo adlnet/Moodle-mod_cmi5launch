@@ -22,6 +22,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+
 use mod_cmi5launch\local\cmi5_connectors;
 use mod_cmi5launch\local\au_helpers;
 use mod_cmi5launch\local\customException;
@@ -38,6 +39,87 @@ require_login($course, false, $cm);
 
 global $CFG, $cmi5launch, $USER, $DB;
 
+function abandonCourse($session, $cmi5launch, $au) {
+
+    $settings = cmi5launch_settings($session->id);
+
+    $actor = cmi5launch_getactor($cmi5launch->id);
+    $data = array(
+        'actor' => $actor,
+        'verb' => array(
+            "id" => "https://w3id.org/xapi/adl/verbs/abandoned",
+            "display" => array(
+                "en-US" => "abandoned"
+            )
+        ),
+        'object' => array(
+            'objectType' => 'Activity',
+            'id' => $au->lmsid
+        ),
+        
+        "timestamp" => date("c") 
+    );
+
+    // Assign passed in function to variable.
+    $stream = 'cmi5launch_stream_and_send';
+       // Make sure LRS settings are there.
+       try {
+           // Url to request statements from.
+           $url = $settings['cmi5launchlrsendpoint'] . "statements";
+           // Build query with data above.
+           $url = $url . '?' . http_build_query($data, "", '&', PHP_QUERY_RFC1738);
+
+           // LRS username and password.
+           $user = $settings['cmi5launchlrslogin'];
+           $pass = $settings['cmi5launchlrspass'];
+       }
+       catch (\Throwable $e) {
+
+          // Throw exception if settings are missing.
+          Throw new nullException('Unable to retrieve LRS settings. Caught exception: '. $e->getMessage() . " Check LRS settings are correct.");
+       }
+
+       // Set error and exception handler to catch and override the default PHP error messages, to make messages more user friendly.
+       set_error_handler('mod_cmi5launch\local\progresslrsreq_warning', E_WARNING);
+       set_exception_handler('mod_cmi5launch\local\exception_progresslrsreq');
+
+       // Use key 'http' even if you send the request to https://...
+       // There can be multiple headers but as an array under the ONE header.
+       // Content(body) must be JSON encoded here, as that is what CMI5 player accepts.
+       $options = array(
+           'http' => array(
+               'method' => 'POST',
+               'header' => array(
+                   'Authorization: Basic ' . base64_encode("$user:$pass"),
+                   "Content-Type: application/json\r\n" .
+                   "X-Experience-API-Version:1.0.3",
+               ),
+           ),
+       );
+
+      try {
+          //By calling the function this way, it enables encapsulation of the function and allows for testing.
+               //It is an extra step, but necessary for required PHP Unit testing.
+               $result = call_user_func($stream, $options, $url);
+
+           // Decode result.
+           $resultdecoded = json_decode($result, true);
+           
+           // Restore default hadlers.
+           restore_exception_handler();
+           restore_error_handler();
+                 
+           return $resultdecoded;
+       
+       } catch (\Throwable $e) {
+           
+           // Restore default hadlers.
+           restore_exception_handler();
+           restore_error_handler();
+
+           throw new nullException('Unable to communicate with LRS. Caught exception: ' . $e->getMessage() . " Check LRS is up, username and password are correct, and LRS endpoint is correct.", 0);
+       }
+}
 // MB - currently not utilizing events, but may in future.
 /*
 // Trigger Activity launched event.
@@ -77,12 +159,19 @@ $location = "";
 set_error_handler('mod_cmi5launch\local\custom_warning', E_WARNING);
 //set_exception_handler('mod_cmi5launch\local\customException');
 
+
+
 try {
+
     // Retrieve AUs.
     $au = $retrieveaus($id);
 
     // Retrieve the au index.
     $auindex = $au->auindex;
+
+    $session = $DB->get_record('cmi5launch_sessions', array('sessionid' => $au->sessions[0]));
+
+    abandonCourse( $session, $cmi5launch, $au);
 
     // Pass in the au index to retrieve a launchurl and session id.
     $urldecoded = $cmi5launchretrieveurl($cmi5launch->id, $auindex);
