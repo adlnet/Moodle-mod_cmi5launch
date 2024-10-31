@@ -27,6 +27,13 @@ use mod_cmi5launch\local\cmi5_connectors;
 use mod_cmi5launch\local\au_helpers;
 use mod_cmi5launch\local\customException;
 use mod_cmi5launch\local\session_helpers;
+use cmi5\Agent;
+require_once("$CFG->dirroot/mod/cmi5launch/lib.php");
+
+// Cmi5PHP - required for interacting with the LRS in cmi5launch_get_statements.
+require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/autoload.php");
+// SCORM library from the SCORM module. Required for its xml2Array class by cmi5launch_process_new_package.
+require_once("$CFG->dirroot/mod/scorm/datamodels/scormlib.php");
 
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require('header.php');
@@ -34,22 +41,22 @@ require_once("$CFG->dirroot/lib/outputcomponents.php");
 
 // Include the errorover (error override) funcs.
 require_once ($CFG->dirroot . '/mod/cmi5launch/classes/local/errorover.php');
-// Cmi5PHP - required for interacting with the LRS in cmi5launch_get_statements.
-require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/autoload.php");
 
-// SCORM library from the SCORM module. Required for its xml2Array class by cmi5launch_process_new_package.
-require_once("$CFG->dirroot/mod/scorm/datamodels/scormlib.php");
 require_login($course, false, $cm);
 
 global $CFG, $cmi5launch, $USER, $DB;
 
-function abandonCourse($session, $cmi5launch, $au) {
+function abandonCourse($session, $au, $actorname) {
 
     $settings = cmi5launch_settings($session->id);
 
-    $actor = cmi5launch_getactor($cmi5launch->id);
     $data = array(
-        'actor' => $actor,
+         'actor' => array(
+                'account' => array(
+                    "homePage" => $settings['cmi5launchcustomacchp'],
+                    "name" => $actorname,
+                ),
+            ),
         'verb' => array(
             "id" => "https://w3id.org/xapi/adl/verbs/abandoned",
             "display" => array(
@@ -176,7 +183,7 @@ try {
     $sessionId = end($sessionids);
     $session = $DB->get_record('cmi5launch_sessions', array('sessionid' => $sessionId));
 
-    abandonCourse( $session, $cmi5launch, $au);
+    abandonCourse( $session, $au, $USER->name);
 
     // Pass in the au index to retrieve a launchurl and session id.
     $urldecoded = $cmi5launchretrieveurl($cmi5launch->id, $auindex);
