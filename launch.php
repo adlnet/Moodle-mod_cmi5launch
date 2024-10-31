@@ -68,7 +68,7 @@ function abandonCourse($session, $au, $actorname) {
             'id' => $au->lmsid
         ),
         
-        "timestamp" => date("c") 
+        "timestamp" => date("c"),
     );
 
     // Assign passed in function to variable.
@@ -183,7 +183,7 @@ try {
     $sessionId = end($sessionids);
     $session = $DB->get_record('cmi5launch_sessions', array('sessionid' => $sessionId));
 
-    abandonCourse( $session, $au, $USER->name);
+    abandonCourse( $session, $au, $USER->username);
 
     // Pass in the au index to retrieve a launchurl and session id.
     $urldecoded = $cmi5launchretrieveurl($cmi5launch->id, $auindex);
