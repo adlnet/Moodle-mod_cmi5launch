@@ -42,7 +42,7 @@ function abandonCourse($session, $au, $actorname) {
 
     $settings = cmi5launch_settings($session->id);
 
-    $data = array(
+    $statement = array(
          'actor' => array(
                 'account' => array(
                     "homePage" => $settings['cmi5launchcustomacchp'],
@@ -64,8 +64,8 @@ function abandonCourse($session, $au, $actorname) {
     );
 
     echo "<h1>Data</h1>";
-    var_dump($data);
-
+    var_dump($statement);
+    $statement_json = json_encode($statement);
 
 
     
@@ -76,8 +76,7 @@ function abandonCourse($session, $au, $actorname) {
        try {
            // Url to request statements from.
            $url = $settings['cmi5launchlrsendpoint'] . "statements";
-           // Build query with data above.
-           $url = $url . '?' . http_build_query($data, "", '&', PHP_QUERY_RFC1738);
+          
 
            // LRS username and password.
            $user = $settings['cmi5launchlrslogin'];
@@ -109,6 +108,7 @@ function abandonCourse($session, $au, $actorname) {
                    "Content-Type: application/json\r\n" .
                    "X-Experience-API-Version:1.0.3",
                ),
+               'content' => $statement_json
            ),
        );
 
