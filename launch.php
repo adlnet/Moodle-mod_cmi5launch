@@ -34,7 +34,11 @@ require_once("$CFG->dirroot/lib/outputcomponents.php");
 
 // Include the errorover (error override) funcs.
 require_once ($CFG->dirroot . '/mod/cmi5launch/classes/local/errorover.php');
+// Cmi5PHP - required for interacting with the LRS in cmi5launch_get_statements.
+require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/autoload.php");
 
+// SCORM library from the SCORM module. Required for its xml2Array class by cmi5launch_process_new_package.
+require_once("$CFG->dirroot/mod/scorm/datamodels/scormlib.php");
 require_login($course, false, $cm);
 
 global $CFG, $cmi5launch, $USER, $DB;
