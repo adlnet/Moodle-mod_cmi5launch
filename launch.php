@@ -41,14 +41,15 @@ global $CFG, $cmi5launch, $USER, $DB;
 function abandonCourse($session, $au, $actorname) {
 
     $settings = cmi5launch_settings($session->id);
+    $agent = array(
+        'account' => array(
+            "homePage" => $settings['cmi5launchcustomacchp'],
+            "name" => $actorname,
+        ),
+    );
 
     $statement = array(
-         'actor' => array(
-                'account' => array(
-                    "homePage" => $settings['cmi5launchcustomacchp'],
-                    "name" => $actorname,
-                ),
-            ),
+         'actor' => $agent,
         'verb' => array(
             "id" => "https://w3id.org/xapi/adl/verbs/abandoned",
             "display" => array(
@@ -64,7 +65,11 @@ function abandonCourse($session, $au, $actorname) {
     );
 
     echo "<h1>Data</h1>";
+    echo "<h1>clear state</h1>";
+    clearLrsState($session, $au->lmsid, $agent);
+    
     var_dump($statement);
+
     $statement_json = json_encode($statement);
 
 
@@ -136,6 +141,67 @@ function abandonCourse($session, $au, $actorname) {
 
            throw new nullException('Unable to communicate with LRS. Caught exception: ' . $e->getMessage() . " Check LRS is up, username and password are correct, and LRS endpoint is correct.", 0);
        }
+}
+
+function clearLrsState($session, $activityId, $agent) {
+    // Retrieve LRS settings from the session
+    $settings = cmi5launch_settings($session->id);
+
+    // Define the LRS endpoint for the state API
+    $url = $settings['cmi5launchlrsendpoint'] . "activities/state";
+    
+    // LRS credentials
+    $user = $settings['cmi5launchlrslogin'];
+    $pass = $settings['cmi5launchlrspass'];
+
+    // Build query parameters for the DELETE request
+    $url .= "?activityId=" . urlencode($activityId) . "&agent=" . urlencode(json_encode($agent));
+
+    // Set up the HTTP headers and options, as in your original style
+    $options = array(
+        'http' => array(
+            'method' => 'DELETE',
+            'header' => array(
+                'Authorization: Basic ' . base64_encode("$user:$pass"),
+                "Content-Type: application/json\r\n" .
+                "X-Experience-API-Version:1.0.3",
+            ),
+        )
+    );
+
+    // Prepare the callable function to handle the HTTP request
+    $stream = 'cmi5launch_stream_and_send';
+
+    // Set error and exception handlers
+    set_error_handler('mod_cmi5launch\local\progresslrsreq_warning', E_WARNING);
+    set_exception_handler('mod_cmi5launch\local\exception_progresslrsreq');
+
+    try {
+        // Call the function encapsulated for testing
+        echo "<h1>Deleting State Data</h1>";
+        $result = call_user_func($stream, $options, $url);
+
+        // Decode and check response for debugging
+        $resultdecoded = json_decode($result, true);
+        var_dump($resultdecoded);
+
+        // Restore handlers
+        restore_exception_handler();
+        restore_error_handler();
+
+        if ($resultdecoded === null && json_last_error() === JSON_ERROR_NONE) {
+            // Successfully deleted (assuming a 204 or empty response)
+            return "State data cleared successfully!";
+        } else {
+            return "Failed to clear state data. Response: " . var_export($resultdecoded, true);
+        }
+    } catch (\Throwable $e) {
+        // Restore handlers on error
+        restore_exception_handler();
+        restore_error_handler();
+
+        throw new nullException('Unable to communicate with LRS to delete state data. Caught exception: ' . $e->getMessage(), 0);
+    }
 }
 // MB - currently not utilizing events, but may in future.
 /*
