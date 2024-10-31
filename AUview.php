@@ -182,8 +182,12 @@ if (!$au->sessions == null) {
 
             // Add score to table.
             $sessioninfo[] = $session->score;
+
             // Add score to array for AU.
             $sessionscores[] = $session->score;
+
+            // Add abandon button
+            $sessioninfo[] = ("<button> Abandon </button>");
 
             // Add to be fed to table.
             $tabledata[] = $sessioninfo;
