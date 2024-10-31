@@ -22,7 +22,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
+namespace mod_cmi5launch\local;
 use mod_cmi5launch\local\cmi5_connectors;
 use mod_cmi5launch\local\au_helpers;
 use mod_cmi5launch\local\customException;
@@ -146,7 +146,6 @@ $id = required_param('launchform_registration', PARAM_TEXT);
 
 // Reload cmi5 instance.
 $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
-
 // Retrieve user's course record.
 $userscourse = $DB->get_record('cmi5launch_usercourse', ['courseid'  => $record->courseid, 'userid'  => $USER->id]);
 
@@ -168,8 +167,10 @@ try {
 
     // Retrieve the au index.
     $auindex = $au->auindex;
-
-    $session = $DB->get_record('cmi5launch_sessions', array('sessionid' => $au->sessions[0]));
+    var_dump($au);
+    $sessionids = json_decode($au->sessions);
+    $sessionId = end($sessionids);
+    $session = $DB->get_record('cmi5launch_sessions', array('sessionid' => $sessionId));
 
     abandonCourse( $session, $cmi5launch, $au);
 
