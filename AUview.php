@@ -145,6 +145,7 @@ if (!$au->sessions == null) {
         get_string('cmi5launchviewlastlaunched', 'cmi5launch'),
         get_string('cmi5launchviewprogress', 'cmi5launch'),
         get_string('cmi5launchviewgradeheader', 'cmi5launch'),
+        'Abandon'
         );
 
 
@@ -186,6 +187,8 @@ if (!$au->sessions == null) {
 
             // Add to be fed to table.
             $tabledata[] = $sessioninfo;
+
+
         } 
     } catch (Exception $e) {
 

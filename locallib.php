@@ -130,7 +130,7 @@ function cmi5launch_get_creds_learninglocker($basiclogin, $basicpass, $url, $exp
         'expiry' => $expiry->format(DATE_ATOM),
         'historical' => false,
         'actors' => array(
-            "objectType" => 'Agent',
+            "objectType" => 'Person',
             "name" => array($actor->getName()),
         ),
         'auth' => $actor,
