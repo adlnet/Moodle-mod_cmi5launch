@@ -217,7 +217,7 @@ echo "<p tabindex=\"0\"onkeyup=\"key_test('"
     . "')\" style=\"cursor: pointer;\">"
     . get_string('cmi5launch_attempt', 'cmi5launch')
     . "</button></p>";
-
+echo "<button>Abandon AU</button>";
 // Add a form to be posted based on the attempt selected.
 ?>
     <form id="launchform" action="launch.php" method="get">
