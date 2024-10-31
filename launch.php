@@ -26,14 +26,6 @@ namespace mod_cmi5launch\local;
 use mod_cmi5launch\local\cmi5_connectors;
 use mod_cmi5launch\local\au_helpers;
 use mod_cmi5launch\local\customException;
-use mod_cmi5launch\local\session_helpers;
-use cmi5\Agent;
-require_once("$CFG->dirroot/mod/cmi5launch/lib.php");
-
-// Cmi5PHP - required for interacting with the LRS in cmi5launch_get_statements.
-require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/autoload.php");
-// SCORM library from the SCORM module. Required for its xml2Array class by cmi5launch_process_new_package.
-require_once("$CFG->dirroot/mod/scorm/datamodels/scormlib.php");
 
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require('header.php');
