@@ -24,6 +24,7 @@
 use mod_cmi5launch\local\session_helpers;
 use mod_cmi5launch\local\customException;
 use mod_cmi5launch\local\au_helpers;
+use mod_cmi5launch\local\progress;
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require('header.php');
 require_once("$CFG->dirroot/lib/outputcomponents.php");
@@ -35,14 +36,95 @@ require_once ($CFG->dirroot . '/mod/cmi5launch/classes/local/errorover.php');
 
 require_login($course, false, $cm);
 
-global $cmi5launch, $USER;
+global $cmi5launch, $USER; 
 
 // Classes and functions.
 $auhelper = new au_helpers;
 $sessionhelper = new session_helpers;
 $retrievesession = $sessionhelper->cmi5launch_get_retrieve_sessions_from_db();
 $retrieveaus = $auhelper->get_cmi5launch_retrieve_aus_from_db();
+$progress = new progress;
 
+function abandonCourse($session, $registrationid, $cmi5launch, $auid) {
+    $settings = cmi5launch_settings($session->id);
+
+    $actor = cmi5launch_getactor($cmi5launch->id);
+    $data = array(
+        'actor' => $actor,
+        'verb' => array(
+            "id" => "https://w3id.org/xapi/adl/verbs/abandoned",
+            "display" => array(
+                "en-US" => "abandoned"
+            )
+        ),
+        'object' => array(
+            'objectType' => 'Activity',
+            'id' => $auid
+        ),
+        
+        "timestamp" => date("c") 
+    );
+
+    // Assign passed in function to variable.
+    $stream = 'cmi5launch_stream_and_send';
+       // Make sure LRS settings are there.
+       try {
+           // Url to request statements from.
+           $url = $settings['cmi5launchlrsendpoint'] . "statements";
+           // Build query with data above.
+           $url = $url . '?' . http_build_query($data, "", '&', PHP_QUERY_RFC1738);
+
+           // LRS username and password.
+           $user = $settings['cmi5launchlrslogin'];
+           $pass = $settings['cmi5launchlrspass'];
+       }
+       catch (\Throwable $e) {
+
+          // Throw exception if settings are missing.
+          Throw new nullException('Unable to retrieve LRS settings. Caught exception: '. $e->getMessage() . " Check LRS settings are correct.");
+       }
+
+       // Set error and exception handler to catch and override the default PHP error messages, to make messages more user friendly.
+       set_error_handler('mod_cmi5launch\local\progresslrsreq_warning', E_WARNING);
+       set_exception_handler('mod_cmi5launch\local\exception_progresslrsreq');
+
+       // Use key 'http' even if you send the request to https://...
+       // There can be multiple headers but as an array under the ONE header.
+       // Content(body) must be JSON encoded here, as that is what CMI5 player accepts.
+       $options = array(
+           'http' => array(
+               'method' => 'POST',
+               'header' => array(
+                   'Authorization: Basic ' . base64_encode("$user:$pass"),
+                   "Content-Type: application/json\r\n" .
+                   "X-Experience-API-Version:1.0.3",
+               ),
+           ),
+       );
+
+      try {
+          //By calling the function this way, it enables encapsulation of the function and allows for testing.
+               //It is an extra step, but necessary for required PHP Unit testing.
+               $result = call_user_func($stream, $options, $url);
+
+           // Decode result.
+           $resultdecoded = json_decode($result, true);
+           
+           // Restore default hadlers.
+           restore_exception_handler();
+           restore_error_handler();
+                 
+           return $resultdecoded;
+       
+       } catch (\Throwable $e) {
+           
+           // Restore default hadlers.
+           restore_exception_handler();
+           restore_error_handler();
+
+           throw new nullException('Unable to communicate with LRS. Caught exception: ' . $e->getMessage() . " Check LRS is up, username and password are correct, and LRS endpoint is correct.", 0);
+       }
+}
 // MB - Not currently using events, but may in future.
 /*
 // Trigger module viewed event.
@@ -95,6 +177,14 @@ echo $OUTPUT->header();
             $('#launchform').submit();
         }
 
+        // // Function to run when the experience is launched.
+        // function mod_cmi5launch_abandon(registration) {
+        //     $progress->
+        //     $statements = $progress.cmi5launch_send_request_to_lrs('cmi5launch_stream_and_send', $data, $session->id);
+        // }
+
+
+
         // TODO: there may be a better way to check completion. Out of scope for current project.
         $(document).ready(function() {
             setInterval(function() {
@@ -108,12 +198,16 @@ echo $OUTPUT->header();
 
 // Retrieve the registration and AU ID from view.php.
 $auid = required_param('AU_view', PARAM_TEXT);
-
+echo "auid";
+var_dump($auid);
 // First thing check for updates.
 cmi5launch_update_grades($cmi5launch, $USER->id);
 
 // Retrieve appropriate AU from DB.
 $au = $retrieveaus($auid);
+echo "au";
+
+var_dump($au);
 
 // Array to hold session scores for the AU.
 $sessionscores = array();
@@ -224,7 +318,7 @@ echo "<p tabindex=\"0\"onkeyup=\"key_test('"
     . "')\" style=\"cursor: pointer;\">"
     . get_string('cmi5launch_attempt', 'cmi5launch')
     . "</button></p>";
-echo "<button>Abandon AU</button>";
+
 // Add a form to be posted based on the attempt selected.
 ?>
     <form id="launchform" action="launch.php" method="get">
