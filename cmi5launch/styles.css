@@ -14,7 +14,7 @@
     border-collapse: collapse;
     table-layout: fixed;
     margin: 1em;
-    font-size: 14px;
+    font-size: 18px;
 }
 
 .custom-cmi5launch-table tr {
@@ -26,7 +26,8 @@
     word-wrap: break-word; /* Forces long words to break */
 }
 
-.cmi5launch-table th, .cmi5launch-table td {
+.cmi5launch-table th, 
+.cmi5launch-table td {
     padding: 8px;
     text-align: left;
     border-bottom: 1px solid #ddd;
