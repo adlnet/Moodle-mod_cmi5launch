@@ -72,7 +72,7 @@ echo $OUTPUT->header();
 // Create the back button.
 ?>
 <form action="view.php" method="get">
-    <input id="id" name="id" type="hidden" value="<?php echo $id ?>">
+    <input class="btn btn-primary" id="id" name="id" type="hidden" value="<?php echo $id ?>">
   <input type="submit" value="Back"/>
 </form>
 <?php
@@ -251,7 +251,7 @@ echo "<p tabindex=\"0\" onkeyup=\"key_test('" . $auid . "')\" id='cmi5launch_new
 if ($au->sessions !== null)
 {
     echo "<p tabindex=\"0\"onkeyup=\"key_test('"
-    . $auid . "')\"id='cmi5launch_newattempt'><button onclick=\"restartSession('"
+    . $auid . "')\"id='cmi5launch_newattempt'><button class=\"btn btn-primary\" onclick=\"restartSession('"
     . $auid
     . "')\" style=\"cursor: pointer;\">"
     . "Restart AU"
