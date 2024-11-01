@@ -241,19 +241,22 @@ $sessionids = json_decode($au->sessions);
 
 // Pass the auid and new session info to next page (launch.php).
 // New attempt button.
-echo "<p tabindex=\"0\"onkeyup=\"key_test('"
-    . $auid . "')\"id='cmi5launch_newattempt'><button onclick=\"resumeSession('"
-    . $auid
-    . "')\" style=\"cursor: pointer;\">"
-    . "Resume Session"
-    . "</button></p>";
+
+echo "<p tabindex=\"0\" onkeyup=\"key_test('" . $auid . "')\" id='cmi5launch_newattempt'>
+<button onclick=\"resumeSession('" . $auid . "')\" style=\"cursor: pointer;\">"
+. ($au->sessions === null ? "Start AU" : "Resume AU")
+. "</button>
+</p>";
+
 
 echo "<p tabindex=\"0\"onkeyup=\"key_test('"
-    . $auid . "')\"id='cmi5launch_newattempt'><button onclick=\"restartSession('"
-    . $auid
-    . "')\" style=\"cursor: pointer;\">"
-    . "Restart Session"
-    . "</button></p>";
+. $auid . "')\"id='cmi5launch_newattempt'><button onclick=\"restartSession('"
+. $auid
+. "')\" style=\"cursor: pointer;\">"
+. "Restart AU"
+. "</button></p>";
+
+
 
 // Add a form to be posted based on the attempt selected.
 ?>
