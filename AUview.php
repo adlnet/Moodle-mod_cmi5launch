@@ -256,7 +256,18 @@ echo "<p tabindex=\"0\"onkeyup=\"key_test('"
 . "Restart AU"
 . "</button></p>";
 
+$buttonLabel = $au->sessions === null ? "Start AU" : "Resume AU";
+$buttonUrl = new moodle_url('/mod/cmi5launch/launch.php', [
+    'id' => $id,
+    'n' => $n,
+    'launchform_registration' => $auid,
+    'restart' => 'false'
+]);
 
+echo $OUTPUT->single_button($buttonUrl, $buttonLabel, 'get', [
+    'class' => 'btn btn-primary',
+    'formid' => 'launchform'
+]);
 
 // Add a form to be posted based on the attempt selected.
 ?>
