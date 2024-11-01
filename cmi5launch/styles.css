@@ -75,3 +75,38 @@
     background-color: #f9f9f9;
     border: 1px solid #ddd;
 }
+
+.button-container {
+    display: flex;
+    justify-content: center;  /* Center buttons horizontally */
+    gap: 10px;                /* Adds space between the buttons */
+    margin: 15px 0;           /* Adds vertical spacing for the container */
+}
+
+/* Style for each button */
+.button-container .btn {
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 5px;       /* Rounded corners */
+    transition: background-color 0.3s ease; /* Smooth hover transition */
+}
+
+/* Primary button styling */
+.button-container .btn-primary {
+    background-color: #007bff;  /* Primary blue color */
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+/* Hover effect for primary button */
+.button-container .btn-primary:hover {
+    background-color: #0056b3;  /* Darker shade on hover */
+}
+
+/* Focus effect for accessibility */
+.button-container .btn-primary:focus {
+    outline: 2px solid #0056b3;
+    outline-offset: 2px;
+}

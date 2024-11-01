@@ -410,12 +410,6 @@ try {
             onclick=\"mod_cmi5launch_launchexperience('" . $auid . "')\" style='cursor: pointer;'>"
             . get_string('cmi5launchviewlaunchlink', 'cmi5launch') . "</button>";
 
-        $auinfo[] = "<button class=\"btn btn-primary\"  tabindex=\"0\" id='cmi5relaunch_attempt'
-            onkeyup=\"key_test('" . $auid . "')\"
-            onclick=\"mod_cmi5launch_launchexperience('" . $auid . "')\" style='cursor: pointer;'>"
-            . get_string('cmi5launchviewlaunchlink', 'cmi5launch') . "</button>";
-
-
         // Add to be fed to table.
         $tabledata[] = $auinfo;
 
