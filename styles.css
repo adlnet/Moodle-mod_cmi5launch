@@ -9,17 +9,22 @@
     text-align: left;
 }
 
-/* Custom table styling for cmi5launch module */
+.cmi5launch-table-container {
+    width: 100%;
+    overflow-x: auto;           /* Enables horizontal scroll if needed */
+    margin: 0 auto;             /* Centers the table on the page */
+}
+
 .cmi5launch-table {
     width: 100%;
+    max-width: 100%;            /* Ensures the table doesn’t exceed screen width */
     border-collapse: separate;
     border-spacing: 0;
-    margin: 1em;
+    margin: 1em 0;
     font-size: 18px;
     border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
 }
 
 /* Caption styling */

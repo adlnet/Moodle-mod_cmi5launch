@@ -218,8 +218,9 @@ if (!is_null($au->sessions)) {
 
         // Output table
         $table->data = $tabledata;
+        echo "<div class=\"cmi5launch-table-container\">";
         echo html_writer::table($table);
-
+        echo "</div>";
         // Update AU record in the database
         $DB->update_record('cmi5launch_aus', $au);
 
