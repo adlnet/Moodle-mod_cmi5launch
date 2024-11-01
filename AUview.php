@@ -74,7 +74,7 @@ echo $OUTPUT->header();
 ?>
 <form action="view.php" method="get">
     <input id="id" name="id" type="hidden" value="<?php echo $id; ?>">
-    <button type="submit" class="btn btn-primary">Back</button>
+    <button type="submit" class="btn btn-primary resume-btn">Back</button>
 </form>
 <?php
 

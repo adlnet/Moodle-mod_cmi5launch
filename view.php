@@ -220,6 +220,7 @@ $cmid = $cmi5launch->id;
 $table = new html_table();
 $table->id = 'cmi5launch_autable';
 $table->caption = get_string('autableheader', 'cmi5launch');
+$table->attributes['class'] = 'generaltable cmi5launch-table';
 $table->head = array(
     get_string('cmi5launchviewAUname', 'cmi5launch'),
     get_string('cmi5launchviewstatus', 'cmi5launch'),
