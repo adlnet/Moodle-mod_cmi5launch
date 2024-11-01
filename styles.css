@@ -28,11 +28,17 @@
 
 .cmi5launch-table th, 
 .cmi5launch-table td {
-    padding: 8px;
     text-align: left;
     border-bottom: 1px solid #ddd;
-    text-overflow: ellipsis;
+    white-space: normal;
     word-wrap: break-word;
+    word-break: break-all;
+    max-width: 100%;
+    overflow-wrap: break-word;
+    padding: 10px;
+    border: 1px solid #ccc;
+    font-size: 10px;
+    line-height: 1.5;
 }
 
 .cmi5launch-table th {
