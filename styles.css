@@ -45,7 +45,7 @@
 .cmi5launch-table .progress-cell {
     white-space: normal;
     word-wrap: break-word;
-    width: 50%;
+    width: 100%;
 }
 
 .cmi5launch-table th,
