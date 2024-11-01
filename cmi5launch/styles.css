@@ -7,7 +7,15 @@
 #page-mod-cmi5launch-mod.dir-rtl #fitem_id_cmi5launchlrspass input,
 #page-mod-cmi5launch-mod.dir-rtl #fitem_id_cmi5launchlrsversion input
 {direction:ltr;text-align:left;}
+body {
+    background-color: #f0f0f0 !important; /* Light gray background to test CSS */
+}
 
+/* Change font style for the whole page */
+* {
+    font-family: Arial, sans-serif !important; /* Changes font globally to Arial */
+    color: #333 !important;                    /* Set a uniform text color */
+}
 /* Custom table styling for cmi5launch module */
 .cmi5launch-table {
     width: 100%;
