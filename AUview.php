@@ -72,8 +72,8 @@ echo $OUTPUT->header();
 // Create the back button.
 ?>
 <form action="view.php" method="get">
-    <input class="btn btn-primary" id="id" name="id" type="hidden" value="<?php echo $id ?>">
-  <input type="submit" value="Back"/>
+    <input id="id" name="id" type="hidden" value="<?php echo $id; ?>">
+    <button type="submit" class="btn btn-primary">Back</button>
 </form>
 <?php
 
@@ -165,10 +165,8 @@ if (!is_null($au->sessions)) {
         $table->caption = get_string('modulenameplural', 'cmi5launch');
         $table->head = array(
             get_string('cmi5launchviewfirstlaunched', 'cmi5launch'),
-            get_string('cmi5launchviewlastlaunched', 'cmi5launch'),
             get_string('cmi5launchviewprogress', 'cmi5launch'),
             get_string('cmi5launchviewgradeheader', 'cmi5launch'),
-            '<button class="btn btn-danger abandon-session">Abandon</button>'
         );
 
         // Decode and iterate through session IDs
@@ -184,13 +182,6 @@ if (!is_null($au->sessions)) {
                     $createdAt = new DateTime($session->createdat, new DateTimeZone('US/Eastern'));
                     $createdAt->setTimezone(new DateTimeZone('America/New_York'));
                     $sessioninfo[] = "<span class='date-cell'>" . $createdAt->format('D d M Y H:i:s') . "</span>";
-                }
-
-                // Format and add last request time
-                if ($session->lastrequesttime) {
-                    $lastRequestTime = new DateTime($session->lastrequesttime, new DateTimeZone('US/Eastern'));
-                    $lastRequestTime->setTimezone(new DateTimeZone('America/New_York'));
-                    $sessioninfo[] = "<span class='date-cell'>" . $lastRequestTime->format('D d M Y H:i:s') . "</span>";
                 }
 
                 // Add progress information
