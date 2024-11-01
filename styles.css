@@ -99,3 +99,8 @@
 .restart-btn:hover {
     background-color: #d64d16;      /* Slightly darker orange on hover */
 }
+
+.cmi5launch-table th:nth-child(2), 
+.cmi5launch-table td:nth-child(2) {
+    width: 50%; /* Adjust width as needed */
+}
