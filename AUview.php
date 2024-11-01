@@ -243,31 +243,20 @@ $sessionids = json_decode($au->sessions);
 // New attempt button.
 
 echo "<p tabindex=\"0\" onkeyup=\"key_test('" . $auid . "')\" id='cmi5launch_newattempt'>
-<button onclick=\"resumeSession('" . $auid . "')\" style=\"cursor: pointer;\">"
+<button  class=\"btn btn-primary\" onclick=\"resumeSession('" . $auid . "')\" style=\"cursor: pointer;\">"
 . ($au->sessions === null ? "Start AU" : "Resume AU")
 . "</button>
 </p>";
 
-
-echo "<p tabindex=\"0\"onkeyup=\"key_test('"
-. $auid . "')\"id='cmi5launch_newattempt'><button onclick=\"restartSession('"
-. $auid
-. "')\" style=\"cursor: pointer;\">"
-. "Restart AU"
-. "</button></p>";
-
-$buttonLabel = $au->sessions === null ? "Start AU" : "Resume AU";
-$buttonUrl = new moodle_url('/mod/cmi5launch/launch.php', [
-    'id' => $id,
-    'n' => $n,
-    'launchform_registration' => $auid,
-    'restart' => 'false'
-]);
-
-echo $OUTPUT->single_button($buttonUrl, $buttonLabel, 'get', [
-    'class' => 'btn btn-primary',
-    'formid' => 'launchform'
-]);
+if ($au->sessions !== null)
+{
+    echo "<p tabindex=\"0\"onkeyup=\"key_test('"
+    . $auid . "')\"id='cmi5launch_newattempt'><button onclick=\"restartSession('"
+    . $auid
+    . "')\" style=\"cursor: pointer;\">"
+    . "Restart AU"
+    . "</button></p>";
+}
 
 // Add a form to be posted based on the attempt selected.
 ?>
