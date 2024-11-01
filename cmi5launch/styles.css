@@ -8,11 +8,12 @@
 #page-mod-cmi5launch-mod.dir-rtl #fitem_id_cmi5launchlrsversion input
 {direction:ltr;text-align:left;}
 
-/* Specific table styling for the cmi5launch module */
+/* Custom table styling for cmi5launch module */
 .cmi5launch-table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 1em;
+    font-size: 14px;
 }
 
 .cmi5launch-table th, .cmi5launch-table td {

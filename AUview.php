@@ -151,82 +151,81 @@ $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
 $userscourse = $DB->get_record('cmi5launch_usercourse', ['courseid'  => $record->courseid, 'userid'  => $USER->id]);
 
 // If it is null there have been no previous sessions.
-if (!$au->sessions == null) {
+if (!is_null($au->sessions)) {
+    try {
+        // Set custom error and exception handlers
+        set_error_handler('mod_cmi5launch\local\custom_warningAU', E_WARNING);
+        set_exception_handler('mod_cmi5launch\local\custom_warningAU');
 
-    try{
+        // Prepare table structure
+        $tabledata = array();
+        $table = new html_table();
+        $table->id = 'cmi5launch_auSessionTable';
+        $table->attributes['class'] = 'generaltable cmi5launch-table'; // Use Moodle class + custom class
+        $table->caption = get_string('modulenameplural', 'cmi5launch');
+        $table->head = array(
+            get_string('cmi5launchviewfirstlaunched', 'cmi5launch'),
+            get_string('cmi5launchviewlastlaunched', 'cmi5launch'),
+            get_string('cmi5launchviewprogress', 'cmi5launch'),
+            get_string('cmi5launchviewgradeheader', 'cmi5launch'),
+            '<button class="btn btn-danger abandon-session">Abandon</button>'
+        );
 
-     // Set error and exception handler
-     set_error_handler('mod_cmi5launch\local\custom_warningAU', E_WARNING);
-     set_exception_handler('mod_cmi5launch\local\custom_warningAU');
- 
-     // Array to hold info for table population
-     $tabledata = array();
- 
-     // Build table
-     $table = new html_table();
-     $table->id = 'cmi5launch_auSessionTable';
-     $table->attributes['class'] = 'generaltable cmi5launch-table'; // Add custom and Moodle classes
- 
-     // Set table header with additional CSS classes
-     $table->head = array(
-         get_string('cmi5launchviewfirstlaunched', 'cmi5launch'),
-         get_string('cmi5launchviewlastlaunched', 'cmi5launch'),
-         get_string('cmi5launchviewprogress', 'cmi5launch'),
-         get_string('cmi5launchviewgradeheader', 'cmi5launch'),
-         '<button class="btn btn-danger abandon-session">Abandon</button>'
-     );
- 
-     // Retrieve session ids
-     $sessionids = json_decode($au->sessions);
- 
-     // Iterate through each session by id
-     foreach ($sessionids as $key => $sessionid) {
-         $session = $DB->get_record('cmi5launch_sessions', array('sessionid' => $sessionid));
-         $sessioninfo = array();
- 
-         if ($session->createdat != null) {
-             $date = new DateTime($session->createdat, new DateTimeZone('US/Eastern'));
-             $date->setTimezone(new DateTimeZone('America/New_York'));
-             $sessioninfo[] = "<span class='date-cell'>" . $date->format('D d M Y H:i:s') . "</span>";
-         }
- 
-         if ($session->lastrequesttime != null) {
-             $date = new DateTime($session->lastrequesttime, new DateTimeZone('US/Eastern'));
-             $date->setTimezone(new DateTimeZone('America/New_York'));
-             $sessioninfo[] = "<span class='date-cell'>" . $date->format('D d M Y H:i:s') . "</span>";
-         }
- 
-         $sessioninfo[] = "<pre class='progress-cell'>" . implode("\n ", json_decode($session->progress)) . "</pre>";
-         $sessioninfo[] = "<span class='score-cell'>" . $session->score . "</span>";
- 
-         $tabledata[] = $sessioninfo;
-     }
- 
-     $table->data = $tabledata;
-     echo html_writer::table($table);
+        // Decode and iterate through session IDs
+        $sessionids = json_decode($au->sessions);
+        foreach ($sessionids as $sessionid) {
+            $session = $DB->get_record('cmi5launch_sessions', ['sessionid' => $sessionid]);
+
+            if ($session) {
+                $sessioninfo = [];
+
+                // Format and add session created date
+                if ($session->createdat) {
+                    $createdAt = new DateTime($session->createdat, new DateTimeZone('US/Eastern'));
+                    $createdAt->setTimezone(new DateTimeZone('America/New_York'));
+                    $sessioninfo[] = "<span class='date-cell'>" . $createdAt->format('D d M Y H:i:s') . "</span>";
+                }
+
+                // Format and add last request time
+                if ($session->lastrequesttime) {
+                    $lastRequestTime = new DateTime($session->lastrequesttime, new DateTimeZone('US/Eastern'));
+                    $lastRequestTime->setTimezone(new DateTimeZone('America/New_York'));
+                    $sessioninfo[] = "<span class='date-cell'>" . $lastRequestTime->format('D d M Y H:i:s') . "</span>";
+                }
+
+                // Add progress information
+                $sessioninfo[] = "<pre class='progress-cell'>" . implode("\n ", json_decode($session->progress)) . "</pre>";
+
+                // Add score and update scores array
+                $sessioninfo[] = "<span class='score-cell'>" . $session->score . "</span>";
+                $sessionscores[] = $session->score;
+
+                // Add session info to table data
+                $tabledata[] = $sessioninfo;
+            }
+        }
+
+        // Output table
+        $table->data = $tabledata;
+        echo html_writer::table($table);
+
+        // Update AU record in the database
+        $DB->update_record('cmi5launch_aus', $au);
 
     } catch (Exception $e) {
-
-        // Restore default hadlers.
+        // Restore default handlers and throw custom exception
         restore_exception_handler();
         restore_error_handler();
-
-        // Throw an exception.
-        throw new customException('loading session table on AUview page. Report this to system administrator: ' . $e->getMessage() . 'Check that session information is present in DB and session id is correct.' , 0);
+        throw new customException(
+            'Error loading session table on AU view page. Contact the system administrator with this message: ' .
+            $e->getMessage() . '. Check that session information is present in DB and session ID is correct.', 0
+        );
+    } finally {
+        // Always restore the default handlers
+        restore_exception_handler();
+        restore_error_handler();
     }
-
-    // Write table.
-    $table->data = $tabledata;
-    echo html_writer::table($table);
-
-    // Update AU in table with new info.
-    $DB->update_record('cmi5launch_aus', $au);
-
-    // Restore default hadlers.
-    restore_exception_handler();
-    restore_error_handler();
 }
-
 // Pass the auid and new session info to next page (launch.php).
 // New attempt button.
 
