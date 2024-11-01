@@ -82,6 +82,16 @@ echo $OUTPUT->header();
 ?>
 
     <script>
+        function toggleProgress(button) {
+            const content = button.nextElementSibling;
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+                button.textContent = 'Hide Progress';
+            } else {
+                content.style.display = 'none';
+                button.textContent = 'View Progress';
+            }
+        }
 
         function key_test(registration) {
 
@@ -161,7 +171,7 @@ if (!is_null($au->sessions)) {
         $tabledata = array();
         $table = new html_table();
         $table->id = 'cmi5launch_auSessionTable';
-        $table->attributes['class'] = 'generaltable cmi5launch-table'; // Use Moodle class + custom class
+        $table->attributes['class'] = 'generaltable cmi5launch-table';
         $table->caption = get_string('modulenameplural', 'cmi5launch');
         $table->head = array(
             get_string('cmi5launchviewfirstlaunched', 'cmi5launch'),
@@ -184,10 +194,14 @@ if (!is_null($au->sessions)) {
                     $sessioninfo[] = "<span class='date-cell'>" . $createdAt->format('D d M Y H:i:s') . "</span>";
                 }
 
-                // Add progress information
-                $sessioninfo[] = "<pre class='progress-cell'>" . implode("\n ", json_decode($session->progress)) . "</pre>";
+                // Add minimized progress information with a toggle button
+                $progressContent = "<pre>" . implode("\n ", json_decode($session->progress)) . "</pre>";
+                $sessioninfo[] = "
+                    <button type='button' class='btn btn-link' onclick='toggleProgress(this)'>View Progress</button>
+                    <div class='progress-cell hidden-content' style='display: none;'>$progressContent</div>
+                ";
 
-                // Add score and update scores array
+                // Add score
                 $sessioninfo[] = "<span class='score-cell'>" . $session->score . "</span>";
                 $sessionscores[] = $session->score;
 
@@ -204,7 +218,6 @@ if (!is_null($au->sessions)) {
         $DB->update_record('cmi5launch_aus', $au);
 
     } catch (Exception $e) {
-        // Restore default handlers and throw custom exception
         restore_exception_handler();
         restore_error_handler();
         throw new customException(
@@ -212,7 +225,6 @@ if (!is_null($au->sessions)) {
             $e->getMessage() . '. Check that session information is present in DB and session ID is correct.', 0
         );
     } finally {
-        // Always restore the default handlers
         restore_exception_handler();
         restore_error_handler();
     }

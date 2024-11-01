@@ -56,3 +56,10 @@
 .btn-danger.abandon-session:hover {
     background-color: #c9302c;
 }
+
+.hidden-content {
+    margin-top: 8px;
+    padding: 8px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+}
