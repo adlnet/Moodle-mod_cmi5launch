@@ -1,0 +1,107 @@
+/*	Left align English text only INPUT fields, when in RTL mode.
+ */
+#page-mod-cmi5launch-mod.dir-rtl #fitem_id_cmi5launchurl input, 
+#page-mod-cmi5launch-mod.dir-rtl #fitem_id_cmi5activityid input,
+#page-mod-cmi5launch-mod.dir-rtl #fitem_id_cmi5launchlrsendpoint input,
+#page-mod-cmi5launch-mod.dir-rtl #fitem_id_cmi5launchlrslogin input,
+#page-mod-cmi5launch-mod.dir-rtl #fitem_id_cmi5launchlrspass input,
+#page-mod-cmi5launch-mod.dir-rtl #fitem_id_cmi5launchlrsversion input
+{direction:ltr;text-align:left;}
+
+/* Custom table styling for cmi5launch module */
+.cmi5launch-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    margin: 1em;
+    font-size: 200px;
+}
+
+.custom-cmi5launch-table tr {
+    vertical-align: top; /* Ensures content starts at the top of the cell */
+}
+
+.custom-cmi5launch-table .progress-cell {
+    white-space: normal; /* Allows text to wrap */
+    word-wrap: break-word; /* Forces long words to break */
+}
+
+.cmi5launch-table th, 
+.cmi5launch-table td {
+    padding: 8px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+    text-overflow: ellipsis;
+    word-wrap: break-word;
+}
+
+.cmi5launch-table th {
+    background-color: #f5f5f5;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.cmi5launch-table .date-cell {
+    font-style: italic;
+    color: #555;
+}
+
+.cmi5launch-table .score-cell {
+    font-weight: bold;
+    color: #333;
+}
+
+
+
+.left-align {
+    text-align: left;
+    padding: 5px;
+}
+
+.hidden-content {
+    margin-top: 8px;
+    padding: 8px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+}
+
+
+/* General button container styling */
+.button-container {
+    display: flex;
+    justify-content: center;        /* Center the buttons horizontally */
+    gap: 15px;                      /* Space between buttons */
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+/* General button styling */
+.button-container .btn {
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+/* Resume button styling */
+.button-container .resume-btn {
+    background-color: #007bff;      /* Primary blue color */
+    color: white;
+}
+
+.button-container .resume-btn:hover {
+    background-color: #0056b3;      /* Darker shade on hover */
+}
+
+/* Restart button styling */
+.button-container .restart-btn {
+    background-color: #ef6832;      /* Orange color for restart */
+    color: white;
+}
+
+.button-container .restart-btn:hover {
+    background-color: #ed7647;      /* Slightly darker orange on hover */
+}
