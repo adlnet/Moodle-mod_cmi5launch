@@ -243,7 +243,7 @@ echo "<div class='button-container' tabindex='0' onkeyup=\"key_test('" . $auid .
         . "</button>";
 
 if ($au->sessions !== null) {
-    echo "<button class='btn-restart restart-session' onclick=\"restartSession('" . $auid . "')\" style=\"cursor: pointer;\">Restart AU</button>";
+    echo "<button class='btn-restart' onclick=\"restartSession('" . $auid . "')\" style=\"cursor: pointer;\">Restart AU</button>";
 }
 
 echo "</div>";

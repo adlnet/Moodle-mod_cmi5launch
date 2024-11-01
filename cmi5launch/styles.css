@@ -51,18 +51,7 @@
     color: #333;
 }
 
-.btn-restart.restart-session {
-    color: white;
-    background-color: #ef6832;
-    padding: 4px 10px;
-    border: none;
-    cursor: pointer;
-    font-size: 14px;
-}
 
-.btn-restart.restart-session:hover {
-    background-color: #ed7647;
-}
 
 .left-align {
     text-align: left;
@@ -74,6 +63,21 @@
     padding: 8px;
     background-color: #f9f9f9;
     border: 1px solid #ddd;
+}
+
+.btn-restart {
+    color: white;
+    background-color: #ef6832; /* Orange color for restart */
+    padding: 8px 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+
+.btn-restart:hover {
+    background-color: #ed7647; /* Slightly darker shade on hover */
 }
 
 .button-container {
