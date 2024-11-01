@@ -12,8 +12,18 @@
 .cmi5launch-table {
     width: 100%;
     border-collapse: collapse;
+    table-layout: fixed;
     margin-top: 1em;
     font-size: 14px;
+}
+
+.custom-cmi5launch-table tr {
+    vertical-align: top; /* Ensures content starts at the top of the cell */
+}
+
+.custom-cmi5launch-table .progress-cell {
+    white-space: normal; /* Allows text to wrap */
+    word-wrap: break-word; /* Forces long words to break */
 }
 
 .cmi5launch-table th, .cmi5launch-table td {
@@ -34,12 +44,6 @@
 .cmi5launch-table .date-cell {
     font-style: italic;
     color: #555;
-}
-
-.cmi5launch-table .progress-cell pre {
-    font-size: 14px;
-    line-height: 1.5;
-    white-space: pre-wrap; /* Wrap long text */
 }
 
 .cmi5launch-table .score-cell {
