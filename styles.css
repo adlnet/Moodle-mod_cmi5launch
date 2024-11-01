@@ -24,6 +24,7 @@
 .custom-cmi5launch-table .progress-cell {
     white-space: normal; /* Allows text to wrap */
     word-wrap: break-word; /* Forces long words to break */
+    width: 50%;
 }
 
 .cmi5launch-table th, 
