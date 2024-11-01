@@ -200,10 +200,12 @@ if (!is_null($au->sessions)) {
                 $progressCellId = "progress-cell-" . $sessionid;
 
                 $sessioninfo[] = "
+                <td class='progress-cell-container'>
                     <div class='left-align'>
                         <button type='button' class='btn btn-link' onclick='toggleProgress(\"$progressCellId\")'>View Progress</button>
                     </div>
                     <div id='$progressCellId' class='progress-cell hidden-content' style='display: none;'>$progressContent</div>
+                </td>
                 ";
 
                 // Add score
