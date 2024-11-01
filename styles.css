@@ -23,15 +23,13 @@
 
 /* Caption styling */
 .cmi5launch-table caption {
-    font-size: 20px;           /* Larger font size for prominence */
+    font-size: 24px;           /* Larger font size for prominence */
     font-weight: 700;          /* Make it bold */
     color: #333;               /* Dark color for readability */
     padding: 10px;             /* Add padding for spacing */
-    text-align: center;        /* Center-align the caption */
+    text-align: left;        /* Center-align the caption */
     background-color: #f5f5f5; /* Light background for contrast */
     text-transform: uppercase; /* Optional: make it uppercase for emphasis */
-    border-top-left-radius: 8px; /* Match rounded corners with table */
-    border-top-right-radius: 8px;
 }
 
 .cmi5launch-table tr {
