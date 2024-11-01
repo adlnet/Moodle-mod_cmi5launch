@@ -51,17 +51,17 @@
     color: #333;
 }
 
-.btn-danger.abandon-session {
+.btn-restart.restart-session {
     color: white;
-    background-color: #d9534f;
+    background-color: #ef6832;
     padding: 4px 10px;
     border: none;
     cursor: pointer;
     font-size: 14px;
 }
 
-.btn-danger.abandon-session:hover {
-    background-color: #c9302c;
+.btn-restart.restart-session:hover {
+    background-color: #ed7647;
 }
 
 .left-align {
@@ -79,8 +79,9 @@
 .button-container {
     display: flex;
     justify-content: center;  /* Center buttons horizontally */
-    gap: 10px;                /* Adds space between the buttons */
-    margin: 15px 0;           /* Adds vertical spacing for the container */
+    gap: 30px;                /* Adds space between the buttons */
+    margin-top: 20px;         /* Extra space above the button container */
+    margin-bottom: 20px;           /* Adds vertical spacing for the container */
 }
 
 /* Style for each button */
