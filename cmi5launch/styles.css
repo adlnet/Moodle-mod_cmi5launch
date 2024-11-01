@@ -57,6 +57,11 @@
     background-color: #c9302c;
 }
 
+.left-align {
+    text-align: left;
+    padding: 5px;
+}
+
 .hidden-content {
     margin-top: 8px;
     padding: 8px;

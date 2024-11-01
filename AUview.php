@@ -82,14 +82,15 @@ echo $OUTPUT->header();
 ?>
 
     <script>
-        function toggleProgress(button) {
-            const content = button.nextElementSibling;
-            if (content.style.display === 'none') {
+
+        function toggleProgress(progressCellId) {
+            const content = document.getElementById(progressCellId);
+            if (content.style.display === 'none' || content.style.display === '') {
                 content.style.display = 'block';
-                button.textContent = 'Hide Progress';
+                content.previousElementSibling.querySelector('button').textContent = 'Hide Progress';
             } else {
                 content.style.display = 'none';
-                button.textContent = 'View Progress';
+                content.previousElementSibling.querySelector('button').textContent = 'View Progress';
             }
         }
 
@@ -196,11 +197,13 @@ if (!is_null($au->sessions)) {
 
                 // Add minimized progress information with a toggle button
                 $progressContent = "<pre>" . implode("\n ", json_decode($session->progress)) . "</pre>";
+                $progressCellId = "progress-cell-" . $sessionid;
+
                 $sessioninfo[] = "
                     <div class='left-align'>
-                        <button type='button' class='btn btn-link' onclick='toggleProgress(this)'>View Progress</button>
+                        <button type='button' class='btn btn-link' onclick='toggleProgress(\"$progressCellId\")'>View Progress</button>
                     </div>
-                    <div class='progress-cell hidden-content' style='display: none;'>$progressContent</div>
+                    <div id='$progressCellId' class='progress-cell hidden-content' style='display: none;'>$progressContent</div>
                 ";
 
                 // Add score
