@@ -65,39 +65,43 @@
     border: 1px solid #ddd;
 }
 
+
+/* General button container styling */
 .button-container {
     display: flex;
-    justify-content: center;  /* Center buttons horizontally */
-    gap: 30px;                /* Adds space between the buttons */
-    margin-top: 20px;         /* Extra space above the button container */
-    margin-bottom: 20px;           /* Adds vertical spacing for the container */
+    justify-content: center;        /* Center the buttons horizontally */
+    gap: 15px;                      /* Space between buttons */
+    margin-top: 20px;
+    margin-bottom: 20px;
 }
 
-/* Style for each button */
+/* General button styling */
 .button-container .btn {
     padding: 10px 20px;
     font-size: 16px;
     font-weight: bold;
-    margin-right: 30px;   
-    border-radius: 5px;       /* Rounded corners */
-    transition: background-color 0.3s ease; /* Smooth hover transition */
-}
-
-/* Primary button styling */
-.button-container .btn-primary {
-    background-color: #19ad31;  /* Primary blue color */
-    color: white;
+    border-radius: 5px;
     border: none;
     cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 
-/* Hover effect for primary button */
-.button-container .btn-primary:hover {
-    background-color: #0056b3;  /* Darker shade on hover */
+/* Resume button styling */
+.button-container .resume-btn {
+    background-color: #007bff;      /* Primary blue color */
+    color: white;
 }
 
-/* Focus effect for accessibility */
-.button-container .btn-primary:focus {
-    outline: 2px solid #0056b3;
-    outline-offset: 2px;
+.button-container .resume-btn:hover {
+    background-color: #0056b3;      /* Darker shade on hover */
+}
+
+/* Restart button styling */
+.button-container .restart-btn {
+    background-color: #ef6832;      /* Orange color for restart */
+    color: white;
+}
+
+.button-container .restart-btn:hover {
+    background-color: #ed7647;      /* Slightly darker orange on hover */
 }

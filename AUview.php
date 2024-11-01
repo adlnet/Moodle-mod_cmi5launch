@@ -237,16 +237,18 @@ if (!is_null($au->sessions)) {
 // Pass the auid and new session info to next page (launch.php).
 // New attempt button.
 
+
 echo "<div class='button-container' tabindex='0' onkeyup=\"key_test('" . $auid . "')\" id='cmi5launch_newattempt'>
-        <button class='btn btn-primary' onclick=\"resumeSession('" . $auid . "')\" style=\"cursor: pointer;\">" 
-        . ($au->sessions === null ? "Start AU" : "Resume AU") 
+        <button class='btn btn-primary resume-btn' onclick=\"resumeSession('" . $auid . "')\">"
+        . ($au->sessions === null ? "Start AU" : "Resume AU")
         . "</button>";
 
 if ($au->sessions !== null) {
-    echo "<button class='btn btn-primary' onclick=\"restartSession('" . $auid . "')\" style=\"cursor: pointer;\">Restart AU</button>";
+    echo "<button class='btn btn-primary restart-btn' onclick=\"restartSession('" . $auid . "')\">Restart AU</button>";
 }
 
 echo "</div>";
+
 // Add a form to be posted based on the attempt selected.
 ?>
     <form id="launchform" action="launch.php" method="get">
