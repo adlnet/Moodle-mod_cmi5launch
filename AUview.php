@@ -177,7 +177,7 @@ if (!is_null($au->sessions)) {
         $table->caption = get_string('modulenameplural', 'cmi5launch');
         $table->head = array(
             get_string('cmi5launchviewfirstlaunched', 'cmi5launch'),
-            get_string('cmi5launchviewprogress', 'cmi5launch'),
+            html_writer::tag('th', get_string('cmi5launchviewprogress', 'cmi5launch'), array('class' => 'progress-column')),
             get_string('cmi5launchviewgradeheader', 'cmi5launch'),
         );
 
