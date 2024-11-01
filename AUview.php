@@ -90,6 +90,20 @@ echo $OUTPUT->header();
             }
         }
 
+        function resumeSession(auid) {
+            $('#launchform_registration').val(auid);
+            $('#launchform_restart').val(false);
+            $('#launchform').submit();
+        }
+
+        // Function to handle restarting the session.
+        function restartSession(auid) {
+            // Add logic if needed to reset the session data here
+            $('#launchform_registration').val(auid);
+            $('#launchform_restart').val(true);
+            $('#launchform').submit();
+        }
+
         // Function to run when the experience is launched.
         function mod_cmi5launch_launchexperience(registration) {
             
@@ -120,16 +134,12 @@ echo $OUTPUT->header();
 
 // Retrieve the registration and AU ID from view.php.
 $auid = required_param('AU_view', PARAM_TEXT);
-echo "auid";
-var_dump($auid);
+
 // First thing check for updates.
 cmi5launch_update_grades($cmi5launch, $USER->id);
 
 // Retrieve appropriate AU from DB.
 $au = $retrieveaus($auid);
-echo "au";
-
-var_dump($au);
 
 // Array to hold session scores for the AU.
 $sessionscores = array();
@@ -164,7 +174,7 @@ if (!$au->sessions == null) {
         'Abandon'
         );
 
-
+$sessionids = json_decode($au->sessions);
         // Retrieve session ids.
         $sessionids = json_decode($au->sessions);
 
@@ -201,11 +211,7 @@ if (!$au->sessions == null) {
 
             // Add score to array for AU.
             $sessionscores[] = $session->score;
-
-            // Add abandon button
             
-            $sessioninfo[] = ("<button onclick=\"mod_cmi5launch_launchexperience('". $auid . "')\"> Abandon </button>");
-
             // Add to be fed to table.
             $tabledata[] = $sessioninfo;
 
@@ -236,16 +242,24 @@ if (!$au->sessions == null) {
 // Pass the auid and new session info to next page (launch.php).
 // New attempt button.
 echo "<p tabindex=\"0\"onkeyup=\"key_test('"
-    . $auid . "')\"id='cmi5launch_newattempt'><button onclick=\"mod_cmi5launch_launchexperience('"
+    . $auid . "')\"id='cmi5launch_newattempt'><button onclick=\"resumeSession('"
     . $auid
     . "')\" style=\"cursor: pointer;\">"
-    . get_string('cmi5launch_attempt', 'cmi5launch')
+    . "Resume Session"
+    . "</button></p>";
+
+echo "<p tabindex=\"0\"onkeyup=\"key_test('"
+    . $auid . "')\"id='cmi5launch_newattempt'><button onclick=\"restartSession('"
+    . $auid
+    . "')\" style=\"cursor: pointer;\">"
+    . "Restart Session"
     . "</button></p>";
 
 // Add a form to be posted based on the attempt selected.
 ?>
     <form id="launchform" action="launch.php" method="get">
         <input id="launchform_registration" name="launchform_registration" type="hidden" value="default">
+        <input id="launchform_restart" name="restart" type="hidden" value="false">
         <input id="id" name="id" type="hidden" value="<?php echo $id ?>">
         <input id="n" name="n" type="hidden" value="<?php echo $n ?>">
     </form>

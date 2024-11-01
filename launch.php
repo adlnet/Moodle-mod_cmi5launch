@@ -235,6 +235,8 @@ $userscourse = $DB->get_record('cmi5launch_usercourse', ['courseid'  => $record-
 // To hold launch url.
 $location = "";
 
+$restart = filter_var($_GET['restart'], FILTER_VALIDATE_BOOLEAN);
+
 // Most of the functions below have their own error handling. We will encapsulate here in case there are any php errors, such
 // as json_decode not working, etc.
 // Set error and exception handler to catch and override the default PHP error messages, to make messages more user friendly.
@@ -247,15 +249,17 @@ try {
 
     // Retrieve AUs.
     $au = $retrieveaus($id);
-
     // Retrieve the au index.
     $auindex = $au->auindex;
-    var_dump($au);
-    $sessionids = json_decode($au->sessions);
-    $sessionId = end($sessionids);
-    $session = $DB->get_record('cmi5launch_sessions', array('sessionid' => $sessionId));
 
-    abandonCourse( $session, $au, $USER->username);
+    if ($restart)
+    {
+        $sessionids = json_decode($au->sessions);
+        $sessionId = end($sessionids);
+        $session = $DB->get_record('cmi5launch_sessions', array('sessionid' => $sessionId));
+        
+        abandonCourse($session, $au, $USER->username);
+    }
 
     // Pass in the au index to retrieve a launchurl and session id.
     $urldecoded = $cmi5launchretrieveurl($cmi5launch->id, $auindex);
