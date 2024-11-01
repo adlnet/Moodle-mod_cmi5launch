@@ -201,9 +201,9 @@ if (!is_null($au->sessions)) {
                 $progressCellId = "progress-cell-" . $sessionid;
 
                 $sessioninfo[] = "
-                    <div class='left-align'>
-                        <button type='button' class='btn btn-link' onclick='toggleProgress(\"$progressCellId\")'>View Progress</button>
-                    </div>
+                    
+                    <button type='button' class='btn btn-link' onclick='toggleProgress(\"$progressCellId\")'>View Progress</button>
+                  
                     <div id='$progressCellId' class='progress-cell hidden-content' style='display: none;'>$progressContent</div>
                 ";
 
