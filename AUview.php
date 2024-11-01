@@ -197,10 +197,11 @@ if (!is_null($au->sessions)) {
                 // Add minimized progress information with a toggle button
                 $progressContent = "<pre>" . implode("\n ", json_decode($session->progress)) . "</pre>";
                 $sessioninfo[] = "
-                    <button type='button' class='btn btn-link' onclick='toggleProgress(this)'>View Progress</button>
+                    <div class='left-align'>
+                        <button type='button' class='btn btn-link' onclick='toggleProgress(this)'>View Progress</button>
+                    </div>
                     <div class='progress-cell hidden-content' style='display: none;'>$progressContent</div>
                 ";
-
                 // Add score
                 $sessioninfo[] = "<span class='score-cell'>" . $session->score . "</span>";
                 $sessionscores[] = $session->score;
