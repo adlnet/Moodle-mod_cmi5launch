@@ -155,68 +155,56 @@ if (!$au->sessions == null) {
 
     try{
 
-        // Set error and exception handler to catch and override the default PHP error messages, to make messages more user friendly.
-        set_error_handler('mod_cmi5launch\local\custom_warningAU', E_WARNING);
-        set_exception_handler('mod_cmi5launch\local\custom_warningAU');
+     // Set error and exception handler
+     set_error_handler('mod_cmi5launch\local\custom_warningAU', E_WARNING);
+     set_exception_handler('mod_cmi5launch\local\custom_warningAU');
+ 
+     // Array to hold info for table population
+     $tabledata = array();
+ 
+     // Build table
+     $table = new html_table();
+     $table->id = 'cmi5launch_auSessionTable';
+     $table->attributes['class'] = 'generaltable cmi5launch-table'; // Add custom and Moodle classes
+ 
+     // Set table header with additional CSS classes
+     $table->head = array(
+         get_string('cmi5launchviewfirstlaunched', 'cmi5launch'),
+         get_string('cmi5launchviewlastlaunched', 'cmi5launch'),
+         get_string('cmi5launchviewprogress', 'cmi5launch'),
+         get_string('cmi5launchviewgradeheader', 'cmi5launch'),
+         '<button class="btn btn-danger abandon-session">Abandon</button>'
+     );
+ 
+     // Retrieve session ids
+     $sessionids = json_decode($au->sessions);
+ 
+     // Iterate through each session by id
+     foreach ($sessionids as $key => $sessionid) {
+         $session = $DB->get_record('cmi5launch_sessions', array('sessionid' => $sessionid));
+         $sessioninfo = array();
+ 
+         if ($session->createdat != null) {
+             $date = new DateTime($session->createdat, new DateTimeZone('US/Eastern'));
+             $date->setTimezone(new DateTimeZone('America/New_York'));
+             $sessioninfo[] = "<span class='date-cell'>" . $date->format('D d M Y H:i:s') . "</span>";
+         }
+ 
+         if ($session->lastrequesttime != null) {
+             $date = new DateTime($session->lastrequesttime, new DateTimeZone('US/Eastern'));
+             $date->setTimezone(new DateTimeZone('America/New_York'));
+             $sessioninfo[] = "<span class='date-cell'>" . $date->format('D d M Y H:i:s') . "</span>";
+         }
+ 
+         $sessioninfo[] = "<pre class='progress-cell'>" . implode("\n ", json_decode($session->progress)) . "</pre>";
+         $sessioninfo[] = "<span class='score-cell'>" . $session->score . "</span>";
+ 
+         $tabledata[] = $sessioninfo;
+     }
+ 
+     $table->data = $tabledata;
+     echo html_writer::table($table);
 
-        // Array to hold info for table population.
-        $tabledata = array();
-
-        // Build table.
-        $table = new html_table();
-        $table->id = 'cmi5launch_auSessionTable';
-        $table->caption = get_string('modulenameplural', 'cmi5launch');
-        $table->head = array(
-        get_string('cmi5launchviewfirstlaunched', 'cmi5launch'),
-        get_string('cmi5launchviewlastlaunched', 'cmi5launch'),
-        get_string('cmi5launchviewprogress', 'cmi5launch'),
-        get_string('cmi5launchviewgradeheader', 'cmi5launch'),
-        'Abandon'
-        );
-
-$sessionids = json_decode($au->sessions);
-        // Retrieve session ids.
-        $sessionids = json_decode($au->sessions);
-
-        // Iterate through each session by id.
-        foreach ($sessionids as $key => $sessionid) {
-
-            // Get the session from DB with session id.
-            $session = $DB->get_record('cmi5launch_sessions', array('sessionid' => $sessionid));
-
-            // Array to hold data for table.
-            $sessioninfo = array();
-
-            if ($session->createdat != null) {
-
-                // Retrieve createdAt and format.
-                $date = new DateTime($session->createdat, new DateTimeZone('US/Eastern'));
-                $date->setTimezone(new DateTimeZone('America/New_York'));
-                // date_timezone_set($date, new DateTimeZone('America/New_York'));
-                $sessioninfo[] = $date->format('D d M Y H:i:s');
-            }
-
-            if ($session->lastrequesttime != null) {
-
-                // Retrieve lastRequestTime and format.
-                $date = new DateTime($session->lastrequesttime, new DateTimeZone('US/Eastern'));
-                $date->setTimezone(new DateTimeZone('America/New_York'));
-                $sessioninfo[] = $date->format('D d M Y H:i:s');
-            }
-            // Add progress to table.
-            $sessioninfo[] = ("<pre>" . implode("\n ", json_decode($session->progress)) . "</pre>");
-
-            // Add score to table.
-            $sessioninfo[] = $session->score;
-
-            // Add score to array for AU.
-            $sessionscores[] = $session->score;
-            
-            // Add to be fed to table.
-            $tabledata[] = $sessioninfo;
-
-
-        } 
     } catch (Exception $e) {
 
         // Restore default hadlers.
