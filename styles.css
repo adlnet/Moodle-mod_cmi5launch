@@ -89,7 +89,7 @@
 /* Width customization for the second column */
 .cmi5launch-table th:nth-child(2), 
 .cmi5launch-table td:nth-child(2) {
-    width: 50%; /* Adjust width as needed */
+    width: 65%; /* Adjust width as needed */
 }
 
 /* Hidden content styling */
