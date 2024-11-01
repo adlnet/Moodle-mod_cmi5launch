@@ -25,7 +25,6 @@
 .cmi5launch-table caption {
     font-size: 24px;           /* Larger font size for prominence */
     font-weight: 700;          /* Make it bold */
-    color: #333;               /* Dark color for readability */
     padding: 10px;             /* Add padding for spacing */
     text-align: left;        /* Center-align the caption */
     background-color: #f5f5f5; /* Light background for contrast */
