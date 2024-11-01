@@ -407,7 +407,7 @@ try {
         //  $infofornextpage = $auid;
 
         // Assign au link to auviews.
-        $auinfo[] = "<button class=\"btn btn-primary\"  tabindex=\"0\" id='cmi5relaunch_attempt'
+        $auinfo[] = "<button class=\"btn btn-primary resume-btn\"  tabindex=\"0\" id='cmi5relaunch_attempt'
             onkeyup=\"key_test('" . $auid . "')\"
             onclick=\"mod_cmi5launch_launchexperience('" . $auid . "')\" style='cursor: pointer;'>"
             . get_string('cmi5launchviewlaunchlink', 'cmi5launch') . "</button>";

@@ -69,7 +69,7 @@
 }
 
 /* General button styling */
-.button-container .btn {
+.btn {
     padding: 10px 20px;
     font-size: 16px;
     font-weight: bold;
@@ -80,21 +80,21 @@
 }
 
 /* Resume button styling */
-.button-container .resume-btn {
+.resume-btn {
     background-color: #007bff;      /* Primary blue color */
     color: white;
 }
 
-.button-container .resume-btn:hover {
+.resume-btn:hover {
     background-color: #0056b3;      /* Darker shade on hover */
 }
 
 /* Restart button styling */
-.button-container .restart-btn {
+.restart-btn {
     background-color: #ef6832;      /* Orange color for restart */
     color: white;
 }
 
-.button-container .restart-btn:hover {
+.restart-btn:hover {
     background-color: #d64d16;      /* Slightly darker orange on hover */
 }
