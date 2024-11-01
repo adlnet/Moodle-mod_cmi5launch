@@ -9,48 +9,39 @@
 {direction:ltr;text-align:left;}
 
 /* Custom table styling for cmi5launch module */
-.custom-cmi5launch-table {
+.cmi5launch-table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 1em;
     font-size: 14px;
-    background-color: #f9f9f9;
-    border: 1px solid #ddd;
 }
 
-.custom-cmi5launch-table th {
-    background-color: #4CAF50; /* A subtle header color */
-    color: white;
-    font-weight: bold;
-    padding: 10px;
+.cmi5launch-table th, .cmi5launch-table td {
+    padding: 8px;
     text-align: left;
-    text-transform: uppercase;
-}
-
-.custom-cmi5launch-table td {
-    padding: 10px;
     border-bottom: 1px solid #ddd;
 }
 
-/* Alternate row colors */
-.custom-cmi5launch-table tr:nth-child(even) {
-    background-color: #f2f2f2;
-}
-
-/* Hover effect for rows */
-.custom-cmi5launch-table tr:hover {
-    background-color: #e0e0e0;
-}
-
-/* Styling for buttons within the table */
-.custom-cmi5launch-table .btn-link {
-    color: #007bff;
+.cmi5launch-table th {
+    background-color: #f5f5f5;
     font-weight: bold;
-    text-decoration: none;
+    text-transform: uppercase;
 }
 
-.custom-cmi5launch-table .btn-link:hover {
-    text-decoration: underline;
+.cmi5launch-table .date-cell {
+    font-style: italic;
+    color: #555;
+}
+
+.cmi5launch-table .progress-cell pre {
+    font-size: 14px;
+    line-height: 1.5;
+    white-space: pre-wrap; /* Wrap long text */
+}
+
+.cmi5launch-table .score-cell {
+    font-weight: bold;
+    color: #333;
 }
 
 .btn-danger.abandon-session {
