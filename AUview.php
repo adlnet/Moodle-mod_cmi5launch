@@ -177,10 +177,9 @@ if (!is_null($au->sessions)) {
         $table->caption = get_string('modulenameplural', 'cmi5launch');
         $table->head = array(
             get_string('cmi5launchviewfirstlaunched', 'cmi5launch'),
-            get_string('cmi5launchviewprogress', 'cmi5launch'),
+            html_writer::tag('th', get_string('cmi5launchviewprogress', 'cmi5launch'), array('class' => 'width: 50%')),
             get_string('cmi5launchviewgradeheader', 'cmi5launch'),
         );
-
         // Decode and iterate through session IDs
         $sessionids = json_decode($au->sessions);
         foreach ($sessionids as $sessionid) {
@@ -202,7 +201,7 @@ if (!is_null($au->sessions)) {
 
                 $sessioninfo[] = "
                     
-                    <button type='button' class='btn btn-resume' onclick='toggleProgress(\"$progressCellId\")'>View Progress</button>
+                    <button type='button' class='btn btn-primary resume-btn' onclick='toggleProgress(\"$progressCellId\")'>View Progress</button>
                   
                     <div id='$progressCellId' class='progress-cell hidden-content' style='display: none;'>$progressContent</div>
                 ";
