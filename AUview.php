@@ -65,7 +65,7 @@ $PAGE->set_title(format_string($cmi5launch->name));
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($context);
 $PAGE->requires->jquery();
-$PAGE->requires->css($CFG->dirroot . '/mod/cmi5launch/styles.css');
+$PAGE->requires->css($CFG->dirroot . '/mod/cmi5launch/cmi5launch/styles.css');
 
 // Output starts here.
 echo $OUTPUT->header();
