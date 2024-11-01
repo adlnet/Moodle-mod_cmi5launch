@@ -84,6 +84,13 @@ echo $OUTPUT->header();
 
     <script>
 
+        window.addEventListener("pageshow", function (event) {
+            // Check if the page was loaded from cache
+            if (event.persisted) {
+                window.location.reload(); // Reload the page to refresh data
+            }
+        });
+
         function toggleProgress(progressCellId) {
             const content = document.getElementById(progressCellId);
             if (content.style.display === 'none' || content.style.display === '') {
