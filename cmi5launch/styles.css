@@ -19,7 +19,10 @@
 .cmi5launch-table th, .cmi5launch-table td {
     padding: 8px;
     text-align: left;
+    min-width: 150px;
     border-bottom: 1px solid #ddd;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 .cmi5launch-table th {
