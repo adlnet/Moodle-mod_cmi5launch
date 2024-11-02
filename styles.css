@@ -9,8 +9,8 @@
     text-align: left;
 }
 
-.tableFixHead          { overflow-y: auto; max-height: 500px; }
-.tableFixHead thead th caption { position: sticky; top: 0; z-index: 1; }
+.table-fix-head          { overflow-y: auto; max-height: 500px; }
+.table-fix-head thead th caption { position: sticky; top: 0; z-index: 1; }
 
 .cmi5launch-table-container {
     width: 100%;
