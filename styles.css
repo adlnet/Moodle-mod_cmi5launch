@@ -143,9 +143,9 @@
 }
 
 .cmi5launch-table tbody tr {
-    display: none; /* Hide all rows by default */
+    display: table-row; /* Show rows with the 'visible' class */
 }
 
-.cmi5launch-table tbody tr.visible {
-    display: table-row; /* Show rows with the 'visible' class */
+.cmi5launch-table tbody tr.invisible {
+    display: none; /* Show rows with the 'visible' class */
 }

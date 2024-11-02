@@ -89,8 +89,8 @@ echo $OUTPUT->header();
         const initialVisibleCount = 5;
 
         // Show only the first 5 rows initially
-        for (let i = 0; i < initialVisibleCount && i < rows.length; i++) {
-            rows[i].classList.add('visible');
+        for (let i = initialVisibleCount; i < rows.length; i++) {
+            rows[i].classList.add('invisible');
         }
 
         // Function to toggle rows and button text
@@ -103,10 +103,10 @@ echo $OUTPUT->header();
             } else {
                 // Show only the first 5 rows
                 rows.forEach((row, index) => {
-                    if (index < initialVisibleCount) {
-                        row.classList.add('visible');
+                    if (index > initialVisibleCount) {
+                        row.classList.add('invisible');
                     } else {
-                        row.classList.remove('visible');
+                        row.classList.remove('invisible');
                     }
                 });
                 toggleButton.textContent = 'Show More';
