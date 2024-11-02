@@ -180,7 +180,7 @@ if (!is_null($au->sessions)) {
         $tabledata = array();
         $table = new html_table();
         $table->id = 'cmi5launch_auSessionTable';
-        $table->attributes['class'] = 'generaltable cmi5launch-table table-fix-head';
+        $table->attributes['class'] = 'generaltable cmi5launch-table';
         $table->caption = get_string('modulenameplural', 'cmi5launch');
         $table->head = array(
             get_string('cmi5launchviewfirstlaunched', 'cmi5launch'),
@@ -228,7 +228,7 @@ if (!is_null($au->sessions)) {
 
         // Output table
         $table->data = $tabledata;
-        echo "<div class=\"cmi5launch-table-container\">";
+        echo "<div class=\"cmi5launch-table-container table-fix-head\">";
         echo html_writer::table($table);
         echo "</div>";
         // Update AU record in the database
