@@ -13,7 +13,13 @@
     width: 100%;
     overflow-x: auto;           /* Enables horizontal scroll if needed */
     margin: 0 auto;             /* Centers the table on the page */
+
+    max-height: 500px; /* Set a fixed height for the table container */
+    overflow-y: auto;  /* Enable vertical scrolling */
+    display: flex;
+    flex-direction: column-reverse; /
 }
+
 
 .cmi5launch-table {
     width: 100%;
@@ -89,6 +95,14 @@
 /* Width customization for the second column */
 .cmi5launch-table .progress-column {
     width: 65%; /* Adjust width as needed */
+}
+
+#cmi5launchTable tbody tr {
+    display: none; /* Hide all rows by default */
+}
+
+#cmi5launchTable tbody tr.visible {
+    display: table-row; /* Show only rows with the 'visible' class */
 }
 
 /* Hidden content styling */
