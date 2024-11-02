@@ -9,8 +9,6 @@
     text-align: left;
 }
 
-.table-fix-head          { overflow-y: auto; max-height: 500px; }
-.table-fix-head thead th caption { position: sticky; top: 0; z-index: 1; }
 
 .cmi5launch-table-container {
     width: 100%;
@@ -142,4 +140,12 @@
 
 .restart-btn:hover {
     background-color: #d64d16;
+}
+
+.cmi5launch-table tbody tr {
+    display: none; /* Hide all rows by default */
+}
+
+.cmi5launch-table tbody tr.visible {
+    display: table-row; /* Show rows with the 'visible' class */
 }

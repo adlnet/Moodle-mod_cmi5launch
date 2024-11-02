@@ -228,7 +228,7 @@ if (!is_null($au->sessions)) {
 
         // Output table
         $table->data = $tabledata;
-        echo "<div class=\"cmi5launch-table-container table-fix-head\">";
+        echo "<div class=\"cmi5launch-table-container\">";
         echo html_writer::table($table);
         echo "</div>";
         // Update AU record in the database
@@ -246,6 +246,31 @@ if (!is_null($au->sessions)) {
         restore_error_handler();
     }
 }
+
+// Add a "Show More" button
+echo "<button id='showMoreButton' class='btn btn-primary resume-btn'>Show More</button>";
+
+$PAGE->requires->js_init_code("
+    document.addEventListener('DOMContentLoaded', function() {
+        const rows = document.querySelectorAll('#cmi5launch_auSessionTable tbody tr');
+        const showMoreButton = document.getElementById('showMoreButton');
+        const initialVisibleCount = 5;
+
+        // Show only the first 5 rows initially
+        for (let i = 0; i < initialVisibleCount && i < rows.length; i++) {
+            rows[i].classList.add('visible');
+        }
+
+        // Show more rows when 'Show More' button is clicked
+        showMoreButton.addEventListener('click', function() {
+            for (let i = initialVisibleCount; i < rows.length; i++) {
+                rows[i].classList.add('visible');
+            }
+            showMoreButton.style.display = 'none'; // Hide the button after showing all rows
+        });
+    });
+");
+
 // Pass the auid and new session info to next page (launch.php).
 // New attempt button.
 
