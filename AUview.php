@@ -83,7 +83,40 @@ echo $OUTPUT->header();
 ?>
 
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+        const rows = document.querySelectorAll('#cmi5launch_auSessionTable tbody tr');
+        const toggleButton = document.getElementById('toggleRowsButton');
+        const initialVisibleCount = 5;
 
+        // Show only the first 5 rows initially
+        for (let i = 0; i < initialVisibleCount && i < rows.length; i++) {
+            rows[i].classList.add('visible');
+        }
+
+        // Function to toggle rows and button text
+        function toggleRows() {
+            const isShowingMore = toggleButton.textContent === 'Show More';
+            if (isShowingMore) {
+                // Show all rows
+                rows.forEach(row => row.classList.add('visible'));
+                toggleButton.textContent = 'Show Less';
+            } else {
+                // Show only the first 5 rows
+                rows.forEach((row, index) => {
+                    if (index < initialVisibleCount) {
+                        row.classList.add('visible');
+                    } else {
+                        row.classList.remove('visible');
+                    }
+                });
+                toggleButton.textContent = 'Show More';
+            }
+        }
+
+        // Add click event to the button to toggle rows
+        toggleButton.addEventListener('click', toggleRows);
+     });
+     
         window.addEventListener("pageshow", function (event) {
             // Check if the page was loaded from cache
             if (event.persisted) {
