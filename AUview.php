@@ -176,55 +176,59 @@ if (!is_null($au->sessions)) {
         set_error_handler('mod_cmi5launch\local\custom_warningAU', E_WARNING);
         set_exception_handler('mod_cmi5launch\local\custom_warningAU');
 
-        // Prepare table structure
-        $tabledata = array();
-        $table = new html_table();
-        $table->id = 'cmi5launch_auSessionTable';
-        $table->attributes['class'] = 'generaltable cmi5launch-table';
-        $table->caption = get_string('modulenameplural', 'cmi5launch');
-        $table->head = array(
-            get_string('cmi5launchviewfirstlaunched', 'cmi5launch'),
-            get_string('cmi5launchviewprogress', 'cmi5launch'),
-            get_string('cmi5launchviewgradeheader', 'cmi5launch'),
-        );
-        $table->colclasses = array('', 'progress-column', '');
+       // Set custom error and exception handlers
+       set_error_handler('mod_cmi5launch\local\custom_warningAU', E_WARNING);
+       set_exception_handler('mod_cmi5launch\local\custom_warningAU');
+
+       // Prepare table structure
+       $tabledata = array();
+       $table = new html_table();
+       $table->id = 'cmi5launch_auSessionTable';
+       $table->attributes['class'] = 'generaltable cmi5launch-table';
+       $table->caption = get_string('modulenameplural', 'cmi5launch');
+       $table->head = array(
+           get_string('cmi5launchviewfirstlaunched', 'cmi5launch'),
+           get_string('cmi5launchviewprogress', 'cmi5launch'),
+           get_string('cmi5launchviewgradeheader', 'cmi5launch'),
+       );
+       $table->colclasses = array('', 'progress-column', '');
 
 
-        // Decode and iterate through session IDs
-        $sessionids = json_decode($au->sessions);
-        $sessionids = array_reverse($sessionids);
-        foreach ($sessionids as $sessionid) {
-            $session = $DB->get_record('cmi5launch_sessions', ['sessionid' => $sessionid]);
+       // Decode and iterate through session IDs
+       $sessionids = json_decode($au->sessions);
+       $sessionids = array_reverse($sessionids);
+       foreach ($sessionids as $sessionid) {
+           $session = $DB->get_record('cmi5launch_sessions', ['sessionid' => $sessionid]);
 
-            if ($session) {
-                $sessioninfo = [];
+           if ($session) {
+               $sessioninfo = [];
 
-                // Format and add session created date
-                if ($session->createdat) {
-                    $createdAt = new DateTime($session->createdat, new DateTimeZone('US/Eastern'));
-                    $createdAt->setTimezone(new DateTimeZone('America/New_York'));
-                    $sessioninfo[] = "<span class='date-cell'>" . $createdAt->format('D d M Y H:i:s') . "</span>";
-                }
+               // Format and add session created date
+               if ($session->createdat) {
+                   $createdAt = new DateTime($session->createdat, new DateTimeZone('US/Eastern'));
+                   $createdAt->setTimezone(new DateTimeZone('America/New_York'));
+                   $sessioninfo[] = "<span class='date-cell'>" . $createdAt->format('D d M Y H:i:s') . "</span>";
+               }
 
-                // Add minimized progress information with a toggle button
-                $progressContent = "<pre>" . implode("\n ", json_decode($session->progress)) . "</pre>";
-                $progressCellId = "progress-cell-" . $sessionid;
+               // Add minimized progress information with a toggle button
+               $progressContent = "<pre>" . implode("\n ", json_decode($session->progress)) . "</pre>";
+               $progressCellId = "progress-cell-" . $sessionid;
 
-                $sessioninfo[] = "
-                    
-                    <button type='button' class='btn btn-primary resume-btn'' onclick='toggleProgress(\"$progressCellId\")'>View Progress</button>
-                  
-                    <div id='$progressCellId' class='progress-cell hidden-content' style='display: none;'>$progressContent</div>
-                ";
+               $sessioninfo[] = "
+                   
+                   <button type='button' class='btn btn-primary resume-btn'' onclick='toggleProgress(\"$progressCellId\")'>View Progress</button>
+                 
+                   <div id='$progressCellId' class='progress-cell hidden-content' style='display: none;'>$progressContent</div>
+               ";
 
-                // Add score
-                $sessioninfo[] = "<span class='score-cell'>" . $session->score . "</span>";
-                $sessionscores[] = $session->score;
+               // Add score
+               $sessioninfo[] = "<span class='score-cell'>" . $session->score . "</span>";
+               $sessionscores[] = $session->score;
 
-                // Add session info to table data
-                $tabledata[] = $sessioninfo;
-            }
-        }
+               // Add session info to table data
+               $tabledata[] = $sessioninfo;
+           }
+       }
 
         // Output table
         $table->data = $tabledata;
