@@ -116,7 +116,7 @@ echo $OUTPUT->header();
         // Add click event to the button to toggle rows
         toggleButton.addEventListener('click', toggleRows);
      });
-     
+
         window.addEventListener("pageshow", function (event) {
             // Check if the page was loaded from cache
             if (event.persisted) {
@@ -284,29 +284,8 @@ if (!is_null($au->sessions)) {
     }
 }
 
-// Add a "Show More" button
-echo "<button id='showMoreButton' class='btn btn-primary resume-btn'>Show More</button>";
+echo "<button id='toggleRowsButton' class='btn btn-secondary'>Show More</button>";
 
-$PAGE->requires->js_init_code("
-    document.addEventListener('DOMContentLoaded', function() {
-        const rows = document.querySelectorAll('#cmi5launch_auSessionTable tbody tr');
-        const showMoreButton = document.getElementById('showMoreButton');
-        const initialVisibleCount = 5;
-
-        // Show only the first 5 rows initially
-        for (let i = 0; i < initialVisibleCount && i < rows.length; i++) {
-            rows[i].classList.add('visible');
-        }
-
-        // Show more rows when 'Show More' button is clicked
-        showMoreButton.addEventListener('click', function() {
-            for (let i = initialVisibleCount; i < rows.length; i++) {
-                rows[i].classList.add('visible');
-            }
-            showMoreButton.style.display = 'none'; // Hide the button after showing all rows
-        });
-    });
-");
 
 // Pass the auid and new session info to next page (launch.php).
 // New attempt button.
