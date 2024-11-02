@@ -9,14 +9,14 @@
     text-align: left;
 }
 
+.tableFixHead          { overflow-y: auto; max-height: 500px; }
+.tableFixHead thead th caption { position: sticky; top: 0; z-index: 1; }
+
 .cmi5launch-table-container {
     width: 100%;
     overflow-x: auto;           /* Enables horizontal scroll if needed */
     margin: 0 auto;             /* Centers the table on the page */
-
-    max-height: 500px; /* Set a fixed height for the table container */
 }
-
 
 .cmi5launch-table {
     width: 100%;
@@ -43,12 +43,6 @@
 
 .cmi5launch-table tr {
     vertical-align: top; /* Ensures content starts at the top of the cell */
-}
-
-.cmi5launch-table tbody {
-    display: block;           /* Required to make tbody scrollable */
-    max-height: 500px;        /* Set desired height for scrollable area */
-    overflow-y: auto;         /* Enable vertical scroll */
 }
 
 .cmi5launch-table .progress-cell {
@@ -100,13 +94,6 @@
     width: 65%; /* Adjust width as needed */
 }
 
-#cmi5launchTable tbody tr {
-    display: none; /* Hide all rows by default */
-}
-
-#cmi5launchTable tbody tr.visible {
-    display: table-row; /* Show only rows with the 'visible' class */
-}
 
 /* Hidden content styling */
 .hidden-content {
