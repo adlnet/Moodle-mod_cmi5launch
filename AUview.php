@@ -217,7 +217,7 @@ if (!is_null($au->sessions)) {
        $tabledata = array();
        $table = new html_table();
        $table->id = 'cmi5launch_auSessionTable';
-       $table->attributes['class'] = 'generaltable cmi5launch-table cmi5launch-table';
+       $table->attributes['class'] = 'generaltable cmi5launch-table launch-table';
        $table->caption = get_string('modulenameplural', 'cmi5launch');
        $table->head = array(
            get_string('cmi5launchviewfirstlaunched', 'cmi5launch'),
