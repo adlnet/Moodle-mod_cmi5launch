@@ -15,9 +15,6 @@
     margin: 0 auto;             /* Centers the table on the page */
 
     max-height: 500px; /* Set a fixed height for the table container */
-    overflow-y: auto;  /* Enable vertical scrolling */
-    display: flex;
-    flex-direction: column-reverse; /
 }
 
 
@@ -46,6 +43,12 @@
 
 .cmi5launch-table tr {
     vertical-align: top; /* Ensures content starts at the top of the cell */
+}
+
+.cmi5launch-table tbody {
+    display: block;           /* Required to make tbody scrollable */
+    max-height: 500px;        /* Set desired height for scrollable area */
+    overflow-y: auto;         /* Enable vertical scroll */
 }
 
 .cmi5launch-table .progress-cell {
