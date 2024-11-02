@@ -25,7 +25,6 @@
     margin: 1em 0;
     font-size: 18px;
     border-radius: 8px;
-    overflow: hidden;
     table-layout: fixed;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
