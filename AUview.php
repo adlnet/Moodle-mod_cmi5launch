@@ -89,8 +89,8 @@ echo $OUTPUT->header();
         const initialVisibleCount = 5;
 
         // Show only the first 5 rows initially
-        for (let i = initialVisibleCount; i < rows.length; i++) {
-            rows[i].classList.add('invisible');
+        for (let i = 0; i < initialVisibleCount && i < rows.length; i++) {
+            rows[i].classList.add('visible');
         }
 
         // Function to toggle rows and button text
@@ -103,10 +103,10 @@ echo $OUTPUT->header();
             } else {
                 // Show only the first 5 rows
                 rows.forEach((row, index) => {
-                    if (index > initialVisibleCount) {
-                        row.classList.add('invisible');
+                    if (index < initialVisibleCount) {
+                        row.classList.add('visible');
                     } else {
-                        row.classList.remove('invisible');
+                        row.classList.remove('visible');
                     }
                 });
                 toggleButton.textContent = 'Show More';
@@ -217,7 +217,7 @@ if (!is_null($au->sessions)) {
        $tabledata = array();
        $table = new html_table();
        $table->id = 'cmi5launch_auSessionTable';
-       $table->attributes['class'] = 'generaltable cmi5launch-table';
+       $table->attributes['class'] = 'generaltable cmi5launch-table cmi5launch-table';
        $table->caption = get_string('modulenameplural', 'cmi5launch');
        $table->head = array(
            get_string('cmi5launchviewfirstlaunched', 'cmi5launch'),
