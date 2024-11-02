@@ -192,6 +192,7 @@ if (!is_null($au->sessions)) {
 
         // Decode and iterate through session IDs
         $sessionids = json_decode($au->sessions);
+        $sessionids = array_reverse($sessionids);
         foreach ($sessionids as $sessionid) {
             $session = $DB->get_record('cmi5launch_sessions', ['sessionid' => $sessionid]);
 

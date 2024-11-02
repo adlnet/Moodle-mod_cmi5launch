@@ -14,7 +14,6 @@
 
 .cmi5launch-table-container {
     width: 100%;
-    overflow-x: auto;           /* Enables horizontal scroll if needed */
     margin: 0 auto;             /* Centers the table on the page */
 }
 
