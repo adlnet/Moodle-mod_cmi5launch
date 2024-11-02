@@ -14,6 +14,7 @@
 
 .cmi5launch-table-container {
     width: 100%;
+          /* Enables horizontal scroll if needed */
     margin: 0 auto;             /* Centers the table on the page */
 }
 
@@ -25,6 +26,7 @@
     margin: 1em 0;
     font-size: 18px;
     border-radius: 8px;
+   
     table-layout: fixed;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
