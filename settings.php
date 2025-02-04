@@ -128,8 +128,7 @@ if ($ADMIN->fulltree) {
     // Print to page tenantid
     echo "<br>";
     echo"(Tenant ID: " . $tenantid ;  
- // $showbutton = false; // remove this MBMBMBMBM
-    // We need to puck a diff thing for this button, we dont want the text baox available
+    
 if ($showbutton) {
     // show only a button, otherwise reg showing
     

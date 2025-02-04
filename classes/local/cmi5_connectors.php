@@ -150,7 +150,6 @@ class cmi5_connectors {
         // Sends the stream to the specified URL.
         $result = $this->cmi5launch_send_request_to_cmi5_player_post('cmi5launch_stream_and_send', $data, $url, $filetype, $username, $password);
 
-      
         // Check result and display message if not 200.
         $resulttest = $this->cmi5launch_connectors_error_message($result, "creating the tenant");
             // why is it coming back null and shouldnt we go to else the?
@@ -159,7 +158,7 @@ class cmi5_connectors {
         // Now this will never return false, it will throw an exception if it fails, so we can just return the result
         try {
             if ($resulttest == true) {
-              
+            
                 return $result;
             } else {
               

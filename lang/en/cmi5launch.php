@@ -132,8 +132,8 @@ $string['cmi5launchlink'] ="</br>
       ";
 
 // Info for settings warnings.
-$string['cmi5launchtenantname_warning'] = '<b>Tenant name is .';
-$string['cmi5launchtenantid_warning'] = 'Tenant ID is .';
+$string['cmi5launchtenantname_warning'] = '<b>Tenant name is ';
+$string['cmi5launchtenantid_warning'] = '. Tenant ID is ';
 $string['cmi5launchtenant_warning'] = "</b><div><br> The tenant name and ID have been set. They cannot be changed without causing problems with existing cmi5 launch link activities. To change, plugin must be uninstalled and reinstalled.</div> <div><br></div>";
 
 // Grading info - MB.
