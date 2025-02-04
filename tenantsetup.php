@@ -68,6 +68,9 @@ if ($mform->is_cancelled()) {
         //TODO
         $tenant = $createtenant($cmi5tenant);
 
+        echo" Tenant: ";
+        echo "<br>";
+        var_dump($tenant);
         // The return response should be json and have 'id' and 'code' 
         $response = $tenant;
 

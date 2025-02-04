@@ -117,6 +117,25 @@ $string['cmi5launchtenanttoken'] = 'cmi5 player: bearer token';
 $string['cmi5launchtenanttoken_help'] = 'The cmi5 tenant bearer token (should be a long string).  Should only need to be used during initial setup. If for some reason the tenant name is changed a new bearer token will need to be generated. This cannot be generated if a tenant name has not been made yet.';
 $string['cmi5launchtenanttoken_default'] = '';
 
+// To avoid hardcoding, the button text is set in the language file.
+
+// Button for cmi5, first time setup.
+$string['cmi5launchfirstsetup'] = "<br><br>First time setup:";
+$string['cmi5launchlink'] ="</br>
+    <p id=name >
+        <div class='input-group rounded'>
+          <button class='btn btn-secondary' type='reset' name='cmi5button' onclick='tosetup()'>
+            <span class='button-label'>Enter cmi5 player info</span>
+            </button>
+        </div>
+    </p>
+      ";
+
+// Info for settings warnings.
+$string['cmi5launchtenantname_warning'] = '<b>Tenant name is .';
+$string['cmi5launchtenantid_warning'] = 'Tenant ID is .';
+$string['cmi5launchtenant_warning'] = "</b><div><br> The tenant name and ID have been set. They cannot be changed without causing problems with existing cmi5 launch link activities. To change, plugin must be uninstalled and reinstalled.</div> <div><br></div>";
+
 // Grading info - MB.
 // Headers.
 $string['defaultgradesettings'] = 'Default values for cmi5 launch link activity grades';
