@@ -163,7 +163,7 @@ class cmi5_connectorsTest extends TestCase
         };
         $test = false;
              // Expected exceptions
-             $exceptionmessage = "Player communication error. Something went wrong creating the course CMI5 Player returned 404 error. With message 'testmessage'." ;
+             $exceptionmessage = "Player communication error. Something went wrong creating the course. CMI5 Player returned 404 error. With message 'testmessage'." ;
             
         // Mock a cmi5 connector object but only stub ONE method, as we want to test the other methods.
         // Create a mock of the send_request class as we don't actually want
@@ -235,7 +235,7 @@ class cmi5_connectorsTest extends TestCase
             // The string just needs to be returned as is. We do expect create_tenant to only call this once.
         $csc->expects($this->once())
         ->method('cmi5launch_connectors_error_message')
-         ->with($errormessage, 'creating the course') // for tomorrow, is thi failing because with only evaluates strings? Like do we need to string the array out> 
+         ->with($errormessage, 'creating the course.') // for tomorrow, is thi failing because with only evaluates strings? Like do we need to string the array out> 
         // IRL it returns something that needs to be json decoded, so lets pass somethin that is encoded>
         ->willReturn(false);
 
@@ -485,7 +485,7 @@ class cmi5_connectorsTest extends TestCase
             ->willReturn($errormessage);
 
         // Expected exceptions
-        $exceptionmessage = "Player communication error. Something went wrong retrieving the registration CMI5 Player returned 404 error. With message 'testmessage'." ;
+        $exceptionmessage = "Player communication error. Something went wrong retrieving the registration. CMI5 Player returned 404 error. With message 'testmessage'." ;
 
         // Expected exceptions and messages
         $this->expectExceptionMessage($exceptionmessage);
@@ -533,7 +533,7 @@ class cmi5_connectorsTest extends TestCase
 
         $mockedclass->expects($this->once())
         ->method('cmi5launch_connectors_error_message')
-        ->with($errormessage, "retrieving the registration")
+        ->with($errormessage, "retrieving the registration.")
         ->willReturn(false);
 
         // Expected exceptions
@@ -649,7 +649,7 @@ class cmi5_connectorsTest extends TestCase
 
         $mockedclass->expects($this->once())
         ->method('cmi5launch_connectors_error_message')
-        ->with($errormessage, "retrieving the registration")
+        ->with($errormessage, "retrieving the registration.")
         ->willReturn(false);
 
    // Expected exceptions
@@ -705,7 +705,7 @@ class cmi5_connectorsTest extends TestCase
             ->willReturn($errormessage);
 
    // Expected exceptions
-     $exceptionmessage = "Player communication error. Something went wrong retrieving the registration CMI5 Player returned 404 error. With message 'testmessage'" ;
+     $exceptionmessage = "Player communication error. Something went wrong retrieving the registration. CMI5 Player returned 404 error. With message 'testmessage'" ;
 
      // Expected exceptions and messages
      $this->expectExceptionMessage($exceptionmessage);

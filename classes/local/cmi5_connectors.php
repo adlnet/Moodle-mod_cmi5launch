@@ -29,6 +29,12 @@
 require_once ($CFG->dirroot . '/mod/cmi5launch/classes/local/errorover.php');
 class cmi5_connectors {
 
+    const CMI5LAUNCH_PLAYER_TENANT_URL = "/api/v1/tenant";
+    const CMI5LAUNCH_PLAYER_COURSE_URL = "/api/v1/course";
+    const CMI5LAUNCH_PLAYER_REGISTRATION_URL = "/api/v1/registration";
+    const CMI5LAUNCH_PLAYER_AUTH_URL = "/api/v1/auth";
+    const CMI5LAUNCH_LAUNCH_URL = "/launch-url/";
+    const CMI5LAUNCH_PLAYER_SESSION_URL = "/api/v1/session/";
     public function cmi5launch_get_create_tenant() {
         return [$this, 'cmi5launch_create_tenant'];
     }
@@ -79,7 +85,7 @@ class cmi5_connectors {
         $settings = cmi5launch_settings($id);
 
         // Build URL to import course to.
-        $url = $settings['cmi5launchplayerurl'] . "/api/v1/course";
+        $url = $settings['cmi5launchplayerurl'] . self::CMI5LAUNCH_PLAYER_COURSE_URL;
 
         // To determine the headers.
         $filetype = "zip";
@@ -94,24 +100,20 @@ class cmi5_connectors {
         // Now this will never return false, it will throw an exception if it fails, so we can just return the result
         try {
             // Check result and display message if not 200.
-            $resulttest = $this->cmi5launch_connectors_error_message($result, "creating the course");
+            $resulttest = $this->cmi5launch_connectors_error_message($result, get_string('cmi5launchcourseerror', 'cmi5launch'));
 
-        //    echo "Is it resulting?";
             if ($resulttest == true) {
                 // Return an array with course info.
                 return $result;
-                // I think this is the problem, it is coming back and throwing another error! I thought it would stop... do I need a kill in the error message hander?
-                // Its throwing BOB??? The third path is executing, THATS the problem!
-                // either way though, shouldn't the error funtion have ITS own test? like,
-                //  what we need to test here is is resulttrue is true or not
+                
             } else {
                 // This should never be false, it should throw an exception if it is, so we can just return the result
                 // But catch all else that miht go wrong
-                throw new playerException("creating the course.");
+                throw new playerException(get_string('cmi5launchcourseerror', 'cmi5launch'));
             }
         }// catch all else that might go wrong
         catch (\Throwable $e){
-            throw new playerException("creating the course" . $e);
+            throw new playerException(get_string('cmi5launchcourseerror', 'cmi5launch'). $e);
         }
         
     }
@@ -135,7 +137,7 @@ class cmi5_connectors {
         $password = $settings['cmi5launchbasepass'];
 
         // Build URL for launch URL request.
-        $url = $playerurl . "/api/v1/tenant";
+        $url = $playerurl . self::CMI5LAUNCH_PLAYER_TENANT_URL;
 
         // The body of the request must be made as array first.
         $data = array(
@@ -162,12 +164,12 @@ class cmi5_connectors {
                 return $result;
             } else {
               
-                throw new playerException("creating the tenant.");
+                throw new playerException(get_string('cmi5launchtenanterror', 'cmi5launch'));
             }
         }// catch all else that might go wrong
         catch (\Throwable $e){
          
-            throw new playerException("Uncaught error creating the tenant" . $e);
+            throw new playerException(get_string('cmi5launchtenantuncaughterror', 'cmi5launch') . $e);
         }
     
     }
@@ -195,7 +197,7 @@ class cmi5_connectors {
         $result = $this->cmi5launch_send_request_to_cmi5_player_get('cmi5launch_stream_and_send', $token, $url);
 
         // Check result and display message if not 200.
-        $resulttest = $this->cmi5launch_connectors_error_message($result, "retrieving the registration");
+        $resulttest = $this->cmi5launch_connectors_error_message($result, get_string('cmi5launchregistrationerror', 'cmi5launch'));
        
         // Now this will never return false, it will throw an exception if it fails, so we can just return the result
         try {
@@ -203,12 +205,12 @@ class cmi5_connectors {
                 return $result;
             } else {
                
-                throw new playerException("retrieving the registration information.");
+                throw new playerException(get_string('cmi5launchregistrationinfoerror', 'cmi5launch'));
             }
         }// catch all else that might go wrong
         catch (\Throwable $e){
        
-            throw new playerException("Uncaught error retrieving the registration information." . $e);
+            throw new playerException( get_string('cmi5launchregistrationuncaughterror', 'cmi5launch'). $e);
         }
 
     }
@@ -234,7 +236,7 @@ class cmi5_connectors {
         global $CFG;
 
         // Build URL for launch URL request.
-        $url = $playerurl . "/api/v1/registration";
+        $url = $playerurl . self::CMI5LAUNCH_PLAYER_REGISTRATION_URL;
 
         // The body of the request must be made as array first.
         $data = array(
@@ -256,7 +258,7 @@ class cmi5_connectors {
         $result = $this->cmi5launch_send_request_to_cmi5_player_post('cmi5launch_stream_and_send', $data, $url, $filetype, $token);
 
         // Check result and display message if not 200.
-        $resulttest = $this->cmi5launch_connectors_error_message($result, "retrieving the registration");
+        $resulttest = $this->cmi5launch_connectors_error_message($result, get_string('cmi5launchregistrationerror', 'cmi5launch'));
 
         // Now this will never return false, it will throw an exception if it fails, so we can just return the result
         try {
@@ -270,12 +272,12 @@ class cmi5_connectors {
 
                 return $registration;
             } else {
-                throw new playerException("retrieving the registration information.");
+                throw new playerException(get_string('cmi5launchregistrationinfoerror', 'cmi5launch'));
             }
         }// catch all else that might go wrong
         catch (\Throwable $e){
        
-            throw new playerException("Uncaught error retrieving the registration information." . $e);
+            throw new playerException(get_string('cmi5launchregistrationuncaughterror', 'cmi5launch'). $e);
         }
 
     }
@@ -290,10 +292,6 @@ class cmi5_connectors {
      */
     public function cmi5launch_retrieve_token($audience, $tenantid) {
 
-        // Honestly the params can be rabbbed through settings right? So I thinks we can change this whole func.
-        // but if it is called, will it need to go tooo secret back page? 
-        // and can we make it same page, like if pthere is no prompt? which is fdiff then null right? Or maybe another page just to be certain.
-        
         global $CFG, $cmi5launchid;
 
         $settings = cmi5launch_settings($cmi5launchid);
@@ -304,7 +302,7 @@ class cmi5_connectors {
         $password = $settings['cmi5launchbasepass'];
 
         // Build URL for launch URL request.
-        $url = $playerurl . "/api/v1/auth";
+        $url = $playerurl . self::CMI5LAUNCH_PLAYER_AUTH_URL;
 
         // The body of the request must be made as array first.
         $data = array(
@@ -320,7 +318,7 @@ class cmi5_connectors {
         $result = $this->cmi5launch_send_request_to_cmi5_player_post('cmi5launch_stream_and_send', $data, $url, $filetype, $username, $password);
 
         // Check result and display message if not 200.
-        $resulttest = $this->cmi5launch_connectors_error_message($result, 'retrieving the tenant token.');
+        $resulttest = $this->cmi5launch_connectors_error_message($result, get_string('cmi5launchtokenerror', 'cmi5launch'));
 
         // Now this will never return false, it will throw an exception if it fails, so we can just return the result
         try {
@@ -332,11 +330,11 @@ class cmi5_connectors {
                 return $token;
 
             } else {
-                throw new playerException("retrieving the tenant token.");
+                throw new playerException(get_string('cmi5launchtokenerror', 'cmi5launch'));
             }
         }// catch all else that might go wrong
         catch (\Throwable $e){
-            throw new playerException("Uncaught error retrieving the tenant token." . $e);
+            throw new playerException(get_string('cmi5launchtokenuncaughtterror', 'cmi5launch'). $e);
         }
     }
 
@@ -367,7 +365,7 @@ class cmi5_connectors {
 
     
         // Build URL for launch URL request.
-        $url = $playerurl . "/api/v1/course/" . $courseid  ."/launch-url/" . $auindex;
+        $url = $playerurl . self::CMI5LAUNCH_PLAYER_COURSE_URL . "/" . $courseid  . self::CMI5LAUNCH_LAUNCH_URL . $auindex;
 
         $data = array(
             'actor' => array(
@@ -389,7 +387,7 @@ class cmi5_connectors {
         $result = $this->cmi5launch_send_request_to_cmi5_player_post('cmi5launch_stream_and_send', $data, $url, $filetype, $token);
 
         // Check result and display message if not 200.
-        $resulttest = $this->cmi5launch_connectors_error_message($result, "retrieving the launch url from player.");
+        $resulttest = $this->cmi5launch_connectors_error_message($result, get_string('cmi5launchurlerror', 'cmi5launch'));
 
         // Now this will never return false, it will throw an exception if it fails, so we can just return the result
         try {
@@ -399,11 +397,11 @@ class cmi5_connectors {
 
             return $urldecoded;
         } else {
-            throw new playerException("retrieving the launch url from player.");
+            throw new playerException(get_string('cmi5launchurlerror', 'cmi5launch'));
         }
     }// catch all else that might go wrong
     catch (\Throwable $e){
-        throw new playerException("Uncaught error retrieving the launch url from player." . $e);
+        throw new playerException(get_string('cmi5launchurluncaughterror', 'cmi5launch') . $e);
     }
 
 
@@ -509,7 +507,7 @@ class cmi5_connectors {
             restore_exception_handler();
             restore_error_handler();
             //
-            throw new playerException("communicating with player, sending or crafting a POST request: " . $e);
+            throw new playerException( get_string('cmi5launchposterror', 'cmi5launch') .   $e);
         }
         
     }
@@ -547,7 +545,7 @@ class cmi5_connectors {
 
         } catch (\Throwable $e) {
           //  echo" are we here?";
-            throw new playerException("communicating with player, sending or crafting a GET request: " . $e);
+            throw new playerException(get_string('cmi5launchgeterror', 'cmi5launch'). $e);
         }
     }
 
@@ -567,13 +565,13 @@ class cmi5_connectors {
         $playerurl = $settings['cmi5launchplayerurl'];
 
         // Build URL for launch URL request.
-        $url = $playerurl . "/api/v1/session/" . $sessionid;
+        $url = $playerurl . self::CMI5LAUNCH_PLAYER_SESSION_URL . $sessionid;
 
         // Sends the stream to the specified URL.
         $result = $this->cmi5launch_send_request_to_cmi5_player_get('cmi5launch_stream_and_send', $token, $url);
 
         // Check result and display message if not 200.
-        $resulttest = $this->cmi5launch_connectors_error_message($result, "retrieving the session information.");
+        $resulttest = $this->cmi5launch_connectors_error_message($result, get_string('cmi5launchsessioninfoerror', 'cmi5launch') );
 
            // Now this will never return false, it will throw an exception if it fails, so we can just return the result
            try {
@@ -582,12 +580,12 @@ class cmi5_connectors {
                 return $result;
 
             } else {
-                throw new playerException("retrieving the session information.");
+                throw new playerException(get_string('cmi5launchsessioninfoerror', 'cmi5launch'));
             }
         }// catch all else that might go wrong
         catch (\Throwable $e){
           
-            throw new playerException("Uncaught error retrieving the session information." . $e);
+            throw new playerException( get_string("cmi5launchsessioninfouncaughterror", 'cmi5launch') . $e);
         }
     }
 
@@ -616,14 +614,14 @@ class cmi5_connectors {
         if ($resulttest === false ){
 
            
-            $errormessage =  $type . " CMI5 Player is not communicating. Is it running?";
+            $errormessage =  $type . get_string('cmi5launchcommerror', 'cmi5launch');
 
             throw new playerException($errormessage);
         }
         else if( array_key_exists("statusCode", $resulttest) && $resulttest["statusCode"] != 200) {
 
        
-            $errormessage = $type . " CMI5 Player returned " . $resulttest["statusCode"] . " error. With message '" 
+            $errormessage = $type . get_string('cmi5launchreturned', 'cmi5launch'). $resulttest["statusCode"] . get_string('cmi5launchwith', 'cmi5launch') . " '" 
             . $resulttest["message"] . "'." ;
 
          //   echo"whatt is error messae before throwing::: " . $errormessage;
