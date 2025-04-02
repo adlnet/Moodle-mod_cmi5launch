@@ -117,6 +117,62 @@ $string['cmi5launchtenanttoken'] = 'cmi5 player: bearer token';
 $string['cmi5launchtenanttoken_help'] = 'The cmi5 tenant bearer token (should be a long string).  Should only need to be used during initial setup. If for some reason the tenant name is changed a new bearer token will need to be generated. This cannot be generated if a tenant name has not been made yet.';
 $string['cmi5launchtenanttoken_default'] = '';
 
+// To avoid hardcoding, the button text is set in the language file.
+
+// Button for cmi5, first time setup.
+$string['cmi5launchfirstsetup'] = "<br><br>First time setup:";
+$string['cmi5launchlink'] ="</br>
+    <p id=name >
+        <div class='input-group rounded'>
+          <button class='btn btn-secondary' type='reset' name='cmi5button' onclick='tosetup()'>
+            <span class='button-label'>Enter cmi5 player info</span>
+            </button>
+        </div>
+    </p>
+      ";
+
+// Info for settings warnings.
+$string['cmi5launchtenantnameis'] = '<b>Tenant name is ';
+$string['cmi5launchtenantidis'] = '. Tenant ID is ';
+$string['cmi5launchtenant_warning'] = "</b><div><br> The tenant name and ID have been set. They cannot be changed without causing problems with existing cmi5 launch link activities. To change, plugin must be uninstalled and reinstalled.</div> <div><br></div>";
+
+// Token generation button.
+$string['cmi5launchlinktotoken'] = "</br>
+        <p id=name >
+            <div class='input-group rounded'>
+              <button class='btn btn-secondary' type='reset' name='tokenbutton' onclick='totokenpage()'>
+                <span class='button-label'>Generate new bearer token</span>
+                </button>
+            </div>
+        </p>
+          ";
+
+// Lines for error messages.
+
+
+
+
+// cmi5_connectors
+$string['cmi5launchcommerror'] = " CMI5 Player is not communicating. Is it running?";
+$string['cmi5launchreturned'] = " CMI5 Player returned ";
+$string['cmi5launchwith'] = " error. With message";
+
+$string['cmi5launchcourseerror'] = "creating the course.";
+$string['cmi5launchtenanterror'] = "creating the tenant.";
+$string['cmi5launchtenantuncaughterror'] = "creating the tenant.";
+$string['cmi5launchregistrationerror'] = "retrieving the registration.";
+$string['cmi5launchregistrationinfoerror'] = "retrieving the registration information.";
+$string['cmi5launchregistrationuncaughterror'] = "Uncaught error retrieving the registration information.";
+$string['cmi5launchtokenerror'] = "retrieving the tenant token.";
+$string['cmi5launchtokenuncaughterror'] = "Uncaught error retrieving the tenant token.";
+$string['cmi5launchurlerror'] = "retrieving the launch url from player.";
+$string['cmi5launchurluncaughterror'] = "Uncaught error retrieving the launch url from player.";
+$string['cmi5launchposterror'] = "communicating with player, sending or crafting a POST request: ";
+$string['cmi5launchgeterror'] = "communicating with player, sending or crafting a GET request: ";
+$string['cmi5launchsessioninfoerror'] = "retrieving the session information.";
+$string['cmi5launchsessioninfouncaughterror'] = "Uncaught error retrieving the session information.";
+
+
 // Grading info - MB.
 // Headers.
 $string['defaultgradesettings'] = 'Default values for cmi5 launch link activity grades';

@@ -68,15 +68,13 @@ if ($mform->is_cancelled()) {
         //TODO
         $tenant = $createtenant($cmi5tenant);
 
-        // The return response should be json and have 'id' and 'code' 
-        $response = $tenant;
+        
+        // The return response should be json and have 'id' and 'code'. But it is a string and we need to convert it to an array.
+        $response = json_decode($tenant, true);
 
         // Save the code as the tenant name and ID as ID.
         $name = $response['code'];
         $id = $response['id'];
-
-        echo "Tenant code: " . $name . "<br>";
-        echo "Tenant ID: " . $id . "<br>";
 
         // check we have a tenant and is, and save them to db for later retrieval (particularly id)
         if ($name != null && $id != null) {
