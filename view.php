@@ -207,7 +207,7 @@ try {
     restore_error_handler();
 
     // If there is an error, display it.
-    throw new customException('Creating or retrieving user course record. Contact your system administrator with error: ' . $e->getMessage(), 0);
+    throw new customException(get_string('cmi5launchviewcourseerror', 'cmi5launch') . $e->getMessage(), 0);
 }
 
 // Array to hold info for table population.
@@ -246,7 +246,7 @@ try {
         // Verify object is an au object.
         if (!is_a($au, 'mod_cmi5launch\local\au', false)) {
 
-            $reason = "Excepted AU, found ";
+            $reason = get_string('cmi5launchviewexceptionau', 'cmi5launch');
             var_dump($au);
             throw new moodle_exception($reason, 'cmi5launch', '', $warnings[$reason]);
         }
@@ -429,7 +429,7 @@ try {
     restore_error_handler();
 
     // If there is an error, display it.
-    throw new customException('retrieving and displaying AU satisfied status and grade. Contact your system administrator with error: ' . $e->getMessage(), 0);
+    throw new customException(get_string('cmi5launchviewauerror', 'cmi5launch') . $e->getMessage(), 0);
 }
 // Lastly, update our course table.
 $updated = $DB->update_record("cmi5launch_usercourse", $userscourse);

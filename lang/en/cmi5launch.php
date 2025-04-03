@@ -172,6 +172,14 @@ $string['cmi5launchgeterror'] = "communicating with player, sending or crafting 
 $string['cmi5launchsessioninfoerror'] = "retrieving the session information.";
 $string['cmi5launchsessioninfouncaughterror'] = "Uncaught error retrieving the session information.";
 
+// tenant setup 
+$string['cmi5launchtenanttitle'] = 'Creating  a tenant';
+$string['cmi5launchtenantmadesuccess'] = 'Tenant made and saved successfully';
+$string['cmi5launchtenantfailsave'] = "Failed to save tenant to DB.";
+$string['cmi5launchtenantfailsavemessage'] = "Tenant name failed to save as setting. With result ";
+$string['cmi5launchtenantfailplayersavemessage'] = "Failed to make tenant. Check connection to player and tenant name (cannot reuse old tenant names).";
+$string['cmi5launchtenantnamefail'] = 'Tenant name not retrieved or blank. Please try again.';
+
 
 // Grading info - MB.
 // Headers.
@@ -237,6 +245,10 @@ $string['cmi5launchaunotfound'] = 'No ids match';
 $string['cmi5launchstatementdoesnotequal'] = 'Type from statement does not equal either block or AU.';
 $string['cmi5lauchincorrectvalue'] = 'Incorrect value passed to function cmi5launch_find_au_satisfied. Correct values are a boolean or array';
 
+// For tokensetup.php
+$string['cmi5launchtokensetuptitle'] = 'Creating a tenant';
+$string['cmi5launchtokensaveerror'] = 'Failed to save token to settings. Check connection with DB and try again.';
+$string['cmi5launchtokensaveerror'] = 'Failed to save token to settings. Check connection with DB and try again.';
 
 // There are 2 grading methods.
 // Highest grade - The highest score obtained in all passed learning objects.
@@ -269,7 +281,27 @@ $string['cmi5launchverbnotretrieved'] = '(Verb not retrieved)';
 // Related to object
 $string['cmi5launchobjectnotpresent'] = '(Object name not retrieved/there is no object in this statement)';
 $string['cmi5launchobjectretrievalerror'] = 'Unable to retrieve object name from LRS. Caught exception: ';
-$string['cmi5launchverbnotretrieved'] = '(Verb not retrieved)';
+$string['cmi5launchobjectnotretrieved'] = '(Object name not retrieved)';
+
+// Related to timestamp
+$string['cmi5launchtimestampnotpresent'] = '(Timestamp not retrieved or not present in statement)';
+$string['cmi5launchtimestampretrievalerror'] = 'Unable to retrieve timestamp from LRS. Caught exception: ';
+$string['cmi5launchtimestampnotretrieved'] = '(Timestamp not retrieved)';
+
+// Related to score
+$string['cmi5launchscorenotpresent'] = '(Score not retrieved or not present in statement)';
+$string['cmi5launchscoreretrievalerror'] = 'Unable to retrieve score from LRS. Caught exception: ';
+$string['cmi5launchscorenotretrieved'] = '(Score not retrieved)';
+
+// Related to session
+$string['cmi5launchsessionidretrievalerror'] = 'Unable to retrieve session id from LRS. Caught exception: ';
+
+// Related to statements
+$string['cmi5launchstatementsretrievalerror'] = 'Unable to retrieve  statements from LRS. Caught exception: ';
+$string['cmi5launchstatementsnotretrieved'] = '(Statements not retrieved)';
+
+// AU errors.
+$string['cmi5launchaubuilderror'] = 'Statement to build AU is null or not an array/object. ';
 
 
 // Start Activity Settings.
@@ -435,4 +467,7 @@ $string['privacy:metadata:cmi5_player:courseid'] = 'The cmi5 player assigns each
 $string['privacy:metadata:cmi5_player:returnurl'] = 'The return URL is a parameter sent to the cmi5 player when requesting a launch URL. It is where the browser returns to upon closing the launched activity. It has a unique ID on the end directing back to the user\'s particular course instance.';
 $string['privacy:metadata:cmi5_player:sessionid'] = 'The cmi5 player assigns each user\'s session a unique ID, and this is sent to the cmi5 player when requesting updated session info.';
 
-
+// For view.php
+$string['cmi5launchviewcourseerror'] = 'Creating or retrieving user course record. Contact your system administrator with error: ';
+$string['cmi5launchviewexceptionau'] = 'Excepted AU, found ';
+$string['cmi5launchviewauerror'] = 'retrieving and displaying AU satisfied status and grade. Contact your system administrator with error: ';

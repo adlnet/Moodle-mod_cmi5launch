@@ -37,7 +37,7 @@ $PAGE->set_url('/mod/cmi5launch/tenantsetup.php');
 // Tell moodle the context, in this case the site context (it's system wide not a course or course page.)
 $PAGE->set_context(\context_system::instance());
 // Title tells what is on tab
-$PAGE->set_title(title: 'Creating a tenant');
+$PAGE->set_title(title: get_string('cmi5launchtenanttitle', 'cmi5launch'));
 
 $PAGE->requires->jquery();
 
@@ -93,28 +93,29 @@ if ($mform->is_cancelled()) {
                 // press a button on a new form JUST to make a token. Lets do it behind the scenes and they can retrieve it if they want through an 
                 //echo or settings page? 
 //                $settingurl = new moodle_url($CFG->wwwroot . '/' . 'admin/settings.php', array('section' => 'modsettingcmi5launch'));
-                redirect(url: $CFG->wwwroot . '/mod/cmi5launch/tokensetup.php', message: 'Tenant made and saved successfully');
+                redirect(url: $CFG->wwwroot . '/mod/cmi5launch/tokensetup.php', message: get_string('cmi5launchtenantmadesuccess', 'cmi5launch'));
 
                // redirect($settingurl, 'Successfully made and saved new tenant', 10);
 
             } else {
-                echo "Failed to save tenant to DB.";
+                echo get_string('cmi5launchtenantfailsave', 'cmi5launch');
                 echo "<br>";
-                echo "Tenant name: " . $name . " failed to save as setting. With result " . $result . "<br>";
+                echo get_string('cmi5launchtenantfailsavemessage', 'cmi5launch') . $result; 
+                echo "<br>";
                 //if fail shoudl we freeze and alert user with a window towith error message
 
                 echo $link;
             }
         } else {
 
-            echo "Failed to make tenant. Check connection to player and tenant name (cannot reuse old tenant names).";
+            echo get_string('cmi5launchtenantfailplayersavemessage', 'cmi5launch');
 
             echo $link;
         }
     } else {
 
         // If there is no tenant name then alert user, when they click to clear take them back to settings page.
-        echo "Tenant name not retrieved or blank. Please try again.";
+        echo get_string('cmi5launchtenantnamefail', 'cmi5launch');
 
         echo $link;
 

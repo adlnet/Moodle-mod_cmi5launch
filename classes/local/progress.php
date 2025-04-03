@@ -90,7 +90,7 @@ class progress {
             restore_error_handler();
         
             // If there is an error, return the error.
-            throw new nullException('Trouble retrieving statements from LRS. Caught exception: '. $e->getMessage()); 
+            throw new nullException( get_string('cmi5launchlrsstatementretrievalerror', 'cmi5launch'). $e->getMessage()); 
         
         }
     }
@@ -121,7 +121,7 @@ class progress {
         catch (\Throwable $e) {
 
            // Throw exception if settings are missing.
-           Throw new nullException('Unable to retrieve LRS settings. Caught exception: '. $e->getMessage() . " Check LRS settings are correct.");
+           Throw new nullException(get_string('cmi5launchlrssettingsretrievalerror', 'cmi5launch'). $e->getMessage() . get_string('cmi5launchlrssettingscorrect', 'cmi5launch'));
         }
 
         // Set error and exception handler to catch and override the default PHP error messages, to make messages more user friendly.
@@ -162,7 +162,7 @@ class progress {
             restore_exception_handler();
             restore_error_handler();
 
-            throw new nullException('Unable to communicate with LRS. Caught exception: ' . $e->getMessage() . " Check LRS is up, username and password are correct, and LRS endpoint is correct.", 0);
+            throw new nullException(get_string('cmi5launchlrscommunicationerror', 'cmi5launch') . $e->getMessage() . get_string('cmi5launchlrschecksettings', 'cmi5launch'), 0);
         }
     }
 
@@ -185,7 +185,7 @@ class progress {
             
             // If there is an error, echo the error.
 
-            echo('Unable to retrieve actor name from LRS. Caught exception: '. $e->getMessage());
+            echo(get_string('cmi5launchactorretrievalerror', 'cmi5launch'). $e->getMessage());
             
             return "(Actor name not retrieved)";
         }    
@@ -229,8 +229,8 @@ class progress {
             return $verb;
         } catch (\Throwable $e) {
             // If there is an error, echo the error.
-            echo('Unable to retrieve verb from LRS. Caught exception: '. $e->getMessage());
-            return "(Verb not retrieved)";
+            echo(get_string('cmi5launchverbretrievalerror', 'cmi5launch'). $e->getMessage());
+            return (get_string('cmi5launchverbnotretrieved', 'cmi5launch'));
         }
     }
 
@@ -287,17 +287,17 @@ class progress {
 
                 } else {
                   
-                    return "(Object name not retrieved/there is no object in this statement)";
+                    return (get_string('cmi5launchobjectnotpresent', 'cmi5launch'));
                 }
 
             } else {
                 
-                return "(Object name not retrieved/there is no object in this statement)";
+                return (get_string('cmi5launchobjectnotpresent', 'cmi5launch'));
             }
         } catch (\Throwable $e) {
             // If there is an error, echo the error.
-            echo('Unable to retrieve object name from LRS. Caught exception: '. $e->getMessage());
-            return "(Object name not retrieved)";
+            echo(get_string('cmi5launchobjectretrievalerror', 'cmi5launch') . $e->getMessage());
+            return get_string('cmi5launchobjectnotretrieved', 'cmi5launch');
         }
     }
 
@@ -325,12 +325,12 @@ class progress {
 
             } else {
 
-                return "(Timestamp not retrieved or not present in statement)";
+                return get_string('cmi5launchtimestampnotpresent', 'cmi5launch');
             }
         } catch (\Throwable $e) {
             // If there is an error, echo the error.
-            echo('Unable to retrieve timestamp from LRS. Caught exception: '. $e->getMessage());
-            return "(Timestamp not retrieved)";
+            echo (get_string('cmi5launchtimestampretrievalerror', 'cmi5launch'). $e->getMessage());
+            return get_string('cmi5launchtimestampnotretrieved', 'cmi5launch');
         }
     }
 
@@ -380,18 +380,18 @@ class progress {
                 }
                 else {
                  
-                    return "(Score not retrieved or not present in statement)";
+                    return get_string('cmi5launchscorenotpresent', 'cmi5launch');
                 }
             } else {
           
-                return "(Score not retrieved or not present in statement)";
+                return get_string('cmi5launchscorenotpresent', 'cmi5launch');
             }
         } catch (\Throwable $e) {
             
             // If there is an error, echo the error.
-            echo('Unable to retrieve score from LRS. Caught exception: '. $e->getMessage());
+            echo(get_string('cmi5launchscoreretrievalerror', 'cmi5launch'). $e->getMessage());
             
-            return "(Score not retrieved)";
+            return get_string('cmi5launchscorenotretrieved', 'cmi5launch');
         }
     }
 
@@ -437,7 +437,7 @@ class progress {
                     }
                 } catch (\Throwable $e) {
                     // If there is an error, echo the error.
-                    echo('Unable to retrieve session id from LRS. Caught exception: '. $e->getMessage() . ". There may not be an extension key in statement.");
+                    echo(get_string('cmi5launchsessionidretrievalerror', 'cmi5launch') . $e->getMessage() . ". There may not be an extension key in statement.");
                 }
 
                 // Now if code equals currentsessionid, this is a statement pertaining to this session.
@@ -471,10 +471,10 @@ class progress {
         } catch (\Throwable $e) {
             
             // If there is an error, echo the error.
-            echo('Unable to retrieve statements from LRS. Caught exception: '. $e->getMessage());
+            echo (get_string('cmi5launchstatementsretrievalerror', 'cmi5launch') . $e->getMessage());
             
             
-            return "(Statements not retrieved)";
+            return get_strin(('cmi5launchstatementsnotretrieved', 'cmi5launch'));
         }
     }
 
