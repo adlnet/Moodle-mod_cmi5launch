@@ -30,7 +30,7 @@
  */
 
 defined('MOODLE_INTERNAL') || die();
-
+require_once("$CFG->dirroot/mod/cmi5launch/locallib.php");
 // Cmi5PHP - required for interacting with the LRS in cmi5launch_get_statements.
 require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/autoload.php");
 
@@ -610,13 +610,12 @@ function cmi5launch_process_new_package($cmi5launch) {
 
         $record->courseid = $returnedinfo["id"];
 
-        // TEST
-    $test = "";
+    // Maybe put those constants I made in lang file that way this place can have them to? - monday
         // Create url for sending to when requesting launch url for course.
         $playerurl = $settings['cmi5launchplayerurl'];
 
         // Build and save launchurl.
-        $url = $playerurl . "/api/v1/" . $record->courseid . "/launch-url/";
+        $url = $playerurl . CMI5LAUNCH_PLAYER_V1 . $record->courseid . CMI5LAUNCH_LAUNCH_URL;
         $record->launchurl = $url;
 
    
@@ -752,16 +751,16 @@ function cmi5launch_find_au_satisfied($auinfoin, $aulmsid) {
                 } else {
 
                     // If no ids match we have a problem, and need to return.
-                    $ausatisfied = "No ids match";
+                    $ausatisfied = get_string('cmi5launchaunotfound', 'cmi5launch');
                 }
             } else {
                 // This shouldn't be reachable, but in case add error message.
-                echo "Type from statement does not equal either block or AU.";
+                echo get_string('cmi5launchstatementdoesnotequal', 'cmi5launch');
             }
         }
     } else {
 
-        echo"Incorrect value passed to function cmi5launch_find_au_satisfied. Correct values are a boolean or array";
+        echo get_string('cmi5lauchincorrectvalue', 'cmi5launch');
 
     }
 

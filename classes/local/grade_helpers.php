@@ -172,7 +172,7 @@ class grade_helpers
 
             } else {
           
-                $nograde = array(0 => 'No grades to update. No record for user found in this course.');
+                $nograde = array(0 => get_string('cmi5launchnogradeerror', 'cmi5launch'));
                 // Do nothing, there is no record for this user in this course.
                 // Restore default hadlers.
                 restore_exception_handler();
@@ -183,7 +183,7 @@ class grade_helpers
         } catch (\Throwable $e) {
          
             // If there is an error, return the error.
-            echo" Error in updating or checking user grades. Report this error to system administrator: ". $e->getMessage(); 
+            echo(get_string('cmi5launchgradeerror', 'cmi5launch') . $e->getMessage()); 
             // Restore default hadlers.
             restore_exception_handler();
             restore_error_handler();
@@ -287,7 +287,7 @@ class grade_helpers
                                 break;
                             default:
 
-                                echo("Gradetype not found.");
+                                echo(get_string('cmi5launchgradetypenotfound', 'cmi5launch'));
                             }
 
                         // Save AU scores to corresponding title.
@@ -320,7 +320,7 @@ class grade_helpers
             restore_error_handler();
 
             // If there is an error, return the error.
-            throw new nullException(" Error in updating or checking user grades. Report this error to system administrator: ". $e->getMessage()); 
+            throw new nullException(get_string('cmi5launchgradeerror', 'cmi5launch') . $e->getMessage()); 
         }
     }
 }

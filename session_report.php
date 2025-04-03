@@ -127,15 +127,15 @@ $table = new \flexible_table('mod-cmi5launch-report');
 $scoretable = new \flexible_table('mod-cmi5launch-report');
 
 $columns[] = 'Attempt';
-$headers[] = get_string('attempt', 'cmi5launch');
+$headers[] = get_string('cmi5launchattemptheader', 'cmi5launch');
 $columns[] = 'Started';
-$headers[] = get_string('started', 'cmi5launch');
+$headers[] = get_string('cmi5launchstartedheader', 'cmi5launch');
 $columns[] = 'Finished';
-$headers[] = get_string('last', 'cmi5launch');
+$headers[] = get_string('cmi5launchfinishedheader', 'cmi5launch');
 $columns[] = 'Status';
-$headers[] = "AU Satisfied Status";
+$headers[] = get_string('cmi5launchsatisfiedstatusheader', 'cmi5launch');
 $columns[] = 'Score';
-$headers[] = get_string('score', 'cmi5launch');
+$headers[] = get_string('cmi5launchscoreheader', 'cmi5launch');
 
 $scorecolumns = array();
 $scoreheaders = array();
@@ -199,7 +199,7 @@ if ($aurecord->sessions != null || false) {
         $usersession = $DB->get_record('cmi5launch_sessions', array('sessionid' => $sessionid));
 
         // Add row data.
-        $rowdata["Attempt"] = "Attempt " . $attempt;
+        $rowdata["Attempt"] = get_string('cmi5launchattemptrow', 'cmi5launch') . $attempt;
         $rowdata["Started"] = $datestart;
         $rowdata["Finished"] = $datefinish;
 
@@ -226,9 +226,9 @@ if ($aurecord->sessions != null || false) {
             }
         }
             // Update table.
-            $scorecolumns[] = "Attempt " . $attempt;
-            $scoreheaders[] = "Attempt " . $attempt;
-            $scorerow["Attempt " . $attempt] = $usersession->score;
+            $scorecolumns[] = get_string('cmi5launchattemptrow', 'cmi5launch') . $attempt;
+            $scoreheaders[] = get_string('cmi5launchattemptrow', 'cmi5launch') . $attempt;
+            $scorerow[get_string('cmi5launchattemptrow', 'cmi5launch') . $attempt] = $usersession->score;
 
         switch ($gradetype) {
 
