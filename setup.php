@@ -29,12 +29,13 @@ use mod_cmi5launch\local\cmi5_connectors;
 <script>
 
 // Function to go back to settings page.
-function goback(){
-   
-    //REtrieve and submit form
-    let input = document.getElementById('gobackform');
-    input.submit();
-    }
+function goback() {
+    // Find the form element by its ID
+    let form = document.getElementById('gobackform');
+    // Submit the form
+    form.submit();
+}
+
 </script>
 
 <?php
@@ -48,7 +49,7 @@ define('CMI5LAUNCH_REPORT_DEFAULT_PAGE_SIZE', 20);
 define('CMI5LAUNCH_REPORT_ATTEMPTS_ALL_STUDENTS', 0);
 define('CMI5LAUNCH_REPORT_ATTEMPTS_STUDENTS_WITH', 1);
 define('CMI5LAUNCH_REPORT_ATTEMPTS_STUDENTS_WITH_NO', 2);
-$PAGE->requires->jquery();
+// this is no longer supported   $PAGE->requires->jquery();
 
 global $cmi5launch, $CFG;
 

@@ -61,7 +61,7 @@ $PAGE->set_url('/mod/cmi5launch/view.php', array('id' => $cm->id));
 $PAGE->set_title(format_string($cmi5launch->name));
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($context);
-$PAGE->requires->jquery();
+// this is no longer supported $PAGE->requires->jquery();
 
 // Output starts here.
 echo $OUTPUT->header();
@@ -87,19 +87,24 @@ echo $OUTPUT->header();
             }
         }
 
-        // Function to run when the experience is launched.
+
         function mod_cmi5launch_launchexperience(registration) {
-            // Set the form paramters.
-            $('#launchform_registration').val(registration);
-            // Post it.
-            $('#launchform').submit();
+            // Set the form parameter
+            document.getElementById('launchform_registration').value = registration;
+            // Submit the form
+            document.getElementById('launchform').submit();
         }
 
-        // TODO: there may be a better way to check completion. Out of scope for current project.
-        $(document).ready(function() {
+
+        document.addEventListener('DOMContentLoaded', function() {
             setInterval(function() {
-                $('#cmi5launch_completioncheck').load('completion_check.php?id=<?php echo $id ?>&n=<?php echo $n ?>');
-            }, 30000); // TODO: make this interval a configuration setting.
+                fetch(`completion_check.php?id=${<?php echo $id ?>}&n=${<?php echo $n ?>}`)
+                    .then(response => response.text())
+                    .then(data => {
+                        document.querySelector('#cmi5launch_completioncheck').innerHTML = data;
+                    })
+                    .catch(error => console.error('Error loading completion check:', error));
+            }, 30000);
         });
     </script>
 <?php

@@ -42,7 +42,7 @@ define('CMI5LAUNCH_REPORT_DEFAULT_PAGE_SIZE', 20);
 define('CMI5LAUNCH_REPORT_ATTEMPTS_ALL_STUDENTS', 0);
 define('CMI5LAUNCH_REPORT_ATTEMPTS_STUDENTS_WITH', 1);
 define('CMI5LAUNCH_REPORT_ATTEMPTS_STUDENTS_WITH_NO', 2);
-$PAGE->requires->jquery();
+// this is no longer supported   $PAGE->requires->jquery();
 
 global $cmi5launch, $CFG;
 
