@@ -26,20 +26,18 @@ use mod_cmi5launch\local\cmi5_connectors;
 
 
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
-require_once($CFG->libdir.'/tablelib.php');
-require_once($CFG->dirroot.'/mod/cmi5launch/locallib.php');
-require_once($CFG->libdir.'/formslib.php');
-require_once($CFG->dirroot. '/reportbuilder/classes/local/report/column.php');
+require_once($CFG->libdir . '/tablelib.php');
+require_once($CFG->dirroot . '/mod/cmi5launch/locallib.php');
+require_once($CFG->libdir . '/formslib.php');
+require_once($CFG->dirroot . '/reportbuilder/classes/local/report/column.php');
 // Include our class file
-require_once($CFG->dirroot.'/mod/cmi5launch/classes/local/tenant_form.php');
+require_once($CFG->dirroot . '/mod/cmi5launch/classes/local/tenant_form.php');
 // Tell moodle about our page, tell it what the url is.\\
 $PAGE->set_url('/mod/cmi5launch/tenantsetup.php');
 // Tell moodle the context, in this case the site context (it's system wide not a course or course page.)
 $PAGE->set_context(\context_system::instance());
 // Title tells what is on tab
 $PAGE->set_title(title: 'Creating a tenant');
-
-$PAGE->requires->jquery();
 
 global $cmi5launch, $CFG;
 
@@ -55,7 +53,6 @@ if ($mform->is_cancelled()) {
 
     // If they cancel, redirect back to the setup page.
     redirect(url: $CFG->wwwroot . '/mod/cmi5launch/setupform.php', message: 'Cancelled');
-
 } else if ($fromform = $mform->get_data()) {
 
     // Retrieve username.
@@ -68,7 +65,7 @@ if ($mform->is_cancelled()) {
         //TODO
         $tenant = $createtenant($cmi5tenant);
 
-        
+
         // The return response should be json and have 'id' and 'code'. But it is a string and we need to convert it to an array.
         $response = json_decode($tenant, true);
 
@@ -87,15 +84,15 @@ if ($mform->is_cancelled()) {
             if ($idresult && $result) {
 
                 // If result is true then redirect back to settings page.
-                // except now we dont want to redirect to  settings! We want to go to 
+                // except now we dont want to redirect to  settings! We want to go to
                 // The TOKEN setup form
                 // Wait, maybe it should do this automatically? Like they don't need to enter it sine we are making this make it for them, and we don't need them to
-                // press a button on a new form JUST to make a token. Lets do it behind the scenes and they can retrieve it if they want through an 
-                //echo or settings page? 
-//                $settingurl = new moodle_url($CFG->wwwroot . '/' . 'admin/settings.php', array('section' => 'modsettingcmi5launch'));
+                // press a button on a new form JUST to make a token. Lets do it behind the scenes and they can retrieve it if they want through an
+                //echo or settings page?
+                //                $settingurl = new moodle_url($CFG->wwwroot . '/' . 'admin/settings.php', array('section' => 'modsettingcmi5launch'));
                 redirect(url: $CFG->wwwroot . '/mod/cmi5launch/tokensetup.php', message: 'Tenant made and saved successfully');
 
-               // redirect($settingurl, 'Successfully made and saved new tenant', 10);
+                // redirect($settingurl, 'Successfully made and saved new tenant', 10);
 
             } else {
                 echo "Failed to save tenant to DB.";
@@ -117,11 +114,8 @@ if ($mform->is_cancelled()) {
         echo "Tenant name not retrieved or blank. Please try again.";
 
         echo $link;
-
     }
-
-}
-;
+};
 echo $OUTPUT->header();
 
 // Display the form.
@@ -130,8 +124,7 @@ echo $OUTPUT->footer();
 ?>
 
 
-    <form id="gobackform" action="../../admin/settings.php" method="get">
+<form id="gobackform" action="../../admin/settings.php" method="get">
     <input id="section" name="section" type="hidden" value="modsettingcmi5launch">
 
 </form>
-
