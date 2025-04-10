@@ -17,7 +17,7 @@
 /* For global cmi5 settings  */
 
 /**
- * Cmi5 settings. Ability to update and change 
+ * Cmi5 settings. Ability to update and change
  *
  * This code fragment is called by moodle_needs_upgrading() and
  * /admin/index.php
@@ -33,19 +33,15 @@ defined('MOODLE_INTERNAL') || die;
 ?>
 
 <script>
-
-    function totokenpage(){
-
+    function totokenpage() {
         // Post it.
-        $('#settingformtoken').submit();
+        document.getElementById('settingformtoken').submit();
     }
 
-    function tosetup(){
-
-    // Post it.
-    $('#setupform').submit();
+    function tosetup() {
+        // Post it.
+        document.getElementById('setupform').submit();
     }
-
 </script>
 <?php
 
@@ -57,21 +53,28 @@ if ($ADMIN->fulltree) {
 
     // MB
     // From scorm grading stuff.
-    $yesno = array(0 => get_string('no'),
-                   1 => get_string('yes'));
-    
-    // Default display settings.
-    $settings->add(new admin_setting_heading('cmi5launch/cmi5launchlrsfieldset',
-        get_string('cmi5launchlrsfieldset', 'cmi5launch'),
-        get_string('cmi5launchlrsfieldset_help', 'cmi5launch')));
+    $yesno = array(
+        0 => get_string('no'),
+        1 => get_string('yes')
+    );
 
-        // LRS settings 
+    // Default display settings.
+    $settings->add(new admin_setting_heading(
+        'cmi5launch/cmi5launchlrsfieldset',
+        get_string('cmi5launchlrsfieldset', 'cmi5launch'),
+        get_string('cmi5launchlrsfieldset_help', 'cmi5launch')
+    ));
+
+    // LRS settings
     $settings->add(new admin_setting_heading('cmi5launch/cmi5lrssettings', get_string('cmi5lrssettingsheader', 'cmi5launch'), ''));
 
-    $settings->add(new admin_setting_configtext_mod_cmi5launch('cmi5launch/cmi5launchlrsendpoint',
+    $settings->add(new admin_setting_configtext_mod_cmi5launch(
+        'cmi5launch/cmi5launchlrsendpoint',
         get_string('cmi5launchlrsendpoint', 'cmi5launch'),
         get_string('cmi5launchlrsendpoint_help', 'cmi5launch'),
-        get_string('cmi5launchlrsendpoint_default', 'cmi5launch'), PARAM_URL));
+        get_string('cmi5launchlrsendpoint_default', 'cmi5launch'),
+        PARAM_URL
+    ));
 
     $options = array(
         1 => get_string('cmi5launchlrsauthentication_option_0', 'cmi5launch'),
@@ -80,61 +83,72 @@ if ($ADMIN->fulltree) {
     );
     // Note the numbers above are deliberately mis-ordered for reasons of backwards compatibility with older settings.
 
-    $setting = new admin_setting_configselect('cmi5launch/cmi5launchlrsauthentication',
+    $setting = new admin_setting_configselect(
+        'cmi5launch/cmi5launchlrsauthentication',
         get_string('cmi5launchlrsauthentication', 'cmi5launch'),
-        get_string('cmi5launchlrsauthentication_help', 'cmi5launch').'<br/>'
-        .get_string('cmi5launchlrsauthentication_watershedhelp', 'cmi5launch')
-        , 1, $options);
+        get_string('cmi5launchlrsauthentication_help', 'cmi5launch') . '<br/>'
+            . get_string('cmi5launchlrsauthentication_watershedhelp', 'cmi5launch'),
+        1,
+        $options
+    );
     $settings->add($setting);
 
-    $setting = new admin_setting_configtext('cmi5launch/cmi5launchlrslogin',
+    $setting = new admin_setting_configtext(
+        'cmi5launch/cmi5launchlrslogin',
         get_string('cmi5launchlrslogin', 'cmi5launch'),
         get_string('cmi5launchlrslogin_help', 'cmi5launch'),
-        get_string('cmi5launchlrslogin_default', 'cmi5launch'));
+        get_string('cmi5launchlrslogin_default', 'cmi5launch')
+    );
     $settings->add($setting);
 
-    $setting = new admin_setting_configtext('cmi5launch/cmi5launchlrspass',
+    $setting = new admin_setting_configtext(
+        'cmi5launch/cmi5launchlrspass',
         get_string('cmi5launchlrspass', 'cmi5launch'),
         get_string('cmi5launchlrspass_help', 'cmi5launch'),
-        get_string('cmi5launchlrspass_default', 'cmi5launch'));
+        get_string('cmi5launchlrspass_default', 'cmi5launch')
+    );
     $settings->add($setting);
 
-    $settings->add(new admin_setting_configtext('cmi5launch/cmi5launchlrsduration',
+    $settings->add(new admin_setting_configtext(
+        'cmi5launch/cmi5launchlrsduration',
         get_string('cmi5launchlrsduration', 'cmi5launch'),
         get_string('cmi5launchlrsduration_help', 'cmi5launch'),
-        get_string('cmi5launchlrsduration_default', 'cmi5launch')));
+        get_string('cmi5launchlrsduration_default', 'cmi5launch')
+    ));
 
-    $settings->add(new admin_setting_configtext('cmi5launch/cmi5launchcustomacchp',
+    $settings->add(new admin_setting_configtext(
+        'cmi5launch/cmi5launchcustomacchp',
         get_string('cmi5launchcustomacchp', 'cmi5launch'),
         get_string('cmi5launchcustomacchp_help', 'cmi5launch'),
-        get_string('cmi5launchcustomacchp_default', 'cmi5launch')));
+        get_string('cmi5launchcustomacchp_default', 'cmi5launch')
+    ));
 
-    $settings->add(new admin_setting_configcheckbox('cmi5launch/cmi5launchuseactoremail',
+    $settings->add(new admin_setting_configcheckbox(
+        'cmi5launch/cmi5launchuseactoremail',
         get_string('cmi5launchuseactoremail', 'cmi5launch'),
         get_string('cmi5launchuseactoremail_help', 'cmi5launch'),
-        1));
+        1
+    ));
 
     // The first time user logs in there will be a button for setup.
     $showbutton = false;
     // If tenantname or id is false, this is a first time setup we'll have the new button.
     $tenantid = get_config('cmi5launch', 'cmi5launchtenantid');
     $tenantname = get_config('cmi5launch', 'cmi5launchtenantname');
+
     if ($tenantid == null || $tenantid == false) {
         $showbutton = true;
-
     }
+
     $settings->add(new admin_setting_heading('cmi5launch/cmi5launchsettings', get_string('cmi5launchsettingsheader', 'cmi5launch'), ''));
 
-   
+    if ($showbutton) {
 
-if ($showbutton) {
-    
-    // Show only a button, otherwise regular information showing.
-    // This is the first time setup.
-    //use this for the button instead of config text
-    $setting = new admin_setting_description('cmi5launchsetup', get_string('cmi5launchfirstsetup', 'cmi5launch'), get_string('cmi5launchlink', 'cmi5launch'));
+        // Show only a button, otherwise regular information showing.
+        // This is the first time setup.
+        //use this for the button instead of config text
+        $setting = new admin_setting_description('cmi5launchsetup', get_string('cmi5launchfirstsetup', 'cmi5launch'), get_string('cmi5launchlink', 'cmi5launch'));
         $settings->add($setting);
-
     } else {
 
         $settings->add(
@@ -163,9 +177,9 @@ if ($showbutton) {
         );
         $settings->add($setting);
 
-     // Display tenant info
-     // To corrrect hardcoded strings and follow moodles coding standards to have full sentences, we may need three get_string here.
-     // We could have them all in one long string (ie getstring . var . getstring . var) but I think this is better.- mb
+        // Display tenant info
+        // To corrrect hardcoded strings and follow moodles coding standards to have full sentences, we may need three get_string here.
+        // We could have them all in one long string (ie getstring . var . getstring . var) but I think this is better.- mb
         $tenantnamestring = get_string('cmi5launchtenantnameis', 'cmi5launch') . $tenantname;
         $tenantidstring = get_string('cmi5launchtenantidis', 'cmi5launch') . $tenantid;
         $tenantwarning = get_string('cmi5launchtenant_warning', 'cmi5launch');
@@ -177,40 +191,59 @@ if ($showbutton) {
         $setting = new admin_setting_configtext(
             'cmi5launch/cmi5launchtenanttoken',
             get_string('cmi5launchtenanttoken', 'cmi5launch'),
-            get_string('cmi5launchtenanttoken_help', 'cmi5launch') . 
-            get_string('cmi5launchlinktotoken', 'cmi5launch'),
+            get_string('cmi5launchtenanttoken_help', 'cmi5launch') .
+                get_string('cmi5launchlinktotoken', 'cmi5launch'),
             get_string('cmi5launchtenanttoken_default', 'cmi5launch')
         );
         $settings->add($setting);
-
     }
 
 
     // MB.
     // Grade stuff I'm bringing over.
-        // Default grade settings.
+    // Default grade settings.
     $settings->add(new admin_setting_heading('cmi5launch/gradesettings', get_string('defaultgradesettings', 'cmi5launch'), ''));
-    $settings->add(new admin_setting_configselect('cmi5launch/grademethod',
-        get_string('grademethod', 'cmi5launch'), get_string('grademethoddesc', 'cmi5launch'),
-        MOD_CMI5LAUNCH_GRADE_HIGHEST, cmi5launch_get_grade_method_array()));
+    $settings->add(new admin_setting_configselect(
+        'cmi5launch/grademethod',
+        get_string('grademethod', 'cmi5launch'),
+        get_string('grademethoddesc', 'cmi5launch'),
+        MOD_CMI5LAUNCH_GRADE_HIGHEST,
+        cmi5launch_get_grade_method_array()
+    ));
 
     for ($i = 0; $i <= 100; $i++) {
         $grades[$i] = "$i";
     }
 
-    $settings->add(new admin_setting_configselect('cmi5launch/maxgrade',
-        get_string('maximumgrade'), get_string('maximumgradedesc', 'cmi5launch'), 100, $grades));
+    $settings->add(new admin_setting_configselect(
+        'cmi5launch/maxgrade',
+        get_string('maximumgrade'),
+        get_string('maximumgradedesc', 'cmi5launch'),
+        100,
+        $grades
+    ));
 
     $settings->add(new admin_setting_heading('cmi5launch/othersettings', get_string('defaultothersettings', 'cmi5launch'), ''));
 
     // Default attempts settings.
-    $settings->add(new admin_setting_configselect('cmi5launch/maxattempt',
-        get_string('maximumattempts', 'cmi5launch'), '', '0', cmi5launch_get_attempts_array()),
-        get_string('whatmaxdesc', 'cmi5launch'), );
+    $settings->add(
+        new admin_setting_configselect(
+            'cmi5launch/maxattempt',
+            get_string('maximumattempts', 'cmi5launch'),
+            '',
+            '0',
+            cmi5launch_get_attempts_array()
+        ),
+        get_string('whatmaxdesc', 'cmi5launch'),
+    );
 
-    $settings->add(new admin_setting_configselect('cmi5launch/whatgrade',
-        get_string('whatgrade', 'cmi5launch'), get_string('whatgradedesc', 'cmi5launch'),
-        MOD_CMI5LAUNCH_HIGHEST_ATTEMPT, cmi5launch_get_what_grade_array()));
+    $settings->add(new admin_setting_configselect(
+        'cmi5launch/whatgrade',
+        get_string('whatgrade', 'cmi5launch'),
+        get_string('whatgradedesc', 'cmi5launch'),
+        MOD_CMI5LAUNCH_HIGHEST_ATTEMPT,
+        cmi5launch_get_what_grade_array()
+    ));
 
     // Not sure if we want to implement mastery override at this time -MB.
     /*
@@ -218,26 +251,29 @@ if ($showbutton) {
     get_string('masteryoverride', 'cmi5launch'), get_string('masteryoverridedesc', 'cmi5launch'), 1, $yesno));
     */
 
-    $settings->add(new admin_setting_configselect('cmi5launch/MOD_CMI5LAUNCH_LAST_ATTEMPTlock',
-        get_string('mod_cmi5launch_last_attempt_lock', 'cmi5launch'), get_string('mod_cmi5launch_last_attempt_lockdesc', 'cmi5launch'), 0, $yesno));
+    $settings->add(new admin_setting_configselect(
+        'cmi5launch/MOD_CMI5LAUNCH_LAST_ATTEMPTlock',
+        get_string('mod_cmi5launch_last_attempt_lock', 'cmi5launch'),
+        get_string('mod_cmi5launch_last_attempt_lockdesc', 'cmi5launch'),
+        0,
+        $yesno
+    ));
+}
 
+?>
 
-    }
+<form id="setupform" action="../mod/cmi5launch/setupform.php" method="get">
 
-    ?> 
-    
-    <form id="setupform" action="../mod/cmi5launch/setupform.php" method="get">
- 
- </form>
-
-
-    <form id="settingformtoken" action="../mod/cmi5launch/tokensetup.php" method="get">
- 
 </form>
 
 
- <form id="settingform" action="../mod/cmi5launch/tenantsetup.php" method="get">
-        
-        <input id="variableName" name="variableName" type="hidden" value="default">
+<form id="settingformtoken" action="../mod/cmi5launch/tokensetup.php" method="get">
 
-    </form>
+</form>
+
+
+<form id="settingform" action="../mod/cmi5launch/tenantsetup.php" method="get">
+
+    <input id="variableName" name="variableName" type="hidden" value="default">
+
+</form>

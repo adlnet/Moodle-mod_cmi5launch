@@ -26,10 +26,10 @@ use mod_cmi5launch\local\session_helpers;
 
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require('header.php');
-require_once($CFG->libdir.'/tablelib.php');
-require_once($CFG->dirroot.'/mod/cmi5launch/locallib.php');
-require_once($CFG->libdir.'/formslib.php');
-require_once($CFG->dirroot. '/reportbuilder/classes/local/report/column.php');
+require_once($CFG->libdir . '/tablelib.php');
+require_once($CFG->dirroot . '/mod/cmi5launch/locallib.php');
+require_once($CFG->libdir . '/formslib.php');
+require_once($CFG->dirroot . '/reportbuilder/classes/local/report/column.php');
 
 require_login($course, false, $cm);
 
@@ -37,7 +37,6 @@ define('CMI5LAUNCH_REPORT_DEFAULT_PAGE_SIZE', 20);
 define('CMI5LAUNCH_REPORT_ATTEMPTS_ALL_STUDENTS', 0);
 define('CMI5LAUNCH_REPORT_ATTEMPTS_STUDENTS_WITH', 1);
 define('CMI5LAUNCH_REPORT_ATTEMPTS_STUDENTS_WITH_NO', 2);
-$PAGE->requires->jquery();
 
 global $cmi5launch, $CFG;
 
@@ -60,7 +59,7 @@ $getaus = $aushelpers->get_cmi5launch_retrieve_aus_from_db();
 $id = required_param('id', PARAM_INT);
 
 // Retrieve the user and AU specific info from previous page.
-$fromreportpage = base64_decode(required_param('session_report', PARAM_TEXT) );
+$fromreportpage = base64_decode(required_param('session_report', PARAM_TEXT));
 // Break it into array.
 $fromreportpage = json_decode($fromreportpage, true);
 
@@ -98,7 +97,7 @@ if (empty($noheader)) {
     // Setup the page.
     $PAGE->set_url($url);
     $PAGE->set_pagelayout('report');
-    $PAGE->set_title("$course->shortname: ".format_string($cm->name));
+    $PAGE->set_title("$course->shortname: " . format_string($cm->name));
     $PAGE->set_heading($course->fullname);
     $PAGE->activityheader->set_attrs([
         'hidecompletion' => true,
@@ -113,7 +112,7 @@ if (empty($noheader)) {
 ?>
 <form action="report.php" method="get">
     <input id="id" name="id" type="hidden" value="<?php echo $id ?>">
-  <input type="submit" value="Back"/>
+    <input type="submit" value="Back" />
 </form>
 <?php
 
@@ -146,7 +145,7 @@ $table->define_headers($headers);
 $table->define_baseurl($PAGE->url);
 
 // Decode and put AU ids in array.
-$auids = (json_decode($auidprevpage, true) );
+$auids = (json_decode($auidprevpage, true));
 
 // For each AU id, find the one that matches our auid from previous page, this is the record we want.
 foreach ($auids as $key => $auid) {
@@ -225,10 +224,10 @@ if ($aurecord->sessions != null || false) {
                 $austatus = "Completed and Failed";
             }
         }
-            // Update table.
-            $scorecolumns[] = "Attempt " . $attempt;
-            $scoreheaders[] = "Attempt " . $attempt;
-            $scorerow["Attempt " . $attempt] = $usersession->score;
+        // Update table.
+        $scorecolumns[] = "Attempt " . $attempt;
+        $scoreheaders[] = "Attempt " . $attempt;
+        $scorerow["Attempt " . $attempt] = $usersession->score;
 
         switch ($gradetype) {
 
@@ -247,15 +246,15 @@ if ($aurecord->sessions != null || false) {
                 break;
         }
 
-            $scorerow["Grading type"] = $grade;
+        $scorerow["Grading type"] = $grade;
 
-            $attempt++;
+        $attempt++;
 
-            $rowdata["Status"] = $austatus;
+        $rowdata["Status"] = $austatus;
 
-            $rowdata["Score"] = $usersession->score;
+        $rowdata["Score"] = $usersession->score;
 
-            $table->add_data_keyed($rowdata);
+        $table->add_data_keyed($rowdata);
     }
 }
 
