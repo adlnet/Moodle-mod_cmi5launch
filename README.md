@@ -231,7 +231,8 @@ Once Moodle has finished uploading the plugin it will bring up the _cmi5 Launch 
 
 
 - cmi5 Player URL : The URL to communicate with the CMI5 player, can include port number(e.g. http://player.example.com or http://localhost:63398). Must NOT include a trailing forward slash.
-	- A note about dockerized containers: When working with Moodle as a docker image, to communicate with the player locally you need to get the local ip address through 'ifconfig' rather than using 'localhost' or '127.0.0.1'. So for instance, if your ip address is 10.10.0.15 you would place "http://10.10.0.15" as the url. 
+	- A note about dockerized containers: When working with Moodle as a docker image, to communicate with the player locally you need to get the local ip address through 'ifconfig' rather than using 'localhost' or '127.0.0.1'. So for instance, if your ip address is 10.10.0.15 you would place "http://10.10.0.15" as the url. Unless The player is on the same docker network as the Moodle container in which case it would be 'http://docker service name : docker internal port'
+ 	- Further, if using with nginx the variable 'PLAYER_API_ROOT' must be appended, example is 'http://docker-service-name:docker-internal-port/PLAYER_API_ROOT'	 	
 
 
 
