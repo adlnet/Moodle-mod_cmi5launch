@@ -24,13 +24,14 @@
 use mod_cmi5launch\local\session_helpers;
 use mod_cmi5launch\local\customException;
 use mod_cmi5launch\local\au_helpers;
+
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require('header.php');
-// why is this an error? require_once("$CFG->dirroot/lib/outputcomponents.php");
+
 
 
 // Include the errorover (error override) funcs.
-require_once ($CFG->dirroot . '/mod/cmi5launch/classes/local/errorover.php');
+require_once($CFG->dirroot . '/mod/cmi5launch/classes/local/errorover.php');
 
 
 require_login($course, false, $cm);
@@ -61,7 +62,7 @@ $PAGE->set_url('/mod/cmi5launch/view.php', array('id' => $cm->id));
 $PAGE->set_title(format_string($cmi5launch->name));
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($context);
-// this is no longer supported $PAGE->requires->jquery();
+
 
 // Output starts here.
 echo $OUTPUT->header();
@@ -70,7 +71,7 @@ echo $OUTPUT->header();
 ?>
 <form action="view.php" method="get">
     <input id="id" name="id" type="hidden" value="<?php echo $id ?>">
-  <input type="submit" value="Back"/>
+    <input type="submit" value="Back" />
 </form>
 <?php
 
@@ -78,36 +79,36 @@ echo $OUTPUT->header();
 
 ?>
 
-    <script>
+<script>
+    function key_test(registration) {
 
-        function key_test(registration) {
-
-            if (event.keyCode === 13 || event.keyCode === 32) {
-                mod_cmi5launch_launchexperience(registration);
-            }
+        if (event.keyCode === 13 || event.keyCode === 32) {
+            mod_cmi5launch_launchexperience(registration);
         }
+    }
 
 
-        function mod_cmi5launch_launchexperience(registration) {
-            // Set the form parameter
-            document.getElementById('launchform_registration').value = registration;
-            // Submit the form
-            document.getElementById('launchform').submit();
-        }
+    // Function to run when the experience is launched.
+    function mod_cmi5launch_launchexperience(registration) {
+        // Set the form paramters.
+        document.getElementById('launchform_registration').value = registration;
+        // Post it.
+        document.getElementById('launchform').submit();
+    }
 
-/*
-        document.addEventListener('DOMContentLoaded', function() {
-            setInterval(function() {
-                fetch(`completion_check.php?id=${php echo $id ?>}&n=${php echo $n ?>}`)
-                    .then(response => response.text())
-                    .then(data => {
-                        document.querySelector('#cmi5launch_completioncheck').innerHTML = data;
-                    })
-                    .catch(error => console.error('Error loading completion check:', error));
-            }, 30000);
-        }); 
-        */
-    </script>
+    // TODO: there may be a better way to check completion. Out of scope for current project.
+    document.addEventListener('DOMContentLoaded', function() {
+        setInterval(function() {
+            fetch('completion_check.php?id=<?php echo $id ?>&n=<?php echo $n ?>')
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('cmi5launch_completioncheck').innerHTML = data;
+                })
+                .catch(error => console.error('Error:', error));
+        }, 30000); // TODO: make this interval a configuration setting.
+    });
+</script>
+
 <?php
 
 // Is this all necessary? Cant the data come through on its own
@@ -133,7 +134,7 @@ $userscourse = $DB->get_record('cmi5launch_usercourse', ['courseid'  => $record-
 // If it is null there have been no previous sessions.
 if (!$au->sessions == null) {
 
-    try{
+    try {
 
         // Set error and exception handler to catch and override the default PHP error messages, to make messages more user friendly.
         set_error_handler('mod_cmi5launch\local\custom_warningAU', E_WARNING);
@@ -147,10 +148,10 @@ if (!$au->sessions == null) {
         $table->id = 'cmi5launch_auSessionTable';
         $table->caption = get_string('modulenameplural', 'cmi5launch');
         $table->head = array(
-        get_string('cmi5launchviewfirstlaunched', 'cmi5launch'),
-        get_string('cmi5launchviewlastlaunched', 'cmi5launch'),
-        get_string('cmi5launchviewprogress', 'cmi5launch'),
-        get_string('cmi5launchviewgradeheader', 'cmi5launch'),
+            get_string('cmi5launchviewfirstlaunched', 'cmi5launch'),
+            get_string('cmi5launchviewlastlaunched', 'cmi5launch'),
+            get_string('cmi5launchviewprogress', 'cmi5launch'),
+            get_string('cmi5launchviewgradeheader', 'cmi5launch'),
         );
 
 
@@ -192,7 +193,7 @@ if (!$au->sessions == null) {
 
             // Add to be fed to table.
             $tabledata[] = $sessioninfo;
-        } 
+        }
     } catch (Exception $e) {
 
         // Restore default hadlers.
@@ -200,7 +201,7 @@ if (!$au->sessions == null) {
         restore_error_handler();
 
         // Throw an exception.
-        throw new customException('loading session table on AUview page. Report this to system administrator: ' . $e->getMessage() . 'Check that session information is present in DB and session id is correct.' , 0);
+        throw new customException('loading session table on AUview page. Report this to system administrator: ' . $e->getMessage() . 'Check that session information is present in DB and session id is correct.', 0);
     }
 
     // Write table.
@@ -226,6 +227,7 @@ echo "<p tabindex=\"0\"onkeyup=\"key_test('"
 
 // Add a form to be posted based on the attempt selected.
 ?>
+
     <form id="launchform" action="launch.php" method="get">
         <input id="launchform_registration" name="launchform_registration" type="hidden" value="default">
         <input id="id" name="id" type="hidden" value="<?php echo $id ?>">
@@ -233,6 +235,7 @@ echo "<p tabindex=\"0\"onkeyup=\"key_test('"
         <input id="auid" name="auid" type="hidden" value="<?php echo $auid ?>"> <!-- Pass AU ID -->
 
     </form>
+
 
 <?php
 

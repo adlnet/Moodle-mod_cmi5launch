@@ -27,6 +27,9 @@ use mod_cmi5launch\local\cmi5_connectors;
 ?>
 
 <script>
+    // Function to go back to settings page.
+    function goback() {
+
 
 // Function to go back to settings page.
 function goback() {
@@ -35,21 +38,20 @@ function goback() {
     // Submit the form
     form.submit();
 }
-
+> main
 </script>
 
 <?php
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
-require_once($CFG->libdir.'/tablelib.php');
-require_once($CFG->dirroot.'/mod/cmi5launch/locallib.php');
-require_once($CFG->libdir.'/formslib.php');
-require_once($CFG->dirroot. '/reportbuilder/classes/local/report/column.php');
+require_once($CFG->libdir . '/tablelib.php');
+require_once($CFG->dirroot . '/mod/cmi5launch/locallib.php');
+require_once($CFG->libdir . '/formslib.php');
+require_once($CFG->dirroot . '/reportbuilder/classes/local/report/column.php');
 
 define('CMI5LAUNCH_REPORT_DEFAULT_PAGE_SIZE', 20);
 define('CMI5LAUNCH_REPORT_ATTEMPTS_ALL_STUDENTS', 0);
 define('CMI5LAUNCH_REPORT_ATTEMPTS_STUDENTS_WITH', 1);
 define('CMI5LAUNCH_REPORT_ATTEMPTS_STUDENTS_WITH_NO', 2);
-// this is no longer supported   $PAGE->requires->jquery();
 
 global $cmi5launch, $CFG;
 
@@ -58,7 +60,7 @@ $cmi5helper = new cmi5_connectors;
 $createtenant = $cmi5helper->cmi5launch_get_create_tenant();
 
 // Retrieve the name entered in previous pages prompt. This will be the new tenant name.
-    $fromsettings = required_param('variableName', PARAM_TEXT);
+$fromsettings = required_param('variableName', PARAM_TEXT);
 
 // Button to return to settings page.
 $link = "</br>
@@ -75,7 +77,7 @@ if ($fromsettings != null) {
     // Make the new tenant and grab results.
     $tenant = $createtenant($fromsettings);
 
-    // The return response should be an array  and have 'id' and 'code' 
+    // The return response should be an array  and have 'id' and 'code'
     $response = $tenant;
 
     //Do we need an if statement for response tyopo?
@@ -98,20 +100,17 @@ if ($fromsettings != null) {
 
             //Hopefully that worked? Now back to settings
             $settingurl = new moodle_url($CFG->wwwroot . '/' . 'admin/settings.php', array('section' => 'modsettingcmi5launch'));
-
         } else {
             echo "Failed to make tenant. Check connection to player and tenant name.";
             //if fail shoudl we freeze and alert user with a window towith error message
 
             echo $link;
         }
-
     } else {
 
         echo "Tenant name not retrieved from player. Check connection.";
 
         echo $link;
-
     }
 } else {
     echo "Tenant name not retrieved or blank. Please try again.";
@@ -121,8 +120,7 @@ if ($fromsettings != null) {
 ?>
 
 
-    <form id="gobackform" action="../../admin/settings.php" method="get">
+<form id="gobackform" action="../../admin/settings.php" method="get">
     <input id="section" name="section" type="hidden" value="modsettingcmi5launch">
 
 </form>
-

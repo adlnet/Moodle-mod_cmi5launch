@@ -34,7 +34,7 @@ require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require('header.php');
 
 // Include the errorover (error override) funcs.
-require_once ($CFG->dirroot . '/mod/cmi5launch/classes/local/errorover.php');
+require_once($CFG->dirroot . '/mod/cmi5launch/classes/local/errorover.php');
 
 require_login($course, false, $cm);
 
@@ -71,7 +71,7 @@ $PAGE->set_url('/mod/cmi5launch/view.php', array('id' => $cm->id));
 $PAGE->set_title(format_string($cmi5launch->name));
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($context);
-// this is no longer supported   $PAGE->requires->jquery();
+
 
 // Output starts here.
 echo $OUTPUT->header();
@@ -82,16 +82,15 @@ $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
 // TODO: Put all the php inserted data as parameters on the functions and put the functions in a separate JS file.
 ?>
 
-    <script>
-      
-        function key_test(registration) {
-        
-            //Onclick calls this
-            if (event.keyCode === 13 || event.keyCode === 32) {
+<script>
+    function key_test(registration) {
 
-                mod_cmi5launch_launchexperience(registration);
-            }
+        //Onclick calls this
+        if (event.keyCode === 13 || event.keyCode === 32) {
+
+            mod_cmi5launch_launchexperience(registration);
         }
+    }
 
         // Function to run when the experience is launched (on click).
         function mod_cmi5launch_launchexperience(registrationInfo) {
@@ -143,6 +142,7 @@ $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
         });
 
     </script>
+
 <?php
 
 // Check for updates.
@@ -150,7 +150,7 @@ cmi5launch_update_grades($cmi5launch, $USER->id);
 
 // Check if a course record exists for this user yet.
 $exists = $DB->record_exists('cmi5launch_usercourse', ['courseid'  => $record->courseid, 'userid'  => $USER->id]);
-  
+
 // Set error and exception handler to catch and override the default PHP error messages, to make messages more user friendly.
 set_error_handler('mod_cmi5launch\local\custom_warningview', E_WARNING);
 set_exception_handler('mod_cmi5launch\local\custom_warningview');
@@ -189,7 +189,6 @@ try {
 
         // Now assign id created by DB.
         $userscourse->id = $newid;
-
     } else { // Record exists.
 
         // We have a record, so we need to retrieve it.
@@ -210,10 +209,9 @@ try {
         }
         // Retrieve AU ids.
         $auids = (json_decode($userscourse->aus));
-//        $auids = (json_decode($userscourse));
+        //        $auids = (json_decode($userscourse));
 
     }
-    
 } catch (Exception $e) {
 
     // Restore default hadlers.
@@ -321,26 +319,22 @@ try {
                             case "Completed":
                                 if ($completedfound == true) {
                                     $ausatisfied = "true";
-                                }
-                                ;
+                                };
                                 break;
                             case "Passed":
                                 if ($passedfound == true) {
                                     $ausatisfied = "true";
-                                }
-                                ;
+                                };
                                 break;
                             case "CompletedOrPassed":
                                 if ($completedfound == true || $passedfound == true) {
                                     $ausatisfied = "true";
-                                }
-                                ;
+                                };
                                 break;
                             case "CompletedAndPassed":
                                 if ($completedfound == true && $passedfound == true) {
                                     $ausatisfied = "true";
-                                }
-                                ;
+                                };
                                 break;
                         }
 
@@ -356,7 +350,6 @@ try {
         if ($au->sessions == null) {
 
             $austatus = "Not attempted";
-
         } else {
 
             // Retrieve AUs moveon specification.
@@ -407,7 +400,6 @@ try {
             if ($austatus == "Satisfied") {
                 $auinfo[2] = " ";
             }
-
         } else {
             // There is no grade, leave blank.
             $auinfo[] = (" ");
@@ -459,12 +451,12 @@ echo html_writer::table($table);
 
 // Add a form to be posted based on the attempt selected.
 ?>
-    <form id="launchform" action="AUview.php" method="get">
-        <input id="AU_view" name="AU_view" type="hidden" value="default">
-        <input id="AU_view_id" name="AU_view_id" type="hidden" value="default">
-        <input id="id" name="id" type="hidden" value="<?php echo $id ?>">
-        <input id="n" name="n" type="hidden" value="<?php echo $n ?>">
-    </form>
+<form id="launchform" action="AUview.php" method="get">
+    <input id="AU_view" name="AU_view" type="hidden" value="default">
+    <input id="AU_view_id" name="AU_view_id" type="hidden" value="default">
+    <input id="id" name="id" type="hidden" value="<?php echo $id ?>">
+    <input id="n" name="n" type="hidden" value="<?php echo $n ?>">
+</form>
 <?php
 
 echo $OUTPUT->footer();

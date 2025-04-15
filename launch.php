@@ -29,10 +29,10 @@ use mod_cmi5launch\local\session_helpers;
 
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require('header.php');
-// throwing error require_once("$CFG->dirroot/lib/outputcomponents.php");
+
 
 // Include the errorover (error override) funcs.
-require_once ($CFG->dirroot . '/mod/cmi5launch/classes/local/errorover.php');
+require_once($CFG->dirroot . '/mod/cmi5launch/classes/local/errorover.php');
 
 require_login($course, false, $cm);
 
@@ -96,7 +96,6 @@ try {
         $sessionlist = json_decode($au->sessions);
         // Now add the new session number.
         $sessionlist[] = $sessionid;
-
     } else {
         // If it is null just start fresh.
         $sessionlist = array();
@@ -113,22 +112,21 @@ try {
     $location = $urldecoded['url'];
     // And launch method.
     $launchmethod = $urldecoded['launchMethod'];
-
 } catch (\Throwable $e) {
     // Restore default handlers.
     restore_exception_handler();
     restore_error_handler();
 
     // If there is an error, return the error.
-    throw new customException("Error in launching experience. Report this error to system administrator: ". $e->getMessage());
+    throw new customException("Error in launching experience. Report this error to system administrator: " . $e->getMessage());
 }
-    // Create and save session object to session table.
-    $savesession($sessionid, $location, $launchmethod);
+// Create and save session object to session table.
+$savesession($sessionid, $location, $launchmethod);
 
-    // Last thing check for updates.
-    cmi5launch_update_grades($cmi5launch, $USER->id);
+// Last thing check for updates.
+cmi5launch_update_grades($cmi5launch, $USER->id);
 
-    header("Location: " . $location);
+header("Location: " . $location);
 
 
 
