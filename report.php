@@ -76,7 +76,7 @@ $contextmodule = context_module::instance($cm->id);
 // Setup page url.
 $PAGE->set_url($url);
 $PAGE->set_pagelayout('report');
-$PAGE->requires->jquery();
+// this is no longer supported   $PAGE->requires->jquery();
 
 // Functions from other classes.
 $gradehelpers = new grade_helpers;
@@ -106,10 +106,12 @@ navigation_node::override_active_url(new moodle_url('/mod/cmi5launch/report.php'
 // Function to run when the experience is launched (on click).
 function mod_cmi5launch_open_report(inforfornextpage) {
 
-      // Set the form paramters.
-      $('#session_report').val(inforfornextpage);
-        // Post it.
-        $('#launchform').submit();
+    // Set the form paramters.
+    document.getElementById('session_report').value = inforfornextpage;
+
+    // Post it.
+    document.getElementById('launchform').submit();
+
      
 }
    

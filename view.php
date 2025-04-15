@@ -71,7 +71,7 @@ $PAGE->set_url('/mod/cmi5launch/view.php', array('id' => $cm->id));
 $PAGE->set_title(format_string($cmi5launch->name));
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($context);
-$PAGE->requires->jquery();
+// this is no longer supported   $PAGE->requires->jquery();
 
 // Output starts here.
 echo $OUTPUT->header();
@@ -97,37 +97,51 @@ $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
         function mod_cmi5launch_launchexperience(registrationInfo) {
 
             // Set the form paramters.
-            $('#AU_view').val(registrationInfo);
+            document.getElementById('AU_view').value = registrationInfo;
 
             // Post it.
-            $('#launchform').submit();
+            document.getElementById('launchform').submit();
 
             //Add some new content.
-            if (!$('#cmi5launch_status').length) {
-                var message = "<? echo get_string('cmi5launch_progress', 'cmi5launch'); ?>";
-                $('#region-main .card-body').append('\
-                <div id="cmi5launch_status"> \
-                    <span id="cmi5launch_completioncheck"></span> \
-                    <p id="cmi5launch_attemptprogress">' + message + '</p> \
-                    <p id="cmi5launch_exit"> \
-                        <a href="complete.php?id=<?php echo $id ?>&n=<?php echo $n ?>" title="Return to course"> \
-                            Return to course \
-                        </a> \
-                    </p> \
-                </div>\
-            ');
+            if (!document.getElementById('cmi5launch_status')) {
+                const message = "<?php echo get_string('cmi5launch_progress', 'cmi5launch'); ?>";
+                const cardBody = document.querySelector('#region-main .card-body');
+                const div = document.createElement('div');
+                div.id = 'cmi5launch_status';
+                div.innerHTML = `
+                    <span id="cmi5launch_completioncheck"></span>
+                    <p id="cmi5launch_attemptprogress">${message}</p>
+                    <p id="cmi5launch_exit">
+                        <a href="complete.php?id=<?php echo $id ?>&n=<?php echo $n ?>" title="Return to course">
+                            Return to course
+                        </a>
+                    </p>
+                `;
+                cardBody.appendChild(div);
             }
-            $('#cmi5launch_completioncheck').load('completion_check.php?id=<?php echo $id ?>&n=<?php echo $n ?>');
-        }
+
+            fetch('completion_check.php?id=<?php echo $id ?>&n=<?php echo $n ?>')
+                .then(response => response.text())
+                .then(html => {
+                    const container = document.getElementById('cmi5launch_completioncheck');
+                    if (container) container.innerHTML = html;
+                });
+
+                    }
 
         // TODO: there may be a better way to check completion. Out of scope for current project.
         //MB - Someone elses todo, may be worth looking into
-    
-        $(document).ready(function() {
-            setInterval(function() {
-                $('#cmi5launch_completioncheck').load('completion_check.php?id=<?php echo $id ?>&n=<?php echo $n ?>');
-            }, 30000); // TODO: make this interval a configuration setting.
+        document.addEventListener('DOMContentLoaded', () => {
+            setInterval(() => {
+                fetch('completion_check.php?id=<?php echo $id ?>&n=<?php echo $n ?>')
+                    .then(response => response.text())
+                    .then(html => {
+                        const container = document.getElementById('cmi5launch_completioncheck');
+                        if (container) container.innerHTML = html;
+                    });
+            }, 30000);
         });
+
     </script>
 <?php
 

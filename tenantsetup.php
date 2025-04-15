@@ -39,7 +39,7 @@ $PAGE->set_context(\context_system::instance());
 // Title tells what is on tab
 $PAGE->set_title(title: 'Creating a tenant');
 
-$PAGE->requires->jquery();
+// this is no longer supported   $PAGE->requires->jquery();
 
 global $cmi5launch, $CFG;
 
