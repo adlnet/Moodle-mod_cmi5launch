@@ -378,6 +378,11 @@ class cmi5_connectors {
             'reg' => $registrationid,
         );
 
+        echo"<br>";
+        echo" Url is " . $url;
+        echo"<br>";
+        echo" data is " . var_dump($data);
+        echo"<br>";
         // To determine the headers.
         $filetype = "json";
 

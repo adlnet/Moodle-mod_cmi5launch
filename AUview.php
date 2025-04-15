@@ -26,7 +26,7 @@ use mod_cmi5launch\local\customException;
 use mod_cmi5launch\local\au_helpers;
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require('header.php');
-require_once("$CFG->dirroot/lib/outputcomponents.php");
+// why is this an error? require_once("$CFG->dirroot/lib/outputcomponents.php");
 
 
 // Include the errorover (error override) funcs.
@@ -95,17 +95,18 @@ echo $OUTPUT->header();
             document.getElementById('launchform').submit();
         }
 
-
+/*
         document.addEventListener('DOMContentLoaded', function() {
             setInterval(function() {
-                fetch(`completion_check.php?id=${<?php echo $id ?>}&n=${<?php echo $n ?>}`)
+                fetch(`completion_check.php?id=${php echo $id ?>}&n=${php echo $n ?>}`)
                     .then(response => response.text())
                     .then(data => {
                         document.querySelector('#cmi5launch_completioncheck').innerHTML = data;
                     })
                     .catch(error => console.error('Error loading completion check:', error));
             }, 30000);
-        });
+        }); 
+        */
     </script>
 <?php
 
@@ -229,6 +230,8 @@ echo "<p tabindex=\"0\"onkeyup=\"key_test('"
         <input id="launchform_registration" name="launchform_registration" type="hidden" value="default">
         <input id="id" name="id" type="hidden" value="<?php echo $id ?>">
         <input id="n" name="n" type="hidden" value="<?php echo $n ?>">
+        <input id="auid" name="auid" type="hidden" value="<?php echo $auid ?>"> <!-- Pass AU ID -->
+
     </form>
 
 <?php
