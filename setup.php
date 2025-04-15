@@ -30,10 +30,15 @@ use mod_cmi5launch\local\cmi5_connectors;
     // Function to go back to settings page.
     function goback() {
 
-        //REtrieve and submit form
-        let input = document.getElementById('gobackform');
-        input.submit();
-    }
+
+// Function to go back to settings page.
+function goback() {
+    // Find the form element by its ID
+    let form = document.getElementById('gobackform');
+    // Submit the form
+    form.submit();
+}
+> main
 </script>
 
 <?php

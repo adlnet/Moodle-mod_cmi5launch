@@ -28,6 +28,8 @@ use mod_cmi5launch\local\au_helpers;
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require('header.php');
 
+
+
 // Include the errorover (error override) funcs.
 require_once($CFG->dirroot . '/mod/cmi5launch/classes/local/errorover.php');
 
@@ -61,6 +63,7 @@ $PAGE->set_title(format_string($cmi5launch->name));
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($context);
 
+
 // Output starts here.
 echo $OUTPUT->header();
 
@@ -84,6 +87,7 @@ echo $OUTPUT->header();
         }
     }
 
+
     // Function to run when the experience is launched.
     function mod_cmi5launch_launchexperience(registration) {
         // Set the form paramters.
@@ -104,6 +108,7 @@ echo $OUTPUT->header();
         }, 30000); // TODO: make this interval a configuration setting.
     });
 </script>
+
 <?php
 
 // Is this all necessary? Cant the data come through on its own
@@ -222,11 +227,15 @@ echo "<p tabindex=\"0\"onkeyup=\"key_test('"
 
 // Add a form to be posted based on the attempt selected.
 ?>
-<form id="launchform" action="launch.php" method="get">
-    <input id="launchform_registration" name="launchform_registration" type="hidden" value="default">
-    <input id="id" name="id" type="hidden" value="<?php echo $id ?>">
-    <input id="n" name="n" type="hidden" value="<?php echo $n ?>">
-</form>
+
+    <form id="launchform" action="launch.php" method="get">
+        <input id="launchform_registration" name="launchform_registration" type="hidden" value="default">
+        <input id="id" name="id" type="hidden" value="<?php echo $id ?>">
+        <input id="n" name="n" type="hidden" value="<?php echo $n ?>">
+        <input id="auid" name="auid" type="hidden" value="<?php echo $auid ?>"> <!-- Pass AU ID -->
+
+    </form>
+
 
 <?php
 

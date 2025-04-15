@@ -72,6 +72,7 @@ $PAGE->set_title(format_string($cmi5launch->name));
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($context);
 
+
 // Output starts here.
 echo $OUTPUT->header();
 
@@ -91,73 +92,57 @@ $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
         }
     }
 
-    // Function to run when the experience is launched (on click).
-    function mod_cmi5launch_launchexperience(registrationInfo) {
+        // Function to run when the experience is launched (on click).
+        function mod_cmi5launch_launchexperience(registrationInfo) {
 
-        // Set the form paramters.
-        document.getElementById('AU_view').value = registrationInfo;
+            // Set the form paramters.
+            document.getElementById('AU_view').value = registrationInfo;
 
-        // Post it.
-        document.getElementById('launchform').submit();
+            // Post it.
+            document.getElementById('launchform').submit();
 
-        //Add some new content.
-        if (!document.getElementById('cmi5launch_status')) {
-            let message = "<?php echo get_string('cmi5launch_progress', 'cmi5launch'); ?>";
-            let regionMain = document.querySelector('#region-main .card-body');
-            let statusDiv = document.createElement('div');
-            statusDiv.id = 'cmi5launch_status';
-
-            let completionCheckSpan = document.createElement('span');
-            completionCheckSpan.id = 'cmi5launch_completioncheck';
-
-            let progressParagraph = document.createElement('p');
-            progressParagraph.id = 'cmi5launch_attemptprogress';
-            progressParagraph.textContent = message;
-
-            let exitParagraph = document.createElement('p');
-            exitParagraph.id = 'cmi5launch_exit';
-
-            let exitLink = document.createElement('a');
-            exitLink.href = "complete.php?id=<?php echo $id ?>&n=<?php echo $n ?>";
-            exitLink.title = "Return to course";
-            exitLink.textContent = "Return to course";
-
-            exitParagraph.appendChild(exitLink);
-            statusDiv.appendChild(completionCheckSpan);
-            statusDiv.appendChild(progressParagraph);
-            statusDiv.appendChild(exitParagraph);
-
-            regionMain.appendChild(statusDiv);
-        }
-        const xhr = new XMLHttpRequest();
-        xhr.open('GET', 'completion_check.php?id=<?php echo $id ?>&n=<?php echo $n ?>', true);
-        xhr.onload = function() {
-            if (xhr.status === 200) {
-                document.getElementById('cmi5launch_completioncheck').innerHTML = xhr.responseText;
+            //Add some new content.
+            if (!document.getElementById('cmi5launch_status')) {
+                const message = "<?php echo get_string('cmi5launch_progress', 'cmi5launch'); ?>";
+                const cardBody = document.querySelector('#region-main .card-body');
+                const div = document.createElement('div');
+                div.id = 'cmi5launch_status';
+                div.innerHTML = `
+                    <span id="cmi5launch_completioncheck"></span>
+                    <p id="cmi5launch_attemptprogress">${message}</p>
+                    <p id="cmi5launch_exit">
+                        <a href="complete.php?id=<?php echo $id ?>&n=<?php echo $n ?>" title="Return to course">
+                            Return to course
+                        </a>
+                    </p>
+                `;
+                cardBody.appendChild(div);
             }
-        };
-        xhr.send();
-    }
 
-    // TODO: there may be a better way to check completion. Out of scope for current project.
-    //MB - Someone elses todo, may be worth looking into
+            fetch('completion_check.php?id=<?php echo $id ?>&n=<?php echo $n ?>')
+                .then(response => response.text())
+                .then(html => {
+                    const container = document.getElementById('cmi5launch_completioncheck');
+                    if (container) container.innerHTML = html;
+                });
 
-    document.addEventListener('DOMContentLoaded', function() {
-        setInterval(function() {
-            const completionCheckElement = document.getElementById('cmi5launch_completioncheck');
-            if (completionCheckElement) {
-                const xhr = new XMLHttpRequest();
-                xhr.open('GET', 'completion_check.php?id=<?php echo $id ?>&n=<?php echo $n ?>', true);
-                xhr.onload = function() {
-                    if (xhr.status === 200) {
-                        completionCheckElement.innerHTML = xhr.responseText;
                     }
-                };
-                xhr.send();
-            }
-        }, 30000); // TODO: make this interval a configuration setting.
-    });
-</script>
+
+        // TODO: there may be a better way to check completion. Out of scope for current project.
+        //MB - Someone elses todo, may be worth looking into
+        document.addEventListener('DOMContentLoaded', () => {
+            setInterval(() => {
+                fetch('completion_check.php?id=<?php echo $id ?>&n=<?php echo $n ?>')
+                    .then(response => response.text())
+                    .then(html => {
+                        const container = document.getElementById('cmi5launch_completioncheck');
+                        if (container) container.innerHTML = html;
+                    });
+            }, 30000);
+        });
+
+    </script>
+
 <?php
 
 // Check for updates.

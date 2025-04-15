@@ -39,6 +39,7 @@ $PAGE->set_context(\context_system::instance());
 // Title tells what is on tab
 $PAGE->set_title(title: 'Creating a tenant');
 
+
 global $cmi5launch, $CFG;
 
 // External classes and functions.

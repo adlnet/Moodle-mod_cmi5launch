@@ -38,6 +38,7 @@ define('CMI5LAUNCH_REPORT_ATTEMPTS_ALL_STUDENTS', 0);
 define('CMI5LAUNCH_REPORT_ATTEMPTS_STUDENTS_WITH', 1);
 define('CMI5LAUNCH_REPORT_ATTEMPTS_STUDENTS_WITH_NO', 2);
 
+
 global $cmi5launch, $CFG;
 
 $cmi5launchsettings = cmi5launch_settings($cmi5launch->id);
