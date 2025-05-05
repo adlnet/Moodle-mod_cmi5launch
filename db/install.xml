@@ -53,7 +53,7 @@
     </TABLE>
     <TABLE NAME="cmi5launch_player" COMMENT="Store variables for API communication with CMI5 player.">
       <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The id of returned course IN MOODLE (this id matches with field id in cmi5launch table. Moodle assigns id'ssequentially. CMI5 ALSO will assign course ids. These are separate."/>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" COMMENT="The id of returned course IN MOODLE (this id matches with field id in cmi5launch table. Moodle assigns id'ssequentially. CMI5 ALSO will assign course ids. These are separate."/>
         <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Name field for course name IN MOODLE, may be different than course name in it's own xml file"/>
         <FIELD NAME="tenantid" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="The id of returned course"/>
         <FIELD NAME="tenantname" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="The name of the user for the cmi5 player (this is found in table cmi5launch_lrs, investiagte ways to get-MB)"/>
@@ -62,7 +62,7 @@
         <FIELD NAME="launchmethod" TYPE="char" LENGTH="10" NOTNULL="false" DEFAULT="AnyWindow" SEQUENCE="false" COMMENT="Whether the course's retrieved URL opens in it's own window or new one"/>
         <FIELD NAME="returnurl" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Tenants return url, where it will go after closing course from launch url"/>
         <FIELD NAME="homepage" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Tenants homepage(URL)"/>
-        <FIELD NAME="registrationid" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" COMMENT="Course registration ID returned by CMI5 player. We want to use this for LRS instead"/>
+        <FIELD NAME="registrationid" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false" COMMENT="Course registration ID returned by CMI5 player. We want to use this for LRS instead"/>
         <FIELD NAME="sessionid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Id created when an AU launch URL is requested"/>
         <FIELD NAME="launchurl" TYPE="char" LENGTH="500" NOTNULL="false" SEQUENCE="false" COMMENT="Returned launch url from cmi5 player"/>
         <FIELD NAME="cmi5playerurl" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="CMI5 player url"/>
@@ -77,7 +77,7 @@
     </TABLE>
     <TABLE NAME="cmi5launch_sessions" COMMENT="A users individual session. One AU can have multiple sessions.">
       <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="true" COMMENT="Main ID for tracking, assigned by Moodle."/>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" COMMENT="Main ID for tracking, assigned by Moodle."/>
         <FIELD NAME="sessionid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="The session ID. This is created by cmi5 player and returned with URL request"/>
         <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="User ID, which combined with course ID can be used to retrieve unique records"/>
         <FIELD NAME="moodlecourseid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Course ID, assigned by Moodle for context and data tracking. (Id field in cmi5launch table)"/>
@@ -113,7 +113,7 @@
     </TABLE>
     <TABLE NAME="cmi5launch_aus" COMMENT="Stores a courses AUs">
       <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="true" COMMENT="The id of the AU (assigned by Moodle)."/>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" COMMENT="The id of the AU (assigned by Moodle)."/>
         <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="User ID, which combined with course ID can be used to retrieve unique records."/>
         <FIELD NAME="attempt" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="The attempt of the au, ie, first, second, third"/>
         <FIELD NAME="launchmethod" TYPE="char" LENGTH="10" NOTNULL="false" DEFAULT="AnyWindow" SEQUENCE="false" COMMENT="Whether the course's retrieved URL opens in it's own window or new one"/>

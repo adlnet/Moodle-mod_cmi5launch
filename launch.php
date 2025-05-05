@@ -88,8 +88,18 @@ try {
     $urldecoded = $cmi5launchretrieveurl($cmi5launch->id, $auindex);
 
     // Retrieve and store session id in the aus table.
+    
     $sessionid = intval($urldecoded['id']);
-
+    
+    // Failsafe here to keep from null value.
+    if ($sessionid == null) {
+        // Restore default handlers.
+        restore_exception_handler();
+        restore_error_handler();
+    
+        // Throw exception.
+        throw new customException("Error in launching experience. Session ID cannot be null. Report this error to system administrator.");
+    }
     // Check if there are previous sessions.
     if (!$au->sessions == null) {
         // We don't want to overwrite so retrieve the sessions before changing them.

@@ -23,17 +23,18 @@
  *
  * @package mod_cmi5launch
  * @copyright  2024 Megan Bohland
- * @copyright  Based on work by 2013 Andrew Downes
+ * @copyright  Based o
+ * n work by 2013 Andrew Downes
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2025042114;      // The current module version (Date: YYYYMMDDXX).
+$plugin->version   = 2025050213;      // The current module version (Date: YYYYMMDDXX).
 
 $plugin->requires  = 2015111000;      // Requires Moodle 3.0 version.
 $plugin->cron      = 0;               // Period for cron to check this module (secs).
 $plugin->component = 'mod_cmi5launch'; // To check on upgrade, that module sits in correct place.
 $plugin->maturity = MATURITY_STABLE;
-$plugin->release = '1.0.0 (Build: 2025042114)';
+$plugin->release = '1.0.1 (Build: 2025050213)';
           

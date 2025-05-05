@@ -41,7 +41,6 @@ global $cmi5launch, $USER;
 // Classes and functions.
 $auhelper = new au_helpers;
 $sessionhelper = new session_helpers;
-$retrievesession = $sessionhelper->cmi5launch_get_retrieve_sessions_from_db();
 $retrieveaus = $auhelper->get_cmi5launch_retrieve_aus_from_db();
 
 // MB - Not currently using events, but may in future.
@@ -110,8 +109,6 @@ echo $OUTPUT->header();
 </script>
 
 <?php
-
-// Is this all necessary? Cant the data come through on its own
 
 // Retrieve the registration and AU ID from view.php.
 $auid = required_param('AU_view', PARAM_TEXT);

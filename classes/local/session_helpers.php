@@ -38,10 +38,6 @@ class session_helpers {
         return [$this, 'cmi5launch_update_sessions'];
     }
 
-    public function cmi5launch_get_retrieve_sessions_from_db() {
-        return [$this, 'cmi5launch_retrieve_sessions_from_db'];
-    }
-
     /**
      * Gets updated session information from CMI5 player
      * @param mixed $sessionid - the session id
