@@ -141,9 +141,6 @@
       <KEYS>
         <KEY NAME="id" TYPE="primary" FIELDS="id"/>
       </KEYS>
-      <INDEXES>
-        <INDEX NAME="id" UNIQUE="false" FIELDS="id"/>
-      </INDEXES>
     </TABLE>
   </TABLES>
 </XMLDB>

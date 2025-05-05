@@ -42,11 +42,11 @@ function xmldb_cmi5launch_upgrade($oldversion) {
     global $DB;
     $dbman = $DB->get_manager();
 
-    if ($oldversion < 2025050213) {
+    if ($oldversion < 2025050517) {
 
         $table = new xmldb_table('cmi5launch_player');
 
-        // 1. Drop the primary key constraint directly using SQL (PostgreSQL-specific)
+        // 1. Drop the primary key constraint directly.
         try {
             $DB->execute("ALTER TABLE {cmi5launch_player} DROP CONSTRAINT IF EXISTS mdl_cmi5play_reg_pk");
         } catch (Exception $e) {
@@ -54,7 +54,7 @@ function xmldb_cmi5launch_upgrade($oldversion) {
         }
 
         // 2. Change the field type
-        $field = new xmldb_field('registrationid', XMLDB_TYPE_CHAR, '10', null, XMLDB_NOTNULL, null, null);
+        $field = new xmldb_field('registrationid', XMLDB_TYPE_CHAR, '50', null, XMLDB_NOTNULL, null, null);
         if ($dbman->field_exists($table, $field)) {
             $dbman->change_field_type($table, $field);
         }
@@ -68,7 +68,7 @@ function xmldb_cmi5launch_upgrade($oldversion) {
         }
 
         // 4. Re-add the non-unique index on name
-        $index = new xmldb_index('name', XMLDB_INDEX_NOTUNIQUE, ['name']);
+        $index = new xmldb_index('name', XMLDB_INDEX_UNIQUE, ['name']);
         if (!$dbman->index_exists($table, $index)) {
             $dbman->add_index($table, $index);
         }
@@ -92,17 +92,8 @@ function xmldb_cmi5launch_upgrade($oldversion) {
             }
         }
     }
-        // 5. Add the non-unique index on id
-        $table = new xmldb_table('cmi5launch_aus');
 
-        // Ensure the index on id exists with correct name.
-        $index = new xmldb_index('id', XMLDB_INDEX_NOTUNIQUE, ['id']);
-        if (!$dbman->index_exists($table, $index)) {
-            $dbman->add_index($table, $index);
-        }
-
-    
-        upgrade_mod_savepoint(true, 2025050213, 'cmi5launch');
+        upgrade_mod_savepoint(true, 2025050517, 'cmi5launch');
     }
 
     // Change masteryscore to number type because of decimal
