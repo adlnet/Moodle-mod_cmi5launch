@@ -30,7 +30,7 @@ use mod_cmi5launch\local\au_helpers;
 use mod_cmi5launch\local\session_helpers;
 
 require_once("../../config.php");
-require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
+//require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require('header.php');
 
 // Include the errorover (error override) funcs.

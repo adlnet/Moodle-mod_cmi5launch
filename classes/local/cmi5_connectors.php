@@ -223,7 +223,8 @@ class cmi5_connectors {
      * @param $courseid - course id - The course ID in the CMI5 player.
      * @param $id - the course id in MOODLE.
      */
-    public function cmi5launch_retrieve_registration_with_post($courseid, $id) {
+    public function 
+    cmi5launch_retrieve_registration_with_post($courseid, $id) {
 
         global $USER;
 

@@ -38,6 +38,9 @@ class session_helpers {
         return [$this, 'cmi5launch_update_sessions'];
     }
 
+    public function cmi5launch_get_retrieve_sessions_from_db() {
+        return [$this, 'cmi5launch_retrieve_sessions_from_db'];
+    }
     /**
      * Gets updated session information from CMI5 player
      * @param mixed $sessionid - the session id
@@ -186,4 +189,38 @@ class session_helpers {
         }
     }
 
-    } 
+
+        /**
+     * Retrieves session from DB
+     * @param mixed $sessionid - the session id
+     * @return session
+     */
+    public function cmi5launch_retrieve_sessions_from_db($sessionid) {
+
+        global $DB, $CFG;
+
+        $check = $DB->record_exists('cmi5launch_sessions', ['sessionid' => $sessionid], '*', IGNORE_MISSING);
+
+
+        // If check is negative, the record does not exist. Throw error.
+        if (!$check) {
+
+            echo "<p>Error attempting to get session data from DB. Check session id.</p>";
+            echo "<pre>";
+            var_dump($sessionid);
+            echo "</pre>";
+
+        } else {
+
+            $sessionitem = $DB->get_record('cmi5launch_sessions',  array('sessionid' => $sessionid));
+
+            $session = new session($sessionitem);
+
+        }
+
+        // Return new session object.
+        return $session;
+    }
+
+}
+
