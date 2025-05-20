@@ -22,35 +22,32 @@
  */
 
 
-// NEeded for moodle pae. sets up loabl
+// Needed for moodle page.
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
-// Include our class file
+// Include our class file.
 require_once($CFG->dirroot.'/mod/cmi5launch/classes/local/setup_form.php');
-// Tell moodle about our page, tell it what the url is.\\
+// Tell moodle about our page, tell it what the url is.
 $PAGE->set_url('/mod/cmi5launch/setupform.php');
-// Tell moodle the context, in this case the site context (it's system wide not a course or course page.)
+// Tell moodle the context, in this case the site context (it's system wide not a course or course page).
 $PAGE->set_context(\context_system::instance());
 // Title tells what is on tab
-$PAGE->set_title(title: 'CMI5 Setup Form');
+$PAGE->set_title(title: get_string('cmi5launchsettingtitle', 'cmi5launch'));
 
-// You want to initialze form in PHP before you echo to page. you dont want to rener while doing calcs
+// We want to initialze form in PHP before you echo to page. Wou dont want to render while doing calcs.
 
-// we want to display a form
+// We want to display a form.
 $mform = new setup_cmi5();
 
 // Form processing and displaying is done here.
 if ($mform->is_cancelled()) {
     // If cancel was pressed, then redirect back to the settings page.
-    // in tutorial he goes back to the manage page, we will go back to settins page?
     redirect(url: $CFG->wwwroot . '/admin/settings.php'. '?section=modsettingcmi5launch', message: "Cancelled");
-    //now he is dire ting to manage page which is equvalent to our cmi5setup page so we should redirect to that? why so many pages I wonder?
-  //  redirect(url: $CFG->wwwroot . '/mod/cmi5launch/cmi5setup.php', message: 'Cancelled');
 
 } else if ($fromform = $mform->get_data()) {
     // When the form is submitted, and the data is successfully validated,
     // the `get_data()` function will return the data posted in the form.
 
-    // REtrieve data from form.
+    // Retrieve data from form.
     $cmi5url = $fromform->cmi5url;
     $cmi5name = $fromform->cmi5name;
     $cmi5password = $fromform->cmi5password;
@@ -64,10 +61,10 @@ if ($mform->is_cancelled()) {
     // As long as they are not null/false we can move on to the next form
     if ($resulturl && $resultname && $resultpass){
         //Move to next form
-        redirect(url: $CFG->wwwroot . '/mod/cmi5launch/tenantsetup.php', message: 'Successfully saved settings.');
+        redirect(url: $CFG->wwwroot . '/mod/cmi5launch/tenantsetup.php', message: get_string('cmi5launchsettingsaved', 'cmi5launch'));
     }else{
         // If for some reason they are null or false, then we will redirect back to the form.
-        redirect(url: $CFG->wwwroot . '/mod/cmi5launch/setupform.php', message: 'Failed to save to database. Please check database is accessable and try again.');
+        redirect(url: $CFG->wwwroot . '/mod/cmi5launch/setupform.php', message: get_string('cmi5launchsettingsavedfail', 'cmi5launch'));
 
     }
 

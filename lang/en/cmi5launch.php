@@ -96,6 +96,13 @@ $string['cmi5launchcontenturl'] = 'cmi5 player URL';
 $string['cmi5launchcontenturl_help'] = 'The url to communicate with cmi5 player, PUBLIC content http://player.example.com or http://localhost:63398). Must NOT include a trailing forward slash.';
 $string['cmi5launchcontenturl_default'] = '';
 
+// Cmi5 setupform.php.
+$string['cmi5launchsettingtitle'] = 'CMI5 Setup Form';
+$string['cmi5launchsettingsaved'] = 'Successfully saved settings.';
+$string['cmi5launchsettingsavedfail'] = 'Failed to save to database. Please check database is accessable and try again.';
+
+
+
 // Cmi5 player credentials.
 $string['cmi5launchbasicname'] = 'cmi5 player: basic username';
 $string['cmi5launchbasicname_help'] = 'The cmi5 base username.';
@@ -113,9 +120,18 @@ $string['cmi5launchbasepass'] = 'cmi5 player: basic password';
 $string['cmi5launchbasepass_help'] = 'The cmi5 base password (secret).';
 $string['cmi5launchbasepass_default'] = '';
 
+// Tenant token related strings.
 $string['cmi5launchtenanttoken'] = 'cmi5 player: bearer token';
 $string['cmi5launchtenanttoken_help'] = 'The cmi5 tenant bearer token (should be a long string).  Should only need to be used during initial setup. If for some reason the tenant name is changed a new bearer token will need to be generated. This cannot be generated if a tenant name has not been made yet.';
 $string['cmi5launchtenanttoken_default'] = '';
+// Setup.
+$string['cmi5launchtokendbfailed'] = 'Failed to save token to settings. Check connection with DB and try again.';
+$string['cmi5launchtokensavefailed'] = 'Save failed. With result ';
+$string['cmi5launchtokencreatedsuccess'] = 'Successfully retrieved and saved new bearer token';
+$string['cmi5launchtokendbretrievefailed'] = 'Failed to retrieve token from cmi5 player. Check connection with player, ensure tenant name and ID exist, and try again.';
+$string['cmi5launchtokenretrievefailed'] = 'Token retrieval failed. With result ';
+$string['cmi5launchtokennonameid'] = 'Tenant name and/or ID not retrieved or blank. Please create a tenant before trying again.';
+
 
 // To avoid hardcoding, the button text is set in the language file.
 
