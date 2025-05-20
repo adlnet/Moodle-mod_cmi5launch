@@ -243,6 +243,7 @@ class cmi5_connectors {
         $data = array(
             'courseId' => $courseid,
             'actor' => array(
+                'objectType' => 'Agent',
                 'account' => array(
                     "homePage" => $homepage,
                     "name" => $actor,
@@ -370,6 +371,7 @@ class cmi5_connectors {
 
         $data = array(
             'actor' => array(
+                'objectType' => 'Agent',
                 'account' => array(
                     "homePage" => $homepage,
                     "name" => $actor,

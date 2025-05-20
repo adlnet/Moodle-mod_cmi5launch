@@ -172,6 +172,14 @@ $string['cmi5launchgeterror'] = "communicating with player, sending or crafting 
 $string['cmi5launchsessioninfoerror'] = "retrieving the session information.";
 $string['cmi5launchsessioninfouncaughterror'] = "Uncaught error retrieving the session information.";
 
+// tenant setup 
+$string['cmi5launchtenanttitle'] = 'Creating  a tenant';
+$string['cmi5launchtenantmadesuccess'] = 'Tenant made and saved successfully';
+$string['cmi5launchtenantfailsave'] = "Failed to save tenant to DB.";
+$string['cmi5launchtenantfailsavemessage'] = "Tenant name failed to save as setting. With result ";
+$string['cmi5launchtenantfailplayersavemessage'] = "Failed to make tenant. Check connection to player and tenant name (cannot reuse old tenant names).";
+$string['cmi5launchtenantnamefail'] = 'Tenant name not retrieved or blank. Please try again.';
+
 
 // Grading info - MB.
 // Headers.
@@ -224,6 +232,7 @@ $string['masteryoverride_help'] = 'If enabled and a mastery score is provided, w
 $string['masteryoverridedesc'] = 'This preference sets the default for the mastery score override setting';
 */
 
+
 $string['general'] = 'General data';
 $string['mod_cmi5launch_grade_average'] = 'Average grade';
 $string['gradeforattempt'] = 'Grade for attempt';
@@ -231,12 +240,76 @@ $string['mod_cmi5launch_grade_highest'] = 'Highest grade';
 $string['grademethod'] = 'Grading method';
 $string['grademethod_help'] = 'The grading method defines how the grade for a single attempt of the activity is determined.';
 
+// for lib.php
+$string['cmi5launchaunotfound'] = 'No ids match';
+$string['cmi5launchstatementdoesnotequal'] = 'Type from statement does not equal either block or AU.';
+$string['cmi5lauchincorrectvalue'] = 'Incorrect value passed to function cmi5launch_find_au_satisfied. Correct values are a boolean or array';
+
+// For tokensetup.php
+$string['cmi5launchtokensetuptitle'] = 'Creating a tenant';
+$string['cmi5launchtokensaveerror'] = 'Failed to save token to settings. Check connection with DB and try again.';
+$string['cmi5launchtokensavefailed'] = 'Save failed. With result ';
+$string['cmi5launchtokensavesuccess'] = 'Successfully retrieved and saved new bearer token.';
+$string['cmi5launchtokenretrievefailed'] = 'Failed to retrieve token from cmi5 player. Check connection with player, ensure tenant name and ID exist, and try again.';
+$string['cmi5launchtokenretrieveerror'] = 'Token retrieval failed. With result ';
+// Related to tenant failure on setup.
+$string['cmi5launchtokentenanterror'] = 'Token retrieval failed. With result ';
+
+
+
 // There are 2 grading methods.
 // Highest grade - The highest score obtained in all passed learning objects.
 // Average grade - The mean of all the scores.
 $string['grademethoddesc'] = 'The grading method defines how the grade for a single attempt of the activity is determined.';
 $string['gradereported'] = 'Grade reported';
 $string['gradesettings'] = 'Grade settings';
+
+// Grade errors
+$string['cmi5launchnogradeerror'] = 'No grades to update. No record for user found in this course.';
+$string['cmi5launchgradeerror'] = ' Error in updating or checking user grades. Report this error to system administrator: ';
+$string['cmi5launchgradetypenotfound'] = 'Grade type not found.';
+
+// Progress errors.
+// LRS errors.
+$string['cmi5launchlrsstatementretrievalerror']= 'Trouble retrieving statements from LRS. Caught exception: ';
+$string['cmi5launchlrssettingsretrievalerror'] = "Unable to retrieve LRS settings. Caught exception: ";
+$string['cmi5launchlrssettingscorrect'] = ' Check LRS settings are correct.';
+$string['cmi5launchlrscommunicationerror'] = 'Unable to communicate with LRS. Caught exception: ';
+$string['cmi5launchlrschecksettings'] = " Check LRS is up, username and password are correct, and LRS endpoint is correct.";
+
+// Related to actor
+$string['cmi5launchactorretrievalerror'] = 'Unable to retrieve actor information. Caught exception: ';
+$string['cmi5launchactornotretrieved'] = '(Actor name not retrieved)';
+
+// Related to verb
+$string['cmi5launchverbretrievalerror'] = 'Unable to retrieve verb from LRS. Caught exception: ';
+$string['cmi5launchverbnotretrieved'] = '(Verb not retrieved)';
+
+// Related to object
+$string['cmi5launchobjectnotpresent'] = '(Object name not retrieved/there is no object in this statement)';
+$string['cmi5launchobjectretrievalerror'] = 'Unable to retrieve object name from LRS. Caught exception: ';
+$string['cmi5launchobjectnotretrieved'] = '(Object name not retrieved)';
+
+// Related to timestamp
+$string['cmi5launchtimestampnotpresent'] = '(Timestamp not retrieved or not present in statement)';
+$string['cmi5launchtimestampretrievalerror'] = 'Unable to retrieve timestamp from LRS. Caught exception: ';
+$string['cmi5launchtimestampnotretrieved'] = '(Timestamp not retrieved)';
+
+// Related to score
+$string['cmi5launchscorenotpresent'] = '(Score not retrieved or not present in statement)';
+$string['cmi5launchscoreretrievalerror'] = 'Unable to retrieve score from LRS. Caught exception: ';
+$string['cmi5launchscorenotretrieved'] = '(Score not retrieved)';
+
+// Related to session
+$string['cmi5launchsessionidretrievalerror'] = 'Unable to retrieve session id from LRS. Caught exception: ';
+
+// Related to statements
+$string['cmi5launchstatementsretrievalerror'] = 'Unable to retrieve  statements from LRS. Caught exception: ';
+$string['cmi5launchstatementsnotretrieved'] = '(Statements not retrieved)';
+
+// AU errors.
+$string['cmi5launchaubuilderror'] = 'Statement to build AU is null or not an array/object. ';
+
 
 // Start Activity Settings.
 $string['cmi5launchname'] = 'Launch link name';
@@ -324,14 +397,15 @@ $string['expirecredentials'] = 'Expire credentials';
 $string['checkcompletion'] = 'Check completion';
 
 // For reports.
-$string['report'] = 'Report';
-$string['attempt'] = 'Attempt';
-$string['started'] = 'Started';
-$string['last'] = 'Finished';
-$string['score'] = 'Score';
+$string['cmi5launchreport'] = 'Report';
+$string['cmi5launchattemptheader'] = 'Attempt';
+$string['cmi5launchstartedheader'] = 'Started';
+$string['cmi5launchfinishedheader'] = 'Finished';
+$string['cmi5launchscoreheader'] = 'Score';
+$string['cmi5launchsatisfiedstatusheader'] = 'AU Satisfied Status';
 
-$string['autitle'] = 'AU Title';
-$string['attempt'] = 'Attempt';
+$string['cmi5launchautitleheader'] = 'AU Title';
+$string['cmi5launchattemptrow'] = 'Attempt ';
 $string['started'] = 'Started';
 $string['last'] = 'Finished';
 $string['score'] = 'Score';
@@ -399,3 +473,8 @@ $string['privacy:metadata:cmi5_player:actor'] = 'When retrieving a launch URL or
 $string['privacy:metadata:cmi5_player:courseid'] = 'The cmi5 player assigns each user and their activity instance a course ID, and it can is used to request a launch URL.';
 $string['privacy:metadata:cmi5_player:returnurl'] = 'The return URL is a parameter sent to the cmi5 player when requesting a launch URL. It is where the browser returns to upon closing the launched activity. It has a unique ID on the end directing back to the user\'s particular course instance.';
 $string['privacy:metadata:cmi5_player:sessionid'] = 'The cmi5 player assigns each user\'s session a unique ID, and this is sent to the cmi5 player when requesting updated session info.';
+
+// For view.php
+$string['cmi5launchviewcourseerror'] = 'Creating or retrieving user course record. Contact your system administrator with error: ';
+$string['cmi5launchviewexceptionau'] = 'Excepted AU, found ';
+$string['cmi5launchviewauerror'] = 'retrieving and displaying AU satisfied status and grade. Contact your system administrator with error: ';
