@@ -76,7 +76,7 @@ if ($tenantname != null && $tenantid != null) {
             // If fail we freeze and alert user with a window with error message.
             echo $link;
         }else {
-        // Assumin the tokenresult is not false, it was saved correctly and we cango back to setting pae.
+        // Assuming the tokenresult is not false, it was saved correctly and we cango back to setting pae.
         // If result is true then redirect back to settings page.
         $settingurl = new moodle_url($CFG->wwwroot . '/' . 'admin/settings.php', array('section' => 'modsettingcmi5launch'));
                 

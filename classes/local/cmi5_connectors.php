@@ -217,7 +217,8 @@ class cmi5_connectors {
      * @param $courseid - course id - The course ID in the CMI5 player.
      * @param $id - the course id in MOODLE.
      */
-    public function cmi5launch_retrieve_registration_with_post($courseid, $id) {
+    public function 
+    cmi5launch_retrieve_registration_with_post($courseid, $id) {
 
         global $USER;
 
@@ -236,6 +237,7 @@ class cmi5_connectors {
         $data = array(
             'courseId' => $courseid,
             'actor' => array(
+                'objectType' => 'Agent',
                 'account' => array(
                     "homePage" => $homepage,
                     "name" => $actor,
@@ -363,6 +365,7 @@ class cmi5_connectors {
 
         $data = array(
             'actor' => array(
+                'objectType' => 'Agent',
                 'account' => array(
                     "homePage" => $homepage,
                     "name" => $actor,
@@ -372,6 +375,7 @@ class cmi5_connectors {
             'reg' => $registrationid,
         );
 
+        
         // To determine the headers.
         $filetype = "json";
 

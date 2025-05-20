@@ -30,11 +30,11 @@ use mod_cmi5launch\local\au_helpers;
 use mod_cmi5launch\local\session_helpers;
 
 require_once("../../config.php");
-require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
+//require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require('header.php');
 
 // Include the errorover (error override) funcs.
-require_once ($CFG->dirroot . '/mod/cmi5launch/classes/local/errorover.php');
+require_once($CFG->dirroot . '/mod/cmi5launch/classes/local/errorover.php');
 
 require_login($course, false, $cm);
 
@@ -71,7 +71,7 @@ $PAGE->set_url('/mod/cmi5launch/view.php', array('id' => $cm->id));
 $PAGE->set_title(format_string($cmi5launch->name));
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($context);
-$PAGE->requires->jquery();
+
 
 // Output starts here.
 echo $OUTPUT->header();
@@ -82,53 +82,67 @@ $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
 // TODO: Put all the php inserted data as parameters on the functions and put the functions in a separate JS file.
 ?>
 
-    <script>
-      
-        function key_test(registration) {
-        
-            //Onclick calls this
-            if (event.keyCode === 13 || event.keyCode === 32) {
+<script>
+    function key_test(registration) {
 
-                mod_cmi5launch_launchexperience(registration);
-            }
+        //Onclick calls this
+        if (event.keyCode === 13 || event.keyCode === 32) {
+
+            mod_cmi5launch_launchexperience(registration);
         }
+    }
 
         // Function to run when the experience is launched (on click).
         function mod_cmi5launch_launchexperience(registrationInfo) {
 
             // Set the form paramters.
-            $('#AU_view').val(registrationInfo);
+            document.getElementById('AU_view').value = registrationInfo;
 
             // Post it.
-            $('#launchform').submit();
+            document.getElementById('launchform').submit();
 
             //Add some new content.
-            if (!$('#cmi5launch_status').length) {
-                var message = "<? echo get_string('cmi5launch_progress', 'cmi5launch'); ?>";
-                $('#region-main .card-body').append('\
-                <div id="cmi5launch_status"> \
-                    <span id="cmi5launch_completioncheck"></span> \
-                    <p id="cmi5launch_attemptprogress">' + message + '</p> \
-                    <p id="cmi5launch_exit"> \
-                        <a href="complete.php?id=<?php echo $id ?>&n=<?php echo $n ?>" title="Return to course"> \
-                            Return to course \
-                        </a> \
-                    </p> \
-                </div>\
-            ');
+            if (!document.getElementById('cmi5launch_status')) {
+                const message = "<?php echo get_string('cmi5launch_progress', 'cmi5launch'); ?>";
+                const cardBody = document.querySelector('#region-main .card-body');
+                const div = document.createElement('div');
+                div.id = 'cmi5launch_status';
+                div.innerHTML = `
+                    <span id="cmi5launch_completioncheck"></span>
+                    <p id="cmi5launch_attemptprogress">${message}</p>
+                    <p id="cmi5launch_exit">
+                        <a href="complete.php?id=<?php echo $id ?>&n=<?php echo $n ?>" title="Return to course">
+                            Return to course
+                        </a>
+                    </p>
+                `;
+                cardBody.appendChild(div);
             }
-            $('#cmi5launch_completioncheck').load('completion_check.php?id=<?php echo $id ?>&n=<?php echo $n ?>');
-        }
+
+            fetch('completion_check.php?id=<?php echo $id ?>&n=<?php echo $n ?>')
+                .then(response => response.text())
+                .then(html => {
+                    const container = document.getElementById('cmi5launch_completioncheck');
+                    if (container) container.innerHTML = html;
+                });
+
+                    }
 
         // TODO: there may be a better way to check completion. Out of scope for current project.
         //MB - Someone elses todo, may be worth looking into
-    
-        $(document).ready(function() {
-            setInterval(function() {
-                $('#cmi5launch_completioncheck').load('completion_check.php?id=<?php echo $id ?>&n=<?php echo $n ?>');
-            }, 30000); // TODO: make this interval a configuration setting.
+        document.addEventListener('DOMContentLoaded', () => {
+            setInterval(() => {
+                fetch('completion_check.php?id=<?php echo $id ?>&n=<?php echo $n ?>')
+                    .then(response => response.text())
+                    .then(html => {
+                        const container = document.getElementById('cmi5launch_completioncheck');
+                        if (container) container.innerHTML = html;
+                    });
+            }, 30000);
         });
+
     </script>
+
 <?php
 
 // Check for updates.
@@ -136,7 +150,7 @@ cmi5launch_update_grades($cmi5launch, $USER->id);
 
 // Check if a course record exists for this user yet.
 $exists = $DB->record_exists('cmi5launch_usercourse', ['courseid'  => $record->courseid, 'userid'  => $USER->id]);
-  
+
 // Set error and exception handler to catch and override the default PHP error messages, to make messages more user friendly.
 set_error_handler('mod_cmi5launch\local\custom_warningview', E_WARNING);
 set_exception_handler('mod_cmi5launch\local\custom_warningview');
@@ -166,7 +180,7 @@ try {
         // Retrieve AU ids for this user/course.
         $aus = json_decode($record->aus);
 
-        // We should not even be able to et here if these are false on record
+        // We should not even be able to get here if these are false on record.
         $auids = $saveaus($createaus($aus));
         $userscourse->aus = (json_encode($auids));
 
@@ -175,7 +189,6 @@ try {
 
         // Now assign id created by DB.
         $userscourse->id = $newid;
-
     } else { // Record exists.
 
         // We have a record, so we need to retrieve it.
@@ -196,10 +209,9 @@ try {
         }
         // Retrieve AU ids.
         $auids = (json_decode($userscourse->aus));
-//        $auids = (json_decode($userscourse));
+        //        $auids = (json_decode($userscourse));
 
     }
-    
 } catch (Exception $e) {
 
     // Restore default hadlers.
@@ -307,26 +319,22 @@ try {
                             case "Completed":
                                 if ($completedfound == true) {
                                     $ausatisfied = "true";
-                                }
-                                ;
+                                };
                                 break;
                             case "Passed":
                                 if ($passedfound == true) {
                                     $ausatisfied = "true";
-                                }
-                                ;
+                                };
                                 break;
                             case "CompletedOrPassed":
                                 if ($completedfound == true || $passedfound == true) {
                                     $ausatisfied = "true";
-                                }
-                                ;
+                                };
                                 break;
                             case "CompletedAndPassed":
                                 if ($completedfound == true && $passedfound == true) {
                                     $ausatisfied = "true";
-                                }
-                                ;
+                                };
                                 break;
                         }
 
@@ -342,7 +350,6 @@ try {
         if ($au->sessions == null) {
 
             $austatus = "Not attempted";
-
         } else {
 
             // Retrieve AUs moveon specification.
@@ -393,7 +400,6 @@ try {
             if ($austatus == "Satisfied") {
                 $auinfo[2] = " ";
             }
-
         } else {
             // There is no grade, leave blank.
             $auinfo[] = (" ");
@@ -445,12 +451,12 @@ echo html_writer::table($table);
 
 // Add a form to be posted based on the attempt selected.
 ?>
-    <form id="launchform" action="AUview.php" method="get">
-        <input id="AU_view" name="AU_view" type="hidden" value="default">
-        <input id="AU_view_id" name="AU_view_id" type="hidden" value="default">
-        <input id="id" name="id" type="hidden" value="<?php echo $id ?>">
-        <input id="n" name="n" type="hidden" value="<?php echo $n ?>">
-    </form>
+<form id="launchform" action="AUview.php" method="get">
+    <input id="AU_view" name="AU_view" type="hidden" value="default">
+    <input id="AU_view_id" name="AU_view_id" type="hidden" value="default">
+    <input id="id" name="id" type="hidden" value="<?php echo $id ?>">
+    <input id="n" name="n" type="hidden" value="<?php echo $n ?>">
+</form>
 <?php
 
 echo $OUTPUT->footer();

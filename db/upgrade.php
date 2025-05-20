@@ -42,6 +42,60 @@ function xmldb_cmi5launch_upgrade($oldversion) {
     global $DB;
     $dbman = $DB->get_manager();
 
+    if ($oldversion < 2025050517) {
+
+        $table = new xmldb_table('cmi5launch_player');
+
+        // 1. Drop the primary key constraint directly.
+        try {
+            $DB->execute("ALTER TABLE {cmi5launch_player} DROP CONSTRAINT IF EXISTS mdl_cmi5play_reg_pk");
+        } catch (Exception $e) {
+            echo('Could not drop primary key constraint manually: ' . $e->getMessage());
+        }
+
+        // 2. Change the field type
+        $field = new xmldb_field('registrationid', XMLDB_TYPE_CHAR, '50', null, XMLDB_NOTNULL, null, null);
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->change_field_type($table, $field);
+        }
+
+        // 3. Re-add the primary key constraint using XMLDB
+        $primarykey = new xmldb_key('primary', XMLDB_KEY_PRIMARY, ['registrationid']);
+        try {
+            $dbman->add_key($table, $primarykey);
+        } catch (Exception $e) {
+            echo('Failed to re-add primary key: ' . $e->getMessage());
+        }
+
+        // 4. Re-add the non-unique index on name
+        $index = new xmldb_index('name', XMLDB_INDEX_UNIQUE, ['name']);
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+    
+     // Continue with other field changes (aus, sessions)
+     $tables = [
+        ['name' => 'cmi5launch_aus', 'field' => 'id'],
+        ['name' => 'cmi5launch_sessions', 'field' => 'id']
+    ];
+    
+    foreach ($tables as $entry) {
+        $table = new xmldb_table($entry['name']);
+        $field = new xmldb_field($entry['field']);
+    
+        // Instead of trying to change it to SERIAL again, just ensure NOT NULL
+        if ($dbman->field_exists($table, $field)) {
+            try {
+                $dbman->change_field_notnull($table, $field);
+            } catch (Exception $e) {
+                echo("Could not ensure NOT NULL on {$entry['name']}.{$entry['field']}: " . $e->getMessage());
+            }
+        }
+    }
+
+        upgrade_mod_savepoint(true, 2025050517, 'cmi5launch');
+    }
+
     // Change masteryscore to number type because of decimal
     if ($oldversion < 2024061115) {
 

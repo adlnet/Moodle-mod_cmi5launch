@@ -21,15 +21,15 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
- 
+
 use mod_cmi5launch\local\grade_helpers;
 
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require('header.php');
-require_once($CFG->libdir.'/tablelib.php');
-require_once($CFG->dirroot.'/mod/cmi5launch/locallib.php');
-require_once($CFG->libdir.'/formslib.php');
-require_once($CFG->dirroot. '/reportbuilder/classes/local/report/column.php');
+require_once($CFG->libdir . '/tablelib.php');
+require_once($CFG->dirroot . '/mod/cmi5launch/locallib.php');
+require_once($CFG->libdir . '/formslib.php');
+require_once($CFG->dirroot . '/reportbuilder/classes/local/report/column.php');
 
 require_login($course, false, $cm);
 
@@ -79,7 +79,7 @@ $contextmodule = context_module::instance($cm->id);
 // Setup page url.
 $PAGE->set_url($url);
 $PAGE->set_pagelayout('report');
-$PAGE->requires->jquery();
+
 
 // Functions from other classes.
 $gradehelpers = new grade_helpers;
@@ -95,10 +95,9 @@ $cmi5launchsettings = cmi5launch_settings($cmi5launch->id);
 navigation_node::override_active_url(new moodle_url('/mod/cmi5launch/report.php', ['id' => $id]));
 
 ?>
-    <script>
-      
-      function key_test(inforfornextpage) {
-        
+<script>
+    function key_test(inforfornextpage) {
+
         // Onclick calls this
         if (event.keyCode === 13 || event.keyCode === 32) {
 
@@ -106,17 +105,16 @@ navigation_node::override_active_url(new moodle_url('/mod/cmi5launch/report.php'
         }
     }
 
-// Function to run when the experience is launched (on click).
-function mod_cmi5launch_open_report(inforfornextpage) {
 
-      // Set the form paramters.
-      $('#session_report').val(inforfornextpage);
+    // Function to run when the experience is launched (on click).
+    function mod_cmi5launch_open_report(inforfornextpage) {
+        // Set the form paramters.
+        document.getElementById('session_report').value = inforfornextpage;
         // Post it.
-        $('#launchform').submit();
-     
-}
-   
-    </script>
+        document.getElementById('launchform').submit();
+    }
+</script>
+
 <?php
 
 // Trigger a report viewed event.
@@ -142,7 +140,7 @@ if (empty($noheader)) {
     $strattempt = get_string('cmi5launchattemptrow', 'cmi5launch');
 
     // Setup the page
-    $PAGE->set_title("$course->shortname: ".format_string($course->id));
+    $PAGE->set_title("$course->shortname: " . format_string($course->id));
     $PAGE->set_heading($course->fullname);
     $PAGE->activityheader->set_attrs([
         'hidecompletion' => true,
@@ -177,7 +175,7 @@ if (has_capability('mod/cmi5launch:viewgrades', $context)) {
         $columns[] = $user->username;
 
         // Backbutton goes to grader.
-        $backurl = $CFG->wwwroot . '/grade/report/grader/index.php' . '?id=' .$cmi5launch->course;
+        $backurl = $CFG->wwwroot . '/grade/report/grader/index.php' . '?id=' . $cmi5launch->course;
     }
 } else {
 
@@ -196,152 +194,150 @@ if (has_capability('mod/cmi5launch:viewgrades', $context)) {
     $columns[] = $user->username;
 
     // Where back button goes.
-    $backurl = $CFG->wwwroot . '/grade/report/user/index.php' . '?id=' .$cmi5launch->course;
+    $backurl = $CFG->wwwroot . '/grade/report/user/index.php' . '?id=' . $cmi5launch->course;
 }
 
-    // Create back button.
-    ?>
-    <form action="<?php echo $backurl ?>" method="get">
-        <input id="id" name="id" type="hidden" value="<?php echo $cmi5launch->course ?>">
-      <input type="submit" value="Back"/>
-    </form>
-    <?php
+// Create back button.
+?>
+<form action="<?php echo $backurl ?>" method="get">
+    <input id="id" name="id" type="hidden" value="<?php echo $cmi5launch->course ?>">
+    <input type="submit" value="Back" />
+</form>
+<?php
 
-    // Reload cmi5 course instance.
-    $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
+// Reload cmi5 course instance.
+$record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
 
-    // Retrieve AU ids for this course.
-    $aus = json_decode($record->aus, true);
+// Retrieve AU ids for this course.
+$aus = json_decode($record->aus, true);
 
-    // Separate AUS into array on id.
-    $auschunked = array_chunk($aus, 13, true);
+// Separate AUS into array on id.
+$auschunked = array_chunk($aus, 13, true);
 
-    // Add the columns and headers to the table.
-    $reporttable->define_columns($columns);
-    $reporttable->define_headers($headers);
-    $reporttable->define_baseurl($PAGE->url);
-    // Setup table (this needs to be done before data is added).
-    $reporttable->setup();
+// Add the columns and headers to the table.
+$reporttable->define_columns($columns);
+$reporttable->define_headers($headers);
+$reporttable->define_baseurl($PAGE->url);
+// Setup table (this needs to be done before data is added).
+$reporttable->setup();
 
-    // Unfortunately, array_chunk nests our AU's, we need to use an index to grab them.
-    // I have not found a way to reliably separate AUs from DB without nesting -MB.
-    foreach ($auschunked[0] as $au) {
+// Unfortunately, array_chunk nests our AU's, we need to use an index to grab them.
+// I have not found a way to reliably separate AUs from DB without nesting -MB.
+foreach ($auschunked[0] as $au) {
 
-        // Array to hold data for rows.
-        $rowdata = array();
+    // Array to hold data for rows.
+    $rowdata = array();
 
-        // For each AU, iterate through each user.
-        foreach ($users as $user) {
+    // For each AU, iterate through each user.
+    foreach ($users as $user) {
 
-            // Array to hold info for next page, that will be placed into buttons for user to click.
-            $infofornextpage = array();
+        // Array to hold info for next page, that will be placed into buttons for user to click.
+        $infofornextpage = array();
 
-            // Retrieve the current au id, this is always unique and will help with retrieving the
-            // student grades. It is the uniquie id cmi5 spec id.
-            $aulmsid = $au[0]['lmsId'];
-            $infofornextpage[] = $aulmsid;
-            // Grab the current title of the AU for the row header, also to be sent to next page.
-            $currenttitle = $au[0]['title'][0]['text'];
-            $infofornextpage[] = $currenttitle;
-            $rowdata["AU Title"] = ($currenttitle);
+        // Retrieve the current au id, this is always unique and will help with retrieving the
+        // student grades. It is the uniquie id cmi5 spec id.
+        $aulmsid = $au[0]['lmsId'];
+        $infofornextpage[] = $aulmsid;
+        // Grab the current title of the AU for the row header, also to be sent to next page.
+        $currenttitle = $au[0]['title'][0]['text'];
+        $infofornextpage[] = $currenttitle;
+        $rowdata["AU Title"] = ($currenttitle);
 
-            $username = $user->username;
+        $username = $user->username;
 
-            // Retrieve users specific info for this course.
-            $userrecord = $DB->get_record('cmi5launch_usercourse', ['courseid' => $record->courseid, 'userid' => $user->id]);
+        // Retrieve users specific info for this course.
+        $userrecord = $DB->get_record('cmi5launch_usercourse', ['courseid' => $record->courseid, 'userid' => $user->id]);
 
-            // Retrieve grade type from settings.
-            $gradetype = $cmi5launchsettings["grademethod"];
+        // Retrieve grade type from settings.
+        $gradetype = $cmi5launchsettings["grademethod"];
 
-            // User record may be null if user has not participated in course yet.
-            if ($userrecord == null) {
+        // User record may be null if user has not participated in course yet.
+        if ($userrecord == null) {
 
-                $userscore = " ";
-                $infofornextpage[] = null;
-            } else {
+            $userscore = " ";
+            $infofornextpage[] = null;
+        } else {
 
-                // Retrieve the users grades for this course.
-                $usergrades = json_decode($userrecord->ausgrades, true);
+            // Retrieve the users grades for this course.
+            $usergrades = json_decode($userrecord->ausgrades, true);
 
-                // These are the AUS we want to send on if clicked, the more specific ids (THIS users AU ids).
-                $currentauids = $userrecord->aus;
-                $infofornextpage[] = $currentauids;
+            // These are the AUS we want to send on if clicked, the more specific ids (THIS users AU ids).
+            $currentauids = $userrecord->aus;
+            $infofornextpage[] = $currentauids;
 
-                $userscore = "";
+            $userscore = "";
 
-                if (!$usergrades == null) {
+            if (!$usergrades == null) {
 
-                    // Now compare the usergrades array keys to lmsid of current au, if
-                    // it matches then we want to display, that's what userscore is.
-                    if (array_key_exists($aulmsid, $usergrades)) {
+                // Now compare the usergrades array keys to lmsid of current au, if
+                // it matches then we want to display, that's what userscore is.
+                if (array_key_exists($aulmsid, $usergrades)) {
 
-                        // If it is, we want it's info which should be title => grade(s).
-                        $auinfo = array();
-                        $auinfo = $usergrades[$aulmsid];
-                        $augrades = $auinfo[$currenttitle];
+                    // If it is, we want it's info which should be title => grade(s).
+                    $auinfo = array();
+                    $auinfo = $usergrades[$aulmsid];
+                    $augrades = $auinfo[$currenttitle];
 
-                        // This is just to display, it calculates here so it doesn't effect the base array stored for AU.
-                        switch($gradetype){
+                    // This is just to display, it calculates here so it doesn't effect the base array stored for AU.
+                    switch ($gradetype) {
 
-                            // GRADE_AUS_CMI5' = '0'.
-                            // GRADE_HIGHEST_CMI5' = '1'.
-                            // GRADE_AVERAGE_CMI5', =  '2'.
-                            // GRADE_SUM_CMI5', = '3'.
-                            case 1:
-                                $userscore = strval($highestgrade($augrades));
+                        // GRADE_AUS_CMI5' = '0'.
+                        // GRADE_HIGHEST_CMI5' = '1'.
+                        // GRADE_AVERAGE_CMI5', =  '2'.
+                        // GRADE_SUM_CMI5', = '3'.
+                        case 1:
+                            $userscore = strval($highestgrade($augrades));
                             break;
-                            case 2:
-                                // We need to update rawgrade not all of grades, that wipes out the array format it needs.
-                                $userscore = strval($averagegrade($augrades));
+                        case 2:
+                            // We need to update rawgrade not all of grades, that wipes out the array format it needs.
+                            $userscore = strval($averagegrade($augrades));
                             break;
-                        }
-
-                        // Remove [] from userscore if they are there.
-                        $toremove = array("[", "]");
-                        if ($userscore != null && str_contains($userscore, "[")) {
-                            $userscore = str_replace($toremove, "", $userscore);
-                        }
                     }
 
-                } else {
-                            $userscore = "N/A";
+                    // Remove [] from userscore if they are there.
+                    $toremove = array("[", "]");
+                    if ($userscore != null && str_contains($userscore, "[")) {
+                        $userscore = str_replace($toremove, "", $userscore);
+                    }
                 }
-
+            } else {
+                $userscore = "N/A";
             }
-            // Add the userid to info for next page.
-            $infofornextpage[] = $user->id;
-
-            // Convert their grade to string to be passed into html button.
-            $userscoreasstring = strval($userscore);
-
-            // Encode to send to next page, because it has to go as a string and pass through the Javascript function.
-            $sendtopage = base64_encode(json_encode($infofornextpage, JSON_HEX_QUOT));
-
-            // Build the button to be displayed. It appears as the users score, but is also a link
-            // to session_report if user wants to break down the score.
-            $button = "<a tabindex=\"0\" id='newreport'
-                onkeyup=\"key_test('" . $sendtopage . "')\" onclick=\"mod_cmi5launch_open_report('"
-                . $sendtopage . "')\" style='cursor: pointer;'>"
-                . $userscoreasstring . "</a>";
-
-            // Add the button to the row data under the correct user.
-            $rowdata[$username] = ($button);
         }
+        // Add the userid to info for next page.
+        $infofornextpage[] = $user->id;
 
-        // Add the row data to the table.
-        $reporttable->add_data_keyed($rowdata);
+        // Convert their grade to string to be passed into html button.
+        $userscoreasstring = strval($userscore);
+
+        // Encode to send to next page, because it has to go as a string and pass through the Javascript function.
+        $sendtopage = base64_encode(json_encode($infofornextpage, JSON_HEX_QUOT));
+
+        // Build the button to be displayed. It appears as the users score, but is also a link
+        // to session_report if user wants to break down the score.
+        $button = "<a tabindex=\"0\" id='newreport'
+                onkeyup=\"key_test('" . $sendtopage . "')\" onclick=\"mod_cmi5launch_open_report('"
+            . $sendtopage . "')\" style='cursor: pointer;'>"
+            . $userscoreasstring . "</a>";
+
+        // Add the button to the row data under the correct user.
+        $rowdata[$username] = ($button);
     }
 
-    // Finish building table now that all data is passed in.
-    $reporttable->get_page_start();
-    $reporttable->get_page_size();
-    $reporttable->finish_output();
+    // Add the row data to the table.
+    $reporttable->add_data_keyed($rowdata);
+}
+
+// Finish building table now that all data is passed in.
+$reporttable->get_page_start();
+$reporttable->get_page_size();
+$reporttable->finish_output();
 ?>
 
 <form id="launchform" action="session_report.php" method="get">
-        <input id="id" name="id" type="hidden" value="<?php echo $id ?>">
-        <input id="session_report" name="session_report" type="hidden" value="default">
-    </form>
+    <input id="id" name="id" type="hidden" value="<?php echo $id ?>">
+    <input id="session_report" name="session_report" type="hidden" value="default">
+</form>
 <?php
 
 if (empty($noheader)) {
