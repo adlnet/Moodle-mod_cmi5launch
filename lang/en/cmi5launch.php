@@ -483,6 +483,15 @@ $string['started'] = 'Started';
 $string['last'] = 'Finished';
 $string['score'] = 'Score';
 
+// Session reports.
+$string['cmi5launchsessionaucompleted'] = 'Completed';
+$string['cmi5launchsessionaucompletedpassed'] = 'Completed and Passed';
+$string['cmi5launchsessionaucompletedfailed'] = 'Completed and Failed';
+$string['cmi5launchsessiongradehigh'] = 'Highest';
+$string['cmi5launchsessiongradeaverage'] = 'Average';
+
+
+
 // For privacy module.
 
 // Usercourse table.

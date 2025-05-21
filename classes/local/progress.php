@@ -474,7 +474,7 @@ class progress {
             echo (get_string('cmi5launchstatementsretrievalerror', 'cmi5launch') . $e->getMessage());
             
             
-            return get_strin(('cmi5launchstatementsnotretrieved', 'cmi5launch'));
+            return get_string('cmi5launchstatementsnotretrieved', 'cmi5launch');
         }
     }
 

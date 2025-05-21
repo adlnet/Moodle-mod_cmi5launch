@@ -216,13 +216,13 @@ if ($aurecord->sessions != null || false) {
         // If it's been attempted but no moveon value.
         if ($iscompleted == 1) {
 
-            $austatus = "Completed";
+            $austatus = get_string('cmi5launchsessionaucompleted', 'cmi5launch');
 
             if ($ispassed == 1) {
-                $austatus = "Completed and Passed";
+                $austatus = get_string('cmi5launchsessionaucompletedpassed', 'cmi5launch');
             }
             if ($isfailed == 1) {
-                $austatus = "Completed and Failed";
+                $austatus = get_string('cmi5launchsessionaucompletedfailed', 'cmi5launch');
             }
         }
             // Update table.
@@ -238,11 +238,11 @@ if ($aurecord->sessions != null || false) {
             // 'GRADE_SUM_CMI5', = '3'.
 
             case 1:
-                $grade = "Highest";
+                $grade = get_string('cmi5launchsessiongradehigh', 'cmi5launch');
                 $overall = max($sessionscores);
                 break;
             case 2:
-                $grade = "Average";
+                $grade = get_string('cmi5launchsessiongradeaverage', 'cmi5launch');
                 $overall = (array_sum($sessionscores) / count($sessionscores));
                 break;
         }
@@ -261,7 +261,7 @@ if ($aurecord->sessions != null || false) {
 
 // Display the grading type, highest, avg, etc.
 $scorecolumns[] = 'Grading type';
-$scoreheaders[] = 'Gradingtype';
+$scoreheaders[] = 'Grading type';
 $scorecolumns[] = 'Overall Score';
 $scoreheaders[] = 'Overall Score';
 
