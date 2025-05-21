@@ -41,7 +41,68 @@ defined('MOODLE_INTERNAL') || die();
 function xmldb_cmi5launch_upgrade($oldversion) {
     global $DB;
     $dbman = $DB->get_manager();
+    if ($oldversion < 2025052112) {
 
+        // Because ID needs to be autosequence, but MySQL and others do not allow a non id to be auto increment, drop registraionid
+        // as primary key and replace it with id.
+        // HOWEVER we need to remake a table to change primary key.
+        if ($oldversion < 2025050518) {
+
+            // 1. Rename old table
+            $oldtable = new xmldb_table('cmi5launch_player');
+            $tempname = 'cmi5launch_player_backup_' . time();
+            $DB->execute("ALTER TABLE {cmi5launch_player} RENAME TO {{$tempname}}");
+        
+            // 2. Define the new table
+            $table = new xmldb_table('cmi5launch_player');
+        
+            $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+            $table->add_field('name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+            $table->add_field('tenantid', XMLDB_TYPE_INTEGER, '10', null, null, null, '0');
+            $table->add_field('tenantname', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+            $table->add_field('tenanttoken', XMLDB_TYPE_CHAR, '350', null, null, null, null);
+            $table->add_field('courseid', XMLDB_TYPE_INTEGER, '10', null, null, null, '0');
+            $table->add_field('launchmethod', XMLDB_TYPE_CHAR, '10', null, null, null, 'AnyWindow');
+            $table->add_field('returnurl', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+            $table->add_field('homepage', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+            $table->add_field('registrationid', XMLDB_TYPE_CHAR, '50', null, XMLDB_NOTNULL, null, null);
+            $table->add_field('sessionid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+            $table->add_field('launchurl', XMLDB_TYPE_CHAR, '500', null, null, null, null);
+            $table->add_field('cmi5playerurl', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+            $table->add_field('cmi5playerport', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        
+            // 3. Set the new primary key on 'id'
+            $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+    
+            // 4. Create the table
+            if (!$dbman->table_exists($table)) {
+                $dbman->create_table($table);
+            }
+        
+            // 5. Copy data from backup (matching fields only)
+            $DB->execute("
+                INSERT INTO {cmi5launch_player} (
+                    id, name, tenantid, tenantname, tenanttoken,
+                    courseid, launchmethod, returnurl, homepage,
+                    registrationid, sessionid, launchurl,
+                    cmi5playerurl, cmi5playerport
+                )
+                SELECT
+                    id, name, tenantid, tenantname, tenanttoken,
+                    courseid, launchmethod, returnurl, homepage,
+                    registrationid, sessionid, launchurl,
+                    cmi5playerurl, cmi5playerport
+                FROM {{$tempname}}");
+        
+            // 7. Drop the backup table
+            $dbman->drop_table(new xmldb_table($tempname));
+        
+            // 8. Finish upgrade step
+            upgrade_mod_savepoint(true, 2025052113, 'cmi5launch');
+        }
+        
+    
+    }
     if ($oldversion < 2025050517) {
 
         $table = new xmldb_table('cmi5launch_player');
