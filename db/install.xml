@@ -69,7 +69,7 @@
         <FIELD NAME="cmi5playerport" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="CMI5 player port"/>
       </FIELDS>
       <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="registrationid"/>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
       <INDEXES>
         <INDEX NAME="name" UNIQUE="false" FIELDS="name"/>
