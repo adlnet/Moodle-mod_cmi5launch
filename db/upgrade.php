@@ -73,17 +73,13 @@ function xmldb_cmi5launch_upgrade($oldversion) {
         
             // 3. Set the new primary key on 'id'
             $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
-        
-            // 4. Add other indexes as needed
-            $table->add_index('uniq_registrationid', XMLDB_INDEX_UNIQUE, ['registrationid']);
-            $table->add_index('name', XMLDB_INDEX_NOTUNIQUE, ['name']);
-        
-            // 5. Create the table
+    
+            // 4. Create the table
             if (!$dbman->table_exists($table)) {
                 $dbman->create_table($table);
             }
         
-            // 6. Copy data from backup (matching fields only)
+            // 5. Copy data from backup (matching fields only)
             $DB->execute("
                 INSERT INTO {cmi5launch_player} (
                     id, name, tenantid, tenantname, tenanttoken,
