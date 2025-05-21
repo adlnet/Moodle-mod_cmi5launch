@@ -24,17 +24,11 @@
  namespace mod_cmi5launch\local;
  defined('MOODLE_INTERNAL') || die();
 
- use mod_cmi5launch\local\cmi5launch_helpers;
 // Include the errorover (error override) funcs.
 require_once ($CFG->dirroot . '/mod/cmi5launch/classes/local/errorover.php');
 class cmi5_connectors {
+   
 
-    const CMI5LAUNCH_PLAYER_TENANT_URL = "/api/v1/tenant";
-    const CMI5LAUNCH_PLAYER_COURSE_URL = "/api/v1/course";
-    const CMI5LAUNCH_PLAYER_REGISTRATION_URL = "/api/v1/registration";
-    const CMI5LAUNCH_PLAYER_AUTH_URL = "/api/v1/auth";
-    const CMI5LAUNCH_LAUNCH_URL = "/launch-url/";
-    const CMI5LAUNCH_PLAYER_SESSION_URL = "/api/v1/session/";
     public function cmi5launch_get_create_tenant() {
         return [$this, 'cmi5launch_create_tenant'];
     }
@@ -85,7 +79,7 @@ class cmi5_connectors {
         $settings = cmi5launch_settings($id);
 
         // Build URL to import course to.
-        $url = $settings['cmi5launchplayerurl'] . self::CMI5LAUNCH_PLAYER_COURSE_URL;
+        $url = $settings['cmi5launchplayerurl'] . CMI5LAUNCH_PLAYER_COURSE_URL;
 
         // To determine the headers.
         $filetype = "zip";
@@ -137,7 +131,7 @@ class cmi5_connectors {
         $password = $settings['cmi5launchbasepass'];
 
         // Build URL for launch URL request.
-        $url = $playerurl . self::CMI5LAUNCH_PLAYER_TENANT_URL;
+        $url = $playerurl . CMI5LAUNCH_PLAYER_TENANT_URL;
 
         // The body of the request must be made as array first.
         $data = array(
@@ -237,7 +231,7 @@ class cmi5_connectors {
         global $CFG;
 
         // Build URL for launch URL request.
-        $url = $playerurl . self::CMI5LAUNCH_PLAYER_REGISTRATION_URL;
+        $url = $playerurl . CMI5LAUNCH_PLAYER_REGISTRATION_URL;
 
         // The body of the request must be made as array first.
         $data = array(
@@ -304,7 +298,7 @@ class cmi5_connectors {
         $password = $settings['cmi5launchbasepass'];
 
         // Build URL for launch URL request.
-        $url = $playerurl . self::CMI5LAUNCH_PLAYER_AUTH_URL;
+        $url = $playerurl . CMI5LAUNCH_PLAYER_AUTH_URL;
 
         // The body of the request must be made as array first.
         $data = array(
@@ -367,7 +361,7 @@ class cmi5_connectors {
 
     
         // Build URL for launch URL request.
-        $url = $playerurl . self::CMI5LAUNCH_PLAYER_COURSE_URL . "/" . $courseid  . self::CMI5LAUNCH_LAUNCH_URL . $auindex;
+        $url = $playerurl . CMI5LAUNCH_PLAYER_COURSE_URL . "/" . $courseid  . CMI5LAUNCH_LAUNCH_URL . $auindex;
 
         $data = array(
             'actor' => array(
@@ -569,7 +563,7 @@ class cmi5_connectors {
         $playerurl = $settings['cmi5launchplayerurl'];
 
         // Build URL for launch URL request.
-        $url = $playerurl . self::CMI5LAUNCH_PLAYER_SESSION_URL . $sessionid;
+        $url = $playerurl . CMI5LAUNCH_PLAYER_SESSION_URL . $sessionid;
 
         // Sends the stream to the specified URL.
         $result = $this->cmi5launch_send_request_to_cmi5_player_get('cmi5launch_stream_and_send', $token, $url);

@@ -25,13 +25,22 @@
  * @copyright 2024 Megan Bohland - added functions
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->dirroot/mod/cmi5launch/lib.php");
 
 // Class for connecting to CMI5 player.
 use mod_cmi5launch\local\cmi5_connectors;
 
+
+define('CMI5LAUNCH_PLAYER_V1', '/api/v1/');
+define( 'CMI5LAUNCH_PLAYER_TENANT_URL', '/api/v1/tenant');
+define('CMI5LAUNCH_PLAYER_COURSE_URL', '/api/v1/course');
+define('CMI5LAUNCH_PLAYER_REGISTRATION_URL', '/api/v1/registration');
+define('CMI5LAUNCH_PLAYER_AUTH_URL', '/api/v1/auth');
+define('CMI5LAUNCH_LAUNCH_URL', '/launch-url/');
+define('CMI5LAUNCH_PLAYER_SESSION_URL', '/api/v1/session/');
+
+// Define constants for player connections.
 // Grade stuff.
 define('MOD_CMI5LAUNCH_GRADE_AUS', '0');
 define('MOD_CMI5LAUNCH_GRADE_HIGHEST', '1');

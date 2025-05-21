@@ -47,6 +47,7 @@ $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST)
 $id = required_param('id', PARAM_INT);
 $download = optional_param('download', '', PARAM_RAW);
 $mode = optional_param('mode', '', PARAM_ALPHA); // Report mode.
+
 // Item number, may be != 0 for activities that allow more than one grade per user.
 // Itemnumber is from the moodle grade_items table, which holds info on the grade item
 // itself such as course, mod type, activity title, etc.
@@ -58,12 +59,14 @@ $userid = optional_param('userid', 0, PARAM_INT);
 $itemid = optional_param('itemid', 0, PARAM_INT);
 // This is the gradeid, which is the id in the same grade_grades table. A row entry, a particular users info.
 $gradeid = optional_param('gradeid', 0, PARAM_INT);
+
 // Active page.
 $page = optional_param('page', 0, PARAM_INT);
 $showall   = optional_param('showall', null, PARAM_BOOL);
 $cmid      = optional_param('cmid', null, PARAM_INT);
 
 $url = new moodle_url('/mod/cmi5launch/report.php');
+
 if ($page !== 0) {
     $url->param('page', $page);
 } else if ($showall) {
@@ -133,8 +136,8 @@ $event->trigger();
 // Print the page header.
 if (empty($noheader)) {
 
-    $strreport = get_string('report', 'cmi5launch');
-    $strattempt = get_string('attempt', 'cmi5launch');
+    $strreport = get_string('cmi5launchreport', 'cmi5launch');
+    $strattempt = get_string('cmi5launchattemptrow', 'cmi5launch');
 
     // Setup the page
     $PAGE->set_title("$course->shortname: " . format_string($course->id));
@@ -151,8 +154,8 @@ if (empty($noheader)) {
 // Create table to display on page.
 $reporttable = new \flexible_table('mod-cmi5launch-report');
 
-$columns[] = 'AU Title';
-$headers[] = get_string('autitle', 'cmi5launch');
+$columns[] = get_string('cmi5launchautitleheader', 'cmi5launch');
+$headers[] = get_string('cmi5launchautitleheader', 'cmi5launch');
 
 // The table is always the same, but the amount of users shown varies.
 // If user has capability, they can see all users.
