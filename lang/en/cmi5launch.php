@@ -30,6 +30,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+
+ 
+
 $string['modulename'] = 'cmi5 launch link';
 $string['modulenameplural'] = 'cmi5 launch links';
 $string['modulename_help'] = 'A plug in for Moodle that allows the launch of cmi5 (xAPI) content which is then tracked to a separate LRS.';
@@ -85,6 +88,7 @@ $string['othersettings'] = 'Additional settings';
 
 // Header.
 $string['cmi5launchsettingsheader'] = 'cmi5 player settings';
+$string['cmi5launchlocationheader'] = 'Location: ';
 
 // Cmi5 player root location.
 $string['cmi5launchplayerurl'] = 'cmi5 player URL';
@@ -95,6 +99,12 @@ $string['cmi5launchplayerurl_default'] = '';
 $string['cmi5launchcontenturl'] = 'cmi5 player URL';
 $string['cmi5launchcontenturl_help'] = 'The url to communicate with cmi5 player, PUBLIC content http://player.example.com or http://localhost:63398). Must NOT include a trailing forward slash.';
 $string['cmi5launchcontenturl_default'] = '';
+
+// Cmi5 setupp.
+$string['cmi5launchsetuptitle'] = 'CMI5 Setup';
+$string['cmi5launchsetup_help'] = 'This is the setup page for CMI5. Here you can create a new tenant for your CMI5 player. Please enter a name for your tenant below.';
+$string['cmi5launchsetupcancel'] = 'Cancelled';
+
 
 // Cmi5 setupform.php.
 $string['cmi5launchsettingtitle'] = 'CMI5 Setup Form';
@@ -287,6 +297,13 @@ $string['cmi5launchnogradeerror'] = 'No grades to update. No record for user fou
 $string['cmi5launchgradeerror'] = ' Error in updating or checking user grades. Report this error to system administrator: ';
 $string['cmi5launchgradetypenotfound'] = 'Grade type not found.';
 
+// Errors on launch.php. 
+$string['cmi5launchsessionerror'] = 'Error in launching experience. Session ID cannot be null. Report this error to system administrator.';
+$string['cmi5launcherror'] = 'Error in launching experience. Report this error to system administrator: ';
+
+// Errors on AUview.php.
+$string['cmi5launchloadsessionerror'] = 'loading session table on AUview page. Check that session information is present in DB and session id is correct. Report the following to system administrator: ';
+
 // Progress errors.
 // LRS errors.
 $string['cmi5launchlrsstatementretrievalerror']= 'Trouble retrieving statements from LRS. Caught exception: ';
@@ -448,7 +465,7 @@ $string['cmi5launch_notavailable'] = 'The Learning Record Store is not available
 If you are the system administrator, go to Site admin / Development / Debugging and set Debug messages to DEVELOPER. Set it back to NONE or MINIMAL once the error details have been recorded.';
 $string['cmi5launch_regidempty'] = 'Registration id not found. Please close this window.';
 
-$string['idmissing'] = 'You must specify a course_module ID or an instance ID';
+$string['cmi5launchidmissing'] = 'You must specify a course_module ID or an instance ID';
 
 // Events.
 $string['eventactivitylaunched'] = 'Activity launched';
@@ -462,12 +479,6 @@ $string['expirecredentials'] = 'Expire credentials';
 $string['checkcompletion'] = 'Check completion';
 
 // For reports.
-$string['cmi5launchreport'] = 'Report';
-$string['cmi5launchattemptheader'] = 'Attempt';
-$string['cmi5launchstartedheader'] = 'Started';
-$string['cmi5launchfinishedheader'] = 'Finished';
-$string['cmi5launchscoreheader'] = 'Score';
-$string['cmi5launchsatisfiedstatusheader'] = 'AU Satisfied Status';
 $string['cmi5launchreport'] = 'Report';
 $string['cmi5launchattemptheader'] = 'Attempt';
 $string['cmi5launchstartedheader'] = 'Started';

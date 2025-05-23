@@ -23,11 +23,11 @@
 
 use mod_cmi5launch\local\au_helpers;
 use mod_cmi5launch\local\session_helpers;
+use mod_cmi5launch\local\cmi5_connectors;
 
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require('header.php');
 require_once($CFG->libdir . '/tablelib.php');
-require_once($CFG->dirroot . '/mod/cmi5launch/locallib.php');
 require_once($CFG->libdir . '/formslib.php');
 require_once($CFG->dirroot . '/reportbuilder/classes/local/report/column.php');
 
@@ -41,6 +41,7 @@ define('CMI5LAUNCH_REPORT_ATTEMPTS_STUDENTS_WITH_NO', 2);
 
 global $cmi5launch, $CFG;
 
+$cmi5 = new cmi5_connectors();
 $cmi5launchsettings = cmi5launch_settings($cmi5launch->id);
 
 // Retrieve the grade type to use to calculate the overall score.
@@ -93,7 +94,7 @@ if (!empty($download)) {
 // Print the page header.
 if (empty($noheader)) {
 
-    $strreport = get_string('report', 'cmi5launch');
+    $strreport = get_string('cmi5launchreport', 'cmi5launch');
 
     // Setup the page.
     $PAGE->set_url($url);
@@ -180,21 +181,36 @@ if ($aurecord->sessions != null || false) {
 
     // There may be more than one session.
     foreach ($sessions as $sessionid) {
+        
 
         $session = $updatesession($progress, $cmi5, $sessionid, $cmi5launch->id, $user);
         // Add score to array for AU.
         $sessionscores[] = $session->score;
 
-        // Retrieve createdAt and format.
-        $date = new DateTime($session->createdat, new DateTimeZone('US/Eastern'));
-        $date->setTimezone(new DateTimeZone('America/New_York'));
-        $datestart = $date->format('D d M Y H:i:s');
+        if ($session->createdat != null || false) {
 
-        // Retrieve lastRequestTime and format.
-        $date = new DateTime($session->lastrequesttime, new DateTimeZone('US/Eastern'));
-        $date->setTimezone(new DateTimeZone('America/New_York'));
-        $datefinish = $date->format('D d M Y H:i:s');
+            // Retrieve createdAt and format.
+            $date = new DateTime($session->createdat, new DateTimeZone('US/Eastern'));
+            $date->setTimezone(new DateTimeZone('America/New_York'));
+            $datestart = $date->format('D d M Y H:i:s');
+        }else {
+            // If no createdAt, set to empty.
+            $datestart = "";
+         }
 
+        if ($session->lastrequesttime != null || false) {
+
+            // Retrieve lastRequestTime and format.
+            $date = new DateTime($session->lastrequesttime, new DateTimeZone('US/Eastern'));
+            $date->setTimezone(new DateTimeZone('America/New_York'));
+            $datefinish = $date->format('D d M Y H:i:s');
+        }else {
+            // If no lastRequesttime then use updatedat.
+            // Retrieve lastRequestTime and format.
+            $date = new DateTime($session->updatedat, new DateTimeZone('US/Eastern'));
+            $date->setTimezone(new DateTimeZone('America/New_York'));
+            $datefinish = $date->format('D d M Y H:i:s');
+        }
         // The users sessions.
         $usersession = $DB->get_record('cmi5launch_sessions', array('sessionid' => $sessionid));
 

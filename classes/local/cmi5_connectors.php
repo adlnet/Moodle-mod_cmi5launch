@@ -23,7 +23,7 @@
 
  namespace mod_cmi5launch\local;
  defined('MOODLE_INTERNAL') || die();
-
+ require_once($CFG->dirroot . '/mod/cmi5launch/constants.php');
 // Include the errorover (error override) funcs.
 require_once ($CFG->dirroot . '/mod/cmi5launch/classes/local/errorover.php');
 class cmi5_connectors {

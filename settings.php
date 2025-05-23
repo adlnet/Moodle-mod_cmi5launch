@@ -28,7 +28,22 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+ 
 defined('MOODLE_INTERNAL') || die;
+
+require_once($CFG->dirroot . '/mod/cmi5launch/constants.php');
+
+
+// Class for connecting to CMI5 player grades.
+use mod_cmi5launch\local\grade_helpers;
+
+// Bring in grade helpers.
+$gradehelpers = new grade_helpers;
+
+$get_grade_array = $gradehelpers->cmi5launch_get_grade_method_array();
+$cmi5launch_get_attempts_array = $gradehelpers->cmi5launch_fetch_attempts_array();
+$cmi5launch_get_grade_type_array = $gradehelpers->cmi5launch_fetch_what_grade_array();
+
 
 ?>
 
@@ -48,7 +63,6 @@ defined('MOODLE_INTERNAL') || die;
 
 // maybe add if ($hassiteconfig?) Can regulare users access this? TODO -MB
 if ($ADMIN->fulltree) {
-    require_once($CFG->dirroot . '/mod/cmi5launch/locallib.php');
     require_once($CFG->dirroot . '/mod/cmi5launch/settingslib.php');
 
     // MB
@@ -208,7 +222,7 @@ if ($ADMIN->fulltree) {
         get_string('grademethod', 'cmi5launch'),
         get_string('grademethoddesc', 'cmi5launch'),
         MOD_CMI5LAUNCH_GRADE_HIGHEST,
-        cmi5launch_get_grade_method_array()
+        $get_grade_array()
     ));
 
     for ($i = 0; $i <= 100; $i++) {
@@ -232,7 +246,7 @@ if ($ADMIN->fulltree) {
             get_string('maximumattempts', 'cmi5launch'),
             '',
             '0',
-            cmi5launch_get_attempts_array()
+            $cmi5launch_get_attempts_array()
         ),
         get_string('whatmaxdesc', 'cmi5launch'),
     );
@@ -242,7 +256,7 @@ if ($ADMIN->fulltree) {
         get_string('whatgrade', 'cmi5launch'),
         get_string('whatgradedesc', 'cmi5launch'),
         MOD_CMI5LAUNCH_HIGHEST_ATTEMPT,
-        cmi5launch_get_what_grade_array()
+        $cmi5launch_get_grade_type_array()
     ));
 
     // Not sure if we want to implement mastery override at this time -MB.
