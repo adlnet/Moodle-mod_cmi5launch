@@ -68,7 +68,7 @@ class grade_helpers
 
 
     /**
-     * Returns an array of the array of what grade options
+     * Returns an array of the array of what grade options are availabe.
      *
      * @return array an array of what grade options
      */
@@ -98,11 +98,11 @@ class grade_helpers
      * @return array an array of attempt options
      */
     function cmi5launch_get_attempts_array() {
-        $attempts = array(0 => get_string('nolimit', 'cmi5launch'),
-                        1 => get_string('attempt1', 'cmi5launch'));
+        $attempts = array(0 => get_string('cmi5launchnolimit', 'cmi5launch'),
+                        1 => get_string('cmi5launchattempt1', 'cmi5launch'));
 
         for ($i = 2; $i <= 6; $i++) {
-            $attempts[$i] = get_string('attemptsx', 'cmi5launch', $i);
+            $attempts[$i] = get_string('cmi5launchattemptsx', 'cmi5launch', $i);
         }
 
         return $attempts;

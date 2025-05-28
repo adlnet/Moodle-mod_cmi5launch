@@ -69,20 +69,17 @@ class au_helpers
         $resultchunked = "";
 
 
-        // Use our own more specific error handler, to give better info tto user.
+        // Use our own more specific error handler, to give better info to user.
         set_error_handler('mod_cmi5launch\local\array_chunk_warning', E_WARNING);
 
         // The results come back as nested array under more then just AUs.
-        // We only want the info pertaining to the AU. However, if the wrong info is passed array_chunk will through an exception.
+        // We only want the info pertaining to the AU. However, if the wrong info is passed array_chunk will throw an exception.
         try {
             $resultchunked = array_chunk($returnedinfo["metadata"]["aus"], 1, );
         } catch (\Exception $e) {
 
-            echo "Cannot retrieve AUs. Error found when trying to parse them from course creation: " .
-                "Please check the connection to player or course format and try again. \n"
-                . $e->getMessage() . "\n";
-
-            //exit;
+            echo ( get_string('cmi5launchaucannotretrieve', 'cmi5launch') . "\n"
+                . $e->getMessage() . "\n");
         }
 
         // Restore the error handler.
@@ -93,8 +90,8 @@ class au_helpers
 
 
     /**
-     * So it should be fed an array of statements that then assigns the values to
-     * several aus, and then returns them as au objects.
+     * It is fed an array of statements that then assigns the values to
+     * several aus, and returns them as au objects.
      * @param mixed $austatements
      * @return array<au>
      */
@@ -107,7 +104,7 @@ class au_helpers
         // So in case it is given null.
         if ($austatements == null) {
 
-            throw new nullException('Cannot retrieve AU information. AU statements from DB are: ' . $austatements, 0);
+            throw new nullException(get_string('cmi5launchaucannotretrievedb', 'cmi5launch') . $austatements, 0);
 
         } else {
             foreach ($austatements as $int => $info) {
@@ -128,7 +125,7 @@ class au_helpers
     }
 
     /**
-     * Takes a list of AUs and record and saves to the DB.
+     * Takes a list of AUs and a record and saves to the DB.
      * @param mixed $auobjectarray
      * @return array
      */
@@ -159,7 +156,7 @@ class au_helpers
               restore_exception_handler();
               restore_error_handler();
               
-            throw new nullException('Cannot save AU information. AU object array is: null', 0);
+            throw new nullException(get_string('cmi5launchaucannotsave', 'cmi5launch'), 0);
 
         } else {
 
@@ -181,9 +178,8 @@ class au_helpers
                     $newrecord->url = $auobject->url;
                     $newrecord->type = $auobject->type;
                   
-                    //apparently thi covoluted methid is becessary shceck php unit tests MB
-                      $title = json_decode(json_encode($auobject->title), true);
-                   // $title = $auobject->title;
+                    // Apparently this convoluted method is necessary due to nature of php unit tests MB
+                    $title = json_decode(json_encode($auobject->title), true);
                     $newrecord->title = $title[0]['text'];
                     $newrecord->moveon = $auobject->moveOn;
                     $newrecord->auindex = $auobject->auIndex;
@@ -209,12 +205,12 @@ class au_helpers
                     // This is for troubleshooting, so we know where the error is.
                     $currentrecord++;
 
-                    // The set exception handler catches exceptionas that SLIP by,
-                    // so maybe DONT make it throwable and  catch type errror
+                    // The set exception handler catches exceptions that SLIP by,
+                    // So maybe DONT make it throwable and  catch type errror
                 } catch (\Throwable $e) {
 
 
-                    echo "Cannot save to DB. Stopped at record with ID number " . ($currentrecord) . ".";
+                    echo (get_string('cmi5launchaucannotsavedb', 'cmi5launch') . ($currentrecord) . ".");
 
                     // This is the tricky part, we need to find out which field is missing. But because the error is thrown ON the field, we need to do some
                     // manuevering to find out which field is missing.
@@ -232,7 +228,7 @@ class au_helpers
                     $missing = $newrecorditems[$key];
 
                     // Now use the found missing value to give feedback to user.
-                    echo " One of the fields is incorrect. Check data for field '$missing'. " . $e->getMessage() . "\n";
+                    echo (get_string('cmi5launchaucannotsavefield', 'cmi5launch') . '$missing'  . $e->getMessage() . "\n");
                     // Restore default hadlers.
                     restore_exception_handler();
                     restore_error_handler();
@@ -262,10 +258,10 @@ class au_helpers
 
 
         // If check is negative, the record does not exist. It should also throw error.
-        // Moodle will throw the error, but we want to pass this message back ot user.
+        // Moodle will throw the error, but we want to pass this message back t0 user.
         if (!$check) {
 
-            throw new nullException("Error attempting to get AU data from DB. Check AU id. AU id is: " . $auid . "</p>", 0);
+            throw new nullException( get_string('cmi5launchaudatadb', 'cmi5launch'). $auid . "</p>", 0);
 
         } else {
 

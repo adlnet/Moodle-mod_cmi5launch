@@ -78,11 +78,9 @@ class session_helpers {
             // Update session.
             foreach ($sessioninfo as $key => $value) {
 
-                // Is the problem key value is not matching due to caps?
                 // We don't want to overwrite ids.
                 // If the property exists and it's not id or sessionid, set it to lowercase and
                 // encode value if it is array. (DB needs properties in lowercase, but player returns camelcase).
-                
              
                     // If it's an array, encode it so it can be saved to DB.
                     if (is_array($value)) {
@@ -118,7 +116,7 @@ class session_helpers {
             restore_error_handler();
 
             // If there is an error, return the error.
-            throw new nullException("Error in updating session. Report this error to system administrator: ". $e->getMessage()); 
+            throw new nullException(get_string('cmi5launchsessionupdateerror', 'cmi5launch'). $e->getMessage()); 
        
         }
         // Restore default handlers.
@@ -184,13 +182,13 @@ class session_helpers {
             restore_error_handler();
 
             // If there is an error, return the error.
-            throw new nullException("Error in creating session. Report this error to system administrator: ". $e->getMessage()); 
+            throw new nullException(get_string('cmi5launchsessioncreationerror', 'cmi5launch') . $e->getMessage()); 
 
         }
     }
 
 
-        /**
+    /**
      * Retrieves session from DB
      * @param mixed $sessionid - the session id
      * @return session
@@ -205,7 +203,7 @@ class session_helpers {
         // If check is negative, the record does not exist. Throw error.
         if (!$check) {
 
-            echo "<p>Error attempting to get session data from DB. Check session id.</p>";
+            echo get_string('cmi5launchsessionretrievederror', 'cmi5launch');
             echo "<pre>";
             var_dump($sessionid);
             echo "</pre>";

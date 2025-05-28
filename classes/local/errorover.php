@@ -34,7 +34,7 @@ namespace mod_cmi5launch\local;
  */
 function exception_au(\Throwable $exception)
 {
-    throw new nullException('Error OVER: ' . $exception->getMessage(), 0);
+    throw new nullException(get_string('cmi5launcherrorover', 'cmi5launch') . $exception->getMessage(), 0);
 }
 
 /**
@@ -48,7 +48,7 @@ function exception_au(\Throwable $exception)
  */
 function exception_grade(\Throwable $exception)
 {
-    throw new nullException('Error in checking user grades: ' . $exception->getMessage(), 0);
+    throw new nullException(get_string('cmi5launcherrorgrade', 'cmi5launch') . $exception->getMessage(), 0);
 }
 
 /**
@@ -63,7 +63,7 @@ function exception_grade(\Throwable $exception)
 function progresslrsreq_warning($errno, $errstr, $errfile, $errline)
 {
 
-    throw new nullException('Unable to communicate with LRS. Caught exception: ' . $errstr. " Check LRS is up, username and password are correct, and LRS endpoint is correct.", 0);
+    throw new nullException(get_string('cmi5launchlrscommunicationerror', 'cmi5launch') . $errstr . get_string('cmi5launchlrschecksettings', 'cmi5launch' ), 0);
 
 }
 
@@ -78,7 +78,7 @@ function progresslrsreq_warning($errno, $errstr, $errfile, $errline)
  */
 function custom_warningAU($errno, $errstr, $errfile, $errline)
 {
-    echo "Error loading session table on AUview page. Report this to system administrator: <br> $errstr at $errfile on $errline: Check that session information is present in DB and session id is correct.";
+    echo (get_string('cmi5launcherrorau', 'cmi5launch')). "<br> $errstr at $errfile on $errline:" .  get_string('cmi5launcherrorausession', 'cmi5launch');
     
     exit;
 
@@ -95,7 +95,7 @@ function custom_warningAU($errno, $errstr, $errfile, $errline)
 function custom_warning($errno, $errstr, $errfile, $errline)
 {
     
-    throw new customException('Error launching experience.  Report this to system administrator: <br> '. $errstr .' at '. $errfile .' on ' .$errline, 0);
+    throw new customException(get_string('cmi5launcherrorexperience', 'cmi5launch'). $errstr .' at '. $errfile .' on ' .$errline, 0);
 
 }
 
@@ -111,7 +111,7 @@ function custom_warning($errno, $errstr, $errfile, $errline)
 function custom_warningview($errno, $errstr, $errfile, $errline)
 {
     
-    throw new customException('error on main view page.  Report this to system administrator: <br> '. $errstr .' at '. $errfile .' on ' .$errline, 0);
+    throw new customException(get_string('cmi5launcherrormain', 'cmi5launch') . $errstr .' at '. $errfile .' on ' .$errline, 0);
 
 }
 /**
@@ -126,10 +126,10 @@ function custom_warningview($errno, $errstr, $errfile, $errline)
 function exception_progresslrsreq(\Throwable $exception)
 {
    
-    throw new nullException('Unable to communicate with LRS. Caught exception: ' . $exception->getMessage() . " Check LRS is up, username and password are correct, and LRS endpoint is correct.", 0);
+    throw new nullException(get_string('cmi5launchlrscommunicationerror', 'cmi5launch') . $exception->getMessage() . get_string('cmi5launchlrschecksettings', 'cmi5launch'), 0);
 }
 /**
- * A warning handler to use in AU cases when many different exceptions for data errors may be thrown. 
+ * A warning handler to use LRS communications when many different exceptions for data errors may be thrown. 
  * @param mixed $errno
  * @param mixed $errstr
  * @param mixed $errfile
@@ -139,11 +139,11 @@ function exception_progresslrsreq(\Throwable $exception)
  */
 function progresslrs_warning($errno, $errstr, $errfile, $errline)
 {
-    throw new nullException('Error in retrieving statements from LRS ' . $errstr, 0);
+    throw new nullException(get_string('cmi5launchlrsstatementretrievalerror', 'cmi5launch') . $errstr, 0);
 }
 
 /**
- * An exception handler to use in AU cases when many different exceptions for data errors may be thrown. 
+ * An exception handler to use in LRS communications when many different exceptions for data errors may be thrown. 
  * @param mixed $errno
  * @param mixed $errstr
  * @param mixed $errfile
@@ -154,11 +154,11 @@ function progresslrs_warning($errno, $errstr, $errfile, $errline)
 function exception_progresslrs(\Throwable $exception)
 {
    
-    throw new nullException('Error in retrieving statements from LRS ' . $exception->getMessage(), 0);
+    throw new nullException(get_string('cmi5launchlrsstatementretrievalerror', 'cmi5launch') . $exception->getMessage(), 0);
 }
 
 /**
- * A warning handler to use in AU cases when many different exceptions for data errors may be thrown. 
+ * A warning handler for sifting data when many different exceptions for data errors may be thrown. 
  * @param mixed $errno
  * @param mixed $errstr
  * @param mixed $errfile
@@ -168,12 +168,12 @@ function exception_progresslrs(\Throwable $exception)
  */
 function sifting_data_warning($errno, $errstr, $errfile, $errline)
 {
-    throw new nullException('Error: ' . $errstr, 0);
-    //  exit;
+    throw new nullException(get_string('cmi5launcherror', 'cmi5launch')  . $errstr, 0);
+;
 }
 
 /**
- * An exception handler to use in AU cases when many different exceptions for data errors may be thrown. 
+ * An exception handler to use in catching parse issues. 
  * @param mixed $errno
  * @param mixed $errstr
  * @param mixed $errfile
@@ -183,11 +183,11 @@ function sifting_data_warning($errno, $errstr, $errfile, $errline)
  */
     function array_chunk_warning($errno, $errstr, $errfile, $errline)
     {
-        throw new nullException('Cannot parse array. Error: ' . $errstr, 0);
+        throw new nullException(get_string('cmi5launchparsearray', 'cmi5launch') . $errstr, 0);
     }
 
 /**
- * An grade handler to use in AU cases when many different exceptions for data errors may be thrown. 
+ * An grade error handler. 
  * @param mixed $errno
  * @param mixed $errstr
  * @param mixed $errfile
@@ -198,18 +198,18 @@ function sifting_data_warning($errno, $errstr, $errfile, $errline)
     function grade_warning($errno, $errstr, $errfile, $errline)
     {
 
-        throw new nullException('Error in checking user grades: ' . $errstr, 0);
+        throw new nullException(get_string('cmi5launcherrorgrade', 'cmi5launch') . $errstr, 0);
     }
 
 
 /**
- * Define a custom exception class, this will make pour tests meaningful
- * from php webpage: "Custom exception classes can allow you to write tests that prove your exceptions
-    *  are meaningful. Usually testing exceptions, you either assert the message equals
-*something in which case you can't change the message format without refactoring,
-*or not make any assertions at all in which case you can get misleading messages
-*later down the line. Especially if your $e->getMessage is something complicated
-*like a var_dump'ed context array."
+* Define a custom exception class, this will make our tests meaningful
+* from php webpage: "Custom exception classes can allow you to write tests that prove your exceptions
+* are meaningful. Usually testing exceptions, you either assert the message equals
+* something in which case you can't change the message format without refactoring,
+* or not make any assertions at all in which case you can get misleading messages
+* later down the line. Especially if your $e->getMessage is something complicated
+* like a var_dump'ed context array."
  */
 class nullException extends \Exception
 {
@@ -232,24 +232,21 @@ class nullException extends \Exception
 }
 
 /**
- * Define a custom exception class, this will make pour tests meaningful
- * from php webpage: "Custom exception classes can allow you to write tests that prove your exceptions
-    *  are meaningful. Usually testing exceptions, you either assert the message equals
-*something in which case you can't change the message format without refactoring,
-*or not make any assertions at all in which case you can get misleading messages
-*later down the line. Especially if your $e->getMessage is something complicated
-*like a var_dump'ed context array."
+* Define a custom exception class, this will make pour tests meaningful
+* from php webpage: "Custom exception classes can allow you to write tests that prove your exceptions
+* are meaningful. Usually testing exceptions, you either assert the message equals
+* something in which case you can't change the message format without refactoring,
+* or not make any assertions at all in which case you can get misleading messages
+* later down the line. Especially if your $e->getMessage is something complicated
+* like a var_dump'ed context array."
  */
 class playerException extends \Exception
 {
     // Redefine the exception so message isn't optional
     // I want an exception that takkkes what is missing and adds it to messsssage? 
-    // Is this possivlbe? 
     public function __construct($message, $code = 0, Throwable $previous = null) {
-        // some code
 
-        // Ah maybe here is where I can differentiate them
-        $playermessage = "Player communication error. Something went wrong " . $message;
+        $playermessage = get_string('cmi5launchplayerexception', 'cmi5launch') . $message;
         // make sure everything is assigned properly
         parent::__construct($playermessage, $code, $previous);
     }
@@ -268,25 +265,23 @@ class playerException extends \Exception
 }
 
 /**
- * Define a custom exception class, this will make pour tests meaningful
- * This is a catchall custom
- * from php webpage: "Custom exception classes can allow you to write tests that prove your exceptions
-    *  are meaningful. Usually testing exceptions, you either assert the message equals
-*something in which case you can't change the message format without refactoring,
-*or not make any assertions at all in which case you can get misleading messages
-*later down the line. Especially if your $e->getMessage is something complicated
-*like a var_dump'ed context array."
+* Define a custom exception class, this will make pour tests meaningful
+* This is a catchall custom
+* from php webpage: "Custom exception classes can allow you to write tests that prove your exceptions
+* are meaningful. Usually testing exceptions, you either assert the message equals
+* something in which case you can't change the message format without refactoring,
+* or not make any assertions at all in which case you can get misleading messages
+* later down the line. Especially if your $e->getMessage is something complicated
+* like a var_dump'ed context array."
  */
 class customException extends \Exception
 {
-    // Redefine the exception so message isn't optional
-    // I want an exception that takkkes what is missing and adds it to messsssage? 
-    // Is this possivlbe? 
+
     public function __construct($message, $code = 0, Throwable $previous = null) {
         // some code
 
         // Ah maybe here is where I can differentiate them
-        $playermessage = "Caught error. Something went wrong " . $message;
+        $playermessage = get_string('cmi5launchcustomexceptionmessage', 'cmi5launch') . $message;
         // make sure everything is assigned properly
         parent::__construct($playermessage, $code, $previous);
 
