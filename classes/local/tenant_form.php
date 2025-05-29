@@ -28,6 +28,8 @@ class setup_tenant extends moodleform {
     
     // Add elements to form.
     public function definition() {
+        $messageplayer = get_string('cmi5launchsetupformplayer', 'cmi5launch');
+        $messagetenant = get_string('cmi5launchtenantformplayer', 'cmi5launch');
         // A reference to the form is stored in $this->form.
         // A common convention is to store it in a variable, such as `$mform`.
         $mform = $this->_form; // Don't forget the underscore!
@@ -42,10 +44,10 @@ class setup_tenant extends moodleform {
         // Default value.
         $mform->setDefault('cmi5tenant', get_string('cmi5launchtenantname_default', 'cmi5launch')); // The second arg here is the default value and appears in the text box.
         // Add a rule to make this field required.
-        $mform->addRule('cmi5tenant', 'This is needed to connect to player', 'required');
+        $mform->addRule('cmi5tenant', $messageplayer, 'required');
 
         // $mform->addElement('header', 'cmi5instructions', 'Please enter a tenant name. When submitted it will create a tenant in the cmi5 player and automatically retrieve and save a bearer token for it as well.');
-        $mform->addElement('html', '<p>Please enter a tenant name. When submitted it will create a tenant in the cmi5 player and automatically retrieve and save a bearer token for it as well</p>'); 
+        $mform->addElement('html', $messagetenant); 
      
         $this->add_action_buttons();
     }

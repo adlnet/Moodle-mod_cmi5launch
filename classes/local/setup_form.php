@@ -27,6 +27,7 @@ require_once("$CFG->libdir/formslib.php");
 class setup_cmi5 extends moodleform {
     // Add elements to form.
     public function definition() {
+        $message = get_string('cmi5launchsetupformplayer', 'cmi5launch');
         // A reference to the form is stored in $this->form.
         // A common convention is to store it in a variable, such as `$mform`.
         $mform = $this->_form; // Don't forget the underscore!
@@ -39,7 +40,7 @@ class setup_cmi5 extends moodleform {
         // Default value.
         $mform->setDefault('cmi5url', get_string('cmi5launchplayerurl_default', 'cmi5launch')); // The second arg here is the default value and appears in the text box.
         // Add a rule to make this field required.
-        $mform->addRule('cmi5url', 'This is needed to connect to player', 'required'); 
+        $mform->addRule('cmi5url', $message, 'required'); 
         // Add a help button with a help message.
         $mform->addHelpButton('cmi5url', 'cmi5launchplayerurl', 'cmi5launch');
 
@@ -50,7 +51,7 @@ class setup_cmi5 extends moodleform {
         // Default value.
         $mform->setDefault('cmi5name', get_string('cmi5launchbasicname_default', 'cmi5launch')); // The second arg here is the default value and appears in the text box.
         // Add a rule to make this field required.
-        $mform->addRule('cmi5name', 'This is needed to connect to player', 'required'); 
+        $mform->addRule('cmi5name',  $message,, 'required'); 
         // Add a help button with a help message.
         $mform->addHelpButton('cmi5name', 'cmi5launchbasicname', 'cmi5launch');
         
@@ -62,7 +63,7 @@ class setup_cmi5 extends moodleform {
         // Default value.
         $mform->setDefault('cmi5password', get_string('cmi5launchbasepass_default', 'cmi5launch')); // The second arg here is the default value and appears in the text box.
         // Add a rule to make this field required.
-       $mform->addRule('cmi5password', 'This is needed to connect to player', 'required'); 
+       $mform->addRule('cmi5password',  $message,, 'required'); 
        // Below is the help button, it sucks you have to push it to see the help text, but it is there
        $mform->addHelpButton('cmi5password', 'cmi5launchbasepass', 'cmi5launch');
 
