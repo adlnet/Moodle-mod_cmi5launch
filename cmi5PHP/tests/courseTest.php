@@ -14,7 +14,7 @@ require_once( "cmi5TestHelpers.php");
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
  *  */
-class cmi5_courseTest extends TestCase
+class courseTest extends TestCase
 {
     private $courseproperties, $emptystatement, $coursepropertiesvalues;
 

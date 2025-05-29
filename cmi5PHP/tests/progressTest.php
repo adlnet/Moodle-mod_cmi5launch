@@ -26,7 +26,7 @@ require_once( "cmi5TestHelpers.php");
  * @covers \mod_cmi5launch\local\progress::cmi5launch_retrieve_statements
  * 
  *  */
-class cmi5_progressTest extends TestCase
+class progressTest extends TestCase
 {
     // Use setupbefore and after class sparingly. In this case, we don't want to use it to connect tests, but rather to
     // 'prep' the test db with values the tests can run against. 
@@ -188,7 +188,7 @@ class cmi5_progressTest extends TestCase
             ->willReturn(null);
 
         // The expected is built by the two messages knowing 'title' is an empty array.
-        $expected = "Trouble retrieving statements from LRS. Caught exception: ";
+        $expected = "Error retrieving statements from LRS. Caught exception: ";
         
         // Catch the exception.
         $this->expectException(nullException::class);

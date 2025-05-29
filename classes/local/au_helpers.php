@@ -228,7 +228,7 @@ class au_helpers
                     $missing = $newrecorditems[$key];
 
                     // Now use the found missing value to give feedback to user.
-                    echo (get_string('cmi5launchaucannotsavefield', 'cmi5launch') . '$missing'  . $e->getMessage() . "\n");
+                    echo (get_string('cmi5launchaucannotsavefield', 'cmi5launch') . "'" . $missing  . "'. ". $e->getMessage() . " \n");
                     // Restore default hadlers.
                     restore_exception_handler();
                     restore_error_handler();

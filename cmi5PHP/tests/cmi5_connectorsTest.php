@@ -563,6 +563,7 @@ class cmi5_connectorsTest extends TestCase
         $data = array(
             "courseId" => $courseid, 
             "actor" => array(
+                'objectType' => 'Agent',
                 "account" =>  array (
                     "homePage" => "http://testhomepage.com",
                     "name" => "testname"
@@ -622,6 +623,7 @@ class cmi5_connectorsTest extends TestCase
         $data = array(
             "courseId" => $courseid, 
             "actor" => array(
+                'objectType' => 'Agent',
                 "account" =>  array (
                     "homePage" => "http://testhomepage.com",
                     "name" => "testname"
@@ -680,6 +682,7 @@ class cmi5_connectorsTest extends TestCase
         $data = array(
             "courseId" => $courseid, 
             "actor" => array(
+                'objectType' => 'Agent',
                 "account" =>  array (
                     "homePage" => "http://testhomepage.com",
                     "name" => "testname"
@@ -908,6 +911,7 @@ class cmi5_connectorsTest extends TestCase
         // The data to be passed to the mocked method.
         $data = array(
             'actor' => array(
+                'objectType' => 'Agent',
                 'account' => array(
                     "homePage" => "http://testhomepage.com",
                     "name" => "testname",
@@ -977,6 +981,7 @@ class cmi5_connectorsTest extends TestCase
         // The data to be passed to the mocked method.
         $data = array(
             'actor' => array(
+                'objectType' => 'Agent',
                 'account' => array(
                     "homePage" => "http://testhomepage.com",
                     "name" => "testname",
@@ -1046,6 +1051,7 @@ class cmi5_connectorsTest extends TestCase
         // The data to be passed to the mocked method.
         $data = array(
             'actor' => array(
+                'objectType' => 'Agent',
                 'account' => array(
                     "homePage" => "http://testhomepage.com",
                     "name" => "testname",
@@ -1113,6 +1119,7 @@ class cmi5_connectorsTest extends TestCase
         // The data to be passed to the mocked method.
         $data = array(
             'actor' => array(
+                'objectType' => 'Agent',
                 'account' => array(
                     "homePage" => "http://testhomepage.com",
                     "name" => "testname",
@@ -1162,6 +1169,7 @@ class cmi5_connectorsTest extends TestCase
         // The data to be passed to the mocked method.
         $data = array(
             'actor' => array(
+                'objectType' => 'Agent',
                 'account' => array(
                     "homePage" => "http://testhomepage.com",
                     "name" => "testname",
@@ -1215,6 +1223,7 @@ class cmi5_connectorsTest extends TestCase
         // The data to be passed to the mocked method.
         $data = array(
             'actor' => array(
+                'objectType' => 'Agent',
                 'account' => array(
                     "homePage" => "http://testhomepage.com",
                     "name" => "testname",
@@ -1263,6 +1272,7 @@ class cmi5_connectorsTest extends TestCase
         // The data to be passed to the mocked method.
         $data = array(
             'actor' => array(
+                'objectType' => 'Agent',
                 'account' => array(
                     "homePage" => "http://testhomepage.com",
                     "name" => "testname",

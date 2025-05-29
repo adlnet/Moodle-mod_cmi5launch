@@ -365,7 +365,7 @@ class ausHelpersTest extends TestCase
         
         // Because this exception is thrown by the error handler, not the SUT, test the output to ensure right exception was thrown.
         $expected = "Cannot save to DB. Stopped at record with ID number " . 1 . "."
-        . " One of the fields is incorrect. Check data for field 'title'. Error: Undefined array key 0\n";
+        . " One of the fields is incorrect. Check data for field 'title'. Error: Undefined array key 0 \n";
         
         // Call function under test.
         $returnedAUids = $helper->cmi5launch_save_aus($helper->cmi5launch_create_aus($testAus));
@@ -393,7 +393,7 @@ class ausHelpersTest extends TestCase
 
         // The expected is built by the two messages knowing 'title' is a string.
         $expected = "Cannot save to DB. Stopped at record with ID number " . 2 . "."
-        . " One of the fields is incorrect. Check data for field 'title'. Cannot access offset of type string on string\n";
+        . " One of the fields is incorrect. Check data for field 'title'. Cannot access offset of type string on string \n";
 
         // Call the function to throw the exception.
         $returnedAUids = $helper->cmi5launch_save_aus($helper->cmi5launch_create_aus($testAus));
