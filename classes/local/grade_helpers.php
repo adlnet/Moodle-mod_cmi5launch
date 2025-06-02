@@ -27,6 +27,7 @@ defined('MOODLE_INTERNAL') || die();
 
 use mod_cmi5launch\local\session_helpers;
 require_once ($CFG->dirroot . '/mod/cmi5launch/classes/local/errorover.php');
+require_once($CFG->dirroot . '/mod/cmi5launch/constants.php');
 
 class grade_helpers
 {
@@ -49,6 +50,65 @@ class grade_helpers
     {
         return [$this, 'cmi5launch_average_grade'];
     }
+
+    public function cmi5launch_get_grade_method_array()
+    {
+        return [$this, 'cmi5launch_grade_method_array'];
+    }
+
+    public function cmi5launch_fetch_attempts_array()
+    {
+        return [$this, 'cmi5launch_get_attempts_array'];
+    }
+
+    public function cmi5launch_fetch_what_grade_array()
+    {
+        return [$this, 'cmi5launch_get_what_grade_array'];
+    }
+
+
+    /**
+     * Returns an array of the array of what grade options are availabe.
+     *
+     * @return array an array of what grade options
+     */
+    function cmi5launch_get_what_grade_array() {
+        return array (MOD_CMI5LAUNCH_HIGHEST_ATTEMPT => get_string('mod_cmi5launch_highest_attempt', 'cmi5launch'),
+                    MOD_CMI5LAUNCH_AVERAGE_ATTEMPT => get_string('mod_cmi5launch_average_attempt', 'cmi5launch'),
+                    MOD_CMI5LAUNCH_FIRST_ATTEMPT => get_string('mod_cmi5launch_first_attempt', 'cmi5launch'),
+                    MOD_CMI5LAUNCH_LAST_ATTEMPT => get_string('mod_cmi5launch_last_attempt', 'cmi5launch'));
+    }
+
+
+    /**
+     * Returns an array of the array of what grade options
+     *
+     * @return array an array of what grade options
+     */
+    function cmi5launch_grade_method_array() {
+        return array (
+                    MOD_CMI5LAUNCH_GRADE_HIGHEST => get_string('mod_cmi5launch_grade_highest', 'cmi5launch'),
+                    MOD_CMI5LAUNCH_GRADE_AVERAGE => get_string('mod_cmi5launch_grade_average', 'cmi5launch'),
+        );
+    }
+
+        /**
+     * Returns an array of the array of attempt options
+     *
+     * @return array an array of attempt options
+     */
+    function cmi5launch_get_attempts_array() {
+        $attempts = array(0 => get_string('cmi5launchnolimit', 'cmi5launch'),
+                        1 => get_string('cmi5launchattempt1', 'cmi5launch'));
+
+        for ($i = 2; $i <= 6; $i++) {
+            $attempts[$i] = get_string('cmi5launchattemptsx', 'cmi5launch', $i);
+        }
+
+        return $attempts;
+    }
+
+
 
     /**
      * Takes in an array of scores and returns the average grade.

@@ -27,7 +27,6 @@ use mod_cmi5launch\local\cmi5_connectors;
 
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require_once($CFG->libdir.'/tablelib.php');
-require_once($CFG->dirroot.'/mod/cmi5launch/locallib.php');
 require_once($CFG->libdir.'/formslib.php');
 require_once($CFG->dirroot. '/reportbuilder/classes/local/report/column.php');
 // Include our class file
@@ -80,7 +79,7 @@ if ($tenantname != null && $tenantid != null) {
         // If result is true then redirect back to settings page.
         $settingurl = new moodle_url($CFG->wwwroot . '/' . 'admin/settings.php', array('section' => 'modsettingcmi5launch'));
                 
-        redirect($settingurl, get_string('cmi5launchtokencreatedsuccess'), 10);
+        redirect($settingurl, get_string('cmi5launchtokencreatedsuccess', 'cmi5launch'), 10);
         }
     }
     else {

@@ -29,7 +29,6 @@ require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require('header.php');
 
 
-
 // Include the errorover (error override) funcs.
 require_once($CFG->dirroot . '/mod/cmi5launch/classes/local/errorover.php');
 
@@ -198,7 +197,7 @@ if (!$au->sessions == null) {
         restore_error_handler();
 
         // Throw an exception.
-        throw new customException('loading session table on AUview page. Report this to system administrator: ' . $e->getMessage() . 'Check that session information is present in DB and session id is correct.', 0);
+        throw new customException(get_string('cmi5launchloadsessionerror', 'cmi5launch') . $e->getMessage() );
     }
 
     // Write table.

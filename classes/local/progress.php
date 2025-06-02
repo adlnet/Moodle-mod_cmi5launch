@@ -187,7 +187,7 @@ class progress {
 
             echo(get_string('cmi5launchactorretrievalerror', 'cmi5launch'). $e->getMessage());
             
-            return "(Actor name not retrieved)";
+            return (get_string('cmi5launchactornotretrieved', 'cmi5launch'));
         }    
     }
 

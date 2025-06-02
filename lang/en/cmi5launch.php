@@ -30,6 +30,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+
+ 
+
 $string['modulename'] = 'cmi5 launch link';
 $string['modulenameplural'] = 'cmi5 launch links';
 $string['modulename_help'] = 'A plug in for Moodle that allows the launch of cmi5 (xAPI) content which is then tracked to a separate LRS.';
@@ -85,6 +88,7 @@ $string['othersettings'] = 'Additional settings';
 
 // Header.
 $string['cmi5launchsettingsheader'] = 'cmi5 player settings';
+$string['cmi5launchlocationheader'] = 'Location: ';
 
 // Cmi5 player root location.
 $string['cmi5launchplayerurl'] = 'cmi5 player URL';
@@ -95,6 +99,12 @@ $string['cmi5launchplayerurl_default'] = '';
 $string['cmi5launchcontenturl'] = 'cmi5 player URL';
 $string['cmi5launchcontenturl_help'] = 'The url to communicate with cmi5 player, PUBLIC content http://player.example.com or http://localhost:63398). Must NOT include a trailing forward slash.';
 $string['cmi5launchcontenturl_default'] = '';
+
+// Cmi5 setupp.
+$string['cmi5launchsetuptitle'] = 'CMI5 Setup';
+$string['cmi5launchsetup_help'] = 'This is the setup page for CMI5. Here you can create a new tenant for your CMI5 player. Please enter a name for your tenant below.';
+$string['cmi5launchsetupcancel'] = 'Cancelled';
+
 
 // Cmi5 setupform.php.
 $string['cmi5launchsettingtitle'] = 'CMI5 Setup Form';
@@ -196,14 +206,9 @@ $string['cmi5launchtenantfailsavemessage'] = "Tenant name failed to save as sett
 $string['cmi5launchtenantfailplayersavemessage'] = "Failed to make tenant. Check connection to player and tenant name (cannot reuse old tenant names).";
 $string['cmi5launchtenantnamefail'] = 'Tenant name not retrieved or blank. Please try again.';
 
-// tenant setup 
-$string['cmi5launchtenanttitle'] = 'Creating  a tenant';
-$string['cmi5launchtenantmadesuccess'] = 'Tenant made and saved successfully';
-$string['cmi5launchtenantfailsave'] = "Failed to save tenant to DB.";
-$string['cmi5launchtenantfailsavemessage'] = "Tenant name failed to save as setting. With result ";
-$string['cmi5launchtenantfailplayersavemessage'] = "Failed to make tenant. Check connection to player and tenant name (cannot reuse old tenant names).";
-$string['cmi5launchtenantnamefail'] = 'Tenant name not retrieved or blank. Please try again.';
-
+// For forms
+$string['cmi5launchsetupformplayer'] = 'This is needed to connect to player';
+$string['cmi5launchtenantformplayer'] = '<p>Please enter a tenant name. When submitted it will create a tenant in the cmi5 player and automatically retrieve and save a bearer token for it as well</p>';
 
 // Grading info - MB.
 // Headers.
@@ -216,9 +221,9 @@ $string['maximumgradedesc'] = 'The maximum grade for a cmi5 launch link activity
 $string['maximumattempts'] = 'Maxium attempt amount';
 $string['whatmaxdesc'] = 'The maximum amount of allowed attempts';
 
-$string['nolimit'] = 'No limit';
-$string['attempt1'] = '1 attempt';
-$string['attemptsx'] = '{$a} attempts';
+$string['cmi5launchnolimit'] = 'No limit';
+$string['cmi5launchattempt1'] = 'First attempt';
+$string['cmi5launchattemptsx'] = '{$a} attempts';
 
 $string['whatgrade'] = 'Attempts grading';
 $string['whatgradedesc'] = 'If multiple attempts are allowed, this setting specifies whether the highest, average (mean), first or last completed attempt is recorded in the gradebook. The last completed attempt option does not include attempts with a \'failed\' status.';
@@ -287,16 +292,24 @@ $string['cmi5launchnogradeerror'] = 'No grades to update. No record for user fou
 $string['cmi5launchgradeerror'] = ' Error in updating or checking user grades. Report this error to system administrator: ';
 $string['cmi5launchgradetypenotfound'] = 'Grade type not found.';
 
+// Errors on launch.php. 
+$string['cmi5launchsessionerror'] = 'Error in launching experience. Session ID cannot be null. Report this error to system administrator.';
+$string['cmi5launcherrorexp'] = 'Error in launching experience. Report this error to system administrator: ';
+
+// Errors on AUview.php.
+$string['cmi5launchloadsessionerror'] = 'loading session table on AUview page. Check that session information is present in DB and session id is correct. Report the following to system administrator: ';
+
+
 // Progress errors.
 // LRS errors.
-$string['cmi5launchlrsstatementretrievalerror']= 'Trouble retrieving statements from LRS. Caught exception: ';
+$string['cmi5launchlrsstatementretrievalerror']= 'Error retrieving statements from LRS. Caught exception: ';
 $string['cmi5launchlrssettingsretrievalerror'] = "Unable to retrieve LRS settings. Caught exception: ";
 $string['cmi5launchlrssettingscorrect'] = ' Check LRS settings are correct.';
 $string['cmi5launchlrscommunicationerror'] = 'Unable to communicate with LRS. Caught exception: ';
 $string['cmi5launchlrschecksettings'] = " Check LRS is up, username and password are correct, and LRS endpoint is correct.";
 
 // Related to actor
-$string['cmi5launchactorretrievalerror'] = 'Unable to retrieve actor information. Caught exception: ';
+$string['cmi5launchactorretrievalerror'] = 'Unable to retrieve actor name from LRS. Caught exception: ';
 $string['cmi5launchactornotretrieved'] = '(Actor name not retrieved)';
 
 // Related to verb
@@ -320,61 +333,37 @@ $string['cmi5launchscorenotretrieved'] = '(Score not retrieved)';
 
 // Related to session
 $string['cmi5launchsessionidretrievalerror'] = 'Unable to retrieve session id from LRS. Caught exception: ';
+$string['cmi5launchsessionupdateerror'] = 'Error in updating session. Report this error to system administrator: ';
+$string['cmi5launchsessioncreationerror'] = 'Error in creating session. Report this error to system administrator: ';
+$string['cmi5launchsessionretrievederror'] = '<p>Error attempting to get session data from DB. Check session id.</p>';
+$string['cmi5launchsessionbuilderror'] = 'Statement to build session is null or not an array/object.';
 
 // Related to statements
-$string['cmi5launchstatementsretrievalerror'] = 'Unable to retrieve  statements from LRS. Caught exception: ';
+$string['cmi5launchstatementsretrievalerror'] = 'Unable to retrieve statements from LRS. Caught exception: ';
 $string['cmi5launchstatementsnotretrieved'] = '(Statements not retrieved)';
 
 // AU errors.
 $string['cmi5launchaubuilderror'] = 'Statement to build AU is null or not an array/object. ';
 
+// Au_helpers errors.
+$string['cmi5launchaucannotretrieve'] = 'Cannot retrieve AUs. Error found when trying to parse them from course creation: Please check the connection to player or course format and try again. ';
+$string['cmi5launchaucannotretrievedb'] = 'Cannot retrieve AU information. AU statements from DB are: ';
+$string['cmi5launchaucannotsave'] = 'Cannot save AU information. AU object array is: null';
+$string['cmi5launchaucannotsavedb'] = 'Cannot save to DB. Stopped at record with ID number ';
+$string['cmi5launchaucannotsavefield'] = ' One of the fields is incorrect. Check data for field ';
+$string['cmi5launchaudatadb'] = 'Error attempting to get AU data from DB. Check AU id. AU id is: ';
 
-// Grade errors
-$string['cmi5launchnogradeerror'] = 'No grades to update. No record for user found in this course.';
-$string['cmi5launchgradeerror'] = ' Error in updating or checking user grades. Report this error to system administrator: ';
-$string['cmi5launchgradetypenotfound'] = 'Grade type not found.';
-
-// Progress errors.
-// LRS errors.
-$string['cmi5launchlrsstatementretrievalerror']= 'Trouble retrieving statements from LRS. Caught exception: ';
-$string['cmi5launchlrssettingsretrievalerror'] = "Unable to retrieve LRS settings. Caught exception: ";
-$string['cmi5launchlrssettingscorrect'] = ' Check LRS settings are correct.';
-$string['cmi5launchlrscommunicationerror'] = 'Unable to communicate with LRS. Caught exception: ';
-$string['cmi5launchlrschecksettings'] = " Check LRS is up, username and password are correct, and LRS endpoint is correct.";
-
-// Related to actor
-$string['cmi5launchactorretrievalerror'] = 'Unable to retrieve actor information. Caught exception: ';
-$string['cmi5launchactornotretrieved'] = '(Actor name not retrieved)';
-
-// Related to verb
-$string['cmi5launchverbretrievalerror'] = 'Unable to retrieve verb from LRS. Caught exception: ';
-$string['cmi5launchverbnotretrieved'] = '(Verb not retrieved)';
-
-// Related to object
-$string['cmi5launchobjectnotpresent'] = '(Object name not retrieved/there is no object in this statement)';
-$string['cmi5launchobjectretrievalerror'] = 'Unable to retrieve object name from LRS. Caught exception: ';
-$string['cmi5launchobjectnotretrieved'] = '(Object name not retrieved)';
-
-// Related to timestamp
-$string['cmi5launchtimestampnotpresent'] = '(Timestamp not retrieved or not present in statement)';
-$string['cmi5launchtimestampretrievalerror'] = 'Unable to retrieve timestamp from LRS. Caught exception: ';
-$string['cmi5launchtimestampnotretrieved'] = '(Timestamp not retrieved)';
-
-// Related to score
-$string['cmi5launchscorenotpresent'] = '(Score not retrieved or not present in statement)';
-$string['cmi5launchscoreretrievalerror'] = 'Unable to retrieve score from LRS. Caught exception: ';
-$string['cmi5launchscorenotretrieved'] = '(Score not retrieved)';
-
-// Related to session
-$string['cmi5launchsessionidretrievalerror'] = 'Unable to retrieve session id from LRS. Caught exception: ';
-
-// Related to statements
-$string['cmi5launchstatementsretrievalerror'] = 'Unable to retrieve  statements from LRS. Caught exception: ';
-$string['cmi5launchstatementsnotretrieved'] = '(Statements not retrieved)';
-
-// AU errors.
-$string['cmi5launchaubuilderror'] = 'Statement to build AU is null or not an array/object. ';
-
+// Error handler page.
+$string['cmi5launcherror'] = 'Error: ';
+$string['cmi5launcherrorover'] = 'Error OVER';
+$string['cmi5launcherrorgrade'] = 'Error in checking user grades: ';
+$string['cmi5launcherrorau'] = 'Error loading session table on AU view page. Report this to system administrator: ';
+$string['cmi5launcherrorausession'] = ' Check that session information is present in DB and session id is correct.'; 
+$string['cmi5launcherrorexperience'] = 'Error launching experience.  Report this to system administrator: <br>'; 
+$string['cmi5launcherrormain'] = ' error on main view page.  Report this to system administrator: <br> '; 
+$string['cmi5launchparsearray'] = 'Cannot parse array. Error: ';
+$string['cmi5launchplayerexception'] = 'Player communication error. Something went wrong ';
+$string['cmi5launchcustomexceptionmessage'] = 'Caught error. Something went wrong';
 
 // Start Activity Settings.
 $string['cmi5launchname'] = 'Launch link name';
@@ -448,7 +437,7 @@ $string['cmi5launch_notavailable'] = 'The Learning Record Store is not available
 If you are the system administrator, go to Site admin / Development / Debugging and set Debug messages to DEVELOPER. Set it back to NONE or MINIMAL once the error details have been recorded.';
 $string['cmi5launch_regidempty'] = 'Registration id not found. Please close this window.';
 
-$string['idmissing'] = 'You must specify a course_module ID or an instance ID';
+$string['cmi5launchidmissing'] = 'You must specify a course_module ID or an instance ID';
 
 // Events.
 $string['eventactivitylaunched'] = 'Activity launched';
@@ -462,12 +451,6 @@ $string['expirecredentials'] = 'Expire credentials';
 $string['checkcompletion'] = 'Check completion';
 
 // For reports.
-$string['cmi5launchreport'] = 'Report';
-$string['cmi5launchattemptheader'] = 'Attempt';
-$string['cmi5launchstartedheader'] = 'Started';
-$string['cmi5launchfinishedheader'] = 'Finished';
-$string['cmi5launchscoreheader'] = 'Score';
-$string['cmi5launchsatisfiedstatusheader'] = 'AU Satisfied Status';
 $string['cmi5launchreport'] = 'Report';
 $string['cmi5launchattemptheader'] = 'Attempt';
 $string['cmi5launchstartedheader'] = 'Started';
@@ -489,6 +472,12 @@ $string['cmi5launchsessionaucompletedpassed'] = 'Completed and Passed';
 $string['cmi5launchsessionaucompletedfailed'] = 'Completed and Failed';
 $string['cmi5launchsessiongradehigh'] = 'Highest';
 $string['cmi5launchsessiongradeaverage'] = 'Average';
+
+// For view.php
+$string['cmi5launchviewcourseerror'] = 'Creating or retrieving user course record. Contact your system administrator with error: ';
+$string['cmi5launchviewexceptionau'] = 'Excepted AU, found ';
+$string['cmi5launchviewauerror'] = 'retrieving and displaying AU satisfied status and grade. Contact your system administrator with error: ';
+
 
 
 
@@ -556,12 +545,3 @@ $string['privacy:metadata:cmi5_player:courseid'] = 'The cmi5 player assigns each
 $string['privacy:metadata:cmi5_player:returnurl'] = 'The return URL is a parameter sent to the cmi5 player when requesting a launch URL. It is where the browser returns to upon closing the launched activity. It has a unique ID on the end directing back to the user\'s particular course instance.';
 $string['privacy:metadata:cmi5_player:sessionid'] = 'The cmi5 player assigns each user\'s session a unique ID, and this is sent to the cmi5 player when requesting updated session info.';
 
-// For view.php
-$string['cmi5launchviewcourseerror'] = 'Creating or retrieving user course record. Contact your system administrator with error: ';
-$string['cmi5launchviewexceptionau'] = 'Excepted AU, found ';
-$string['cmi5launchviewauerror'] = 'retrieving and displaying AU satisfied status and grade. Contact your system administrator with error: ';
-
-// For view.php
-$string['cmi5launchviewcourseerror'] = 'Creating or retrieving user course record. Contact your system administrator with error: ';
-$string['cmi5launchviewexceptionau'] = 'Excepted AU, found ';
-$string['cmi5launchviewauerror'] = 'retrieving and displaying AU satisfied status and grade. Contact your system administrator with error: ';

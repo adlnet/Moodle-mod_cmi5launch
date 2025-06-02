@@ -23,9 +23,11 @@
 
  namespace mod_cmi5launch\local;
  defined('MOODLE_INTERNAL') || die();
-
+ require_once($CFG->dirroot . '/mod/cmi5launch/constants.php');
 // Include the errorover (error override) funcs.
 require_once ($CFG->dirroot . '/mod/cmi5launch/classes/local/errorover.php');
+require_once($CFG->dirroot . '/mod/cmi5launch/lib.php');
+
 class cmi5_connectors {
    
 
@@ -85,8 +87,6 @@ class cmi5_connectors {
         $filetype = "zip";
 
         $databody = $filename->get_content();
-
-        // So this one has some troubleshooting built in already, but we probably need to throw an exception to stop function or moodle will freak
 
         // Sends the stream to the specified URL.
         $result = $this->cmi5launch_send_request_to_cmi5_player_post('cmi5launch_stream_and_send',$databody, $url, $filetype, $tenanttoken);
@@ -607,8 +607,8 @@ class cmi5_connectors {
             $resulttest = $resulttotest;
         }
 
-        // I think splittin these to return two seperate messages deppennnding on whether player is running is better.
-        // Player cannot return an error if not runnin,
+        // I think splitting these to return two seperate messages depending on whether player is running is better.
+        // Player cannot return an error if not running,
         if ($resulttest === false ){
 
            
@@ -622,8 +622,7 @@ class cmi5_connectors {
             $errormessage = $type . get_string('cmi5launchreturned', 'cmi5launch'). $resulttest["statusCode"] . get_string('cmi5launchwith', 'cmi5launch') . " '" 
             . $resulttest["message"] . "'." ;
 
-         //   echo"whatt is error messae before throwing::: " . $errormessage;
-          //  echo" what is error messae: " . $errormessage;"";
+
             throw new playerException($errormessage);
         
         } else {

@@ -25,25 +25,25 @@
 // Needed for moodle page.
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 
-// Tell moodle about our page, tell it what the url is.\\
+// Tell moodle about our page, tell it what the url is.
 $PAGE->set_url('/mod/cmi5launch/setup.php');
 // Tell moodle the context, in this case the site context (it's system wide not a course or course page.)
 $PAGE->set_context(\context_system::instance());
 // Title tells what is on tab
-$PAGE->set_title(title: 'CMI5 Setup');
+$PAGE->set_title(title: get_string('cmi5launchsetuptitle', 'cmi5launch'));
 
-//whenyou want to out put html use the moodle core output rendereer: often overridden in theme
+// When you want to output html use the moodle core output rendereer: often overridden in theme
 echo $OUTPUT->header();
 
-// Easier tom ake template as objec ttypecast to array 
+// Easier to make template as object typecast to array.
 $templatecontext = (object) [
-    'texttodisplay' => 'This is the setup page for CMI5. Here you can create a new tenant for your CMI5 player. Please enter a name for your tenant below.',
+    'texttodisplay' => get_string('cmi5launchsetup_help', 'cmi5launch'),
 ];
-// now render the mustache template we made.
-// takes template and template context - basically some vairables pasded into template and used to render stuff. 
+// Now render the mustache template we made.
+// Takes template and template context - basically some variables passed into template and used to render stuff. 
 echo $OUTPUT->render_from_template('mod_cmi5launch/setup', $templatecontext);
 
-// When we first come here lets check if there are plugin settings for username, passowrd, and url, there should nt be so display the form.
+// When we first come here lets check if there are plugin settings for username, passowrd, and url, there shouldnt be so display the form.
 // If there are, then we should display the tenant form.
 // Retrieve the three settings from the database.
 $playerurl = get_config('cmi5launch', 'cmi5launchplayerurl');
@@ -55,7 +55,7 @@ $playerpass = null;
 // If the settings are not set, then display the first form.
 if(!$playerurl || !$playername || !$playerpass){
 
-    redirect(url: $CFG->wwwroot . '/mod/cmi5launch/setupform.php', message: 'Cancelled');
+    redirect(url: $CFG->wwwroot . '/mod/cmi5launch/setupform.php', message: get_string('cmi5launchsetupcancel', 'cmi5launch'));
 
 }
 

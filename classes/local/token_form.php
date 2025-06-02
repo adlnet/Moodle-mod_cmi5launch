@@ -28,6 +28,7 @@ require_once("$CFG->libdir/formslib.php");
 class setup_token extends moodleform {
     // Add elements to form.
     public function definition() {
+        $message = get_string('cmi5launchsetupformplayer', 'cmi5launch');
         // A reference to the form is stored in $this->form.
         // A common convention is to store it in a variable, such as `$mform`.
         $mform = $this->_form; // Don't forget the underscore!
@@ -41,7 +42,7 @@ class setup_token extends moodleform {
         // These three go together for making one eleme
        // $mform->addElement('button', 'generatetoken', 'Generate Token');
         // Add a rule to make this field required.
-        $mform->addRule('cmi5token', 'This is needed to connect to player', 'required');
+        $mform->addRule('cmi5token', $message, 'required');
 
         $this->add_action_buttons();
     }

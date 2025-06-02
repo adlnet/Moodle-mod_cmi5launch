@@ -30,10 +30,9 @@
  */
 
 defined('MOODLE_INTERNAL') || die();
-require_once("$CFG->dirroot/mod/cmi5launch/locallib.php");
 // Cmi5PHP - required for interacting with the LRS in cmi5launch_get_statements.
 require_once("$CFG->dirroot/mod/cmi5launch/cmi5PHP/autoload.php");
-
+require_once($CFG->dirroot . '/mod/cmi5launch/constants.php');
 // SCORM library from the SCORM module. Required for its xml2Array class by cmi5launch_process_new_package.
 require_once("$CFG->dirroot/mod/scorm/datamodels/scormlib.php");
 
@@ -85,8 +84,8 @@ function cmi5launch_supports($feature) {
             return true;
         // Type of module.
         // This effects how icons are displayed? 
-      //  case FEATURE_MOD_PURPOSE:
-           // return MOD_PURPOSE_CONTENT;
+        //  case FEATURE_MOD_PURPOSE:
+        // return MOD_PURPOSE_CONTENT;
         default:
             return null;
     }
@@ -139,32 +138,6 @@ function cmi5launch_update_instance(stdClass $cmi5launch, mod_cmi5launch_mod_for
     $cmi5launch->timemodified = time();
     $cmi5launch->id = $cmi5launch->instance;
 
-    // We removed this part of lrs box -MB
-    // $cmi5launchlrs = cmi5launch_build_lrs_settings($cmi5launch);
-    /*
-    // Determine if override defaults checkbox is checked.
-    if ($cmi5launch->overridedefaults == '1') {
-        // Check to see if there is a record of this instance in the table.
-        $cmi5launchlrsid = $DB->get_field(
-            'cmi5launch_lrs',
-            'id',
-            array('cmi5launchid' => $cmi5launch->instance),
-            IGNORE_MISSING
-        );
-        // If not, will need to insert_record.
-        if (!$cmi5launchlrsid) {
-            if (!$DB->insert_record('cmi5launch_lrs', $cmi5launchlrs)) {
-                return false;
-            }
-        } else { // If it does exist, update it.
-            $cmi5launchlrs->id = $cmi5launchlrsid;
-
-            if (!$DB->update_record('cmi5launch_lrs', $cmi5launchlrs)) {
-                return false;
-            }
-        }
-    }
-    */
 
     if (!$DB->update_record('cmi5launch', $cmi5launch)) {
         return false;
@@ -178,93 +151,8 @@ function cmi5launch_update_instance(stdClass $cmi5launch, mod_cmi5launch_mod_for
     return true;
 }
 
-function cmi5launch_build_lrs_settings(stdClass $cmi5launch) {
-    global $DB, $CFG;
 
-    // Data for cmi5launch_lrs table.
-    $cmi5launchlrs = new stdClass();
-    $cmi5launchlrs->customacchp = $cmi5launch->cmi5launchcustomacchp;
-    $cmi5launchlrs->useactoremail = $cmi5launch->cmi5launchuseactoremail;
-    $cmi5launchlrs->cmi5launchid = $cmi5launch->instance;
 
-    return $cmi5launchlrs;
-}
-
-/**
- * Removes an instance of the cmi5launch from the database
- *
- * Given an ID of an instance of this module,
- * this function will permanently delete the instance
- * and any data that depends on it.
- *
- * @param int $id Id of the module instance
- * @return boolean Success/Failure
- */
-function cmi5launch_delete_instance($id) {
-    global $DB;
-
-    // Currently it deletes only the cmi5launch, Do we want it to delete ALL tables? What is it suppossed to do>
-    // Like if it deletes all tables is it expected to delete user data?
-    
-    if (! $cmi5launch = $DB->get_record('cmi5launch', array('id' => $id))) {
-        return false;
-    }
-
-    // FORGET THE HARDCODED, THIS WORKS WITHOUT IT, IT APPEARS TO DELETE EVERYTHIN IN A"COURSE" BUT IF AN ACTIVITY IS DELETED IT DISAPEARS FROM MOODLE
-    //BUT NOT FROM DB. is THIS SUPPOSSED TO DO DB? 
-    
-    ///huh? why is this hardcoded?
-    // Determine if there is a record of this (ever) in the cmi5launch_lrs table.
-  /*  $cmi5launchlrsid = $DB->get_field('cmi5launch_lrs', 'id', array('cmi5launchid' => $id), $strictness = IGNORE_MISSING);
-    if ($cmi5launchlrsid) {
-        // If there is, delete it.
-        $DB->delete_records('cmi5launch_lrs', array('id' => $cmi5launchlrsid));
-    }
-*/
-    $DB->delete_records('cmi5launch', array('id' => $cmi5launch->id));
-
-    return true;
-}
-
-/**
- * Returns a small object with summary information about what a
- * user has done with a given particular instance of this module
- * Used for user activity reports.
- * $return->time = the time they did it
- * $return->info = a short text description
- *
- * @return stdClass|null
- */
-function cmi5launch_user_outline($course, $user, $mod, $cmi5launch) {
-    $return = new stdClass();
-    $return->time = 0;
-    $return->info = '';
-    return $return;
-}
-
-/**
- * Prints a detailed representation of what a user has done with
- * a given particular instance of this module, for user activity reports.
- *
- * @param stdClass $course the current course record
- * @param stdClass $user the record of the user we are generating report for
- * @param cm_info $mod course module info
- * @param stdClass $cmi5launch the module instance record
- * @return void, is supposed to echp directly
- */
-function cmi5launch_user_complete($course, $user, $mod, $cmi5launch) {
-}
-
-/**
- * Given a course and a time, this module should find recent activity
- * that has occurred in cmi5launch activities and print it out.
- * Return true if there was output, or false is there was none.
- *
- * @return boolean
- */
-function cmi5launch_print_recent_activity($course, $viewfullnames, $timestart) {
-    return false;  // True if anything was printed, otherwise false.
-}
 
 /**
  * Prepares the recent activity data
@@ -316,68 +204,6 @@ function cmi5launch_get_extra_capabilities() {
 
 // File API.
 
-/**
- * Returns the lists of all browsable file areas within the given module context
- *
- * The file area 'intro' for the activity introduction field is added automatically
- * by {@link file_browser::get_file_info_context_module()}
- *
- * @param stdClass $course
- * @param stdClass $cm
- * @param stdClass $context
- * @return array of [(string)filearea] => (string)description
- */
-function cmi5launch_get_file_areas($course, $cm, $context) {
-    $areas = array();
-    $areas['content'] = get_string('areacontent', 'scorm');
-    $areas['package'] = get_string('areapackage', 'scorm');
-    return $areas;
-}
-
-/**
- * File browsing support for cmi5launch file areas
- *
- * @package mod_cmi5launch
- * @category files
- *
- * @param file_browser $browser
- * @param array $areas
- * @param stdClass $course
- * @param stdClass $cm
- * @param stdClass $context
- * @param string $filearea
- * @param int $itemid
- * @param string $filepath
- * @param string $filename
- * @return file_info instance or null if not found
- */
-function cmi5launch_get_file_info($browser, $areas, $course, $cm, $context, $filearea, $itemid, $filepath, $filename) {
-    global $CFG;
-
-    if (!has_capability('moodle/course:managefiles', $context)) {
-        return null;
-    }
-
-    $fs = get_file_storage();
-
-    if ($filearea === 'package') {
-        $filepath = is_null($filepath) ? '/' : $filepath;
-        $filename = is_null($filename) ? '.' : $filename;
-
-        $urlbase = $CFG->wwwroot.'/pluginfile.php';
-        if (!$storedfile = $fs->get_file($context->id, 'mod_cmi5launch', 'package', 0, $filepath, $filename)) {
-            if ($filepath === '/' && $filename === '.') {
-                $storedfile = new virtual_root_file($context->id, 'mod_cmi5launch', 'package', 0);
-            } else {
-                // Not found.
-                return null;
-            }
-        }
-        return new file_info_stored($browser, $context, $storedfile, $urlbase, $areas[$filearea], false, true, false, false);
-    }
-
-    return false;
-}
 
 /**
  * Serves cmi5 content, introduction images and packages. Implements needed access control ;-)
@@ -537,11 +363,7 @@ function cmi5launch_get_completion_state($course, $cm, $userid, $type) {
 }
 
 // Cmi5Launch specific functions.
-/*
-The functions below should really be in locallib, however they are required for one
-or more of the functions above so need to be here.
-It looks like the standard Quiz module does that same thing, so I don't feel so bad.
-*/
+
 
 /**
  * Handles uploaded zip packages when a module is added or updated. Unpacks the zip contents
@@ -618,8 +440,7 @@ function cmi5launch_process_new_package($cmi5launch) {
         $url = $playerurl . CMI5LAUNCH_PLAYER_V1 . $record->courseid . CMI5LAUNCH_LAUNCH_URL;
         $record->launchurl = $url;
 
-   
-        
+
         $aus = ($retrieveaus($returnedinfo));
         $record->aus = (json_encode($aus));
 
@@ -629,7 +450,7 @@ function cmi5launch_process_new_package($cmi5launch) {
         $packer = get_file_packer('application/zip');
         $packagefile->extract_to_storage($packer, $context->id, 'mod_cmi5launch', 'content', 0, '/');
 
-        // If the cmi5.xml file isn't there, don't do try to use it.
+        // If the cmi5.xml file isn't there, don't try to use it.
         // This is unlikely as it should have been checked when the file was validated.
         if ($manifestfile = $fs->get_file($context->id, 'mod_cmi5launch', 'content', 0, '/', 'cmi5.xml')) {
             $xmltext = $manifestfile->get_content();
@@ -903,27 +724,6 @@ function cmi5launch_settings($instance) {
 }
 
 
-/**
- * Should the global LRS settings be used instead of the instance specific ones?
- *
- * @package  mod_cmi5launch
- * @category cmi5
- * @param string $instance The Moodle id for the cmi5 module instance.
- * @return bool
- */
-function cmi5launch_use_global_cmi5_lrs_settings($instance) {
-    global $DB;
-    // Determine if there is a row in cmi5launch_lrs matching the current activity id.
-    $activitysettings = $DB->get_record('cmi5launch', array('id' => $instance));
-
-    /* Removed override defaults from db
-    if ($activitysettings->overridedefaults == 1) {
-        return false;
-    }
-    */
-    return true;
-}
-
 // Grade functions.
 
 /**
@@ -1150,4 +950,3 @@ function cmi5launch_grade_item_update($cmi5launch, $grades = null) {
         return $result;
     }
   
-

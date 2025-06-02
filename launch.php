@@ -98,7 +98,7 @@ try {
         restore_error_handler();
     
         // Throw exception.
-        throw new customException("Error in launching experience. Session ID cannot be null. Report this error to system administrator.");
+        throw new customException(get_string('cmi5launchsessionerror', 'cmi5launch') );
     }
     // Check if there are previous sessions.
     if (!$au->sessions == null) {
@@ -128,7 +128,7 @@ try {
     restore_error_handler();
 
     // If there is an error, return the error.
-    throw new customException("Error in launching experience. Report this error to system administrator: " . $e->getMessage());
+    throw new customException(get_string('cmi5launcherror', 'cmi5launch') . $e->getMessage());
 }
 // Create and save session object to session table.
 $savesession($sessionid, $location, $launchmethod);
@@ -136,7 +136,7 @@ $savesession($sessionid, $location, $launchmethod);
 // Last thing check for updates.
 cmi5launch_update_grades($cmi5launch, $USER->id);
 
-header("Location: " . $location);
+header(get_string('cmi5launchlocationheader', 'cmi5launch') . $location);
 
 
 

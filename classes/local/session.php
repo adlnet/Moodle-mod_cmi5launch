@@ -51,7 +51,7 @@ class session {
         // or that the statement is not an array or not an object.
         if (is_null($statement) || (!is_array($statement) && !is_object($statement) )) {
             
-            throw new nullException('Statement to build session is null or not an array/object.', 0);
+            throw new nullException(get_string('cmi5launchsessionbuilderror', 'cmi5launch'), 0);
         }
 
         foreach ($statement as $key => $value) {

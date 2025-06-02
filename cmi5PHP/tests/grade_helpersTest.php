@@ -647,7 +647,7 @@ class grade_helpersTest extends TestCase
         $result = $updateau($sessionhelper, $auids, $USER);
                 
         // There will be five of these, one for each au.
-        $this->expectOutputString("Gradetype not found.Gradetype not found.Gradetype not found.Gradetype not found.Gradetype not found.");
+        $this->expectOutputString("Grade type not found.Grade type not found.Grade type not found.Grade type not found.Grade type not found.");
                     
         $this->assertIsArray($result);
         
