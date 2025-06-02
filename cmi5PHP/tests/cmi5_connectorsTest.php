@@ -8,6 +8,7 @@ use mod_cmi5launch\test\cmi5TestHelpers;
 use mod_cmi5launch\local\playerException;
 
 require_once( "cmi5TestHelpers.php");
+require_once($CFG->dirroot . '/mod/cmi5launch/lib.php');
 
 /**
  * Tests for cmi5 connectors class.

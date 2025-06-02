@@ -79,7 +79,7 @@ if ($tenantname != null && $tenantid != null) {
         // If result is true then redirect back to settings page.
         $settingurl = new moodle_url($CFG->wwwroot . '/' . 'admin/settings.php', array('section' => 'modsettingcmi5launch'));
                 
-        redirect($settingurl, get_string('cmi5launchtokencreatedsuccess'), 10);
+        redirect($settingurl, get_string('cmi5launchtokencreatedsuccess', 'cmi5launch'), 10);
         }
     }
     else {

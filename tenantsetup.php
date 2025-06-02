@@ -29,6 +29,7 @@ require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require_once($CFG->libdir . '/tablelib.php');
 require_once($CFG->libdir . '/formslib.php');
 require_once($CFG->dirroot . '/reportbuilder/classes/local/report/column.php');
+require_once($CFG->dirroot . '/mod/cmi5launch/lib.php');
 
 
 // Include our class file

@@ -26,6 +26,8 @@
  require_once($CFG->dirroot . '/mod/cmi5launch/constants.php');
 // Include the errorover (error override) funcs.
 require_once ($CFG->dirroot . '/mod/cmi5launch/classes/local/errorover.php');
+require_once($CFG->dirroot . '/mod/cmi5launch/lib.php');
+
 class cmi5_connectors {
    
 
