@@ -142,20 +142,11 @@ $string['cmi5launchtokendbretrievefailed'] = 'Failed to retrieve token from cmi5
 $string['cmi5launchtokenretrievefailed'] = 'Token retrieval failed. With result ';
 $string['cmi5launchtokennonameid'] = 'Tenant name and/or ID not retrieved or blank. Please create a tenant before trying again.';
 
-
-// To avoid hardcoding, the button text is set in the language file.
-
+// First time setup button
 // Button for cmi5, first time setup.
-$string['cmi5launchfirstsetup'] = "<br><br>First time setup:";
-$string['cmi5launchlink'] ="</br>
-    <p id=name >
-        <div class='input-group rounded'>
-          <button class='btn btn-secondary' type='reset' name='cmi5button' onclick='tosetup()'>
-            <span class='button-label'>Enter cmi5 player info</span>
-            </button>
-        </div>
-    </p>
-      ";
+$string['cmi5launchsetupbutton'] = 'First time setup:';
+$string['cmi5launchsetupbuttontitle'] = 'Enter cmi5 player info';
+
 
 // Info for settings warnings.
 $string['cmi5launchtenantnameis'] = '<b>Tenant name is ';
@@ -163,15 +154,9 @@ $string['cmi5launchtenantidis'] = '. Tenant ID is ';
 $string['cmi5launchtenant_warning'] = "</b><div><br> The tenant name and ID have been set. They cannot be changed without causing problems with existing cmi5 launch link activities. To change, plugin must be uninstalled and reinstalled.</div> <div><br></div>";
 
 // Token generation button.
-$string['cmi5launchlinktotoken'] = "</br>
-        <p id=name >
-            <div class='input-group rounded'>
-              <button class='btn btn-secondary' type='reset' name='tokenbutton' onclick='totokenpage()'>
-                <span class='button-label'>Generate new bearer token</span>
-                </button>
-            </div>
-        </p>
-          ";
+$string['cmi5launchtokensetupbutton'] = 'Generate new bearer token';
+$string['cmi5launchtokensetupheading'] = 'Generate new bearer token for cmi5 player';
+
 
 // Lines for error messages.
 
