@@ -45,24 +45,11 @@ $cmi5launch_get_attempts_array = $gradehelpers->cmi5launch_fetch_attempts_array(
 $cmi5launch_get_grade_type_array = $gradehelpers->cmi5launch_fetch_what_grade_array();
 
 
-?>
-
-<script>
-    function totokenpage() {
-        // Post it.
-        document.getElementById('settingformtoken').submit();
-    }
-
-    function tosetup() {
-        // Post it.
-        document.getElementById('setupform').submit();
-    }
-</script>
-<?php
-
 
 // maybe add if ($hassiteconfig?) Can regulare users access this? TODO -MB
 if ($ADMIN->fulltree) {
+    $PAGE->requires->js_call_amd('mod_cmi5launch/settings', 'init');
+
     require_once($CFG->dirroot . '/mod/cmi5launch/settingslib.php');
 
     // MB
@@ -160,9 +147,21 @@ if ($ADMIN->fulltree) {
 
         // Show only a button, otherwise regular information showing.
         // This is the first time setup.
-        //use this for the button instead of config text
-        $setting = new admin_setting_description('cmi5launchsetup', get_string('cmi5launchfirstsetup', 'cmi5launch'), get_string('cmi5launchlink', 'cmi5launch'));
-        $settings->add($setting);
+        // Use this for the button instead of config text
+        
+        // Setup form link/button
+        $setupurl = new moodle_url('/mod/cmi5launch/setupform.php');
+        $setupbutton = html_writer::link(
+            $setupurl,
+            get_string('cmi5launchsetupbuttontitle', 'cmi5launch'),
+            ['class' => 'btn btn-secondary']
+        );
+        $settings->add(new admin_setting_description(
+            'cmi5launch/setupform',
+            get_string('cmi5launchsetupbutton', 'cmi5launch'),
+            $setupbutton
+        ));
+
     } else {
 
         $settings->add(
@@ -201,15 +200,31 @@ if ($ADMIN->fulltree) {
         $setting = new admin_setting_description('cmi5launchtenantmessage', "cmi5launch tenant name and id:", $todisplay);
         $settings->add($setting);
 
-        // Token generation button.
+        // Token information.
         $setting = new admin_setting_configtext(
             'cmi5launch/cmi5launchtenanttoken',
             get_string('cmi5launchtenanttoken', 'cmi5launch'),
-            get_string('cmi5launchtenanttoken_help', 'cmi5launch') .
-                get_string('cmi5launchlinktotoken', 'cmi5launch'),
+            get_string('cmi5launchtenanttoken_help', 'cmi5launch') ,
+                
             get_string('cmi5launchtenanttoken_default', 'cmi5launch')
         );
+
         $settings->add($setting);
+
+            // Token setup form link/button.
+        $tokenurl = new moodle_url('/mod/cmi5launch/tokensetup.php');
+        $tokenbutton = html_writer::link(
+            $tokenurl,
+            get_string('cmi5launchtokensetupbutton', 'cmi5launch'),
+            ['class' => 'btn btn-secondary']
+        );
+        $settings->add(new admin_setting_description(
+            'cmi5launch/tokensetup',
+            get_string('cmi5launchtokensetupheading', 'cmi5launch'),
+            $tokenbutton
+        ));
+
+
     }
 
 
@@ -275,19 +290,3 @@ if ($ADMIN->fulltree) {
 }
 
 ?>
-
-<form id="setupform" action="../mod/cmi5launch/setupform.php" method="get">
-
-</form>
-
-
-<form id="settingformtoken" action="../mod/cmi5launch/tokensetup.php" method="get">
-
-</form>
-
-
-<form id="settingform" action="../mod/cmi5launch/tenantsetup.php" method="get">
-
-    <input id="variableName" name="variableName" type="hidden" value="default">
-
-</form>
