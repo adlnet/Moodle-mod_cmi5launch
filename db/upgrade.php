@@ -343,7 +343,7 @@ function xmldb_cmi5launch_upgrade($oldversion) {
 
         // Conditionally rename table if it exists.
         if ($dbman->table_exists('cmi5launch_course')) {
-             // Define table cmi5launch_lrs to be renamed to NEWNAMEGOESHERE.
+             // Define table cmi5launch_course to be renamed.
              $table = new xmldb_table('cmi5launch_course');
 
              // Launch rename table for cmi5launch_lrs.
@@ -1065,25 +1065,7 @@ function xmldb_cmi5launch_upgrade($oldversion) {
         }
     }
 
-    if ($oldversion < 2018103000) {
-        $table = new xmldb_table('cmi5launch_credentials');
-        if ($dbman->table_exists($table)) {
-            $dbman->drop_table($table, $continue = true, $feedback = true);
-        }
-
-        $table = new xmldb_table('cmi5launch_lrs');
-        $field = new xmldb_field('watershedlogin', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
-        if ($dbman->field_exists($table, $field)) {
-            $dbman->drop_field($table, $field, $continue = true, $feedback = true);
-        }
-
-        $field = new xmldb_field('watershedpass', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
-        if ($dbman->field_exists($table, $field)) {
-            $dbman->drop_field($table, $field, $continue = true, $feedback = true);
-        }
-
-        upgrade_mod_savepoint(true, 2018103000, 'cmi5launch');
-    }
+   
 
     // Final return of upgrade result (true, all went good) to Moodle.
     return true;
