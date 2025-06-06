@@ -431,9 +431,9 @@ class provider implements
         $params = array_merge(['moodlecourseid' => $cm->instance], $userinparams);
         $sql = "moodlecourseid = :moodlecourseid AND userid {$userinsql}";
     
-        $DB->delete_records_select('cmi5lauch_usercourse', $sql, $params);
-        $DB->delete_records_select('cmi5lauch_sessions', $sql, $params);
-        $DB->delete_records_select('cmi5lauch_aus', $sql, $params);
+        $DB->delete_records_select('cmi5launch_usercourse', $sql, $params);
+        $DB->delete_records_select('cmi5launch_sessions', $sql, $params);
+        $DB->delete_records_select('cmi5launch_aus', $sql, $params);
     }
 
    
