@@ -34,7 +34,12 @@ class restore_cmi5launch_activity_structure_step extends restore_activity_struct
 
         $paths = array();
 
+        // Restore all DB tables. 
         $paths[] = new restore_path_element('cmi5launch', '/activity/cmi5launch');
+        $paths[] = new restore_path_element('usercourse', '/activity/cmi5launch/usercourses/usercourse');
+        $paths[] = new restore_path_element('au', '/activity/cmi5launch/aus/au');
+        $paths[] = new restore_path_element('session', '/activity/cmi5launch/sessions/session');
+        $paths[] = new restore_path_element('player', '/activity/cmi5launch/player');
 
         // Return the paths wrapped into standard activity structure.
         return $this->prepare_activity_structure($paths);
@@ -54,6 +59,34 @@ class restore_cmi5launch_activity_structure_step extends restore_activity_struct
         $newitemid = $DB->insert_record('cmi5launch', $data);
         $this->apply_activity_instance($newitemid);
     }
+    protected function process_usercourse($data) {
+        global $DB;
+        $data = (object)$data;
+        $data->id = null;
+        $DB->insert_record('cmi5launch_usercourse', $data);
+    }
+    
+    protected function process_au($data) {
+        global $DB;
+        $data = (object)$data;
+        $data->id = null;
+        $DB->insert_record('cmi5launch_aus', $data);
+    }
+    
+    protected function process_session($data) {
+        global $DB;
+        $data = (object)$data;
+        $data->id = null;
+        $DB->insert_record('cmi5launch_sessions', $data);
+    }
+    
+    protected function process_player($data) {
+        global $DB;
+        $data = (object)$data;
+        $data->id = null;
+        $DB->insert_record('cmi5launch_player', $data);
+    }
+    
 
     protected function after_execute() {
         global $DB;

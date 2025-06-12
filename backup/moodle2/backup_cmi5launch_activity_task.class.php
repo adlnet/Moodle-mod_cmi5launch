@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Description of cmi5launch backup task
+ * BAckup tasks for cmi5 plugin.
  *
  * @package    mod_cmi5launch
  * @copyright 2023 Megan Bohland

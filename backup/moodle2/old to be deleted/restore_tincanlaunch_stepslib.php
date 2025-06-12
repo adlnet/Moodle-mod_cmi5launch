@@ -34,6 +34,8 @@ class restore_tincan_activity_structure_step extends restore_activity_structure_
         $paths = array();
 
         $paths[] = new restore_path_element('cmi5launch', '/activity/cmi5launch');
+        // For usercourse.
+        $paths[] = new restore_path_element('cmi5launch_usercourse', '/activity/cmi5launch/usercourses/usercourse');
 
         // Return the paths wrapped into standard activity structure.
         return $this->prepare_activity_structure($paths);

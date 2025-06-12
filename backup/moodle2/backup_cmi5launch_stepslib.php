@@ -32,15 +32,67 @@ class backup_cmi5launch_activity_structure_step extends backup_activity_structur
 
     protected function define_structure() {
 
-        // Define each element separated.
-        $cmi5launch = new backup_nested_element('cmi5launch', array('id'), array(
-            'name', 'intro', 'introformat', 'cmi5launchurl', 'cmi5activityid',
-            'cmi5verbid', 'overridedefaults', 'cmi5multipleregs', 'timecreated',
-            'timemodified', 'courseinfo', 'aus', 'grade'));
+        // Define root plugin element
+        // Note: args here are  tablename, primary key(s), and then fields.
+        $cmi5launch = new backup_nested_element('cmi5launch', ['id'], ['course', 'name', 'intro', 'introformat', 'cmi5activityid', 'registrationid',
+            'returnurl', 'courseid', 'cmi5verbid', 'cmi5expiry', 'overridedefaults', 'cmi5multipleregs', 'timecreated', 'timemodified',
+            'courseinfo', 'aus'
+        ]);
 
-        // Define sources.
-        $cmi5launch->set_source_table('cmi5launch', array('id' => backup::VAR_ACTIVITYID));
+        // Add children groups
 
+        // Usercourse is a users individual cmi5launch object.
+        $usercourses = new backup_nested_element('usercourses');
+        $cmi5launch->add_child($usercourses);
+
+        $usercourse = new backup_nested_element('usercourse', ['id'], ['courseid', 'moodlecourseid', 'userid', 'cmi5activityid', 'registrationid','returnurl',' aus',
+            'ausgrades','grade'
+        ]);
+        $usercourses->add_child($usercourse);
+
+
+        // AUs and Sessions are not linked via keys, but an array stored in a field accessed programmatically.
+        
+        // AUs are for assignable units, which are the individual activities for each usercourse.
+        $aus = new backup_nested_element('aus');
+
+        $au = new backup_nested_element('au', ['id'], [ 'userid', 'attempt', 'launchmethod', 'lmsid', 'moodlecourseid', 'url', 'type', 'title', 'moveon',
+            'auindex', 'parents', 'objectives', 'description', 'activitytype', 'masteryscore', 'completed', 'passed', 'inprogress', 'noattempt', 'satisfied',
+            'sessions', 'scores', 'grade']);
+        $aus->add_child($au);
+        
+        
+        // Sessions, which are the individual sessions for each usercourse.
+        $sessions = new backup_nested_element('sessions');
+
+        $session = new backup_nested_element('session', ['id'], ['sessionid', 'userid', 'moodlecourseid', 'registrationscoursesausid', 'tenantname',
+            'createdat', 'updatedat', 'code', 'launchtokenid', 'lastrequesttime', 'launchmode', 'masteryscore', 'score','islaunched', 'isinitialized', 'initializedat',
+            'duration', 'iscompleted', 'ispassed', 'isfailed', 'isterminated', 'isabandoned', 'progress', 'launchmethod', 'launchurl'
+        ]);
+        $sessions->add_child($session);
+
+        // A table to hold the Catapult player's info.
+        $player = new backup_nested_element('player', ['id'], ['name', 'tenantid', 'tenantname', 'tenanttoken', 'courseid',
+            'launchmethod', 'returnurl', 'homepage', 'registrationid', 'sessionid', 'launchurl', 'cmi5playerurl', 'cmi5playerport'
+        ]);
+        
+
+        // Data sources.
+
+        // Link tables to root.
+        ;
+        $cmi5launch->add_child($aus);
+        $cmi5launch->add_child($sessions);
+        $cmi5launch->add_child($player);
+
+        // Data sources.
+        $cmi5launch->set_source_table('cmi5launch', ['id' => backup::VAR_ACTIVITYID]);
+
+        // Note: Adjust filters here if you want to limit to this activity/course
+        $usercourse->set_source_table('cmi5launch_usercourse', ['moodlecourseid' => backup::VAR_ACTIVITYID]); // no parent filter
+        $au->set_source_table('cmi5launch_aus', ['moodlecourseid' => backup::VAR_ACTIVITYID]); // no parent filter
+        $session->set_source_table('cmi5launch_sessions', ['moodlecourseid' => backup::VAR_ACTIVITYID]); // no parent filter
+        $player->set_source_table('cmi5launch_player', ['id' => backup::VAR_ACTIVITYID]);
         // Return the root element (cmi5launch), wrapped into standard activity structure.
         return $this->prepare_activity_structure($cmi5launch);
     }
