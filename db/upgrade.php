@@ -41,6 +41,22 @@ defined('MOODLE_INTERNAL') || die();
 function xmldb_cmi5launch_upgrade($oldversion) {
     global $DB;
     $dbman = $DB->get_manager();
+
+    // The player table is no longer used, remove. 
+    if ($oldversion < 2025061612) {
+
+        // Define table cmi5launch_player to be dropped.
+        $table = new xmldb_table('cmi5launch_player');
+
+        // Conditionally launch drop table for cmi5launch_player.
+        if ($dbman->table_exists($table)) {
+            $dbman->drop_table($table);
+        }
+
+        // Cmi5launch savepoint reached.
+        upgrade_mod_savepoint(true, 2025061612, 'cmi5launch');
+    }
+
     if ($oldversion < 2025052112) {
 
         // Because ID needs to be autosequence, but MySQL and others do not allow a non id to be auto increment, drop registraionid
