@@ -72,7 +72,7 @@ class restore_cmi5launch_activity_structure_step extends restore_activity_struct
     }
 
     // The tables must be restored in this order as session ids are mapped and stored in AUS, and AUs to usercourses.
-    protected function process_cmi5launch_session($data) {
+    protected function process_session($data) {
         global $DB;
     
         $data = (object)$data;
@@ -94,7 +94,7 @@ class restore_cmi5launch_activity_structure_step extends restore_activity_struct
         $this->set_mapping('cmi5launch_sessions', $oldid, $newitemid);
     }
     
-    protected function process_cmi5launch_aus($data) {
+    protected function process_au($data) {
         global $DB;
     
         $data = (object)$data;
@@ -129,7 +129,7 @@ class restore_cmi5launch_activity_structure_step extends restore_activity_struct
         $this->set_mapping('cmi5launch_aus', $oldid, $newitemid);
     }
     
-    protected function process_cmi5launch_usercourse($data) {
+    protected function process_usercourse($data) {
         global $DB;
     
         $data = (object)$data;

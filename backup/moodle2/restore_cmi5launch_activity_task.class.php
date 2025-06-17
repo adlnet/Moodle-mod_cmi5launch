@@ -72,16 +72,16 @@ class restore_cmi5launch_activity_task extends restore_activity_task {
         $rules = array();
 
         // List of cmi5launchs in course.
-        $rules[] = new restore_decode_rule('cmi5LAUNCHINDEX', '/mod/cmi5launch/index.php?id=$1', 'course');
+        $rules[] = new restore_decode_rule('CMI5LAUNCHINDEX', '/mod/cmi5launch/index.php?id=$1', 'course');
 
-        // Cmi5launch by cm->id.
-        $rules[] = new restore_decode_rule('cmi5LAUNCHVIEWBYID', '/mod/cmi5launch/view.php?id=$1', 'course_module');
+        // Cmi5launch viewed by cmid (common link form).
+        $rules[] = new restore_decode_rule('CMI5LAUNCHVIEWBYID', '/mod/cmi5launch/view.php?id=$1', 'course_module');
 
-        // Cmi5launch by cmi5launch->id.
-        $rules[] = new restore_decode_rule('cmi5LAUNCHVIEWBYB', '/mod/cmi5launch/view.php?b=$1', 'cmi5launch');
+        // Cmi5launch viewed by instance id.
+        $rules[] = new restore_decode_rule('CMI5LAUNCHVIEWBYB', '/mod/cmi5launch/view.php?b=$1', 'cmi5launch');
 
         // Convert old cmi5launch links MDL-33362 & MDL-35007.
-        $rules[] = new restore_decode_rule('cmi5LAUNCHSTART', '/mod/cmi5launch/view.php?id=$1', 'course_module');
+        $rules[] = new restore_decode_rule('CMI5LAUNCHSTART', '/mod/cmi5launch/view.php?id=$1', 'course_module');
 
         return $rules;
     }
