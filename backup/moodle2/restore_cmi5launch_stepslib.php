@@ -86,10 +86,34 @@ class restore_cmi5launch_activity_structure_step extends restore_activity_struct
         if (!empty($data->moodlecourseid)) {
             $data->moodlecourseid = $this->get_mappingid('cmi5launch', $data->moodlecourseid);
         }
-    
-        // Insert session
-        $newitemid = $DB->insert_record('cmi5launch_sessions', $data);
-    
+        //Check for existing records to prevent duplicates. 
+        $existing = $DB->get_record('cmi5launch_sessions', [
+            'userid' => $data->sessionid,
+            'sessionid' => $data->courseid,
+        ]);
+
+        if ($existing) {
+            // Check if restored data is more complete.
+            $restore_has_more_data = (
+                isset($data->score) ||
+                isset($data->iscompleted) ||
+                isset($data->ispassed) ||
+                isset($data->isffailed) ||
+                isset($data->isterminated) ||
+                isset($data->isabandoned)
+            );
+            if ($restore_has_more_data) {
+                $data->id = $existing->id;
+                $DB->update_record('cmi5launch_sessions', $data);
+                debugging("Updated session with better data for userid={$data->userid}");
+                $newitemid = $existing->id;
+            } else {
+                debugging("Skipped duplicate session for userid={$data->userid}, kept existing");
+                $newitemid = $existing->id;
+            }
+        } else {
+            $newitemid = $DB->insert_record('cmi5launch_sessions', $data);
+        }
         // Save mapping so we can remap session IDs in aus.scores and aus.sessions
         $this->set_mapping('cmi5launch_sessions', $oldid, $newitemid);
     }
@@ -121,9 +145,34 @@ class restore_cmi5launch_activity_structure_step extends restore_activity_struct
     
             $data->sessions = json_encode($newids);
         }
-    
-        // Insert AU.
-        $newitemid = $DB->insert_record('cmi5launch_aus', $data);
+        
+        //Check for existing in case of duplicates.
+        $existing = $DB->get_record('cmi5launch_aus', [
+            'userid' => $data->userid,
+            'moodlecourseid' => $data->courseid,
+        ]);
+
+        if ($existing) {
+            // Check if restored data is more complete.
+            $restore_has_more_data = (
+                !empty($data->sessions) ||
+                !empty($data->scores) ||
+                isset($data->grade)
+            );
+            if ($restore_has_more_data) {
+                $data->id = $existing->id;
+                $DB->update_record('cmi5launch_aus', $data);
+                debugging("Updated aus tables with better data for userid={$data->userid}");
+                $newitemid = $existing->id;
+            } else {
+                debugging("Skipped duplicate aus record for userid={$data->userid}, kept existing");
+                $newitemid = $existing->id;
+            }
+        } else {
+            // Insert AU.
+            $newitemid = $DB->insert_record('cmi5launch_aus', $data);
+        }
+
     
         // Store mapping for use in usercourse 'aus' JSON.
         $this->set_mapping('cmi5launch_aus', $oldid, $newitemid);
@@ -139,6 +188,9 @@ class restore_cmi5launch_activity_structure_step extends restore_activity_struct
         $data->moodlecourseid = $this->get_mappingid('cmi5launch', $data->moodlecourseid);
         $data->userid = $this->get_mappingid('user', $data->userid);
     
+        // Set courseid from current course.
+        $data->courseid = $this->get_courseid();
+
         // Decode and remap AU IDs.
         if (!empty($data->aus)) {
             $oldaus = json_decode($data->aus);
@@ -154,8 +206,32 @@ class restore_cmi5launch_activity_structure_step extends restore_activity_struct
             $data->aus = json_encode($newaus);
         }
     
-        // Insert the record.
-        $newitemid = $DB->insert_record('cmi5launch_usercourse', $data);
+        $existing = $DB->get_record('cmi5launch_usercourse', [
+            'userid' => $data->userid,
+            'courseid' => $data->courseid,
+            'registrationid' => $data->registrationid,
+        ]);
+
+        if ($existing) {
+            // Check if restored data is more complete.
+            $restore_has_more_data = (
+                !empty($data->aus) ||
+                !empty($data->ausgrades) ||
+                isset($data->grade)
+            );
+            
+            if ($restore_has_more_data) {
+                $data->id = $existing->id;
+                $DB->update_record('cmi5launch_usercourse', $data);
+                debugging("Updated usercourse with better data for userid={$data->userid}");
+                $newitemid = $existing->id;
+            } else {
+                debugging("Skipped duplicate usercourse for userid={$data->userid}, kept existing");
+                $newitemid = $existing->id;
+            }
+        } else {
+            $newitemid = $DB->insert_record('cmi5launch_usercourse', $data);
+        }
     
         // Save the mapping.
         $this->set_mapping('cmi5launch_usercourse', $oldid, $newitemid);
