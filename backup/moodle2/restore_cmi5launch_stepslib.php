@@ -78,18 +78,21 @@ class restore_cmi5launch_activity_structure_step extends restore_activity_struct
         $data = (object)$data;
         $oldid = $data->id;
     
-        // Remap user and course foreign keys
+        // Remap user and course foreign keys.
         if (!empty($data->userid)) {
             $data->userid = $this->get_mappingid('user', $data->userid);
         }
-    
+        
+        // Remap course foreign key.
         if (!empty($data->moodlecourseid)) {
             $data->moodlecourseid = $this->get_mappingid('cmi5launch', $data->moodlecourseid);
         }
+
+    
         //Check for existing records to prevent duplicates. 
         $existing = $DB->get_record('cmi5launch_sessions', [
-            'userid' => $data->sessionid,
-            'sessionid' => $data->courseid,
+            'userid' => $data->userid,
+            'sessionid' => $data->sessionid,
         ]);
 
         if ($existing) {
@@ -149,7 +152,7 @@ class restore_cmi5launch_activity_structure_step extends restore_activity_struct
         //Check for existing in case of duplicates.
         $existing = $DB->get_record('cmi5launch_aus', [
             'userid' => $data->userid,
-            'moodlecourseid' => $data->courseid,
+            'moodlecourseid' => $data->moodlecourseid,
         ]);
 
         if ($existing) {

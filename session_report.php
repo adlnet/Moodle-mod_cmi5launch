@@ -148,133 +148,136 @@ $table->define_baseurl($PAGE->url);
 
 // Decode and put AU ids in array.
 $auids = (json_decode($auidprevpage, true));
+// Aurecord to hold record
+$aurecord = null;
 
 // For each AU id, find the one that matches our auid from previous page, this is the record we want.
 foreach ($auids as $key => $auid) {
 
+    //This maybe better. it looks for the record rather than loop through ALL records.
     // Retrieve record from table.
-    $au = $DB->get_record('cmi5launch_aus', ['id' => $auid]);
+    $aurecord = $DB->get_record('cmi5launch_aus', ['id' => $auid, 'lmsid' => $cmi5idprevpage]);
+    if (!$aurecord) {
+        // If no record found,
+       //do nothin,
+        continue;
+    } else {
 
-    if ($au->lmsid == $cmi5idprevpage) {
 
-        // If the id matches it is the record we want.
-        $aurecord = $au;
-    }
-}
+        if ($aurecord->sessions != null || false) {
+            // Retrieve session ids for this course.
+            $sessions = json_decode($aurecord->sessions, true);
 
-if ($aurecord->sessions != null || false) {
-    // Retrieve session ids for this course.
-    $sessions = json_decode($aurecord->sessions, true);
+            // Start Attempts at one.
+            $attempt = 1;
 
-    // Start Attempts at one.
-    $attempt = 1;
+            // Arrays to hold row info.
+            $rowdata = array();
+            $scorerow = array();
 
-    // Arrays to hold row info.
-    $rowdata = array();
-    $scorerow = array();
+            // An array to hold grades for max or mean scoring.
+            $sessionscores = array();
+            // Set table up, this needs to be done before rows added.
+            $table->setup();
+            $austatus = "";
 
-    // An array to hold grades for max or mean scoring.
-    $sessionscores = array();
-    // Set table up, this needs to be done before rows added.
-    $table->setup();
-    $austatus = "";
+            // There may be more than one session.
+            foreach ($sessions as $sessionid) {
 
-    // There may be more than one session.
-    foreach ($sessions as $sessionid) {
-        
 
-        $session = $updatesession($progress, $cmi5, $sessionid, $cmi5launch->id, $user);
-        // Add score to array for AU.
-        $sessionscores[] = $session->score;
+                $session = $updatesession($progress, $cmi5, $sessionid, $cmi5launch->id, $user);
+                // Add score to array for AU.
+                $sessionscores[] = $session->score;
 
-        if ($session->createdat != null || false) {
+                if ($session->createdat != null || false) {
 
-            // Retrieve createdAt and format.
-            $date = new DateTime($session->createdat, new DateTimeZone('US/Eastern'));
-            $date->setTimezone(new DateTimeZone('America/New_York'));
-            $datestart = $date->format('D d M Y H:i:s');
-        }else {
-            // If no createdAt, set to empty.
-            $datestart = "";
-         }
+                    // Retrieve createdAt and format.
+                    $date = new DateTime($session->createdat, new DateTimeZone('US/Eastern'));
+                    $date->setTimezone(new DateTimeZone('America/New_York'));
+                    $datestart = $date->format('D d M Y H:i:s');
+                } else {
+                    // If no createdAt, set to empty.
+                    $datestart = "";
+                }
 
-        if ($session->lastrequesttime != null || false) {
+                if ($session->lastrequesttime != null || false) {
 
-            // Retrieve lastRequestTime and format.
-            $date = new DateTime($session->lastrequesttime, new DateTimeZone('US/Eastern'));
-            $date->setTimezone(new DateTimeZone('America/New_York'));
-            $datefinish = $date->format('D d M Y H:i:s');
-        }else {
-            // If no lastRequesttime then use updatedat.
-            // Retrieve lastRequestTime and format.
-            $date = new DateTime($session->updatedat, new DateTimeZone('US/Eastern'));
-            $date->setTimezone(new DateTimeZone('America/New_York'));
-            $datefinish = $date->format('D d M Y H:i:s');
-        }
-        // The users sessions.
-        $usersession = $DB->get_record('cmi5launch_sessions', array('sessionid' => $sessionid));
+                    // Retrieve lastRequestTime and format.
+                    $date = new DateTime($session->lastrequesttime, new DateTimeZone('US/Eastern'));
+                    $date->setTimezone(new DateTimeZone('America/New_York'));
+                    $datefinish = $date->format('D d M Y H:i:s');
+                } else {
+                    // If no lastRequesttime then use updatedat.
+                    // Retrieve lastRequestTime and format.
+                    $date = new DateTime($session->updatedat, new DateTimeZone('US/Eastern'));
+                    $date->setTimezone(new DateTimeZone('America/New_York'));
+                    $datefinish = $date->format('D d M Y H:i:s');
+                }
+                // The users sessions.
+                $usersession = $DB->get_record('cmi5launch_sessions', array('sessionid' => $sessionid));
 
-        // Add row data.
-        $rowdata["Attempt"] = get_string('cmi5launchattemptrow', 'cmi5launch') . $attempt;
-        $rowdata["Started"] = $datestart;
-        $rowdata["Finished"] = $datefinish;
+                // Add row data.
+                $rowdata["Attempt"] = get_string('cmi5launchattemptrow', 'cmi5launch') . $attempt;
+                $rowdata["Started"] = $datestart;
+                $rowdata["Finished"] = $datefinish;
 
-        // AUs moveon specification.
-        $aumoveon = $aurecord->moveon;
+                // AUs moveon specification.
+                $aumoveon = $aurecord->moveon;
 
-        // 0 is no 1 is yes, these are from CMI5 player
-        $iscompleted = $session->iscompleted;
-        $ispassed = $session->ispassed;
-        $isfailed = $session->isfailed;
-        $isterminated = $session->isterminated;
-        $isabandoned = $session->isabandoned;
+                // 0 is no 1 is yes, these are from CMI5 player
+                $iscompleted = $session->iscompleted;
+                $ispassed = $session->ispassed;
+                $isfailed = $session->isfailed;
+                $isterminated = $session->isterminated;
+                $isabandoned = $session->isabandoned;
 
-        // If it's been attempted but no moveon value.
-        if ($iscompleted == 1) {
+                // If it's been attempted but no moveon value.
+                if ($iscompleted == 1) {
 
-            $austatus = get_string('cmi5launchsessionaucompleted', 'cmi5launch');
+                    $austatus = get_string('cmi5launchsessionaucompleted', 'cmi5launch');
 
-            if ($ispassed == 1) {
-                $austatus = get_string('cmi5launchsessionaucompletedpassed', 'cmi5launch');
+                    if ($ispassed == 1) {
+                        $austatus = get_string('cmi5launchsessionaucompletedpassed', 'cmi5launch');
+                    }
+                    if ($isfailed == 1) {
+                        $austatus = get_string('cmi5launchsessionaucompletedfailed', 'cmi5launch');
+                    }
+                }
+                // Update table.
+                $scorecolumns[] = get_string('cmi5launchattemptrow', 'cmi5launch') . $attempt;
+                $scoreheaders[] = get_string('cmi5launchattemptrow', 'cmi5launch') . $attempt;
+                $scorerow[get_string('cmi5launchattemptrow', 'cmi5launch') . $attempt] = $usersession->score;
+
+                switch ($gradetype) {
+
+                    // 'GRADE_AUS_CMI5' = '0').
+                    // 'GRADE_HIGHEST_CMI5' = '1'.
+                    // 'GRADE_AVERAGE_CMI5', =  '2'.
+                    // 'GRADE_SUM_CMI5', = '3'.
+
+                    case 1:
+                        $grade = get_string('cmi5launchsessiongradehigh', 'cmi5launch');
+                        $overall = max($sessionscores);
+                        break;
+                    case 2:
+                        $grade = get_string('cmi5launchsessiongradeaverage', 'cmi5launch');
+                        $overall = (array_sum($sessionscores) / count($sessionscores));
+                        break;
+                }
+
+                $scorerow["Grading type"] = $grade;
+
+                $attempt++;
+
+                $rowdata["Status"] = $austatus;
+
+                $rowdata["Score"] = $usersession->score;
+
+                $table->add_data_keyed($rowdata);
             }
-            if ($isfailed == 1) {
-                $austatus = get_string('cmi5launchsessionaucompletedfailed', 'cmi5launch');
-            }
         }
-            // Update table.
-            $scorecolumns[] = get_string('cmi5launchattemptrow', 'cmi5launch') . $attempt;
-            $scoreheaders[] = get_string('cmi5launchattemptrow', 'cmi5launch') . $attempt;
-            $scorerow[get_string('cmi5launchattemptrow', 'cmi5launch') . $attempt] = $usersession->score;
-
-        switch ($gradetype) {
-
-            // 'GRADE_AUS_CMI5' = '0').
-            // 'GRADE_HIGHEST_CMI5' = '1'.
-            // 'GRADE_AVERAGE_CMI5', =  '2'.
-            // 'GRADE_SUM_CMI5', = '3'.
-
-            case 1:
-                $grade = get_string('cmi5launchsessiongradehigh', 'cmi5launch');
-                $overall = max($sessionscores);
-                break;
-            case 2:
-                $grade = get_string('cmi5launchsessiongradeaverage', 'cmi5launch');
-                $overall = (array_sum($sessionscores) / count($sessionscores));
-                break;
-        }
-
-        $scorerow["Grading type"] = $grade;
-
-        $attempt++;
-
-        $rowdata["Status"] = $austatus;
-
-        $rowdata["Score"] = $usersession->score;
-
-        $table->add_data_keyed($rowdata);
-    }
-}
-
+    } // end else from aurecord if 
+} // end of for each auids
 // Display the grading type, highest, avg, etc.
 $scorecolumns[] = 'Grading type';
 $scoreheaders[] = 'Grading type';
@@ -285,6 +288,8 @@ $scoreheaders[] = 'Overall Score';
 if (!empty($sessionscores)) {
 
     $scorerow["Overall Score"] = $overall;
+}else{
+    $scorerow["Overall Score"] = '';
 }
 
 // Setup score table.
