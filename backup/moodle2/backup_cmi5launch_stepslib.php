@@ -41,15 +41,7 @@ class backup_cmi5launch_activity_structure_step extends backup_activity_structur
 
         // Add children groups
 
-        // Usercourse is a users individual cmi5launch object.
-        $usercourses = new backup_nested_element('usercourses');
-        $cmi5launch->add_child($usercourses);
-
-        $usercourse = new backup_nested_element('usercourse', ['id'], ['courseid', 'moodlecourseid', 'userid', 'cmi5activityid', 'registrationid','returnurl','aus',
-            'ausgrades','grade'
-        ]);
-        $usercourses->add_child($usercourse);
-
+  
 
         // AUs and Sessions are not linked via keys, but an array stored in a field accessed programmatically.
         
@@ -71,18 +63,23 @@ class backup_cmi5launch_activity_structure_step extends backup_activity_structur
         ]);
         $sessionstable->add_child($session);
 
-        // A table to hold the Catapult player's info.
-        $player = new backup_nested_element('player', ['id'], ['name', 'tenantid', 'tenantname', 'tenanttoken', 'courseid',
-            'launchmethod', 'returnurl', 'homepage', 'registrationid', 'sessionid', 'launchurl', 'cmi5playerurl', 'cmi5playerport'
-        ]);
-        
+       
 
         // Data sources.
 
         // Link tables to root.
-        $cmi5launch->add_child($austable);
         $cmi5launch->add_child($sessionstable);
-        $cmi5launch->add_child($player);
+        $cmi5launch->add_child($austable);
+              
+        // Usercourse is a users individual cmi5launch object.
+        $usercourses = new backup_nested_element('usercourses');
+        $cmi5launch->add_child($usercourses);
+
+        $usercourse = new backup_nested_element('usercourse', ['id'], ['courseid', 'moodlecourseid', 'userid', 'cmi5activityid', 'registrationid','returnurl','aus',
+            'ausgrades','grade'
+        ]);
+        $usercourses->add_child($usercourse);
+
 
         // Data sources.
         $cmi5launch->set_source_table('cmi5launch', ['id' => backup::VAR_ACTIVITYID]);

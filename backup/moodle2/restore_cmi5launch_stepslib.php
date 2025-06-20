@@ -28,32 +28,48 @@ defined('MOODLE_INTERNAL') || die;
 /**
  * Structure step to restore one cmi5launch activity
  */
-class restore_cmi5launch_activity_structure_step extends restore_activity_structure_step {
+class restore_cmi5launch_activity_structure_step extends restore_activity_structure_step
+{
 
-    protected function define_structure() {
+    private $usercourse_aus_originals = [];
+    private $original_au_sessions = [];
+    private $au_dbid_map = []; // Store original AU IDs to remap after execution.
 
-        $paths = array();
+    private $arrayofoldsessionids = []; // Store original session IDs to remap after execution.
+    private $arrayofoldauids = []; // Store original AU IDs to remap after execution.
+    private $arrayofnewsessionids = []; // Store new session IDs to remap after execution.
+    private $arrayofnewauids = []; // Store new AU IDs to remap after execution.
+    protected function define_structure()
+    {
+        $paths = [];
 
+        // Core activity must come first.
         $paths[] = new restore_path_element('cmi5launch', '/activity/cmi5launch');
-        $paths[] = new restore_path_element('usercourse', '/activity/cmi5launch/usercourses/usercourse');
-        $paths[] = new restore_path_element('au', '/activity/cmi5launch/aus_records/au');
-        $paths[] = new restore_path_element('session', '/activity/cmi5launch/session_records/session');
 
-        // Return the paths wrapped into standard activity structure.
+        // Sessions MUST be restored before AUs, since AUs rely on session ID mappings.
+        $paths[] = new restore_path_element('session', '/activity/cmi5launch/session_records/session');
+        $paths[] = new restore_path_element('au', '/activity/cmi5launch/aus_records/au');
+
+        // Then usercourses (which rely on AUS remapping).
+        $paths[] = new restore_path_element('usercourse', '/activity/cmi5launch/usercourses/usercourse');
+
         return $this->prepare_activity_structure($paths);
     }
+
+
 
     /**
      * Process cmi5launch tag information
      * @param array $data information
      */
-    protected function process_cmi5launch($data) {
+    protected function process_cmi5launch($data)
+    {
         global $DB;
-    
-        $data = (object)$data;
+
+        $data = (object) $data;
         $oldid = $data->id;
         $data->course = $this->get_courseid();
-    
+
         // Set timestamps if not already defined.
         if (!isset($data->timecreated)) {
             $data->timecreated = time();
@@ -61,98 +77,75 @@ class restore_cmi5launch_activity_structure_step extends restore_activity_struct
         if (!isset($data->timemodified)) {
             $data->timemodified = $data->timecreated;
         }
-    
+
         $newitemid = $DB->insert_record('cmi5launch', $data);
-    
+
         // Link this instance to the course module.
         $this->apply_activity_instance($newitemid);
-    
+
         // Save mapping for other tables.
         $this->set_mapping('cmi5launch', $oldid, $newitemid);
     }
 
     // The tables must be restored in this order as session ids are mapped and stored in AUS, and AUs to usercourses.
-    protected function process_session($data) {
+    protected function process_session($data)
+    {
         global $DB;
-    
-        $data = (object)$data;
+        error_log("Restoring sessions" . PHP_EOL, 3, '/var/www/moodledata/cmi5_debug.log');
+
+        $data = (object) $data;
         $oldid = $data->id;
-    
+
         // Remap user and course foreign keys.
         if (!empty($data->userid)) {
             $data->userid = $this->get_mappingid('user', $data->userid);
         }
-        
+
         // Remap course foreign key.
         if (!empty($data->moodlecourseid)) {
             $data->moodlecourseid = $this->get_mappingid('cmi5launch', $data->moodlecourseid);
         }
 
-    
-        //Check for existing records to prevent duplicates. 
-        $existing = $DB->get_record('cmi5launch_sessions', [
-            'userid' => $data->userid,
-            'sessionid' => $data->sessionid,
-        ]);
+        // Add current id to oldsession id array for remapping later.
+        $this->arrayofoldsessionids[] = $oldid;
+        error_log("Processing session with old ID {$oldid}" . PHP_EOL, 3, '/var/www/moodledata/cmi5_debug.log');
 
-        if ($existing) {
-            // Check if restored data is more complete.
-            $restore_has_more_data = (
-                isset($data->score) ||
-                isset($data->iscompleted) ||
-                isset($data->ispassed) ||
-                isset($data->isffailed) ||
-                isset($data->isterminated) ||
-                isset($data->isabandoned)
-            );
-            if ($restore_has_more_data) {
-                $data->id = $existing->id;
-                $DB->update_record('cmi5launch_sessions', $data);
-                debugging("Updated session with better data for userid={$data->userid}");
-                $newitemid = $existing->id;
-            } else {
-                debugging("Skipped duplicate session for userid={$data->userid}, kept existing");
-                $newitemid = $existing->id;
-            }
-        } else {
-            $newitemid = $DB->insert_record('cmi5launch_sessions', $data);
-        }
+        $newitemid = $DB->insert_record('cmi5launch_sessions', $data);
+        error_log("Inserted record now have new id  {$newitemid}" . PHP_EOL, 3, '/var/www/moodledata/cmi5_debug.log');
+
+        // Add new id to newsessionid array for remapping later.
+        $this->arrayofnewsessionids[] = $newitemid;
+        error_log("New session ID {$newitemid} added to array for remapping later" . PHP_EOL, 3, '/var/www/moodledata/cmi5_debug.log');
+
         // Save mapping so we can remap session IDs in aus.scores and aus.sessions
         $this->set_mapping('cmi5launch_sessions', $oldid, $newitemid);
+        error_log("Restored session: old ID {$oldid} is now mapped to new DB ID {$newitemid}" . PHP_EOL, 3, '/var/www/moodledata/cmi5_debug.log');
+
     }
-    
-    protected function process_au($data) {
+
+    protected function process_au($data)
+    {
         global $DB;
-    
-        $data = (object)$data;
+        error_log("Restoring aus" . PHP_EOL, 3, '/var/www/moodledata/cmi5_debug.log');
+
+        $data = (object) $data;
         $oldid = $data->id;
-    
+
         // Remap foreign keys.
         if (!empty($data->userid)) {
             $data->userid = $this->get_mappingid('user', $data->userid);
         }
-    
+
         $data->moodlecourseid = $this->get_mappingid('cmi5launch', $data->moodlecourseid);
-    
-        // Remap session IDs in array field.
-        if (!empty($data->sessions)) {
-            $sessionids = json_decode($data->sessions, true);
-            $newids = [];
-    
-            foreach ($sessionids as $oldsessionid) {
-                $newid = $this->get_mappingid('cmi5launch_sessions', $oldsessionid);
-                if ($newid !== false) {
-                    $newids[] = $newid;
-                }
-            }
-    
-            $data->sessions = json_encode($newids);
-        }
-        
+
+        // Add oldid to oldauid array for remapping later.
+        $this->arrayofoldauids[] = $oldid;
+        error_log("Processing AU with old ID {$oldid}" . PHP_EOL, 3, '/var/www/moodledata/cmi5_debug.log');
         //Check for existing in case of duplicates.
         $existing = $DB->get_record('cmi5launch_aus', [
             'userid' => $data->userid,
             'moodlecourseid' => $data->moodlecourseid,
+            'lmsid' => $data->lmsid,
         ]);
 
         if ($existing) {
@@ -165,50 +158,77 @@ class restore_cmi5launch_activity_structure_step extends restore_activity_struct
             if ($restore_has_more_data) {
                 $data->id = $existing->id;
                 $DB->update_record('cmi5launch_aus', $data);
-                debugging("Updated aus tables with better data for userid={$data->userid}");
+                error_log("Updated aus tables with better data for userid={$data->userid}" . PHP_EOL, 3, '/var/www/moodledata/cmi5_debug.log');
+
                 $newitemid = $existing->id;
+                // Add new id to newauid array for remapping later.
+                $this->arrayofnewauids[] = $newitemid;
+                error_log("New AU ID {$newitemid} added to array for remapping later" . PHP_EOL, 3, '/var/www/moodledata/cmi5_debug.log');
+
             } else {
-                debugging("Skipped duplicate aus record for userid={$data->userid}, kept existing");
-                $newitemid = $existing->id;
+                error_log("Skipped duplicate aus record for userid={$data->userid}, kept existing" . PHP_EOL, 3, '/var/www/moodledata/cmi5_debug.log');
+
+                $newitemid = $DB->insert_record('cmi5launch_aus', $data);
+                // Add new id to newauid array for remapping later.
+                $this->arrayofnewauids[] = $newitemid;
+                error_log("New AU ID {$newitemid} added to array for remapping later" . PHP_EOL, 3, '/var/www/moodledata/cmi5_debug.log');
+
             }
         } else {
+            error_log("Final cleaned sessions for AU {$oldid}: " . $data->sessions . PHP_EOL, 3, '/var/www/moodledata/cmi5_debug.log');
+
             // Insert AU.
             $newitemid = $DB->insert_record('cmi5launch_aus', $data);
+            // Add new id to newauid array for remapping later.
+            $this->arrayofnewauids[] = $newitemid;
+            error_log("New AU ID {$newitemid} added to array for remapping later" . PHP_EOL, 3, '/var/www/moodledata/cmi5_debug.log');
+
         }
 
-    
+
         // Store mapping for use in usercourse 'aus' JSON.
-        $this->set_mapping('cmi5launch_aus', $oldid, $newitemid);
+        $this->set_mapping('cmi5launch_aus', $oldid, $newitemid);// Save remap info
+        
+        $this->au_dbid_map[$oldid] = $newitemid;
     }
-    
-    protected function process_usercourse($data) {
+
+    protected function process_usercourse($data)
+    {
         global $DB;
-    
-        $data = (object)$data;
+        error_log("Restoring usercourse" . PHP_EOL, 3, '/var/www/moodledata/cmi5_debug.log');
+
+
+        $data = (object) $data;
         $oldid = $data->id;
-    
+
         // Fix foreign keys.
         $data->moodlecourseid = $this->get_mappingid('cmi5launch', $data->moodlecourseid);
         $data->userid = $this->get_mappingid('user', $data->userid);
-    
+
         // Set courseid from current course.
         $data->courseid = $this->get_courseid();
+
+        // Preserve original AU IDs for later remapping in after_execute.
+        if (!empty($data->aus)) {
+            $this->usercourse_aus_originals[$oldid] = json_decode($data->aus);
+        }
 
         // Decode and remap AU IDs.
         if (!empty($data->aus)) {
             $oldaus = json_decode($data->aus);
             $newaus = [];
-    
+
             foreach ($oldaus as $oldauid) {
                 $newauid = $this->get_mappingid('cmi5launch_aus', $oldauid);
                 if ($newauid !== false) {
                     $newaus[] = $newauid;
                 }
             }
-    
+
             $data->aus = json_encode($newaus);
         }
-    
+
+
         $existing = $DB->get_record('cmi5launch_usercourse', [
             'userid' => $data->userid,
             'courseid' => $data->courseid,
@@ -222,31 +242,71 @@ class restore_cmi5launch_activity_structure_step extends restore_activity_struct
                 !empty($data->ausgrades) ||
                 isset($data->grade)
             );
-            
+
             if ($restore_has_more_data) {
                 $data->id = $existing->id;
                 $DB->update_record('cmi5launch_usercourse', $data);
-                debugging("Updated usercourse with better data for userid={$data->userid}");
+                error_log("Updated usercourse with better data for userid={$data->userid}" . PHP_EOL, 3, '/var/www/moodledata/cmi5_debug.log');
+
                 $newitemid = $existing->id;
             } else {
-                debugging("Skipped duplicate usercourse for userid={$data->userid}, kept existing");
+                error_log("Skipped duplicate usercourse for userid={$data->userid}, kept existing" . PHP_EOL, 3, '/var/www/moodledata/cmi5_debug.log');
+
                 $newitemid = $existing->id;
             }
         } else {
             $newitemid = $DB->insert_record('cmi5launch_usercourse', $data);
         }
-    
+
         // Save the mapping.
         $this->set_mapping('cmi5launch_usercourse', $oldid, $newitemid);
     }
-    
 
-    
 
-    protected function after_execute() {
+  
+    protected function after_execute()
+    {
         global $DB;
 
         // Add cmi5launch related files.
         $this->add_related_files('mod_cmi5launch', 'intro', null);
+
+        // Remap session IDs in AUs now that all mappings exist.
+        $aus = $DB->get_records('cmi5launch_aus');
+
+        // For each new AU ID, gert record, remap sessions and resave
+        foreach ($this->arrayofnewauids as $auid) {
+
+            $au = $DB->get_record('cmi5launch_aus', ['id' => $auid]);
+
+            $oldsessions = json_decode($au->sessions, true); // Decode existing sessions
+
+            // New session ids
+            $newsessionids = [];
+
+            foreach ($oldsessions as $oldsessionid) {
+                // Remap each session ID.
+
+
+                $newsessionid = $this->get_mappingid('cmi5launch_sessions', $oldsessionid);
+                if ($newsessionid !== false) {
+                    $newsessionids[] = $newsessionid; // Store new session ID
+                    error_log("Saved a new session id" . PHP_EOL, 3, '/var/www/moodledata/cmi5_debug.log');
+
+                } else {
+                    error_log("Failed to remap session ID {$oldsessionid} for AU {$auid}" . PHP_EOL, 3, '/var/www/moodledata/cmi5_debug.log');
+                }
+            }
+                // Once done with all session IDs for this AU, update the AU record.
+                $au->sessions = json_encode($newsessionids);
+                $DB->update_record('cmi5launch_aus', $au);
+                error_log("Updated au with auid with new session ids " . PHP_EOL, 3, '/var/www/moodledata/cmi5_debug.log');
+
+            
+
+
+        }
+
     }
+
 }
