@@ -949,4 +949,24 @@ function cmi5launch_grade_item_update($cmi5launch, $grades = null) {
         // Return result.
         return $result;
     }
-  
+  /**
+ * Deletes an instance of the cmi5launch module.
+ *
+ * @param int $id The ID of the module instance.
+ * @return bool True on success.
+ */
+function cmi5launch_delete_instance($id) {
+    global $DB;
+
+    if (!$cmi5launch = $DB->get_record('cmi5launch', ['id' => $id])) {
+        return false;
+    }
+
+    // Delete related records.
+    $DB->delete_records('cmi5launch_usercourse', ['moodlecourseid' => $id]);
+    $DB->delete_records('cmi5launch_aus', ['moodlecourseid' => $id]);
+    $DB->delete_records('cmi5launch_sessions', ['moodlecourseid' => $id]);
+    $DB->delete_records('cmi5launch', ['id' => $id]);
+
+    return true;
+}

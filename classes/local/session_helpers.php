@@ -60,14 +60,15 @@ class session_helpers {
         $progress = new $progress();
         $getsessioninfo = $connector->cmi5launch_get_session_info();
         $getprogress = $progress->cmi5launch_get_retrieve_statements();
+
         
         try {
             // Get the session from DB with session id.
-            $session = $DB->get_record('cmi5launch_sessions', array('sessionid' => $sessionid));
-               
+            $session = $DB->get_record('cmi5launch_sessions', array('sessionid' => $sessionid, 'userid' => $user->id));
+
             // Reload cmi5 instance.
             $record = $DB->get_record('cmi5launch', array('id' => $cmi5launchid));
-
+    
             // Reload user course instance.
             $userscourse = $DB->get_record('cmi5launch_usercourse', ['courseid' => $record->courseid, 'userid' => $user->id]);
             // Get updates from the LRS as well.
@@ -140,7 +141,6 @@ class session_helpers {
         // Set error and exception handler to catch and override the default PHP error messages, to make messages more user friendly.
         set_error_handler('mod_cmi5launch\local\progresslrs_warning', E_WARNING);
         set_exception_handler('mod_cmi5launch\local\exception_progresslrs');
-
 
         // Put a try here to catch if anything goes wrong.
         try {

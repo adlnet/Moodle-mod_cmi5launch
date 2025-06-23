@@ -18,8 +18,7 @@
  * Define all the restore steps that will be used by the restore_cmi5launch_activity_task
  *
  * @package    mod_cmi5launch
- * @copyright 2023 Megan Bohland
- * @copyright  Based on work by 2016 onward Remote-Learner.net Inc
+ * @copyright  2016 onward Remote-Learner.net Inc
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -28,13 +27,15 @@ defined('MOODLE_INTERNAL') || die;
 /**
  * Structure step to restore one cmi5launch activity
  */
-class restore_cmi5launch_activity_structure_step extends restore_activity_structure_step {
+class restore_tincan_activity_structure_step extends restore_activity_structure_step {
 
     protected function define_structure() {
 
         $paths = array();
 
         $paths[] = new restore_path_element('cmi5launch', '/activity/cmi5launch');
+        // For usercourse.
+        $paths[] = new restore_path_element('cmi5launch_usercourse', '/activity/cmi5launch/usercourses/usercourse');
 
         // Return the paths wrapped into standard activity structure.
         return $this->prepare_activity_structure($paths);

@@ -167,12 +167,16 @@ class grade_helpers
             $scores = json_decode($scores, true);
         }
 
+        // if it is an object print so i know what it is
+        if (is_object($scores)) {
+            var_dump($scores);
+        }
         if (!$scores == null && is_array($scores)) {
 
             // Find the highest grade.
             $highestgrade = max($scores);
 
-        } else if ($scores > $highestgrade && !is_array($scores)) {
+        } else if ($scores > $highestgrade && !is_array($scores) && is_numeric($scores)) {
 
             // If it's an int, it's a single value so highest is itself.
             $highestgrade = $scores;
@@ -286,6 +290,7 @@ class grade_helpers
                 // Array to hold session scores for update.
                 $sessiongrades = array();
 
+
                 // This uses the auid to pull the right record from the aus table.
                 $aurecord = $DB->get_record('cmi5launch_aus', ['id' => $auid]);
 
@@ -302,7 +307,7 @@ class grade_helpers
                         foreach ($sessions as $sessionid) {
 
                             // Using current session id, retrieve session from DB.
-                            $session = $DB->get_record('cmi5launch_sessions', ['sessionid' => $sessionid]);
+                            $session = $DB->get_record('cmi5launch_sessions', ['sessionid' => $sessionid, 'userid' => $user->id, "moodlecourseid" => $cmi5launch->id]);
 
                             // Retrieve new info (if any) from CMI5 player and LRS on session.
                             $session = $updatesession($progress, $cmi5, $sessionid, $cmi5launch->id, $user);
