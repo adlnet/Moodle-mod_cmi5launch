@@ -63,7 +63,7 @@ class session_helpers {
         
         try {
             // Get the session from DB with session id.
-            $session = $DB->get_record('cmi5launch_sessions', array('sessionid' => $sessionid));
+            $session = $DB->get_record('cmi5launch_sessions', array('sessionid' => $sessionid, 'moodlecourseid' => $cmi5launchid, 'userid' => $user->id), '*', MUST_EXIST);
                
             // Reload cmi5 instance.
             $record = $DB->get_record('cmi5launch', array('id' => $cmi5launchid));

@@ -302,7 +302,7 @@ class grade_helpers
                         foreach ($sessions as $sessionid) {
 
                             // Using current session id, retrieve session from DB.
-                            $session = $DB->get_record('cmi5launch_sessions', ['sessionid' => $sessionid]);
+                            $session = $DB->get_record('cmi5launch_sessions', ['sessionid' => $sessionid, 'userid' => $user->id, 'moodlecourseid' => $cmi5launch->id], '*', MUST_EXIST);
 
                             // Retrieve new info (if any) from CMI5 player and LRS on session.
                             $session = $updatesession($progress, $cmi5, $sessionid, $cmi5launch->id, $user);

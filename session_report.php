@@ -214,7 +214,7 @@ foreach ($auids as $key => $auid) {
                     $datefinish = $date->format('D d M Y H:i:s');
                 }
                 // The users sessions.
-                $usersession = $DB->get_record('cmi5launch_sessions', array('sessionid' => $sessionid));
+                $usersession = $DB->get_record('cmi5launch_sessions', array('sessionid' => $sessionid, 'userid' => $userid, 'moodlecourseid' => $id));
 
                 // Add row data.
                 $rowdata["Attempt"] = get_string('cmi5launchattemptrow', 'cmi5launch') . $attempt;
@@ -246,8 +246,9 @@ foreach ($auids as $key => $auid) {
                 // Update table.
                 $scorecolumns[] = get_string('cmi5launchattemptrow', 'cmi5launch') . $attempt;
                 $scoreheaders[] = get_string('cmi5launchattemptrow', 'cmi5launch') . $attempt;
+                if ($usersession){
                 $scorerow[get_string('cmi5launchattemptrow', 'cmi5launch') . $attempt] = $usersession->score;
-
+                }
                 switch ($gradetype) {
 
                     // 'GRADE_AUS_CMI5' = '0').
@@ -271,7 +272,9 @@ foreach ($auids as $key => $auid) {
 
                 $rowdata["Status"] = $austatus;
 
-                $rowdata["Score"] = $usersession->score;
+                if ($usersession) {
+                    $rowdata["Score"] = $usersession->score;
+                }
 
                 $table->add_data_keyed($rowdata);
             }
