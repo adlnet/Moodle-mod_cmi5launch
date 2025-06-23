@@ -164,7 +164,7 @@ foreach ($auids as $key => $auid) {
     } else {
 
 
-        if ($aurecord->sessions != null || false) {
+        if (isset($aurecord->sessions)) {
             // Retrieve session ids for this course.
             $sessions = json_decode($aurecord->sessions, true);
 
@@ -189,7 +189,7 @@ foreach ($auids as $key => $auid) {
                 // Add score to array for AU.
                 $sessionscores[] = $session->score;
 
-                if ($session->createdat != null || false) {
+                if (!empty($session->createdat)) {
 
                     // Retrieve createdAt and format.
                     $date = new DateTime($session->createdat, new DateTimeZone('US/Eastern'));
@@ -200,7 +200,7 @@ foreach ($auids as $key => $auid) {
                     $datestart = "";
                 }
 
-                if ($session->lastrequesttime != null || false) {
+                if (!empty($session->lastrequesttime)) {
 
                     // Retrieve lastRequestTime and format.
                     $date = new DateTime($session->lastrequesttime, new DateTimeZone('US/Eastern'));

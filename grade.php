@@ -26,8 +26,9 @@
 require_once("../../config.php");
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require('header.php');
+require_login($course, true, $cm);
 
-require_login($course, false, $cm);
+
 
 // This page is the go-between from moodle grader (index.php) to our report.php.
 // It's never visited itself, but is almost like an invisible page.
@@ -51,7 +52,16 @@ $itemid = optional_param('itemid', 0, PARAM_INT);
 
 // This gradeid, which is also from the grade_grades table. It corresponds to a row entry, ie. a particular users info.
 $gradeid = optional_param('gradeid', 0, PARAM_INT);
-$contextmodule = context_module::instance($cm->id);
+
+
+
+$PAGE->set_url('/mod/cmi5launch/grade.php', array(
+    'id' => $id,
+    'itemid' => $itemid,
+    'itemnumber' => $itemnumber,
+    'gradeid' => $gradeid,
+    'userid' => $userid,
+));
 
 global $cmi5launch, $USER;
 
@@ -66,6 +76,9 @@ if (! $course = $DB->get_record('cmi5launch', array('course' => $cm->course, 'na
 
     throw new \moodle_exception('coursemisconf');
 }
+$contextmodule = context_module::instance($cm->id);
+
+
 
 // Check the user has the capability to view grades.
 if (has_capability('mod/cmi5launch:viewgrades', $context)) {
@@ -81,13 +94,21 @@ if (has_capability('mod/cmi5launch:viewgrades', $context)) {
     }
 
     // If the logged in user has an id pass that along, as they may have grades to view as well.
-    if ($userid != 0 || null) {
+    if ($userid != 0 || $userid != null) {
 
-        redirect('report.php?id=' . $cm->id . '&userid=' . $userid . '&itemnumber=' .
-            $itemnumber . '&itemid=' . $itemid . '&gradeid=' . $gradeid);
+        redirect(new moodle_url('/mod/cmi5launch/report.php', array(
+            'id' => $cm->id,
+            'userid' => $userid,
+            'itemnumber' => $itemnumber,
+            'itemid' => $itemid,
+            'gradeid' => $gradeid,
+        )));
+        
 
     } else {
-        redirect('report.php?id=' . $cm->id . '&itemid=' . $itemid);
+        redirect(new moodle_url('/mod/cmi5launch/report.php', array(
+            'id' => $cm->id,
+            'itemid' => $itemid)));
     }
 
 } else {
@@ -96,5 +117,7 @@ if (has_capability('mod/cmi5launch:viewgrades', $context)) {
     // Retrieve/update the users grades for this course.
     cmi5launch_update_grades($cmi5launch, $USER->id);
 
-    redirect('report.php?id='.$cm->id .'&userid=' . $userid );
+    redirect(new moodle_url('/mod/cmi5launch/report.php', array(
+        'id' => $cm->id,
+        'userid' => $userid)));
 }
