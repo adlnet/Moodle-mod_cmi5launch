@@ -97,9 +97,11 @@ class progress {
 
     /**
      * Builds and sends requests to LRS
-     * @param mixed $data
-     * @param mixed $id
-     * @return mixed
+     * @param callable $cmi5launch_stream_and_send - function to stream and send data. 
+     * @param array $data - data to send in request.
+     * @param mixed $id  - The id of the cmi5launch instance.
+     * @return mixed - The response from the LRS.
+     * @throws nullException - If there is an error retrieving the LRS settings or sending the request.
      */
     public function cmi5launch_send_request_to_lrs($cmi5launch_stream_and_send, $data, $id) {
 
@@ -169,8 +171,8 @@ class progress {
     /**
      * Returns an actor (name) retrieved from collected LRS data based on registration id
      * @param mixed $resultarray - data retrieved from LRS, usually an array
-     * @param mixed $i - the registration id
-     * @return mixed - actor
+     * @param mixed $registrationid - the registration id
+     * @return mixed - The actor name.
      */
     public function cmi5launch_retrieve_actor($resultarray, $registrationid) {
   
@@ -421,9 +423,7 @@ class progress {
                 $code = $session->code;
                 $currentsessionid = "";
 
-                // what is first array key in statement? It is the registration id.
-        
-                //// There should always be an extension but in case. 
+                // There should always be an extension but in case. 
                 try {
                     $ext = $singlestatement[$registrationid][0]["context"]["extensions"];
 

@@ -25,10 +25,7 @@ namespace mod_cmi5launch\local;
 
 /**
  * An exception handler to use in AU cases when many different exceptions for data errors may be thrown. 
- * @param mixed $errno
- * @param mixed $errstr
- * @param mixed $errfile
- * @param mixed $errline
+ * @param \Throwable $exception - The exception that was thrown.
  * @throws \mod_cmi5launch\local\nullException
  * @return never
  */
@@ -39,10 +36,7 @@ function exception_au(\Throwable $exception)
 
 /**
  * An exception handler to use in grade cases when many different exceptions for data errors may be thrown. 
- * @param mixed $errno
- * @param mixed $errstr
- * @param mixed $errfile
- * @param mixed $errline
+ * @param \Throwable $exception - The exception that was thrown.
  * @throws \mod_cmi5launch\local\nullException
  * @return never
  */
@@ -52,11 +46,11 @@ function exception_grade(\Throwable $exception)
 }
 
 /**
- * An error handler to use in progress cases when many different exceptions for data errors may be thrown. 
- * @param mixed $errno
- * @param mixed $errstr
- * @param mixed $errfile
- * @param mixed $errline
+ * An warning handler to use in progress cases when many different exceptions for data errors may be thrown. 
+ * @param mixed $errno - The error number.
+ * @param mixed $errstr - The error message.
+ * @param mixed $errfile -  The file where the error occurred.
+ * @param mixed $errline - The line number where the error occurred.
  * @throws \mod_cmi5launch\local\nullException
  * @return never
  */
@@ -69,10 +63,10 @@ function progresslrsreq_warning($errno, $errstr, $errfile, $errline)
 
 /**
  * An warning handler to use to post better warnings to users for troubleshooting. 
- * @param mixed $errno
- * @param mixed $errstr
- * @param mixed $errfile
- * @param mixed $errline
+ * @param mixed $errno - The error number.
+ * @param mixed $errstr - The error message.
+ * @param mixed $errfile -  The file where the error occurred.
+ * @param mixed $errline - The line number where the error occurred.
  * @throws \mod_cmi5launch\local\nullException
  * @return never
  */
@@ -85,10 +79,10 @@ function custom_warningAU($errno, $errstr, $errfile, $errline)
 }
 /**
  * An warning handler to use to post better warnings to users for troubleshooting. 
- * @param mixed $errno
- * @param mixed $errstr
- * @param mixed $errfile
- * @param mixed $errline
+ * @param mixed $errno - The error number.
+ * @param mixed $errstr - The error message.
+ * @param mixed $errfile -  The file where the error occurred.
+ * @param mixed $errline - The line number where the error occurred.
  * @throws \mod_cmi5launch\local\nullException
  * @return never
  */
@@ -101,10 +95,10 @@ function custom_warning($errno, $errstr, $errfile, $errline)
 
 /**
  * An warning handler to use to post better warnings to users for troubleshooting. 
- * @param mixed $errno
- * @param mixed $errstr
- * @param mixed $errfile
- * @param mixed $errline
+ * @param mixed $errno - The error number.
+ * @param mixed $errstr - The error message.
+ * @param mixed $errfile -  The file where the error occurred.
+ * @param mixed $errline - The line number where the error occurred.
  * @throws \mod_cmi5launch\local\nullException
  * @return never
  */
@@ -116,10 +110,10 @@ function custom_warningview($errno, $errstr, $errfile, $errline)
 }
 /**
  * An exception handler to use in AU cases when many different exceptions for data errors may be thrown. 
- * @param mixed $errno
- * @param mixed $errstr
- * @param mixed $errfile
- * @param mixed $errline
+ * @param mixed $errno - The error number.
+ * @param mixed $errstr - The error message.
+ * @param mixed $errfile -  The file where the error occurred.
+ * @param mixed $errline - The line number where the error occurred.
  * @throws \mod_cmi5launch\local\nullException
  * @return never
  */
@@ -129,11 +123,11 @@ function exception_progresslrsreq(\Throwable $exception)
     throw new nullException(get_string('cmi5launchlrscommunicationerror', 'cmi5launch') . $exception->getMessage() . get_string('cmi5launchlrschecksettings', 'cmi5launch'), 0);
 }
 /**
- * A warning handler to use LRS communications when many different exceptions for data errors may be thrown. 
- * @param mixed $errno
- * @param mixed $errstr
- * @param mixed $errfile
- * @param mixed $errline
+ * A warning handler for LRS communications when many different exceptions for data errors may be thrown. 
+ * @param mixed $errno - The error number.
+ * @param mixed $errstr - The error message.
+ * @param mixed $errfile -  The file where the error occurred.
+ * @param mixed $errline - The line number where the error occurred.
  * @throws \mod_cmi5launch\local\nullException
  * @return never
  */
@@ -144,10 +138,10 @@ function progresslrs_warning($errno, $errstr, $errfile, $errline)
 
 /**
  * An exception handler to use in LRS communications when many different exceptions for data errors may be thrown. 
- * @param mixed $errno
- * @param mixed $errstr
- * @param mixed $errfile
- * @param mixed $errline
+ * @param mixed $errno - The error number.
+ * @param mixed $errstr - The error message.
+ * @param mixed $errfile -  The file where the error occurred.
+ * @param mixed $errline - The line number where the error occurred.
  * @throws \mod_cmi5launch\local\nullException
  * @return never
  */
@@ -159,10 +153,10 @@ function exception_progresslrs(\Throwable $exception)
 
 /**
  * A warning handler for sifting data when many different exceptions for data errors may be thrown. 
- * @param mixed $errno
- * @param mixed $errstr
- * @param mixed $errfile
- * @param mixed $errline
+ * @param mixed $errno - The error number.
+ * @param mixed $errstr - The error message.
+ * @param mixed $errfile -  The file where the error occurred.
+ * @param mixed $errline - The line number where the error occurred.
  * @throws \mod_cmi5launch\local\nullException
  * @return never
  */
@@ -174,10 +168,10 @@ function sifting_data_warning($errno, $errstr, $errfile, $errline)
 
 /**
  * An exception handler to use in catching parse issues. 
- * @param mixed $errno
- * @param mixed $errstr
- * @param mixed $errfile
- * @param mixed $errline
+ * @param mixed $errno - The error number.
+ * @param mixed $errstr - The error message.
+ * @param mixed $errfile -  The file where the error occurred.
+ * @param mixed $errline - The line number where the error occurred.
  * @throws \mod_cmi5launch\local\nullException
  * @return never
  */
@@ -187,11 +181,11 @@ function sifting_data_warning($errno, $errstr, $errfile, $errline)
     }
 
 /**
- * An grade error handler. 
- * @param mixed $errno
- * @param mixed $errstr
- * @param mixed $errfile
- * @param mixed $errline
+ * An warning handler to use in catching parse issues. 
+ * @param mixed $errno - The error number.
+ * @param mixed $errstr - The error message.
+ * @param mixed $errfile -  The file where the error occurred.
+ * @param mixed $errline - The line number where the error occurred.
  * @throws \mod_cmi5launch\local\nullException
  * @return never
  */
@@ -232,7 +226,7 @@ class nullException extends \Exception
 }
 
 /**
-* Define a custom exception class, this will make pour tests meaningful
+* Define a custom exception class, this will make our tests meaningful
 * from php webpage: "Custom exception classes can allow you to write tests that prove your exceptions
 * are meaningful. Usually testing exceptions, you either assert the message equals
 * something in which case you can't change the message format without refactoring,
@@ -252,7 +246,7 @@ class playerException extends \Exception
     }
 
    
-    // custom string representation of object (what is returned with echo)
+    // Custom string representation of object (what is returned with echo)
     public function __toString(): string {
         return __CLASS__ . ": [{$this->code}]: {$this->message}\n";
         // maybe here?
@@ -265,7 +259,7 @@ class playerException extends \Exception
 }
 
 /**
-* Define a custom exception class, this will make pour tests meaningful
+* Define a custom exception class, this will make our tests meaningful
 * This is a catchall custom
 * from php webpage: "Custom exception classes can allow you to write tests that prove your exceptions
 * are meaningful. Usually testing exceptions, you either assert the message equals

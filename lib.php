@@ -100,7 +100,7 @@ function cmi5launch_supports($feature) {
  * of the new instance.
  *
  * @param object $cmi5launch An object from the form in mod_form.php
- * @param mod_cmi5launch_mod_form $mform
+ * @param mod_cmi5launch_mod_form $mform The form object.
  * @return int The id of the newly inserted cmi5launch record
  */
 function cmi5launch_add_instance(stdClass $cmi5launch, mod_cmi5launch_mod_form $mform = null) {
@@ -128,8 +128,8 @@ function cmi5launch_add_instance(stdClass $cmi5launch, mod_cmi5launch_mod_form $
  * (defined by the form in mod_form.php) this function
  * will update an existing instance with new data.
  *
- * @param object $cmi5launch An object from the form in mod_form.php
- * @param mod_cmi5launch_mod_form $mform
+ * @param object $cmi5launch An object from the form in mod_form.php.
+ * @param mod_cmi5launch_mod_form $mform  The form object.
  * @return boolean Success/Fail
  */
 function cmi5launch_update_instance(stdClass $cmi5launch, mod_cmi5launch_mod_form $mform = null) {
@@ -153,7 +153,7 @@ function cmi5launch_update_instance(stdClass $cmi5launch, mod_cmi5launch_mod_for
 
 
 
-
+// The below functions are blank. I assume they can be filled in to implement activity tracking. -MB
 /**
  * Prepares the recent activity data
  *
@@ -174,7 +174,16 @@ function cmi5launch_get_recent_mod_activity(&$activities, &$index, $timestart, $
 }
 
 /**
- * Prints single activity item prepared by {@see cmi5launch_get_recent_mod_activity()}
+ * Prints a single recent activity item.
+ *
+ * This callback function is used by the recent activity report to render
+ * each activity prepared by cmi5launch_get_recent_mod_activity().
+ *
+ * @param object $activity The activity object prepared earlier.
+ * @param int $courseid The course ID.
+ * @param bool $detail Whether to show more detailed information.
+ * @param array $modnames Array of module names.
+ * @param bool $viewfullnames Whether to show full names of users.
  * @return void
  */
 function cmi5launch_print_recent_mod_activity($activity, $courseid, $detail, $modnames, $viewfullnames) {
@@ -312,8 +321,8 @@ function cmi5launch_extend_navigation(navigation_node $navref, stdclass $course,
  * This function is called when the context for the page is a cmi5launch module. This is not called by AJAX
  * so it is safe to rely on the $PAGE.
  *
- * @param settings_navigation $settingsnav {@link settings_navigation}
- * @param navigation_node $cmi5launchnode {@link navigation_node}
+ * @param settings_navigation $settingsnav 
+ * @param navigation_node $cmi5launchnode 
  */
 function cmi5launch_extend_settings_navigation(settings_navigation $settingsnav, navigation_node $cmi5launchnode = null) {
 }
@@ -589,20 +598,20 @@ function cmi5launch_find_au_satisfied($auinfoin, $aulmsid) {
 }
 
 /**
- * Fetches Statements from the LRS. This is used for completion tracking -
+ * Fetches statements from the LRS. This is used for completion tracking—
  * we check for a statement matching certain criteria for each learner.
  *
  * @package  mod_cmi5launch
  * @category cmi5
  * @param string $url LRS endpoint URL
- * @param string $basiclogin login/key for the LRS
- * @param string $basicpass pass/secret for the LRS
- * @param string $version version of xAPI to use
- * @param string $activityid Activity Id to filter by
- * @param cmi5 Agent $agent Agent to filter by
- * @param string $verb Verb Id to filter by
- * @param string $since Since date to filter by
- * @return cmi5 LRS Response
+ * @param string $basiclogin Login/key for the LRS
+ * @param string $basicpass Password/secret for the LRS
+ * @param string $version xAPI version to use
+ * @param string $activityid Activity ID to filter by
+ * @param \cmi5\Agent $agent Agent to filter by
+ * @param string $verb Verb ID to filter by
+ * @param string|null $since Since date to filter by (optional)
+ * @return \cmi5\LRSResponse Response from the LRS
  */
 function cmi5launch_get_statements($url, $basiclogin, $basicpass, $version, $activityid, $agent, $verb, $since = null) {
 
@@ -730,9 +739,8 @@ function cmi5launch_settings($instance) {
  * Return grade for given user or all users.
  *
  * @global stdClass
- * @global object
- * @param int $cmi5id id of scorm
- * @param int $userid optional user id, 0 means all users
+ * @param object $cmi5launch. Cmi5 mod instance object.
+ * @param int $userid optional user id, 0 means all users.
  * @return array array of grades, false if none
  */
 function cmi5launch_get_user_grades($cmi5launch, $userid=0) {
@@ -786,16 +794,16 @@ function cmi5launch_get_user_grades($cmi5launch, $userid=0) {
 
 /**
  * Update grades in central gradebook.
+ * This function is called automatically by moodle if it needs the users grades updated.
+ * It can also be called manually when you want to push a new grade to gradebook.
+ * This function should do whatever is needed to generate the relevant grades to push into gradebook
+ * then call 'myplugin_grade_item_update with the grades to write.
+ * 
  * @category grade
  * @param object $cmi5launch - mod object
  * @param int $userid - A user ID or 0 for all users.
  * @param bool $nullifnone - If true and a single user is specified with no grade, a grade item with a null rawgrade is inserted.
  */
-// This function is called automatically by moodle if it needs the users grades updated.
-// It can also be called manually when you want to push a new grade to gradebook.
-// This function should do whatever is needed to generate the relevant grades to push into gradebook
-// then call 'myplugin_grade_item_update with the grades to write.
-
 function cmi5launch_update_grades($cmi5launch, $userid = 0, $nullifnone = true) {
 
     global $CFG, $DB;
@@ -838,17 +846,18 @@ function cmi5launch_update_grades($cmi5launch, $userid = 0, $nullifnone = true) 
 /**
  * Update/create grade item for given cmi5 activity.
  * Calls grade_update from moodle gradelib.php
+ * This is the only place that grade_update should be called.
+ * And this function should be called from cmi5launch_add_instance, cmi5launch_update_instance and cmi5launch_update_grades.
+ * It should look at settings in the activity $activitydbrecord to determine grading type, max and min
+ * values, etc. Then setup gradeinfo to pass to grade_update, it should also pass on the optional grades value.
+ * $gradeinfo is an array containing: ['itemname' => $activityname, 'idnumber' => $activityidnumber,
+ * 'gradetype' => GRADE_TYPE_VALUE, 'grademax' => 100, 'grademin' => 0].
  * @category grade
  * @param object $cmi5launch - mod object
  * @param mixed $grades optional array/object of grade(s); 'reset' means reset grades in gradebook
  * @return object grade_item
  */
-// This is the only place that grade_update should be called.
-// And this function should be called from cmi5launch_add_instance, cmi5launch_update_instance and cmi5launch_update_grades.
-// It should look at settings in the activity $activitydbrecord to determine grading type, max and min
-// values, etc. Then setup gradeinfo to pass to grade_update, it should also pass on the optional grades value.
-// $gradeinfo is an array containing: ['itemname' => $activityname, 'idnumber' => $activityidnumber,
-// 'gradetype' => GRADE_TYPE_VALUE, 'grademax' => 100, 'grademin' => 0].
+
 function cmi5launch_grade_item_update($cmi5launch, $grades = null) {
 
     global $CFG, $DB, $USER, $cmi5launchsettings;
@@ -928,12 +937,9 @@ function cmi5launch_grade_item_update($cmi5launch, $grades = null) {
 
     /**
      * Wrapper function to allow for testing where file_get_contents cannot be overriden.
-     * Also has create_stream as this makes a resource which interfers with testing.
-     * @param mixed $url - the url to be sent to 
-     * @param mixed $use_include_path
-     * @param mixed $context - the data to be sent
-     * @param mixed $offset
-     * @param mixed $maxlen
+     * Also has stream_context_create as this makes a resource which interfers with testing.
+     * @param array $option - The headers and other info to send to the url.
+     * @param string $url - The url to send the data to.
      * @return mixed $result - either a string or false.
      */
     function cmi5launch_stream_and_send($options, $url)
@@ -949,24 +955,25 @@ function cmi5launch_grade_item_update($cmi5launch, $grades = null) {
         // Return result.
         return $result;
     }
-  /**
- * Deletes an instance of the cmi5launch module.
- *
- * @param int $id The ID of the module instance.
- * @return bool True on success.
- */
-function cmi5launch_delete_instance($id) {
-    global $DB;
 
-    if (!$cmi5launch = $DB->get_record('cmi5launch', ['id' => $id])) {
-        return false;
+    /**
+     * Deletes an instance of the cmi5launch module.
+     *
+     * @param int $id The ID of the module instance.
+     * @return bool True on success.
+     */
+    function cmi5launch_delete_instance($id) {
+        global $DB;
+
+        if (!$cmi5launch = $DB->get_record('cmi5launch', ['id' => $id])) {
+            return false;
+        }
+
+        // Delete related records.
+        $DB->delete_records('cmi5launch_usercourse', ['moodlecourseid' => $id]);
+        $DB->delete_records('cmi5launch_aus', ['moodlecourseid' => $id]);
+        $DB->delete_records('cmi5launch_sessions', ['moodlecourseid' => $id]);
+        $DB->delete_records('cmi5launch', ['id' => $id]);
+
+        return true;
     }
-
-    // Delete related records.
-    $DB->delete_records('cmi5launch_usercourse', ['moodlecourseid' => $id]);
-    $DB->delete_records('cmi5launch_aus', ['moodlecourseid' => $id]);
-    $DB->delete_records('cmi5launch_sessions', ['moodlecourseid' => $id]);
-    $DB->delete_records('cmi5launch', ['id' => $id]);
-
-    return true;
-}
