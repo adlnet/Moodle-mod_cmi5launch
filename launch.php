@@ -20,6 +20,7 @@
  * @copyright  2023 Megan Bohland
  * @copyright  Based on work by 2013 Andrew Downes
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package mod_cmi5launch
  */
 
 use mod_cmi5launch\local\cmi5_connectors;
@@ -63,7 +64,7 @@ $retrieveaus = $auhelper->get_cmi5launch_retrieve_aus_from_db();
 $id = required_param('launchform_registration', PARAM_TEXT);
 
 // Reload cmi5 instance.
-$record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
+$record = $DB->get_record('cmi5launch', ['id' => $cmi5launch->id]);
 
 // Retrieve user's course record.
 $userscourse = $DB->get_record('cmi5launch_usercourse', ['courseid'  => $record->courseid, 'userid'  => $USER->id]);
@@ -75,7 +76,7 @@ $location = "";
 // as json_decode not working, etc.
 // Set error and exception handler to catch and override the default PHP error messages, to make messages more user friendly.
 set_error_handler('mod_cmi5launch\local\custom_warning', E_WARNING);
-//set_exception_handler('mod_cmi5launch\local\customException');
+// set_exception_handler('mod_cmi5launch\local\customException');
 
 try {
     // Retrieve AUs.
@@ -88,15 +89,15 @@ try {
     $urldecoded = $cmi5launchretrieveurl($cmi5launch->id, $auindex);
 
     // Retrieve and store session id in the aus table.
-    
+
     $sessionid = intval($urldecoded['id']);
-    
+
     // Failsafe here to keep from null value.
     if ($sessionid == null) {
         // Restore default handlers.
         restore_exception_handler();
         restore_error_handler();
-    
+
         // Throw exception.
         throw new customException(get_string('cmi5launchsessionerror', 'cmi5launch') );
     }
@@ -108,7 +109,7 @@ try {
         $sessionlist[] = $sessionid;
     } else {
         // If it is null just start fresh.
-        $sessionlist = array();
+        $sessionlist = [];
         $sessionlist[] = $sessionid;
     }
 

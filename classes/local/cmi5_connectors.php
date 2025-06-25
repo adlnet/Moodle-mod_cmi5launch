@@ -19,6 +19,7 @@
  *
  * @copyright  2023 Megan Bohland
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package mod_cmi5launch
  */
 
  namespace mod_cmi5launch\local;
@@ -73,7 +74,7 @@ class cmi5_connectors {
     public function cmi5launch_create_course($id, $tenanttoken, $filename) {
 
         global $DB, $CFG;
-        
+
         $settings = cmi5launch_settings($id);
 
         // Build URL to import course to.
@@ -85,7 +86,7 @@ class cmi5_connectors {
         $databody = $filename->get_content();
 
         // Sends the stream to the specified URL.
-        $result = $this->cmi5launch_send_request_to_cmi5_player_post('cmi5launch_stream_and_send',$databody, $url, $filetype, $tenanttoken);
+        $result = $this->cmi5launch_send_request_to_cmi5_player_post('cmi5launch_stream_and_send', $databody, $url, $filetype, $tenanttoken);
 
         // Now this will never return false, it will throw an exception if it fails, so we can just return the result
         try {
@@ -95,7 +96,7 @@ class cmi5_connectors {
             if ($resulttest == true) {
                 // Return an array with course info.
                 return $result;
-                
+
             } else {
                 // This should never be false, it should throw an exception if it is, so we can just return the result
                 // But catch all else that miht go wrong
@@ -105,7 +106,7 @@ class cmi5_connectors {
         catch (\Throwable $e){
             throw new playerException(get_string('cmi5launchcourseerror', 'cmi5launch'). $e);
         }
-        
+
     }
 
     /**
@@ -128,8 +129,8 @@ class cmi5_connectors {
         $url = $playerurl . CMI5LAUNCH_PLAYER_TENANT_URL;
 
         // The body of the request must be made as array first.
-        $data = array(
-            'code' => $newtenantname);
+        $data = [
+            'code' => $newtenantname];
 
         // To determine the headers.
         $filetype = "json";
@@ -146,18 +147,18 @@ class cmi5_connectors {
         // Now this will never return false, it will throw an exception if it fails, so we can just return the result
         try {
             if ($resulttest == true) {
-            
+
                 return $result;
             } else {
-              
+
                 throw new playerException(get_string('cmi5launchtenanterror', 'cmi5launch'));
             }
         } // Catch all else that might go wrong
         catch (\Throwable $e){
-         
+
             throw new playerException(get_string('cmi5launchtenantuncaughterror', 'cmi5launch') . $e);
         }
-    
+
     }
 
     /**
@@ -166,7 +167,7 @@ class cmi5_connectors {
      * Registration  is "code" in returned json body.
      * @param $registration - registration UUID
      * @param $id - cmi5 launch id
-     *  @return bool|string - Response from cmi5 player.
+     * @return bool|string - Response from cmi5 player.
      * @throws playerException - If the request fails or returns an error.
      */
     public function cmi5launch_retrieve_registration_with_get($registration, $id) {
@@ -186,18 +187,18 @@ class cmi5_connectors {
 
         // Check result and display message if not 200.
         $resulttest = $this->cmi5launch_connectors_error_message($result, get_string('cmi5launchregistrationerror', 'cmi5launch'));
-       
+
         // Now this will never return false, it will throw an exception if it fails, so we can just return the result
         try {
             if ($resulttest == true) {
                 return $result;
             } else {
-               
+
                 throw new playerException(get_string('cmi5launchregistrationinfoerror', 'cmi5launch'));
             }
         }// catch all else that might go wrong
         catch (\Throwable $e){
-       
+
             throw new playerException( get_string('cmi5launchregistrationuncaughterror', 'cmi5launch'). $e);
         }
 
@@ -213,7 +214,7 @@ class cmi5_connectors {
      * @return string - The registration code from the CMI5 player.
      * @throws playerException - If the request fails or returns an error.
      */
-    public function 
+    public function
     cmi5launch_retrieve_registration_with_post($courseid, $id) {
 
         global $USER;
@@ -230,16 +231,16 @@ class cmi5_connectors {
         $url = $playerurl . CMI5LAUNCH_PLAYER_REGISTRATION_URL;
 
         // The body of the request must be made as array first.
-        $data = array(
+        $data = [
             'courseId' => $courseid,
-            'actor' => array(
+            'actor' => [
                 'objectType' => 'Agent',
-                'account' => array(
+                'account' => [
                     "homePage" => $homepage,
                     "name" => $actor,
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
 
         // Data needs to be JSON encoded.
         $data = json_encode($data);
@@ -255,7 +256,7 @@ class cmi5_connectors {
         // Now this will never return false, it will throw an exception if it fails, so we can just return the result
         try {
             if ($resulttest == true) {
-                    
+
                 $registrationinfo = json_decode($result, true);
 
                 // The returned 'registration info' is a large json object.
@@ -268,7 +269,7 @@ class cmi5_connectors {
             }
         }// Catch all else that might go wrong.
         catch (\Throwable $e){
-       
+
             throw new playerException(get_string('cmi5launchregistrationuncaughterror', 'cmi5launch'). $e);
         }
 
@@ -278,7 +279,7 @@ class cmi5_connectors {
      * Function to retrieve a token from cmi5 player.
      * @param $audience - the name the of the audience using the token.
      * @param #tenantid - the id of the tenant.
-     *  @return string - The token from the CMI5 player.
+     * @return string - The token from the CMI5 player.
      * @throws playerException - If the request fails or returns an error.
      */
     public function cmi5launch_retrieve_token($audience, $tenantid) {
@@ -287,7 +288,7 @@ class cmi5_connectors {
 
         $settings = cmi5launch_settings($cmi5launchid);
 
-        //$actor = $USER->username;
+        // $actor = $USER->username;
         $username = $settings['cmi5launchbasicname'];
         $playerurl = $settings['cmi5launchplayerurl'];
         $password = $settings['cmi5launchbasepass'];
@@ -296,10 +297,10 @@ class cmi5_connectors {
         $url = $playerurl . CMI5LAUNCH_PLAYER_AUTH_URL;
 
         // The body of the request must be made as array first.
-        $data = array(
+        $data = [
             'tenantId' => $tenantid,
             'audience' => $audience,
-        );
+        ];
         $filetype = "json";
 
         // Data needs to be JSON encoded.
@@ -314,10 +315,10 @@ class cmi5_connectors {
         // Now this will never return false, it will throw an exception if it fails, so we can just return the result
         try {
             if ($resulttest == true) {
-            
-                $resultDecoded = json_decode($result, true);
-                $token = $resultDecoded['token'];
-                
+
+                $resultdecoded = json_decode($result, true);
+                $token = $resultdecoded['token'];
+
                 return $token;
 
             } else {
@@ -333,7 +334,7 @@ class cmi5_connectors {
      * Function to retrieve a launch URL for an AU.
      * @param $id - courses's ID in MOODLE to retrieve corect record.
      * @param $auindex -AU's index to send in the request for launch url.
-     *  @return array - The launch URL and other info from the CMI5 player.
+     * @return array - The launch URL and other info from the CMI5 player.
      * @throws playerException - If the request fails or returns an error.
      */
     public function cmi5launch_retrieve_url($id, $auindex) {
@@ -341,7 +342,7 @@ class cmi5_connectors {
         global $DB, $USER;
 
         // Retrieve actor record, this enables correct actor info for URL storage.
-        $record = $DB->get_record("cmi5launch", array('id' => $id));
+        $record = $DB->get_record("cmi5launch", ['id' => $id]);
 
         $settings = cmi5launch_settings($id);
 
@@ -356,23 +357,21 @@ class cmi5_connectors {
         $playerurl = $settings['cmi5launchplayerurl'];
         $courseid = $userscourse->courseid;
 
-    
         // Build URL for launch URL request.
         $url = $playerurl . CMI5LAUNCH_PLAYER_COURSE_URL . "/" . $courseid  . CMI5LAUNCH_LAUNCH_URL . $auindex;
 
-        $data = array(
-            'actor' => array(
+        $data = [
+            'actor' => [
                 'objectType' => 'Agent',
-                'account' => array(
+                'account' => [
                     "homePage" => $homepage,
                     "name" => $actor,
-                ),
-            ),
+                ],
+            ],
             'returnUrl' => $returnurl,
             'reg' => $registrationid,
-        );
+        ];
 
-        
         // To determine the headers.
         $filetype = "json";
 
@@ -386,32 +385,32 @@ class cmi5_connectors {
 
         // Now this will never return false, it will throw an exception if it fails, so we can just return the result
         try {
-        if ($resulttest == true) {
-            // Only return the URL.
-            $urldecoded = json_decode($result, true);
+            if ($resulttest == true) {
+                // Only return the URL.
+                $urldecoded = json_decode($result, true);
 
-            return $urldecoded;
-        } else {
-            throw new playerException(get_string('cmi5launchurlerror', 'cmi5launch'));
+                return $urldecoded;
+            } else {
+                throw new playerException(get_string('cmi5launchurlerror', 'cmi5launch'));
+            }
+        }// Catch all else that might go wrong.
+        catch (\Throwable $e){
+            throw new playerException(get_string('cmi5launchurluncaughterror', 'cmi5launch') . $e);
         }
-    }// Catch all else that might go wrong.
-    catch (\Throwable $e){
-        throw new playerException(get_string('cmi5launchurluncaughterror', 'cmi5launch') . $e);
-    }
 
     }
 
     /**
      * Function to construct, send an URL, and save result as POST message to player.
-     *  @param $cmi5launch_stream_and_send - the function that will be used to send the request.
+     * @param $cmi5launch_stream_and_send - the function that will be used to send the request.
      * @param $databody - the data that will be used to construct the body of request as JSON.
      * @param $url - The URL the request will be sent to.
      * @param $filetype - The type of file being sent, either zip or json.
      * @param ...$tokenorpassword is a variable length param. If one is passed, it is $token, if two it is $username and $password.
      * @return mixed - $result is the response from cmi5 player.
-     *  @throws playerException - If the request fails or returns an error.
+     * @throws playerException - If the request fails or returns an error.
      */
-    public function cmi5launch_send_request_to_cmi5_player_post($cmi5launch_stream_and_send, $databody, $url, $filetype, ...$tokenorpassword) {
+    public function cmi5launch_send_request_to_cmi5_player_post($cmi5launchstreamandsend, $databody, $url, $filetype, ...$tokenorpassword) {
 
          // Set error and exception handler to catch and override the default PHP error messages, to make messages more user friendly.
          set_error_handler('mod_cmi5launch\local\sifting_data_warning', E_WARNING);
@@ -420,7 +419,7 @@ class cmi5_connectors {
         try {
             // I think this whole thing should be try catch cause there are several things that can go wrong.
             // Assign passed in function to variable.
-            $stream = $cmi5launch_stream_and_send;
+            $stream = $cmi5launchstreamandsend;
             // Determine content type to be used in header.
             // It is also the same as accepted type.
             $contenttype = $filetype;
@@ -439,22 +438,21 @@ class cmi5_connectors {
                 // Use key 'http' even if you send the request to https://...
                 // There can be multiple headers but as an array under the ONE header.
                 // Content(body) must be JSON encoded here, as that is what CMI5 player accepts.
-                $options = array(
-                    'http' => array(
+                $options = [
+                    'http' => [
                         'method' => 'POST',
-                        'header' => array(
+                        'header' => [
                             'Authorization: Basic ' . base64_encode("$username:$password"),
                             "Content-Type: " . $contenttype .
-                            "Accept: " . $contenttype
-                        ),
+                            "Accept: " . $contenttype,
+                        ],
                         'content' => ($databody),
-                    ),
-                );
+                    ],
+                ];
 
-                //By calling the function this way, it enables encapsulation of the function and allows for testing.
-                //It is an extra step, but necessary for required PHP Unit testing.
+                // By calling the function this way, it enables encapsulation of the function and allows for testing.
+                // It is an extra step, but necessary for required PHP Unit testing.
                 $result = call_user_func($stream, $options, $url);
-
 
                 // Else the args are what we need for posting a course.
             } else {
@@ -466,22 +464,21 @@ class cmi5_connectors {
                 // There can be multiple headers but as an array under the ONE header
                 // content(body) must be JSON encoded here, as that is what CMI5 player accepts
                 // JSON_UNESCAPED_SLASHES used so http addresses are displayed correctly.
-                $options = array(
-                    'http' => array(
+                $options = [
+                    'http' => [
                         'method' => 'POST',
                         'ignore_errors' => true,
-                        'header' => array(
+                        'header' => [
                             "Authorization: Bearer " . $token,
                             "Content-Type: " . $contenttype .
-                            "Accept: " . $contenttype
-                        ),
+                            "Accept: " . $contenttype,
+                        ],
                         'content' => ($databody),
-                    ),
-                );
+                    ],
+                ];
 
-
-                //By calling the function this way, it enables encapsulation of the function and allows for testing.
-                //It is an extra step, but necessary for required PHP Unit testing.
+                // By calling the function this way, it enables encapsulation of the function and allows for testing.
+                // It is an extra step, but necessary for required PHP Unit testing.
                 $result = call_user_func($stream, $options, $url);
             }
 
@@ -492,41 +489,40 @@ class cmi5_connectors {
             // Return response.
             return $result;
 
-        }catch(\Throwable $e) {  
-            
+        }catch(\Throwable $e) {
+
             // Restore default hadlers.
             restore_exception_handler();
             restore_error_handler();
-            //
-            throw new playerException( get_string('cmi5launchposterror', 'cmi5launch') .   $e);
+                        throw new playerException( get_string('cmi5launchposterror', 'cmi5launch') .   $e);
         }
-        
+
     }
 
     /**
      * Function to construct and send GET request to CMI5 player.
-     *  @param $cmi5launch_stream_and_send - the function that will be used to send the request.
+     * @param $cmi5launch_stream_and_send - the function that will be used to send the request.
      * @param $token - the token that will be used to authenticate the request.
      * @param $url - The URL the request will be sent to.
      * @return mixed - $sessionDecoded is the response from cmi5 player.
-     *  @throws playerException - If the request fails or returns an error.
+     * @throws playerException - If the request fails or returns an error.
      */
-    public function cmi5launch_send_request_to_cmi5_player_get($cmi5launch_stream_and_send, $token, $url) {
-        
-        $stream = $cmi5launch_stream_and_send;
+    public function cmi5launch_send_request_to_cmi5_player_get($cmi5launchstreamandsend, $token, $url) {
+
+        $stream = $cmi5launchstreamandsend;
         // Use key 'http' even if you send the request to https://...
         // There can be multiple headers but as an array under the ONE header
         // content(body) must be JSON encoded here, as that is what CMI5 player accepts
         // JSON_UNESCAPED_SLASHES used so http addresses are displayed correctly.
-        $options = array (
-            'http' => array (
+        $options = [
+            'http' => [
                 'method'  => 'GET',
                 'ignore_errors' => true,
-                'header' => array ("Authorization: Bearer ". $token,
+                'header' => ["Authorization: Bearer ". $token,
                     "Content-Type: application/json\r\n" .
-                    "Accept: application/json\r\n"),
-            ),
-        );
+                    "Accept: application/json\r\n"],
+            ],
+        ];
 
         try {
             // By calling the function this way, it enables encapsulation of the function and allows for testing.
@@ -567,7 +563,7 @@ class cmi5_connectors {
         $resulttest = $this->cmi5launch_connectors_error_message($result, get_string('cmi5launchsessioninfoerror', 'cmi5launch') );
 
            // Now this will never return false, it will throw an exception if it fails, so we can just return the result
-           try {
+        try {
             if ($resulttest == true) {
 
                 return $result;
@@ -577,7 +573,7 @@ class cmi5_connectors {
             }
         }// Catch all else that might go wrong
         catch (\Throwable $e){
-          
+
             throw new playerException( get_string("cmi5launchsessioninfouncaughterror", 'cmi5launch') . $e);
         }
     }
@@ -591,8 +587,8 @@ class cmi5_connectors {
      * @param string $type - The type missing to be added to the error message.
      * @return bool
      */
-    public  function cmi5launch_connectors_error_message($resulttotest, $type) {
-    
+    public function cmi5launch_connectors_error_message($resulttotest, $type) {
+
         // Decode result because if it is not 200 then something went wrong
         // If it's a string, decode it.
         if (is_string($resulttotest)) {
@@ -605,19 +601,17 @@ class cmi5_connectors {
         // Player cannot return an error if not running,
         if ($resulttest === false ){
 
-            $errormessage =  $type . get_string('cmi5launchcommerror', 'cmi5launch');
+            $errormessage = $type . get_string('cmi5launchcommerror', 'cmi5launch');
 
             throw new playerException($errormessage);
         }
         else if( array_key_exists("statusCode", $resulttest) && $resulttest["statusCode"] != 200) {
 
-       
-            $errormessage = $type . get_string('cmi5launchreturned', 'cmi5launch'). $resulttest["statusCode"] . get_string('cmi5launchwith', 'cmi5launch') . " '" 
-            . $resulttest["message"] . "'." ;
-
+            $errormessage = $type . get_string('cmi5launchreturned', 'cmi5launch'). $resulttest["statusCode"] . get_string('cmi5launchwith', 'cmi5launch') . " '"
+            . $resulttest["message"] . "'.";
 
             throw new playerException($errormessage);
-        
+
         } else {
               // No errors, continue.
             return true;

@@ -19,6 +19,7 @@
  * @copyright  2023 Megan Bohland
  * @copyright  Based on work by 2013 Andrew Downes
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package mod_cmi5launch
  */
 
 use mod_cmi5launch\local\session_helpers;
@@ -56,7 +57,7 @@ $event->trigger();
 */
 
 // Print the page header.
-$PAGE->set_url('/mod/cmi5launch/view.php', array('id' => $cm->id));
+$PAGE->set_url('/mod/cmi5launch/view.php', ['id' => $cm->id]);
 $PAGE->set_title(format_string($cmi5launch->name));
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($context);
@@ -119,10 +120,10 @@ cmi5launch_update_grades($cmi5launch, $USER->id);
 $au = $retrieveaus($auid);
 
 // Array to hold session scores for the AU.
-$sessionscores = array();
+$sessionscores = [];
 
 // Reload cmi5 instance.
-$record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
+$record = $DB->get_record('cmi5launch', ['id' => $cmi5launch->id]);
 
 // Reload user course instance.
 $userscourse = $DB->get_record('cmi5launch_usercourse', ['courseid'  => $record->courseid, 'userid'  => $USER->id]);
@@ -137,18 +138,18 @@ if (!$au->sessions == null) {
         set_exception_handler('mod_cmi5launch\local\custom_warningAU');
 
         // Array to hold info for table population.
-        $tabledata = array();
+        $tabledata = [];
 
         // Build table.
         $table = new html_table();
         $table->id = 'cmi5launch_auSessionTable';
         $table->caption = get_string('modulenameplural', 'cmi5launch');
-        $table->head = array(
+        $table->head = [
             get_string('cmi5launchviewfirstlaunched', 'cmi5launch'),
             get_string('cmi5launchviewlastlaunched', 'cmi5launch'),
             get_string('cmi5launchviewprogress', 'cmi5launch'),
             get_string('cmi5launchviewgradeheader', 'cmi5launch'),
-        );
+        ];
 
 
         // Retrieve session ids.
@@ -158,10 +159,10 @@ if (!$au->sessions == null) {
         foreach ($sessionids as $key => $sessionid) {
 
             // Get the session from DB with session id.
-            $session = $DB->get_record('cmi5launch_sessions', array('sessionid' => $sessionid));
+            $session = $DB->get_record('cmi5launch_sessions', ['sessionid' => $sessionid]);
 
             // Array to hold data for table.
-            $sessioninfo = array();
+            $sessioninfo = [];
 
             if ($session->createdat != null) {
 

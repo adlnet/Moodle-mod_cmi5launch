@@ -19,6 +19,7 @@
  *
  * @copyright  2023 Megan Bohland
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package mod_cmi5launch
  */
 
 
@@ -40,7 +41,7 @@ define('CMI5LAUNCH_REPORT_ATTEMPTS_STUDENTS_WITH_NO', 2);
 global $cmi5launch, $cmi5launchsettings, $USER, $DB;
 // Reload course information.
 $cm = get_coursemodule_from_id('cmi5launch', $id, 0, false, MUST_EXIST);
-$course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
+$course = $DB->get_record('course', ['id' => $cm->course], '*', MUST_EXIST);
 
 // Activity Module ID.
 $id = required_param('id', PARAM_INT);
@@ -145,7 +146,7 @@ if (empty($noheader)) {
         'hidecompletion' => true,
         'description' => '',
     ]);
-    $PAGE->navbar->add($strreport, new moodle_url('/mod/cmi5launch/report.php', array('id' => $cm->id)));
+    $PAGE->navbar->add($strreport, new moodle_url('/mod/cmi5launch/report.php', ['id' => $cm->id]));
 
     echo $OUTPUT->header();
 }
@@ -181,7 +182,7 @@ if (has_capability('mod/cmi5launch:viewgrades', $context)) {
     // If the user does not have the correct capability then we are looking at a specific user,
     // who is not a teacher and needs to see only their grades.
     // Retrieve that user from DB.
-    $user = $DB->get_record('user', array('id' => $USER->id));
+    $user = $DB->get_record('user', ['id' => $USER->id]);
 
     // Make sure their grades are up to date.
     $updategrades($user);
@@ -205,7 +206,7 @@ if (has_capability('mod/cmi5launch:viewgrades', $context)) {
 <?php
 
 // Reload cmi5 course instance.
-$record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
+$record = $DB->get_record('cmi5launch', ['id' => $cmi5launch->id]);
 
 // Retrieve AU ids for this course.
 $aus = json_decode($record->aus, true);
@@ -225,13 +226,13 @@ $reporttable->setup();
 foreach ($auschunked[0] as $au) {
 
     // Array to hold data for rows.
-    $rowdata = array();
+    $rowdata = [];
 
     // For each AU, iterate through each user.
     foreach ($users as $user) {
 
         // Array to hold info for next page, that will be placed into buttons for user to click.
-        $infofornextpage = array();
+        $infofornextpage = [];
 
         // Retrieve the current au id, this is always unique and will help with retrieving the
         // student grades. It is the uniquie id cmi5 spec id.
@@ -273,7 +274,7 @@ foreach ($auschunked[0] as $au) {
                 if (array_key_exists($aulmsid, $usergrades)) {
 
                     // If it is, we want it's info which should be title => grade(s).
-                    $auinfo = array();
+                    $auinfo = [];
                     $auinfo = $usergrades[$aulmsid];
                     $augrades = $auinfo[$currenttitle];
 
@@ -294,7 +295,7 @@ foreach ($auschunked[0] as $au) {
                     }
 
                     // Remove [] from userscore if they are there.
-                    $toremove = array("[", "]");
+                    $toremove = ["[", "]"];
                     if ($userscore != null && str_contains($userscore, "[")) {
                         $userscore = str_replace($toremove, "", $userscore);
                     }

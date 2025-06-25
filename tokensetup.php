@@ -19,6 +19,7 @@
  *
  * @copyright  2023 Megan Bohland
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package mod_cmi5launch
  */
 
 use mod_cmi5launch\local\cmi5_connectors;
@@ -61,25 +62,25 @@ if ($tenantname != null && $tenantid != null) {
     // Make the new token and grab results.
     $token = $gettoken($tenantname, $tenantid);
 
-// If the token is not false it should be what we need
+    // If the token is not false it should be what we need
     if ($token != false) {
-    
-        //Save it to the settings. 
+
+        // Save it to the settings.
         $tokenresult = set_config('cmi5launchtenanttoken', $token, $plugin = 'cmi5launch');
 
         if ($tokenresult == false) {
             echo (get_string('cmi5launchtokendbfailed', 'cmi5launch'));
             echo "<br>";
             echo (get_string('cmi5launchtokensavefailed', 'cmi5launch') . $tokenresult . "<br>");
-            
+
             // If fail we freeze and alert user with a window with error message.
             echo $link;
         }else {
-        // Assuming the tokenresult is not false, it was saved correctly and we cango back to setting pae.
-        // If result is true then redirect back to settings page.
-        $settingurl = new moodle_url($CFG->wwwroot . '/' . 'admin/settings.php', array('section' => 'modsettingcmi5launch'));
-                
-        redirect($settingurl, get_string('cmi5launchtokencreatedsuccess', 'cmi5launch'), 10);
+            // Assuming the tokenresult is not false, it was saved correctly and we cango back to setting pae.
+            // If result is true then redirect back to settings page.
+            $settingurl = new moodle_url($CFG->wwwroot . '/' . 'admin/settings.php', ['section' => 'modsettingcmi5launch']);
+
+            redirect($settingurl, get_string('cmi5launchtokencreatedsuccess', 'cmi5launch'), 10);
         }
     }
     else {
@@ -87,16 +88,16 @@ if ($tenantname != null && $tenantid != null) {
         echo (get_string('cmi5launchtokendbretrievefailed', 'cmi5launch'));
         echo "<br>";
         echo ( get_string('cmi5launchtokenretrievefailed', 'cmi5launch') . $tokenresult . "<br>");
-        
+
             // If fail we freeze and alert user with a window with error message.
             echo $link;
     }
 
 } else {
-    
+
     // If there is no tenant name then alert user, when they click to clear take them back to settings page.
     echo (get_string('cmi5launchtokennonameid', 'cmi5launch'));
- 
+
     echo $link;
 
 }
@@ -104,7 +105,7 @@ if ($tenantname != null && $tenantid != null) {
 
 // When you want to output html use the moodle core output rendereer: often overridden in theme
 echo $OUTPUT->header();
- 
+
 // We want to display a form.
 $mform = new setup_token();
 echo $OUTPUT->footer();

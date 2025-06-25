@@ -1,4 +1,19 @@
 <?php
+// This file is part of Moodle - https://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+
 namespace cmi5Test;
 
 use mod_cmi5launch\local\nullException;
@@ -12,131 +27,130 @@ use mod_cmi5launch\local\session;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
  * @covers \au
+ * @package mod_cmi5launch
  */
-class sessionTest extends TestCase
-{
+class sessionTest extends TestCase {
+
     private $sessionproperties, $emptystatement, $mockstatementvalues;
 
-    protected function setUp(): void
-    {
+    protected function setUp(): void {
         // All the properties in an AU object.
-        $this->sessionproperties = array(
+        $this->sessionproperties = [
             'id',
             'tenantname',
-            'tenantId', 
-            'registrationsCoursesAusId', 
+            'tenantId',
+            'registrationsCoursesAusId',
             'lmsid',
             'progress',
-            'aulaunchurl', 
-            'launchurl', 
+            'aulaunchurl',
+            'launchurl',
             'grade',
-            'createdAt', 
-            'updatedAt', 
+            'createdAt',
+            'updatedAt',
             'registrationCourseAusId',
-            'code', 
-            'lastRequestTime', 
-            'launchTokenId', 
-            'launchMode', 
+            'code',
+            'lastRequestTime',
+            'launchTokenId',
+            'launchMode',
             'masteryScore',
-            'isLaunched', 
-            'isInitialized', 
-            'initializedAt', 
+            'isLaunched',
+            'isInitialized',
+            'initializedAt',
             'isCompleted',
-            'isPassed', 
-            'isFailed', 
-            'isTerminated', 
-            'isAbandoned', 
-            'courseid', 
-            'completed', 
+            'isPassed',
+            'isFailed',
+            'isTerminated',
+            'isAbandoned',
+            'courseid',
+            'completed',
             'passed',
             'inprogress',
-            'sessionid', 
-            'userid', 
-            'registrationscoursesausid', 
-            'createdat', 
-            'updatedat', 
-            'launchtokenid', 
-            'lastrequesttime', 
-            'launchmode',   
-            'masteryscore', 
+            'sessionid',
+            'userid',
+            'registrationscoursesausid',
+            'createdat',
+            'updatedat',
+            'launchtokenid',
+            'lastrequesttime',
+            'launchmode',
+            'masteryscore',
             'tenantid',
-            'score', 
-            'response', 
-            'islaunched', 
-            'isinitialized', 
-            'initializedat', 
-            'duration', 
-            'iscompleted', 
-            'ispassed', 
-            'isfailed', 
-            'isterminated', 
-            'isabandoned', 
-            'launchmethod', 
-            'moodlecourseid' 
-        );
+            'score',
+            'response',
+            'islaunched',
+            'isinitialized',
+            'initializedat',
+            'duration',
+            'iscompleted',
+            'ispassed',
+            'isfailed',
+            'isterminated',
+            'isabandoned',
+            'launchmethod',
+            'moodlecourseid',
+        ];
 
-        $this->emptystatement = array();
+        $this->emptystatement = [];
 
         // A good test would be to test the constructor with a statement that has all the properties set.
-        $this->mockstatementvalues = array(
+        $this->mockstatementvalues = [
             'id' => 'id',
             'tenantname' => 'tenantname',
-            'tenantId' => 'tenantId', 
-            'registrationsCoursesAusId' => 'registrationsCoursesAusId', 
+            'tenantId' => 'tenantId',
+            'registrationsCoursesAusId' => 'registrationsCoursesAusId',
             'lmsid' => 'lmsid',
             'progress' => 'progress',
-            'aulaunchurl' => 'aulaunchurl', 
-            'launchurl' => 'launchurl', 
+            'aulaunchurl' => 'aulaunchurl',
+            'launchurl' => 'launchurl',
             'grade' => 'grade',
-            'createdAt' => 'createdAt', 
-            'updatedAt' => 'updatedAt', 
+            'createdAt' => 'createdAt',
+            'updatedAt' => 'updatedAt',
             'registrationCourseAusId' => 'registrationCourseAusId',
-            'code' => 'code', 
-            'lastRequestTime' => 'lastRequestTime', 
-            'launchTokenId' => 'launchTokenId', 
-            'launchMode' => 'launchMode', 
+            'code' => 'code',
+            'lastRequestTime' => 'lastRequestTime',
+            'launchTokenId' => 'launchTokenId',
+            'launchMode' => 'launchMode',
             'masteryScore' => 'masteryScore',
-            'isLaunched' => 'isLaunched', 
-            'isInitialized' => 'isInitialized', 
-            'initializedAt' => 'initializedAt', 
+            'isLaunched' => 'isLaunched',
+            'isInitialized' => 'isInitialized',
+            'initializedAt' => 'initializedAt',
             'isCompleted' => 'isCompleted',
-            'isPassed' => 'isPassed', 
-            'isFailed' => 'isFailed', 
-            'isTerminated' => 'isTerminated', 
-            'isAbandoned' => 'isAbandoned', 
-            'courseid' => 'courseid', 
-            'completed'=> 'completed', 
+            'isPassed' => 'isPassed',
+            'isFailed' => 'isFailed',
+            'isTerminated' => 'isTerminated',
+            'isAbandoned' => 'isAbandoned',
+            'courseid' => 'courseid',
+            'completed' => 'completed',
             'passed' => 'passed',
             'inprogress' => 'inprogress',
-            'sessionid' => 'sessionid', 
-            'userid' => 'userid', 
-            'registrationscoursesausid' => 'registrationscoursesausid', 
-            'createdat' => 'createdat', 
-            'updatedat'=> 'updatedat', 
-            'launchtokenid' => 'launchtokenid', 
-            'lastrequesttime'=> 'lastrequesttime', 
-            'launchmode'=> 'launchmode', 
-            'masteryscore' => 'masteryscore', 
+            'sessionid' => 'sessionid',
+            'userid' => 'userid',
+            'registrationscoursesausid' => 'registrationscoursesausid',
+            'createdat' => 'createdat',
+            'updatedat' => 'updatedat',
+            'launchtokenid' => 'launchtokenid',
+            'lastrequesttime' => 'lastrequesttime',
+            'launchmode' => 'launchmode',
+            'masteryscore' => 'masteryscore',
             'tenantid' => 'tenantid',
-            'score' => 'score', 
-            'response' => 'response', 
-            'islaunched' => 'islaunched', 
-            'isinitialized' => 'isinitialized', 
-            'initializedat' => 'initializedat', 
-            'duration' => 'duration', 
-            'iscompleted' => 'iscompleted', 
-            'ispassed' => 'ispassed', 
-            'isfailed' => 'isfailed', 
-            'isterminated' => 'isterminated', 
-            'isabandoned' => 'isabandoned', 
-            'launchmethod' => 'launchmethod', 
-            'moodlecourseid' => 'moodlecourseid' 
-        );
+            'score' => 'score',
+            'response' => 'response',
+            'islaunched' => 'islaunched',
+            'isinitialized' => 'isinitialized',
+            'initializedat' => 'initializedat',
+            'duration' => 'duration',
+            'iscompleted' => 'iscompleted',
+            'ispassed' => 'ispassed',
+            'isfailed' => 'isfailed',
+            'isterminated' => 'isterminated',
+            'isabandoned' => 'isabandoned',
+            'launchmethod' => 'launchmethod',
+            'moodlecourseid' => 'moodlecourseid',
+        ];
 
     }
 
-    protected function tearDown(): void
-    {
+    protected function tearDown(): void {
 
     }
 
@@ -145,8 +159,7 @@ class sessionTest extends TestCase
      * Should instantiate an session object with no values.
      * @return void
      */
-    public function testInstantiationWithEmpty()
-    {
+    public function testinstantiationwithempty() {
         // Make an session object with no values.
         $obj = new session($this->emptystatement);
 
@@ -155,22 +168,22 @@ class sessionTest extends TestCase
 
         // It is saying session is not transversable. Implementing traversable in session is breaking the code, typecast the object as array for dirty fix.
         // Make sure the session object does not have any 'extra' properties, only the amount passed in
-        $expectedAmount = count($this->sessionproperties);
-        $sessionArray = (array) $obj;
-        $this->assertCount($expectedAmount, $sessionArray, "Session has $expectedAmount properties");
+        $expectedamount = count($this->sessionproperties);
+        $sessionarray = (array) $obj;
+        $this->assertCount($expectedamount, $sessionarray, "Session has $expectedamount properties");
 
-        //Properties exists and are empty
-        foreach ($sessionArray as $property => $value) {
+        // Properties exists and are empty
+        foreach ($sessionarray as $property => $value) {
 
             // If value is 'progress' it's an array not null.
             if ($property == 'progress') {
-             
-                $this->assertArrayHasKey($property, $sessionArray, "$property exists");
+
+                $this->assertArrayHasKey($property, $sessionarray, "$property exists");
                 $this->assertIsArray($value, "$property empty");
-            
+
             }else{
-            
-                $this->assertArrayHasKey($property, $sessionArray, "$property exists");
+
+                $this->assertArrayHasKey($property, $sessionarray, "$property exists");
                 $this->assertNull($value, "$property empty");
             }
         }
@@ -181,23 +194,22 @@ class sessionTest extends TestCase
      * Should instantiate a session object with values.
      * @return void
      */
-    public function testInstantiationWithValues()
-    {
+    public function testinstantiationwithvalues() {
         $obj = new session($this->mockstatementvalues);
 
         // Assert it's an AU object?
         $this->assertInstanceOf(session::class, $obj);
-     
+
         // It is saying AU is not transversable. Implementing traversable in AU is breaking the code, typecast the object as array for dirty fix.
         // Make sure the AU object does not have any 'extra' properties, only the amount passed in
-        $expectedAmount = count($this->sessionproperties);
-        $sessionArray = (array) $obj;
-        $this->assertCount($expectedAmount, $sessionArray, "Serssion has $expectedAmount properties");
+        $expectedamount = count($this->sessionproperties);
+        $sessionarray = (array) $obj;
+        $this->assertCount($expectedamount, $sessionarray, "Serssion has $expectedamount properties");
 
-        //Properties exists and are correct (value should equal name of property)
-        foreach ($sessionArray as $property => $value) {
+        // Properties exists and are correct (value should equal name of property)
+        foreach ($sessionarray as $property => $value) {
 
-            $this->assertArrayHasKey($property, $sessionArray, "$property exists");
+            $this->assertArrayHasKey($property, $sessionarray, "$property exists");
             $this->assertEquals($property, $value, "$value does not equal $property");
         }
     }
@@ -206,8 +218,7 @@ class sessionTest extends TestCase
      * Test of session constructor class exceptions. This one tests if statement is null.
      * @return void
      */
-    public function testInstantiation_except_null()
-    {
+    public function testinstantiation_except_null() {
         // Null statement to send and trigger exception.
         $nullstatement = null;
 
@@ -215,7 +226,7 @@ class sessionTest extends TestCase
           // Catch the exception.
           $this->expectException(nullException::class);
           $this->expectExceptionMessage("Statement to build session is null or not an array/object." );
-      
+
         $obj = new session($nullstatement);
 
     }
@@ -224,18 +235,17 @@ class sessionTest extends TestCase
      * Test of AU constructor class exceptions. This one tests if statement passed in is not an array.
      * @return void
      */
-    public function testInstantiation_except_nonarray()
-    {
+    public function testinstantiation_except_nonarray() {
         // Null statement to send and trigger exception.
         $nullstatement = "string";
 
           // Catch the exception.
           $this->expectException(nullException::class);
           $this->expectExceptionMessage("Statement to build session is null or not an array/object." );
-      
+
         $obj = new session($nullstatement);
 
     }
 
-    
+
 }

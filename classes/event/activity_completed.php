@@ -76,7 +76,7 @@ class activity_completed extends \core\event\base {
     public function get_url() {
         return new \moodle_url(
             '/mod/cmi5launch/launch.php',
-            array('id' => $this->contextinstanceid, 'activityid' => $this->objectid)
+            ['id' => $this->contextinstanceid, 'activityid' => $this->objectid]
         );
     }
 
@@ -86,8 +86,8 @@ class activity_completed extends \core\event\base {
      * @return array of parameters to be passed to legacy add_to_log() function.
      */
     protected function get_legacy_logdata() {
-        return array($this->courseid, 'cmi5launch', 'launch', 'launch.php?id=' . $this->contextinstanceid,
-                '', $this->contextinstanceid);
+        return [$this->courseid, 'cmi5launch', 'launch', 'launch.php?id=' . $this->contextinstanceid,
+                '', $this->contextinstanceid];
     }
 
 }

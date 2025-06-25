@@ -83,8 +83,8 @@ function cmi5launch_supports($feature) {
         case FEATURE_SHOW_DESCRIPTION:
             return true;
         // Type of module.
-        // This effects how icons are displayed? 
-        //  case FEATURE_MOD_PURPOSE:
+        // This effects how icons are displayed?
+        // case FEATURE_MOD_PURPOSE:
         // return MOD_PURPOSE_CONTENT;
         default:
             return null;
@@ -137,7 +137,6 @@ function cmi5launch_update_instance(stdClass $cmi5launch, mod_cmi5launch_mod_for
 
     $cmi5launch->timemodified = time();
     $cmi5launch->id = $cmi5launch->instance;
-
 
     if (!$DB->update_record('cmi5launch', $cmi5launch)) {
         return false;
@@ -208,7 +207,7 @@ function cmi5launch_cron() {
  * @return array
  */
 function cmi5launch_get_extra_capabilities() {
-    return array();
+    return [];
 }
 
 // File API.
@@ -228,7 +227,7 @@ function cmi5launch_get_extra_capabilities() {
  * @param array $options additional options affecting the file serving
  * @return bool false if file not found, does not return if found - just send the file
  */
-function cmi5launch_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options = array()) {
+function cmi5launch_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options = []) {
     global $CFG, $DB;
 
     if ($context->contextlevel != CONTEXT_MODULE) {
@@ -274,14 +273,14 @@ function cmi5launch_pluginfile($course, $cm, $context, $filearea, $args, $forced
  */
 function cmi5launch_export_contents($cm, $baseurl) {
     global $CFG;
-    $contents = array();
+    $contents = [];
     $context = context_module::instance($cm->id);
 
     $fs = get_file_storage();
     $files = $fs->get_area_files($context->id, 'mod_cmi5launch', 'package', 0, 'sortorder DESC, id ASC', false);
 
     foreach ($files as $fileinfo) {
-        $file = array();
+        $file = [];
         $file['type'] = 'file';
         $file['filename']     = $fileinfo->get_filename();
         $file['filepath']     = $fileinfo->get_filepath();
@@ -321,8 +320,8 @@ function cmi5launch_extend_navigation(navigation_node $navref, stdclass $course,
  * This function is called when the context for the page is a cmi5launch module. This is not called by AJAX
  * so it is safe to rely on the $PAGE.
  *
- * @param settings_navigation $settingsnav 
- * @param navigation_node $cmi5launchnode 
+ * @param settings_navigation $settingsnav
+ * @param navigation_node $cmi5launchnode
  */
 function cmi5launch_extend_settings_navigation(settings_navigation $settingsnav, navigation_node $cmi5launchnode = null) {
 }
@@ -333,7 +332,7 @@ function cmi5launch_get_completion_state($course, $cm, $userid, $type) {
     $result = $type; // Default return value.
 
      // Get cmi5launch.
-    if (!$cmi5launch = $DB->get_record('cmi5launch', array('id' => $cm->instance))) {
+    if (!$cmi5launch = $DB->get_record('cmi5launch', ['id' => $cm->instance])) {
         throw new Exception("Can't find activity {$cm->instance}"); // TODO: localise this.
     }
 
@@ -400,7 +399,7 @@ function cmi5launch_process_new_package($cmi5launch) {
     $createcourse = $connectors->cmi5launch_get_create_course();
     $retrieveaus = $auhelper->get_cmi5launch_retrieve_aus();
     // Reload cmi5 instance.
-    $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
+    $record = $DB->get_record('cmi5launch', ['id' => $cmi5launch->id]);
 
     $fs = get_file_storage();
 
@@ -411,7 +410,7 @@ function cmi5launch_process_new_package($cmi5launch) {
         'mod_cmi5launch',
         'package',
         0,
-        array('subdirs' => 0, 'maxfiles' => 1)
+        ['subdirs' => 0, 'maxfiles' => 1]
     );
     // Get filename of zip that was uploaded.
     $files = $fs->get_area_files($context->id, 'mod_cmi5launch', 'package', 0, '', false);
@@ -449,10 +448,8 @@ function cmi5launch_process_new_package($cmi5launch) {
         $url = $playerurl . CMI5LAUNCH_PLAYER_V1 . $record->courseid . CMI5LAUNCH_LAUNCH_URL;
         $record->launchurl = $url;
 
-
         $aus = ($retrieveaus($returnedinfo));
         $record->aus = (json_encode($aus));
-
 
         $fs->delete_area_files($context->id, 'mod_cmi5launch', 'content');
 
@@ -461,38 +458,37 @@ function cmi5launch_process_new_package($cmi5launch) {
 
         // If the cmi5.xml file isn't there, don't try to use it.
         // This is unlikely as it should have been checked when the file was validated.
-        if ($manifestfile = $fs->get_file($context->id, 'mod_cmi5launch', 'content', 0, '/', 'cmi5.xml')) {
-            $xmltext = $manifestfile->get_content();
+    if ($manifestfile = $fs->get_file($context->id, 'mod_cmi5launch', 'content', 0, '/', 'cmi5.xml')) {
+        $xmltext = $manifestfile->get_content();
 
-            $defaultorgid = 0;
-            $firstinorg = 0;
+        $defaultorgid = 0;
+        $firstinorg = 0;
 
-            $pattern = '/&(?!\w{2,6};)/';
-            $replacement = '&amp;';
-            $xmltext = preg_replace($pattern, $replacement, $xmltext);
+        $pattern = '/&(?!\w{2,6};)/';
+        $replacement = '&amp;';
+        $xmltext = preg_replace($pattern, $replacement, $xmltext);
 
-            $objxml = new xml2Array();
-            $manifest = $objxml->parse($xmltext);
+        $objxml = new xml2Array();
+        $manifest = $objxml->parse($xmltext);
 
-            // Update activity id from the first activity in cmi5.xml, if it is found.
-            // Skip without error if not. (The Moodle admin will need to enter the id manually).
-            if (isset ($manifest[0]["children"][0]["children"][0]["attrs"]["ID"])) {
-                $record->cmi5activityid = $manifest[0]["children"][0]["children"][0]["attrs"]["ID"];
+        // Update activity id from the first activity in cmi5.xml, if it is found.
+        // Skip without error if not. (The Moodle admin will need to enter the id manually).
+        if (isset ($manifest[0]["children"][0]["children"][0]["attrs"]["ID"])) {
+            $record->cmi5activityid = $manifest[0]["children"][0]["children"][0]["attrs"]["ID"];
+        }
+
+        // Update launch from the first activity in cmi5.xml, if it is found.
+        // Skip if not. (The Moodle admin will need to enter the url manually).
+        foreach ($manifest[0]["children"][0]["children"][0]["children"] as $property) {
+            if ($property["name"] === "LAUNCH") {
+                $record->cmi5launchurl = $CFG->wwwroot . "/pluginfile.php/" . $context->id . "/mod_cmi5launch/"
+                    . $manifestfile->get_filearea() . "/" . $property["tagData"];
             }
+        }
 
-            // Update launch from the first activity in cmi5.xml, if it is found.
-            // Skip if not. (The Moodle admin will need to enter the url manually).
-            foreach ($manifest[0]["children"][0]["children"][0]["children"] as $property) {
-                if ($property["name"] === "LAUNCH") {
-                    $record->cmi5launchurl = $CFG->wwwroot . "/pluginfile.php/" . $context->id . "/mod_cmi5launch/"
-                        . $manifestfile->get_filearea() . "/" . $property["tagData"];
-                }
-            }
-
-            // Save reference.
-            // Turn off to trigger echo.
-            return $DB->update_record('cmi5launch', $record);
-    
+        // Save reference.
+        // Turn off to trigger echo.
+        return $DB->update_record('cmi5launch', $record);
 
     }
 }
@@ -507,7 +503,7 @@ function cmi5launch_process_new_package($cmi5launch) {
  */
 function cmi5launch_validate_package($file) {
     $packer = get_file_packer('application/zip');
-    $errors = array();
+    $errors = [];
     $filelist = $file->list_files($packer);
     if (!is_array($filelist)) {
         $errors['packagefile'] = get_string('badarchive', 'cmi5launch');
@@ -515,13 +511,13 @@ function cmi5launch_validate_package($file) {
         $badmanifestpresent = false;
         foreach ($filelist as $info) {
             if ($info->pathname == 'cmi5.xml') {
-                return array();
+                return [];
             } else if (strpos($info->pathname, 'cmi5.xml') !== false) {
                 // This package has cmi5 xml file inside a folder of the package.
                 $badmanifestpresent = true;
             }
             if (preg_match('/\.cst$/', $info->pathname)) {
-                return array();
+                return [];
             }
         }
         if ($badmanifestpresent) {
@@ -617,13 +613,13 @@ function cmi5launch_get_statements($url, $basiclogin, $basicpass, $version, $act
 
     $lrs = new \cmi5\RemoteLRS($url, $version, $basiclogin, $basicpass);
 
-    $statementsquery = array(
+    $statementsquery = [
         "agent" => $agent,
-        "verb" => new \cmi5\Verb(array("id" => trim($verb))),
-        "activity" => new \cmi5\Activity(array("id" => trim($activityid))),
+        "verb" => new \cmi5\Verb(["id" => trim($verb)]),
+        "activity" => new \cmi5\Activity(["id" => trim($activityid)]),
         "related_activities" => "false",
         "format" => "ids",
-    );
+    ];
 
     if (!is_null($since)) {
         $statementsquery["since"] = $since;
@@ -672,29 +668,29 @@ function cmi5launch_getactor($instance) {
     $settings = cmi5launch_settings($instance);
 
     if ($USER->idnumber && $settings['cmi5launchcustomacchp']) {
-        $agent = array(
+        $agent = [
             "name" => fullname($USER),
-            "account" => array(
+            "account" => [
                 "homePage" => $settings['cmi5launchcustomacchp'],
                 "name" => $USER->idnumber,
-            ),
+            ],
             "objectType" => "Agent",
-        );
+        ];
     } else if ($USER->email && $settings['cmi5launchuseactoremail']) {
-        $agent = array(
+        $agent = [
             "name" => fullname($USER),
             "mbox" => "mailto:".$USER->email,
             "objectType" => "Agent",
-        );
+        ];
     } else {
-        $agent = array(
+        $agent = [
             "name" => fullname($USER),
-            "account" => array(
+            "account" => [
                 "homePage" => $CFG->wwwroot,
                 "name" => $USER->username,
-            ),
+            ],
             "objectType" => "Agent",
-        );
+        ];
     }
 
     return new \cmi5\Agent($agent);
@@ -717,9 +713,9 @@ function cmi5launch_settings($instance) {
         return $cmi5launchsettings;
     }
 
-    $expresult = array();
+    $expresult = [];
 
-    $result = $DB->get_records('config_plugins', array('plugin' => 'cmi5launch'));
+    $result = $DB->get_records('config_plugins', ['plugin' => 'cmi5launch']);
 
     foreach ($result as $value) {
         $expresult[$value->name] = $value->value;
@@ -755,7 +751,7 @@ function cmi5launch_get_user_grades($cmi5launch, $userid=0) {
     $id = required_param('id', PARAM_INT);
     $contextmodule = context_module::instance($id);
 
-    $grades = array();
+    $grades = [];
 
     // If userid is empty it means we want all users.
     if (empty($userid)) {
@@ -798,7 +794,7 @@ function cmi5launch_get_user_grades($cmi5launch, $userid=0) {
  * It can also be called manually when you want to push a new grade to gradebook.
  * This function should do whatever is needed to generate the relevant grades to push into gradebook
  * then call 'myplugin_grade_item_update with the grades to write.
- * 
+ *
  * @category grade
  * @param object $cmi5launch - mod object
  * @param int $userid - A user ID or 0 for all users.
@@ -813,7 +809,7 @@ function cmi5launch_update_grades($cmi5launch, $userid = 0, $nullifnone = true) 
     $id = required_param('id', PARAM_INT);
 
     // Reload cmi5 course instance.
-    $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
+    $record = $DB->get_record('cmi5launch', ['id' => $cmi5launch->id]);
     $cm = get_coursemodule_from_id('cmi5launch', $id, 0, false, MUST_EXIST);
     $contextmodule = context_module::instance($cm->id);
     $users = get_enrolled_users($contextmodule);
@@ -874,10 +870,10 @@ function cmi5launch_grade_item_update($cmi5launch, $grades = null) {
         require_once($CFG->libdir . '/gradelib.php');
     }
     // Reload cmi5 course instance.
-    $record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
+    $record = $DB->get_record('cmi5launch', ['id' => $cmi5launch->id]);
 
     // Assign course instance info to grade params.
-    $params = array('itemname' => $cmi5launch->name);
+    $params = ['itemname' => $cmi5launch->name];
     if (isset($cmi5launch->id)) {
         $params['idnumber'] = $cmi5launch->id;
     }
@@ -942,19 +938,18 @@ function cmi5launch_grade_item_update($cmi5launch, $grades = null) {
      * @param string $url - The url to send the data to.
      * @return mixed $result - either a string or false.
      */
-    function cmi5launch_stream_and_send($options, $url)
-    {
+function cmi5launch_stream_and_send($options, $url) {
 
-        // The options are placed into a stream to be sent.
-        $context = stream_context_create($options);
+    // The options are placed into a stream to be sent.
+    $context = stream_context_create($options);
 
-        // Sends the stream to the specified URL and stores results.
-        // The false is use_include_path, which we dont want in this case, we want to go to the url.
-        $result = file_get_contents($url, false, $context);
+    // Sends the stream to the specified URL and stores results.
+    // The false is use_include_path, which we dont want in this case, we want to go to the url.
+    $result = file_get_contents($url, false, $context);
 
-        // Return result.
-        return $result;
-    }
+    // Return result.
+    return $result;
+}
 
     /**
      * Deletes an instance of the cmi5launch module.
@@ -962,18 +957,18 @@ function cmi5launch_grade_item_update($cmi5launch, $grades = null) {
      * @param int $id The ID of the module instance.
      * @return bool True on success.
      */
-    function cmi5launch_delete_instance($id) {
-        global $DB;
+function cmi5launch_delete_instance($id) {
+    global $DB;
 
-        if (!$cmi5launch = $DB->get_record('cmi5launch', ['id' => $id])) {
-            return false;
-        }
-
-        // Delete related records.
-        $DB->delete_records('cmi5launch_usercourse', ['moodlecourseid' => $id]);
-        $DB->delete_records('cmi5launch_aus', ['moodlecourseid' => $id]);
-        $DB->delete_records('cmi5launch_sessions', ['moodlecourseid' => $id]);
-        $DB->delete_records('cmi5launch', ['id' => $id]);
-
-        return true;
+    if (!$cmi5launch = $DB->get_record('cmi5launch', ['id' => $id])) {
+        return false;
     }
+
+    // Delete related records.
+    $DB->delete_records('cmi5launch_usercourse', ['moodlecourseid' => $id]);
+    $DB->delete_records('cmi5launch_aus', ['moodlecourseid' => $id]);
+    $DB->delete_records('cmi5launch_sessions', ['moodlecourseid' => $id]);
+    $DB->delete_records('cmi5launch', ['id' => $id]);
+
+    return true;
+}

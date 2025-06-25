@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-
 /**
  * English strings for cmi5launch
  *
@@ -31,7 +30,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 
- 
+
 
 $string['modulename'] = 'cmi5 launch link';
 $string['modulenameplural'] = 'cmi5 launch links';
@@ -183,7 +182,7 @@ $string['cmi5launchgeterror'] = "communicating with player, sending or crafting 
 $string['cmi5launchsessioninfoerror'] = "retrieving the session information.";
 $string['cmi5launchsessioninfouncaughterror'] = "Uncaught error retrieving the session information.";
 
-// tenant setup 
+// tenant setup
 $string['cmi5launchtenanttitle'] = 'Creating  a tenant';
 $string['cmi5launchtenantmadesuccess'] = 'Tenant made and saved successfully';
 $string['cmi5launchtenantfailsave'] = "Failed to save tenant to DB.";
@@ -277,7 +276,7 @@ $string['cmi5launchnogradeerror'] = 'No grades to update. No record for user fou
 $string['cmi5launchgradeerror'] = ' Error in updating or checking user grades. Report this error to system administrator: ';
 $string['cmi5launchgradetypenotfound'] = 'Grade type not found.';
 
-// Errors on launch.php. 
+// Errors on launch.php.
 $string['cmi5launchsessionerror'] = 'Error in launching experience. Session ID cannot be null. Report this error to system administrator.';
 $string['cmi5launcherrorexp'] = 'Error in launching experience. Report this error to system administrator: ';
 
@@ -287,7 +286,7 @@ $string['cmi5launchloadsessionerror'] = 'loading session table on AUview page. C
 
 // Progress errors.
 // LRS errors.
-$string['cmi5launchlrsstatementretrievalerror']= 'Error retrieving statements from LRS. Caught exception: ';
+$string['cmi5launchlrsstatementretrievalerror'] = 'Error retrieving statements from LRS. Caught exception: ';
 $string['cmi5launchlrssettingsretrievalerror'] = "Unable to retrieve LRS settings. Caught exception: ";
 $string['cmi5launchlrssettingscorrect'] = ' Check LRS settings are correct.';
 $string['cmi5launchlrscommunicationerror'] = 'Unable to communicate with LRS. Caught exception: ';
@@ -343,9 +342,9 @@ $string['cmi5launcherror'] = 'Error: ';
 $string['cmi5launcherrorover'] = 'Error OVER';
 $string['cmi5launcherrorgrade'] = 'Error in checking user grades: ';
 $string['cmi5launcherrorau'] = 'Error loading session table on AU view page. Report this to system administrator: ';
-$string['cmi5launcherrorausession'] = ' Check that session information is present in DB and session id is correct.'; 
-$string['cmi5launcherrorexperience'] = 'Error launching experience.  Report this to system administrator: <br>'; 
-$string['cmi5launcherrormain'] = ' error on main view page.  Report this to system administrator: <br> '; 
+$string['cmi5launcherrorausession'] = ' Check that session information is present in DB and session id is correct.';
+$string['cmi5launcherrorexperience'] = 'Error launching experience.  Report this to system administrator: <br>';
+$string['cmi5launcherrormain'] = ' error on main view page.  Report this to system administrator: <br> ';
 $string['cmi5launchparsearray'] = 'Cannot parse array. Error: ';
 $string['cmi5launchplayerexception'] = 'Player communication error. Something went wrong ';
 $string['cmi5launchcustomexceptionmessage'] = 'Caught error. Something went wrong';
@@ -469,7 +468,7 @@ $string['cmi5launchviewauerror'] = 'retrieving and displaying AU satisfied statu
 // For privacy module.
 
 // Usercourse table.
-$string['privacy:metadata:cmi5launch_usercourse'] = 'The cmi5 launch link plugin stores a users particular instance of a cmi5 Activity. While some things, like the courseid are generic to all users of the course, others, like the grade are specific to user.';  
+$string['privacy:metadata:cmi5launch_usercourse'] = 'The cmi5 launch link plugin stores a users particular instance of a cmi5 Activity. While some things, like the courseid are generic to all users of the course, others, like the grade are specific to user.';
 $string['privacy:metadata:cmi5launch_usercourse:id'] = 'The ID of the user course\'s particular instance assigned by Moodle.';
 $string['privacy:metadata:cmi5launch_usercourse:userid'] = 'The ID of the user';
 $string['privacy:metadata:cmi5launch_usercourse:registrationid'] = 'The registration ID is unique to each users particular cmi5 activity and is assigned by the cmi5 player.';
@@ -477,9 +476,9 @@ $string['privacy:metadata:cmi5launch_usercourse:ausgrades'] = 'All the AUs and t
 $string['privacy:metadata:cmi5launch_usercourse:grade'] = 'The current overall grade (based on grading type) for the cmi5 activity.';
 
 // Sessions table.
-$string['privacy:metadata:cmi5launch_sessions'] = 'The cmi5 launch link plugin stores each session of a users particular instance of a cmi5 Activity. While some things, like the masteryscore are generic to all users of the course, others, like the grade are specific to user.';  
+$string['privacy:metadata:cmi5launch_sessions'] = 'The cmi5 launch link plugin stores each session of a users particular instance of a cmi5 Activity. While some things, like the masteryscore are generic to all users of the course, others, like the grade are specific to user.';
 $string['privacy:metadata:cmi5launch_sessions:id'] = 'The ID of the user\'s session\'s particular instance assigned by Moodle.';
-$string['privacy:metadata:cmi5launch_sessions:sessionid'] = 'The session id. This is created by the cmi5 player and returned with URL request. Each session has a unique ID.';  
+$string['privacy:metadata:cmi5launch_sessions:sessionid'] = 'The session id. This is created by the cmi5 player and returned with URL request. Each session has a unique ID.';
 $string['privacy:metadata:cmi5launch_sessions:userid'] = 'User id, which combined with course ID can be used to retrieve unique records.';
 $string['privacy:metadata:cmi5launch_sessions:registrationscoursesausid'] = 'ID assigned by the cmi5 player to AUs.';
 $string['privacy:metadata:cmi5launch_sessions:createdat'] = 'Time a session started (string that is returned by CMI5 player).';

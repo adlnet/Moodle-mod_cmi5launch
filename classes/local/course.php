@@ -18,6 +18,7 @@
  * Class to handle invidual courses.
  * @copyright  2023 Megan Bohland
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package mod_cmi5launch
  */
 
  namespace mod_cmi5launch\local;
@@ -27,7 +28,7 @@ class course {
 
     // Lowercase values are for saving to DB.
     public $id, $url, $ausgrades, $type, $lmsid, $grade, $scores, $title, $moveon, $auindex,
-    $parents, $objectives, $launchurl, $sessions = array(), $sessionid, $returnurl, $description = [], $activitytype, $launchmethod,
+    $parents, $objectives, $launchurl, $sessions = [], $sessionid, $returnurl, $description = [], $activitytype, $launchmethod,
     $masteryscore, $progress, $noattempt, $completed, $passed, $inprogress, $satisfied, $moodlecourseid;
 
     // The id assigned by cmi5 player.
@@ -40,7 +41,7 @@ class course {
     public $registrationid;
 
     // Array of AUs in the course.
-    public $aus = array();
+    public $aus = [];
 
     // Constructs courses. Is fed array and where array key matches property, sets the property.
     public function __construct($statement) {

@@ -1,4 +1,19 @@
 <?php
+// This file is part of Moodle - https://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+
 namespace cmi5Test;
 
 use PHPUnit\Framework\TestCase;
@@ -13,15 +28,16 @@ require_once( "cmi5TestHelpers.php");
  * @copyright 2023 Megan Bohland
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
- *  */
-class courseTest extends TestCase
-{
+ *  * @package mod_cmi5launch
+ * @package mod_cmi5launch
+ */
+class courseTest extends TestCase {
+
     private $courseproperties, $emptystatement, $coursepropertiesvalues;
 
-    protected function setUp(): void
-    {
+    protected function setUp(): void {
         // All the properties in an AU object.
-        $this->courseproperties = array(
+        $this->courseproperties = [
             'id',
             'url',
             'ausgrades',
@@ -53,12 +69,12 @@ class courseTest extends TestCase
             'userid',
             'registrationid',
             'aus',
-        );
+        ];
 
-        $this->emptystatement = array();
+        $this->emptystatement = [];
 
         // Perhaps a good test would be to test the constructor with a statement that has all the properties set.
-        $this->coursepropertiesvalues = array(
+        $this->coursepropertiesvalues = [
             'id' => 'id',
             'url' => 'url',
             'ausgrades' => 'ausgrades',
@@ -73,7 +89,7 @@ class courseTest extends TestCase
             'objectives' => 'objectives',
             'launchurl' => 'launchurl',
             'sessions' => 'sessions',
-            'sessionid' => 'sessionid', 
+            'sessionid' => 'sessionid',
             'returnurl' => 'returnurl',
             'description' => 'description',
             'activitytype' => 'activitytype',
@@ -89,34 +105,32 @@ class courseTest extends TestCase
             'courseid' => 'courseid',
             'userid' => 'userid',
             'registrationid' => 'registrationid',
-            'aus' => 'aus'
-        );
+            'aus' => 'aus',
+        ];
     }
 
-    protected function tearDown(): void
-    {
+    protected function tearDown(): void {
 
     }
 
     /**
      * Test instantiation of course object with empty statement.
-     * 
+     *
      * @return void
      */
-    public function testInstantiationWithEmpty()
-    {
+    public function testinstantiationwithempty() {
         // Call course constructor.
         $obj = new course($this->emptystatement);
 
         // Ensure it is a course object.
         $this->assertInstanceOf(course::class, $obj);
 
-        //Make sure the course object does not have any 'extra' properties, only the amount passed in
-        $expectedAmount = count($this->courseproperties);
-        
+        // Make sure the course object does not have any 'extra' properties, only the amount passed in
+        $expectedamount = count($this->courseproperties);
+
         // Typecasting the object as an array to allow traversing.
         $coursearray = (array) $obj;
-        $this->assertCount($expectedAmount, $coursearray, "AU has $expectedAmount properties");
+        $this->assertCount($expectedamount, $coursearray, "AU has $expectedamount properties");
 
         // Verify properties exist and are empty or null.
         foreach ($coursearray as $property => $value) {
@@ -128,30 +142,29 @@ class courseTest extends TestCase
                 $this->logicalOr(
                     $this->isNull($value, "$property is null"),
                     $this->isEmpty($value, "$property is empty")
-                ), 
+                ),
                );
-            }
+        }
 
     }
 
     /**
      * Test instantiation of course object with values.
-     * 
+     *
      * @return void
      */
-    public function testInstantiationWithValues()
-    {
+    public function testinstantiationwithvalues() {
         // Call course constructor.
         $obj = new course($this->coursepropertiesvalues);
 
         // Verify it is a course object.
         $this->assertInstanceOf(course::class, $obj);
-        
+
         // Make sure the course object does not have any 'extra' properties, only the amount passed in.
         $expectedamount = count($this->courseproperties);
-        
+
         // Typecasting the object as an array to allow traversing.
-        $coursearray = (array) $obj;    
+        $coursearray = (array) $obj;
         $this->assertCount($expectedamount, $coursearray, "AU has $expectedamount properties");
 
         // Properties exists and are correct. Value should equal name of property.
@@ -159,7 +172,7 @@ class courseTest extends TestCase
         foreach ($coursearray as $property => $value) {
 
             $this->assertArrayHasKey($property, $coursearray, "$property exists");
-            
+
             if ($property == 'id') {
 
                 $this->assertNull($value, "$property is null");
@@ -167,10 +180,10 @@ class courseTest extends TestCase
             else {
                 $this->assertEquals($property, $value, "$value does not equal $property");
             }
-            
+
         }
     }
 
 
 }
-    
+

@@ -19,9 +19,10 @@
  *
  * @copyright  2023 Megan Bohland
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package mod_cmi5launch
  */
 
- 
+
 namespace mod_cmi5launch\local;
 // Include the errorover (error override) funcs.
 require_once ($CFG->dirroot . '/mod/cmi5launch/classes/local/errorover.php');
@@ -32,16 +33,16 @@ defined('MOODLE_INTERNAL') || die();
 class session {
     // Properties, these need to be capitilized as they are because that's how they are returned in statements and need to be saved.
     // Id is session id.
-    public $id, $tenantname, $tenantId, $registrationsCoursesAusId, $lmsid,
+    public $id, $tenantname, $tenantid, $registrationscoursesausid, $lmsid,
     $progress = [], $aulaunchurl, $launchurl, $grade,
-    $createdAt, $updatedAt, $registrationCourseAusId,
-    $code, $lastRequestTime, $launchTokenId, $launchMode, $masteryScore,
-    $isLaunched, $isInitialized, $initializedAt, $isCompleted,
-    $isPassed, $isFailed, $isTerminated, $isAbandoned, $courseid, $completed, $passed, $inprogress;
+    $createdat, $updatedat, $registrationcourseausid,
+    $code, $lastrequesttime, $launchtokenid, $launchmode, $masteryscore,
+    $islaunched, $isinitialized, $initializedat, $iscompleted,
+    $ispassed, $isfailed, $isterminated, $isabandoned, $courseid, $completed, $passed, $inprogress;
 
     // Database properties, that need to be lower case.
     public $sessionid, $userid, $registrationscoursesausid, $createdat, $updatedat, $launchtokenid, $lastrequesttime, $launchmode, $masteryscore, $tenantid,
-    $score, $response, $islaunched, $isinitialized, $initializedat, $duration, $iscompleted, $ispassed, $isfailed, $isterminated, $isabandoned, $launchmethod, $moodlecourseid;  
+    $score, $response, $islaunched, $isinitialized, $initializedat, $duration, $iscompleted, $ispassed, $isfailed, $isterminated, $isabandoned, $launchmethod, $moodlecourseid;
 
 
     // Constructs sessions. Is fed array and where array key matches property, sets the property.
@@ -50,7 +51,7 @@ class session {
         // What can go wrong here? It could be that a statement is null
         // or that the statement is not an array or not an object.
         if (is_null($statement) || (!is_array($statement) && !is_object($statement) )) {
-            
+
             throw new nullException(get_string('cmi5launchsessionbuilderror', 'cmi5launch'), 0);
         }
 

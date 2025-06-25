@@ -41,10 +41,10 @@ if ($completion->is_enabled($cm) && $cmi5launch->cmi5verbid) {
 
     if ($oldstate->completionstate !== $newstate->completionstate) {
         // Trigger Activity completed event.
-        $event = \mod_cmi5launch\event\activity_completed::create(array(
+        $event = \mod_cmi5launch\event\activity_completed::create([
             'objectid' => $cmi5launch->id,
             'context' => $context,
-        ));
+        ]);
         $event->add_record_snapshot('course_modules', $cm);
         $event->add_record_snapshot('cmi5launch', $cmi5launch);
         $event->trigger();

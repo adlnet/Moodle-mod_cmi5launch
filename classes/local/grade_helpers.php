@@ -19,6 +19,7 @@
  *
  * @copyright  2023 Megan Bohland
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package mod_cmi5launch
  */
 
 namespace mod_cmi5launch\local;
@@ -29,40 +30,33 @@ use mod_cmi5launch\local\session_helpers;
 require_once ($CFG->dirroot . '/mod/cmi5launch/classes/local/errorover.php');
 require_once($CFG->dirroot . '/mod/cmi5launch/constants.php');
 
-class grade_helpers
-{
-    public function get_cmi5launch_update_au_for_user_grades()
-    {
+class grade_helpers {
+
+    public function get_cmi5launch_update_au_for_user_grades() {
         return [$this, 'cmi5launch_update_au_for_user_grades'];
     }
 
-    public function get_cmi5launch_check_user_grades_for_updates()
-    {
+    public function get_cmi5launch_check_user_grades_for_updates() {
         return [$this, 'cmi5launch_check_user_grades_for_updates'];
     }
 
-    public function get_cmi5launch_highest_grade()
-    {
+    public function get_cmi5launch_highest_grade() {
         return [$this, 'cmi5launch_highest_grade'];
     }
 
-    public function get_cmi5launch_average_grade()
-    {
+    public function get_cmi5launch_average_grade() {
         return [$this, 'cmi5launch_average_grade'];
     }
 
-    public function cmi5launch_get_grade_method_array()
-    {
+    public function cmi5launch_get_grade_method_array() {
         return [$this, 'cmi5launch_grade_method_array'];
     }
 
-    public function cmi5launch_fetch_attempts_array()
-    {
+    public function cmi5launch_fetch_attempts_array() {
         return [$this, 'cmi5launch_get_attempts_array'];
     }
 
-    public function cmi5launch_fetch_what_grade_array()
-    {
+    public function cmi5launch_fetch_what_grade_array() {
         return [$this, 'cmi5launch_get_what_grade_array'];
     }
 
@@ -73,10 +67,10 @@ class grade_helpers
      * @return array an array of what grade options
      */
     function cmi5launch_get_what_grade_array() {
-        return array (MOD_CMI5LAUNCH_HIGHEST_ATTEMPT => get_string('mod_cmi5launch_highest_attempt', 'cmi5launch'),
+        return  [MOD_CMI5LAUNCH_HIGHEST_ATTEMPT => get_string('mod_cmi5launch_highest_attempt', 'cmi5launch'),
                     MOD_CMI5LAUNCH_AVERAGE_ATTEMPT => get_string('mod_cmi5launch_average_attempt', 'cmi5launch'),
                     MOD_CMI5LAUNCH_FIRST_ATTEMPT => get_string('mod_cmi5launch_first_attempt', 'cmi5launch'),
-                    MOD_CMI5LAUNCH_LAST_ATTEMPT => get_string('mod_cmi5launch_last_attempt', 'cmi5launch'));
+                    MOD_CMI5LAUNCH_LAST_ATTEMPT => get_string('mod_cmi5launch_last_attempt', 'cmi5launch')];
     }
 
 
@@ -86,20 +80,20 @@ class grade_helpers
      * @return array an array of what grade options
      */
     function cmi5launch_grade_method_array() {
-        return array (
+        return  [
                     MOD_CMI5LAUNCH_GRADE_HIGHEST => get_string('mod_cmi5launch_grade_highest', 'cmi5launch'),
                     MOD_CMI5LAUNCH_GRADE_AVERAGE => get_string('mod_cmi5launch_grade_average', 'cmi5launch'),
-        );
+        ];
     }
 
         /**
-     * Returns an array of the array of attempt options
-     *
-     * @return array an array of attempt options
-     */
+         * Returns an array of the array of attempt options
+         *
+         * @return array an array of attempt options
+         */
     function cmi5launch_get_attempts_array() {
-        $attempts = array(0 => get_string('cmi5launchnolimit', 'cmi5launch'),
-                        1 => get_string('cmi5launchattempt1', 'cmi5launch'));
+        $attempts = [0 => get_string('cmi5launchnolimit', 'cmi5launch'),
+                        1 => get_string('cmi5launchattempt1', 'cmi5launch')];
 
         for ($i = 2; $i <= 6; $i++) {
             $attempts[$i] = get_string('cmi5launchattemptsx', 'cmi5launch', $i);
@@ -116,8 +110,7 @@ class grade_helpers
      *                      - or a singular int.
      * @return int
      */
-    public function cmi5launch_average_grade($scores)
-    {
+    public function cmi5launch_average_grade($scores) {
 
         global $cmi5launch, $USER, $DB;
 
@@ -154,8 +147,7 @@ class grade_helpers
      * @param mixed $scores
      * @return int
      */
-    public function cmi5launch_highest_grade($scores)
-    {
+    public function cmi5launch_highest_grade($scores) {
 
         global $cmi5launch, $USER, $DB;
 
@@ -185,8 +177,6 @@ class grade_helpers
         // Now apply intval.
         $highestgrade = intval($highestgrade);
 
-     
-
         return $highestgrade;
     }
 
@@ -196,8 +186,7 @@ class grade_helpers
      * @param array $user - the user whose grades are being updated.
      * @return array
      */
-    public function cmi5launch_check_user_grades_for_updates($user, )
-    {
+    public function cmi5launch_check_user_grades_for_updates($user, ) {
 
         global $cmi5launch, $USER, $DB;
 
@@ -214,10 +203,10 @@ class grade_helpers
 
                 // Retrieve the record.
                 $userscourse = $DB->get_record('cmi5launch_usercourse', ['courseid' => $cmi5launch->courseid, 'userid' => $user->id]);
-                
+
                 $auids = json_decode($userscourse->aus);
 
-               // Bring in functions and classes.
+                // Bring in functions and classes.
                 $sessionhelper = new session_helpers;
 
                 $returnedinfo = $this->cmi5launch_update_au_for_user_grades($sessionhelper, $auids, $user);
@@ -235,8 +224,8 @@ class grade_helpers
                 return $overallgrade;
 
             } else {
-          
-                $nograde = array(0 => get_string('cmi5launchnogradeerror', 'cmi5launch'));
+
+                $nograde = [0 => get_string('cmi5launchnogradeerror', 'cmi5launch')];
                 // Do nothing, there is no record for this user in this course.
                 // Restore default hadlers.
                 restore_exception_handler();
@@ -245,9 +234,9 @@ class grade_helpers
 
             }
         } catch (\Throwable $e) {
-         
+
             // If there is an error, return the error.
-            echo(get_string('cmi5launchgradeerror', 'cmi5launch') . $e->getMessage()); 
+            echo(get_string('cmi5launchgradeerror', 'cmi5launch') . $e->getMessage());
             // Restore default hadlers.
             restore_exception_handler();
             restore_error_handler();
@@ -260,8 +249,7 @@ class grade_helpers
      * @param mixed $auid
      * @return au|bool
      */
-    public function cmi5launch_update_au_for_user_grades($session_helpers, $auids, $user)
-    {
+    public function cmi5launch_update_au_for_user_grades($sessionhelpers, $auids, $user) {
         global $cmi5launch, $USER, $DB;
 
         $cmi5launchsettings = cmi5launch_settings($cmi5launch->id);
@@ -269,17 +257,17 @@ class grade_helpers
         // Instantiate progress and cmi5_connectors class to pass.
         $progress = new progress;
         $cmi5 = new cmi5_connectors;
-        
+
         // Set error and exception handler to catch and override the default PHP error messages, to make messages more user friendly.
         set_error_handler('mod_cmi5launch\local\grade_warning', E_WARNING);
         set_exception_handler('mod_cmi5launch\local\exception_grade');
 
         // Array to hold AU scores.
-        $auscores = array();
-        $overallgrade = array();
+        $auscores = [];
+        $overallgrade = [];
         try {
             // Bring in functions and classes.
-            $sessionhelper = $session_helpers;
+            $sessionhelper = $sessionhelpers;
 
             // Functions from other classes.
             $updatesession = $sessionhelper->cmi5launch_get_update_session();
@@ -288,8 +276,7 @@ class grade_helpers
             foreach ($auids as $key => $auid) {
 
                 // Array to hold session scores for update.
-                $sessiongrades = array();
-
+                $sessiongrades = [];
 
                 // This uses the auid to pull the right record from the aus table.
                 $aurecord = $DB->get_record('cmi5launch_aus', ['id' => $auid]);
@@ -353,14 +340,13 @@ class grade_helpers
                             default:
 
                                 echo(get_string('cmi5launchgradetypenotfound', 'cmi5launch'));
-                            }
+                        }
 
                         // Save AU scores to corresponding title.
-                        $auscores[$aurecord->lmsid] = array($aurecord->title => $aurecord->scores);
+                        $auscores[$aurecord->lmsid] = [$aurecord->title => $aurecord->scores];
 
                         // Save an overall grade \to be passed out to grade_update.
                         $overallgrade = $aurecord->grade;
-
 
                         // Save Au title and their scores to AU.
                         // Save updates to DB.
@@ -371,7 +357,7 @@ class grade_helpers
             }
 
             // Array to hold answer.
-            $toreturn = array(0 => $auscores, 1 => $overallgrade);
+            $toreturn = [0 => $auscores, 1 => $overallgrade];
 
             // Restore default hadlers.
             restore_exception_handler();
@@ -379,13 +365,13 @@ class grade_helpers
 
             return $toreturn;
         } catch (\Throwable $e) {
-            
+
             // Restore default handlers.
             restore_exception_handler();
             restore_error_handler();
 
             // If there is an error, return the error.
-            throw new nullException(get_string('cmi5launchgradeerror', 'cmi5launch') . $e->getMessage()); 
+            throw new nullException(get_string('cmi5launchgradeerror', 'cmi5launch') . $e->getMessage());
         }
     }
 }

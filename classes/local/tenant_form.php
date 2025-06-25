@@ -15,17 +15,18 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Form for cmi5 connection, to enter tenant name. 
+ * Form for cmi5 connection, to enter tenant name.
  *
  * @copyright  2023 Megan Bohland
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package mod_cmi5launch
  */
 
 // moodleform is defined in formslib.php
 require_once("$CFG->libdir/formslib.php");
 
 class setup_tenant extends moodleform {
-    
+
     // Add elements to form.
     public function definition() {
         $messageplayer = get_string('cmi5launchsetupformplayer', 'cmi5launch');
@@ -36,8 +37,8 @@ class setup_tenant extends moodleform {
 
         // Add elements to your form. Second arg is the name of element
         $mform->addElement('text', 'cmi5tenant', get_string('cmi5launchtenantnamesetup', 'cmi5launch'));
-    // Add a help button with a help message.
-    $mform->addHelpButton('cmi5tenant', 'cmi5launchtenantnamesetup', 'cmi5launch');
+        // Add a help button with a help message.
+        $mform->addHelpButton('cmi5tenant', 'cmi5launchtenantnamesetup', 'cmi5launch');
 
         // Set type of element.
         $mform->setType('cmi5tenant', PARAM_NOTAGS);
@@ -47,8 +48,8 @@ class setup_tenant extends moodleform {
         $mform->addRule('cmi5tenant', $messageplayer, 'required');
 
         // $mform->addElement('header', 'cmi5instructions', 'Please enter a tenant name. When submitted it will create a tenant in the cmi5 player and automatically retrieve and save a bearer token for it as well.');
-        $mform->addElement('html', $messagetenant); 
-     
+        $mform->addElement('html', $messagetenant);
+
         $this->add_action_buttons();
     }
 

@@ -48,8 +48,8 @@ class course_module_viewed extends \core\event\course_module_viewed {
      * @return array of parameters to be passed to legacy add_to_log() function.
      */
     protected function get_legacy_logdata() {
-        return array($this->courseid, 'cmi5launch', 'pre-view', 'view.php?id=' . $this->contextinstanceid, $this->objectid,
-                $this->contextinstanceid);
+        return [$this->courseid, 'cmi5launch', 'pre-view', 'view.php?id=' . $this->contextinstanceid, $this->objectid,
+                $this->contextinstanceid];
     }
 }
 

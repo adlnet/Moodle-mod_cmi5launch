@@ -25,6 +25,7 @@ require_once(dirname(dirname(dirname(dirname(__FILE__)))).'/config.php');
 
 /**
  * Custom uninstallation procedure
+ * @package mod_cmi5launch
  */
 function xmldb_cmi5launch_uninstall() {
     return true;

@@ -36,15 +36,13 @@ class backup_cmi5launch_activity_structure_step extends backup_activity_structur
         // Note: args here are  tablename, primary key(s), and then fields.
         $cmi5launch = new backup_nested_element('cmi5launch', ['id'], ['course', 'name', 'intro', 'introformat', 'cmi5activityid', 'registrationid',
             'returnurl', 'courseid', 'cmi5verbid', 'cmi5expiry', 'overridedefaults', 'cmi5multipleregs', 'timecreated', 'timemodified',
-            'courseinfo', 'aus'
+            'courseinfo', 'aus',
         ]);
 
         // Add children groups
 
-  
-
         // AUs and Sessions are not linked via keys, but an array stored in a field accessed programmatically.
-        
+
         // AUs are for assignable units, which are the individual activities for each usercourse.
         $austable = new backup_nested_element('aus_records');
 
@@ -52,34 +50,30 @@ class backup_cmi5launch_activity_structure_step extends backup_activity_structur
             'auindex', 'parents', 'objectives', 'description', 'activitytype', 'masteryscore', 'completed', 'passed', 'inprogress', 'noattempt', 'satisfied',
             'sessions', 'scores', 'grade']);
         $austable->add_child($au);
-        
-        
+
         // Sessions, which are the individual sessions for each usercourse.
         $sessionstable = new backup_nested_element('session_records');
 
         $session = new backup_nested_element('session', ['id'], ['sessionid', 'userid', 'moodlecourseid', 'registrationscoursesausid', 'tenantname',
-            'createdat', 'updatedat', 'code', 'launchtokenid', 'lastrequesttime', 'launchmode', 'masteryscore', 'score','islaunched', 'isinitialized', 'initializedat',
-            'duration', 'iscompleted', 'ispassed', 'isfailed', 'isterminated', 'isabandoned', 'progress', 'launchmethod', 'launchurl'
+            'createdat', 'updatedat', 'code', 'launchtokenid', 'lastrequesttime', 'launchmode', 'masteryscore', 'score', 'islaunched', 'isinitialized', 'initializedat',
+            'duration', 'iscompleted', 'ispassed', 'isfailed', 'isterminated', 'isabandoned', 'progress', 'launchmethod', 'launchurl',
         ]);
         $sessionstable->add_child($session);
-
-       
 
         // Data sources.
 
         // Link tables to root.
         $cmi5launch->add_child($sessionstable);
         $cmi5launch->add_child($austable);
-              
+
         // Usercourse is a users individual cmi5launch object.
         $usercourses = new backup_nested_element('usercourses');
         $cmi5launch->add_child($usercourses);
 
-        $usercourse = new backup_nested_element('usercourse', ['id'], ['courseid', 'moodlecourseid', 'userid', 'cmi5activityid', 'registrationid','returnurl','aus',
-            'ausgrades','grade'
+        $usercourse = new backup_nested_element('usercourse', ['id'], ['courseid', 'moodlecourseid', 'userid', 'cmi5activityid', 'registrationid', 'returnurl', 'aus',
+            'ausgrades', 'grade',
         ]);
         $usercourses->add_child($usercourse);
-
 
         // Data sources.
         $cmi5launch->set_source_table('cmi5launch', ['id' => backup::VAR_ACTIVITYID]);

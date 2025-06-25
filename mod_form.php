@@ -49,7 +49,7 @@ class mod_cmi5launch_mod_form extends moodleform_mod {
         $mform->addElement('header', 'general', get_string('general', 'form'));
 
         // Adding the standard "name" field.
-        $mform->addElement('text', 'name', get_string('cmi5launchname', 'cmi5launch'), array('size' => '64'));
+        $mform->addElement('text', 'name', get_string('cmi5launchname', 'cmi5launch'), ['size' => '64']);
         if (!empty($CFG->formatstringstriptags)) {
             $mform->setType('name', PARAM_TEXT);
         } else {
@@ -90,8 +90,8 @@ class mod_cmi5launch_mod_form extends moodleform_mod {
         // New local package upload.
 
         // This is making an array of filemanager.
-        $filemanageroptions = array();
-        $filemanageroptions['accepted_types'] = array('.zip');
+        $filemanageroptions = [];
+        $filemanageroptions['accepted_types'] = ['.zip'];
         $filemanageroptions['maxbytes'] = 0;
         $filemanageroptions['maxfiles'] = 1;
         $filemanageroptions['subdirs'] = 0;
@@ -113,7 +113,7 @@ class mod_cmi5launch_mod_form extends moodleform_mod {
             'text',
             'cmi5launchcustomacchp',
             get_string('cmi5launchcustomacchp', 'cmi5launch'),
-            array('size' => '64')
+            ['size' => '64']
         );
         $mform->setType('cmi5launchcustomacchp', PARAM_TEXT);
         $mform->addRule('cmi5launchcustomacchp', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
@@ -150,23 +150,23 @@ class mod_cmi5launch_mod_form extends moodleform_mod {
         $mform =& $this->_form;
 
         // Add Verb Id setting.
-        $verbgroup = array();
+        $verbgroup = [];
         $verbgroup[] =& $mform->createElement(
             'checkbox',
             'completionverbenabled',
             ' ',
             get_string('completionverb', 'cmi5launch')
         );
-        $verbgroup[] =& $mform->createElement('text', 'cmi5verbid', ' ', array('size' => '64'));
+        $verbgroup[] =& $mform->createElement('text', 'cmi5verbid', ' ', ['size' => '64']);
         $mform->setType('cmi5verbid', PARAM_TEXT);
 
-        $mform->addGroup($verbgroup, 'completionverbgroup', get_string('completionverbgroup', 'cmi5launch'), array(' '), false);
+        $mform->addGroup($verbgroup, 'completionverbgroup', get_string('completionverbgroup', 'cmi5launch'), [' '], false);
         $mform->addGroupRule(
-            'completionverbgroup', array(
-                'cmi5verbid' => array(
-                    array(get_string('maximumchars', '', 255), 'maxlength', 255, 'client'),
-                ),
-            )
+            'completionverbgroup', [
+                'cmi5verbid' => [
+                    [get_string('maximumchars', '', 255), 'maxlength', 255, 'client'],
+                ],
+            ]
         );
 
         $mform->addHelpButton('completionverbgroup', 'completionverbgroup', 'cmi5launch');
@@ -174,36 +174,36 @@ class mod_cmi5launch_mod_form extends moodleform_mod {
         $mform->setDefault('cmi5verbid', 'http://adlnet.gov/expapi/verbs/completed');
 
         // Add Completion Expiry Date setting.
-        $completiongroup = array();
+        $completiongroup = [];
         $completiongroup[] =& $mform->createElement(
             'checkbox',
             'completionexpiryenabled',
             ' ',
             get_string('completionexpiry', 'cmi5launch')
         );
-        $completiongroup[] =& $mform->createElement('text', 'cmi5expiry', ' ', array('size' => '64'));
+        $completiongroup[] =& $mform->createElement('text', 'cmi5expiry', ' ', ['size' => '64']);
         $mform->setType('cmi5expiry', PARAM_TEXT);
 
         $mform->addGroup(
             $completiongroup,
             'completionexpirygroup',
             get_string('completionexpirygroup', 'cmi5launch'),
-            array(' '),
+            [' '],
             false
         );
         $mform->addGroupRule(
-            'completionexpirygroup', array(
-                'cmi5expiry' => array(
-                    array(get_string('maximumchars', '', 10), 'maxlength', 10, 'client'),
-                ),
-            )
+            'completionexpirygroup', [
+                'cmi5expiry' => [
+                    [get_string('maximumchars', '', 10), 'maxlength', 10, 'client'],
+                ],
+            ]
         );
 
         $mform->addHelpButton('completionexpirygroup', 'completionexpirygroup', 'cmi5launch');
         $mform->disabledIf('cmi5expiry', 'completionexpiryenabled', 'notchecked');
         $mform->setDefault('cmi5expiry', '365');
 
-        return array('completionverbgroup', 'completionexpirygroup');
+        return ['completionverbgroup', 'completionexpirygroup'];
     }
 
     public function completion_rule_enabled($data) {
@@ -245,7 +245,7 @@ class mod_cmi5launch_mod_form extends moodleform_mod {
                 // Retrieve activity lrs settings from DB.
                 $cmi5launchlrs = $DB->get_record(
                     'cmi5launch_lrs',
-                    array('cmi5launchid' => $defaultvalues['instance']),
+                    ['cmi5launchid' => $defaultvalues['instance']],
                     $fields = '*',
                     IGNORE_MISSING
                 );
@@ -267,7 +267,7 @@ class mod_cmi5launch_mod_form extends moodleform_mod {
             'mod_cmi5launch',
             'package',
             0,
-            array('subdirs' => 0, 'maxfiles' => 1)
+            ['subdirs' => 0, 'maxfiles' => 1]
         );
         $defaultvalues['packagefile'] = $draftitemid;
 
@@ -299,7 +299,7 @@ class mod_cmi5launch_mod_form extends moodleform_mod {
                 'mod_cmi5launch',
                 'packagefilecheck',
                 null,
-                array('subdirs' => 0, 'maxfiles' => 1)
+                ['subdirs' => 0, 'maxfiles' => 1]
             );
 
             // Get file from users draft area.

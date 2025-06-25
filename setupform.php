@@ -15,10 +15,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Page to create cmi5 connection, and tenant and token. 
+ * Page to create cmi5 connection, and tenant and token.
  *
  * @copyright  2023 Megan Bohland
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package mod_cmi5launch
  */
 
 
@@ -57,10 +58,10 @@ if ($mform->is_cancelled()) {
     $resultname = set_config('cmi5launchbasicname', $cmi5name, $plugin = 'cmi5launch');
     $resultpass = set_config('cmi5launchbasepass', $cmi5password, $plugin = 'cmi5launch');
 
-    
+
     // As long as they are not null/false we can move on to the next form
     if ($resulturl && $resultname && $resultpass){
-        //Move to next form
+        // Move to next form
         redirect(url: $CFG->wwwroot . '/mod/cmi5launch/tenantsetup.php', message: get_string('cmi5launchsettingsaved', 'cmi5launch'));
     }else{
         // If for some reason they are null or false, then we will redirect back to the form.
@@ -77,4 +78,4 @@ $mform->display();
 
 echo $OUTPUT->footer();
 
-?>
+

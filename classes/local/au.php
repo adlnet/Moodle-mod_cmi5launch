@@ -13,11 +13,13 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 /**
  * Class to handle Assignable Units.
  *
  * @copyright  2023 Megan Bohland
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package mod_cmi5launch
  */
 namespace mod_cmi5launch\local;
 
@@ -33,14 +35,14 @@ class au {
 
     // Uppercase values because that's how they come from player.
     // Moodle wants all lowercase, but we need to be able to receive the data from the player.
-    public $launchMethod, $lmsId, $moveOn, $auIndex, $activityType, $masteryScore;
+    public $launchmethod, $lmsid, $moveon, $auindex, $activitytype, $masteryscore;
     // Constructs AUs. Is fed array and where array key matches property, sets the property.
     public function __construct($statement) {
 
         // What can go wrong here? It could be that a statement is null
         // or that the statement is not an array or not an object.
         if (is_null($statement) || (!is_array($statement) && !is_object($statement) )) {
-            
+
             throw new nullException(get_string('cmi5launchaubuilderror', 'cmi5launch'), 0);
         }
         // If it is an array, create the object.

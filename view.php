@@ -20,6 +20,7 @@
  * @copyright  2023 Megan Bohland
  * @copyright  Based on work by 2013 Andrew Downes
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package mod_cmi5launch
  */
 
 use mod_cmi5launch\local\customException;
@@ -30,7 +31,7 @@ use mod_cmi5launch\local\au_helpers;
 use mod_cmi5launch\local\session_helpers;
 
 require_once("../../config.php");
-//require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
+// require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require('header.php');
 
 // Include the errorover (error override) funcs.
@@ -67,7 +68,7 @@ $event->trigger();
 */
 
 // Print the page header.
-$PAGE->set_url('/mod/cmi5launch/view.php', array('id' => $cm->id));
+$PAGE->set_url('/mod/cmi5launch/view.php', ['id' => $cm->id]);
 $PAGE->set_title(format_string($cmi5launch->name));
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($context);
@@ -77,7 +78,7 @@ $PAGE->set_context($context);
 echo $OUTPUT->header();
 
 // Reload cmi5 course instance.
-$record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
+$record = $DB->get_record('cmi5launch', ['id' => $cmi5launch->id]);
 
 // TODO: Put all the php inserted data as parameters on the functions and put the functions in a separate JS file.
 ?>
@@ -209,7 +210,7 @@ try {
         }
         // Retrieve AU ids.
         $auids = (json_decode($userscourse->aus));
-        //        $auids = (json_decode($userscourse));
+        // $auids = (json_decode($userscourse));
 
     }
 } catch (Exception $e) {
@@ -223,7 +224,7 @@ try {
 }
 
 // Array to hold info for table population.
-$tabledata = array();
+$tabledata = [];
 
 // We need id to get progress.
 $cmid = $cmi5launch->id;
@@ -232,15 +233,15 @@ $cmid = $cmi5launch->id;
 $table = new html_table();
 $table->id = 'cmi5launch_autable';
 $table->caption = get_string('autableheader', 'cmi5launch');
-$table->head = array(
+$table->head = [
     get_string('cmi5launchviewAUname', 'cmi5launch'),
     get_string('cmi5launchviewstatus', 'cmi5launch'),
     get_string('cmi5launchviewgradeheader', 'cmi5launch'),
     get_string('cmi5launchviewregistrationheader', 'cmi5launch'),
-);
+];
 
 // Array to hold Au scores.
-$auscores = array();
+$auscores = [];
 try {
     // Query CMI5 player for updated registration info.
     $registrationinfofromcmi5 = json_decode($getregistrationinfo($registrationid, $cmi5launch->id), true);
@@ -252,7 +253,7 @@ try {
     foreach ($auids as $key => $auid) {
 
         // Array to hold scores for AU.
-        $sessionscores = array();
+        $sessionscores = [];
         $au = $getaus($auid);
 
         // Verify object is an au object.
@@ -305,7 +306,7 @@ try {
                     foreach ($sessions as $key => $value) {
 
                         // Get the session from DB with session id.
-                        $ausession = $DB->get_record('cmi5launch_sessions', array('sessionid' => $value));
+                        $ausession = $DB->get_record('cmi5launch_sessions', ['sessionid' => $value]);
 
                         if ($ausession->iscompleted == "1") {
                             $completedfound = true;
@@ -377,7 +378,7 @@ try {
         }
 
         // Create array of info to place in table.
-        $auinfo = array();
+        $auinfo = [];
 
         // Assign au name, progress, and index.
         $auinfo[] = $au->title;
@@ -408,7 +409,7 @@ try {
         $auindex = $au->auindex;
 
         // AU id for next page (to be loaded).
-        //  $infofornextpage = $auid;
+        // $infofornextpage = $auid;
 
         // Assign au link to auviews.
         $auinfo[] = "<button tabindex=\"0\" id='cmi5relaunch_attempt'
@@ -420,7 +421,7 @@ try {
         $tabledata[] = $auinfo;
 
         // Update AU scores.
-        $auscores[$au->lmsid] = array($au->title => $au->scores);
+        $auscores[$au->lmsid] = [$au->title => $au->scores];
 
         // Update the AU in DB.
         $DB->update_record("cmi5launch_aus", $au);

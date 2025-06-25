@@ -33,22 +33,22 @@ class check_completion extends \core\task\scheduled_task {
     public function execute() {
         global $DB;
 
-        $module = $DB->get_record('modules', array('name' => 'cmi5launch'), '*', MUST_EXIST);
+        $module = $DB->get_record('modules', ['name' => 'cmi5launch'], '*', MUST_EXIST);
         $modules = $DB->get_records('cmi5launch');
-        $courses = array(); // Cache course data incase the multiple modules exist in a course.
+        $courses = []; // Cache course data incase the multiple modules exist in a course.
 
         foreach ($modules as $cmi5launch) {
             echo ('Checking module id '.$cmi5launch->id.'. '.PHP_EOL);
             $cm = $DB->get_record(
                 'course_modules',
-                array('module' => $module->id,
-                    'instance' => $cmi5launch->id),
+                ['module' => $module->id,
+                    'instance' => $cmi5launch->id],
                 '*',
                 MUST_EXIST
             );
             if (!isset($courses[$cm->course])) {
-                $courses[$cm->course] = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
-                $courses[$cm->course]->enrolments = $DB->get_records('user_enrolments', array('status' => 0));
+                $courses[$cm->course] = $DB->get_record('course', ['id' => $cm->course], '*', MUST_EXIST);
+                $courses[$cm->course]->enrolments = $DB->get_records('user_enrolments', ['status' => 0]);
             }
             $course = $courses[$cm->course];
             $completion = new \completion_info($course);
@@ -69,11 +69,11 @@ class check_completion extends \core\task\scheduled_task {
                     echo ('New completion state is '.$newstate.'. '.PHP_EOL);
                     if ($oldstate !== $newstate) {
                         // Trigger Activity completed event.
-                        $event = \mod_cmi5launch\event\activity_completed::create(array(
+                        $event = \mod_cmi5launch\event\activity_completed::create([
                             'objectid' => $cmi5launch->id,
                             'context' => \context_module::instance($cm->id),
                             'userid' => $enrolment->userid,
-                        ));
+                        ]);
                         $event->add_record_snapshot('course_modules', $cm);
                         $event->add_record_snapshot('cmi5launch', $cmi5launch);
                         $event->trigger();

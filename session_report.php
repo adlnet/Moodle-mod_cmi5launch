@@ -19,6 +19,7 @@
  *
  * @copyright  2023 Megan Bohland
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package mod_cmi5launch
  */
 
 use mod_cmi5launch\local\au_helpers;
@@ -77,7 +78,7 @@ $userid = $fromreportpage[3];
 
 // Retrieve the course module.
 $cm = get_coursemodule_from_id('cmi5launch', $id, 0, false, MUST_EXIST);
-$course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
+$course = $DB->get_record('course', ['id' => $cm->course], '*', MUST_EXIST);
 $contextmodule = context_module::instance($cm->id);
 
 // Set page url.
@@ -105,7 +106,7 @@ if (empty($noheader)) {
         'hidecompletion' => true,
         'description' => '',
     ]);
-    $PAGE->navbar->add($strreport, new moodle_url('/mod/cmi5launch/report.php', array('id' => $cm->id)));
+    $PAGE->navbar->add($strreport, new moodle_url('/mod/cmi5launch/report.php', ['id' => $cm->id]));
 
     echo $OUTPUT->header();
 }
@@ -119,7 +120,7 @@ if (empty($noheader)) {
 <?php
 
 // Retrieve the user.
-$user = $DB->get_record('user', array('id' => $userid));
+$user = $DB->get_record('user', ['id' => $userid]);
 
 // Create tables to display on page.
 // This is the main table with session info.
@@ -138,8 +139,8 @@ $headers[] = get_string('cmi5launchsatisfiedstatusheader', 'cmi5launch');
 $columns[] = 'Score';
 $headers[] = get_string('cmi5launchscoreheader', 'cmi5launch');
 
-$scorecolumns = array();
-$scoreheaders = array();
+$scorecolumns = [];
+$scoreheaders = [];
 
 // Add the columns and headers to the table.
 $table->define_columns($columns);
@@ -154,12 +155,12 @@ $aurecord = null;
 // For each AU id, find the one that matches our auid from previous page, this is the record we want.
 foreach ($auids as $key => $auid) {
 
-    //This maybe better. it looks for the record rather than loop through ALL records.
+    // This maybe better. it looks for the record rather than loop through ALL records.
     // Retrieve record from table.
     $aurecord = $DB->get_record('cmi5launch_aus', ['id' => $auid, 'lmsid' => $cmi5idprevpage]);
     if (!$aurecord) {
         // If no record found,
-       //do nothin,
+        // do nothin,
         continue;
     } else {
 
@@ -172,11 +173,11 @@ foreach ($auids as $key => $auid) {
             $attempt = 1;
 
             // Arrays to hold row info.
-            $rowdata = array();
-            $scorerow = array();
+            $rowdata = [];
+            $scorerow = [];
 
             // An array to hold grades for max or mean scoring.
-            $sessionscores = array();
+            $sessionscores = [];
             // Set table up, this needs to be done before rows added.
             $table->setup();
             $austatus = "";
@@ -214,7 +215,7 @@ foreach ($auids as $key => $auid) {
                     $datefinish = $date->format('D d M Y H:i:s');
                 }
                 // The users sessions.
-                $usersession = $DB->get_record('cmi5launch_sessions', array('sessionid' => $sessionid, 'userid' => $userid, 'moodlecourseid' => $id));
+                $usersession = $DB->get_record('cmi5launch_sessions', ['sessionid' => $sessionid, 'userid' => $userid, 'moodlecourseid' => $id]);
 
                 // Add row data.
                 $rowdata["Attempt"] = get_string('cmi5launchattemptrow', 'cmi5launch') . $attempt;
@@ -247,7 +248,7 @@ foreach ($auids as $key => $auid) {
                 $scorecolumns[] = get_string('cmi5launchattemptrow', 'cmi5launch') . $attempt;
                 $scoreheaders[] = get_string('cmi5launchattemptrow', 'cmi5launch') . $attempt;
                 if ($usersession){
-                $scorerow[get_string('cmi5launchattemptrow', 'cmi5launch') . $attempt] = $usersession->score;
+                    $scorerow[get_string('cmi5launchattemptrow', 'cmi5launch') . $attempt] = $usersession->score;
                 }
                 switch ($gradetype) {
 
@@ -279,7 +280,7 @@ foreach ($auids as $key => $auid) {
                 $table->add_data_keyed($rowdata);
             }
         }
-    } // end else from aurecord if 
+    } // end else from aurecord if
 } // end of for each auids
 // Display the grading type, highest, avg, etc.
 $scorecolumns[] = 'Grading type';

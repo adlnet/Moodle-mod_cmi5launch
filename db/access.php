@@ -47,34 +47,34 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$capabilities = array(
-    'mod/cmi5launch:view' => array(
+$capabilities = [
+    'mod/cmi5launch:view' => [
         'captype' => 'read',
         'contextlevel' => CONTEXT_MODULE,
-        'archetypes' => array(
+        'archetypes' => [
             'guest' => CAP_ALLOW,
             'user' => CAP_ALLOW,
-        ),
-    ),
+        ],
+    ],
 
-    'mod/cmi5launch:viewgrades' => array(
+    'mod/cmi5launch:viewgrades' => [
         'captype' => 'read',
         'contextlevel' => CONTEXT_MODULE,
-        'archetypes' => array(
+        'archetypes' => [
             'coursecreator' => CAP_ALLOW,
             'teacher' => CAP_ALLOW,
-        ),
-    ),
+        ],
+    ],
 
-    'mod/cmi5launch:addinstance' => array(
+    'mod/cmi5launch:addinstance' => [
         'riskbitmask' => RISK_XSS,
         'captype' => 'write',
         'contextlevel' => CONTEXT_COURSE,
-        'archetypes' => array(
+        'archetypes' => [
             'editingteacher' => CAP_ALLOW,
             'manager' => CAP_ALLOW,
-        ),
+        ],
         'clonepermissionsfrom' => 'moodle/course:manageactivities',
-    ),
-);
+    ],
+];
 

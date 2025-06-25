@@ -19,6 +19,7 @@
  *
  * @copyright  2023 Megan Bohland
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package mod_cmi5launch
  */
 
 use mod_cmi5launch\local\cmi5_connectors;
@@ -65,7 +66,7 @@ if ($mform->is_cancelled()) {
 
         // Make the new tenant and grab results.
         // here is an aarea that could fail. Should we try catch or is that covered in the creat tenant call?
-        //TODO
+        // TODO
         $tenant = $createtenant($cmi5tenant);
 
 
@@ -90,9 +91,9 @@ if ($mform->is_cancelled()) {
                 // except now we dont want to redirect to  settings! We want to go to
                 // The TOKEN setup form
                 // Wait, maybe it should do this automatically? Like they don't need to enter it sine we are making this make it for them, and we don't need them to
-                // press a button on a new form JUST to make a token. Lets do it behind the scenes and they can retrieve it if they want through an 
-                //echo or settings page? 
-//                $settingurl = new moodle_url($CFG->wwwroot . '/' . 'admin/settings.php', array('section' => 'modsettingcmi5launch'));
+                // press a button on a new form JUST to make a token. Lets do it behind the scenes and they can retrieve it if they want through an
+                // echo or settings page?
+                // $settingurl = new moodle_url($CFG->wwwroot . '/' . 'admin/settings.php', array('section' => 'modsettingcmi5launch'));
                 redirect(url: $CFG->wwwroot . '/mod/cmi5launch/tokensetup.php', message: get_string('cmi5launchtenantmadesuccess', 'cmi5launch'));
 
                 // redirect($settingurl, 'Successfully made and saved new tenant', 10);
@@ -100,9 +101,9 @@ if ($mform->is_cancelled()) {
             } else {
                 echo get_string('cmi5launchtenantfailsave', 'cmi5launch');
                 echo "<br>";
-                echo get_string('cmi5launchtenantfailsavemessage', 'cmi5launch') . $result; 
+                echo get_string('cmi5launchtenantfailsavemessage', 'cmi5launch') . $result;
                 echo "<br>";
-                //if fail shoudl we freeze and alert user with a window towith error message
+                // if fail shoudl we freeze and alert user with a window towith error message
 
                 echo $link;
             }

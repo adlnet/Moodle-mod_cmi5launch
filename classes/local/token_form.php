@@ -15,10 +15,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Form for cmi5 connection, and tenant and token. 
+ * Form for cmi5 connection, and tenant and token.
  *
  * @copyright  2023 Megan Bohland
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package mod_cmi5launch
  */
 
 // moodleform is defined in formslib.php
@@ -40,7 +41,7 @@ class setup_token extends moodleform {
         // Default value.
         $mform->setDefault('cmi5token', get_string('cmi5launchtenanttoken_default', 'cmi5launch')); // The second arg here is the default value and appears in the text box.
         // These three go together for making one eleme
-       // $mform->addElement('button', 'generatetoken', 'Generate Token');
+        // $mform->addElement('button', 'generatetoken', 'Generate Token');
         // Add a rule to make this field required.
         $mform->addRule('cmi5token', $message, 'required');
 

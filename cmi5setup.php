@@ -15,10 +15,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Page to create cmi5 connection, and tenant and token. 
+ * Page to create cmi5 connection, and tenant and token.
  *
  * @copyright  2023 Megan Bohland
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package mod_cmi5launch
  */
 
 
@@ -40,7 +41,7 @@ $templatecontext = (object) [
     'texttodisplay' => get_string('cmi5launchsetup_help', 'cmi5launch'),
 ];
 // Now render the mustache template we made.
-// Takes template and template context - basically some variables passed into template and used to render stuff. 
+// Takes template and template context - basically some variables passed into template and used to render stuff.
 echo $OUTPUT->render_from_template('mod_cmi5launch/setup', $templatecontext);
 
 // When we first come here lets check if there are plugin settings for username, passowrd, and url, there shouldnt be so display the form.
