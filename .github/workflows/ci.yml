@@ -95,9 +95,15 @@ jobs:
         if: ${{ !cancelled() }}
         run: moodle-plugin-ci mustache
 
-      - name: Show Node.js version
-        run: node -v
-
+      - name: Show Node and npm versions
+        run: |
+          echo "Node version: $(node -v)"
+          echo "npm version: $(npm -v)"
+          echo "nvm version: $(nvm --version)"
+          echo "nvm current: $(nvm current)"
+          which node
+          which npm
+          
       - name: Grunt
         if: ${{ !cancelled() }}
         run: moodle-plugin-ci grunt --max-lint-warnings 0
