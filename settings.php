@@ -44,15 +44,11 @@ $getgradearray = $gradehelpers->cmi5launch_get_grade_method_array();
 $cmi5launchgetattemptsarray = $gradehelpers->cmi5launch_fetch_attempts_array();
 $cmi5launchgetgradetypearray = $gradehelpers->cmi5launch_fetch_what_grade_array();
 
-
-
-// maybe add if ($hassiteconfig?) Can regulare users access this? TODO -MB
 if ($ADMIN->fulltree) {
     $PAGE->requires->js_call_amd('mod_cmi5launch/settings', 'init');
 
     require_once($CFG->dirroot . '/mod/cmi5launch/settingslib.php');
 
-    // MB
     // From scorm grading stuff.
     $yesno = [
         0 => get_string('no'),
@@ -66,7 +62,7 @@ if ($ADMIN->fulltree) {
         get_string('cmi5launchlrsfieldset_help', 'cmi5launch')
     ));
 
-    // LRS settings
+    // LRS settings.
     $settings->add(new admin_setting_heading('cmi5launch/cmi5lrssettings', get_string('cmi5lrssettingsheader', 'cmi5launch'), ''));
 
     $settings->add(new admin_setting_configtext_mod_cmi5launch(
@@ -147,8 +143,7 @@ if ($ADMIN->fulltree) {
 
         // Show only a button, otherwise regular information showing.
         // This is the first time setup.
-        // Use this for the button instead of config text
-
+        // Use this for the button instead of config text.
         // Setup form link/button
         $setupurl = new moodle_url('/mod/cmi5launch/setupform.php');
         $setupbutton = html_writer::link(
@@ -190,9 +185,7 @@ if ($ADMIN->fulltree) {
         );
         $settings->add($setting);
 
-        // Display tenant info
-        // To corrrect hardcoded strings and follow moodles coding standards to have full sentences, we may need three get_string here.
-        // We could have them all in one long string (ie getstring . var . getstring . var) but I think this is better.- mb
+        // Display tenant info.
         $tenantnamestring = get_string('cmi5launchtenantnameis', 'cmi5launch') . $tenantname;
         $tenantidstring = get_string('cmi5launchtenantidis', 'cmi5launch') . $tenantid;
         $tenantwarning = get_string('cmi5launchtenant_warning', 'cmi5launch');
@@ -211,7 +204,7 @@ if ($ADMIN->fulltree) {
 
         $settings->add($setting);
 
-            // Token setup form link/button.
+        // Token setup form link/button.
         $tokenurl = new moodle_url('/mod/cmi5launch/tokensetup.php');
         $tokenbutton = html_writer::link(
             $tokenurl,
@@ -227,9 +220,6 @@ if ($ADMIN->fulltree) {
 
     }
 
-
-    // MB.
-    // Grade stuff I'm bringing over.
     // Default grade settings.
     $settings->add(new admin_setting_heading('cmi5launch/gradesettings', get_string('defaultgradesettings', 'cmi5launch'), ''));
     $settings->add(new admin_setting_configselect(

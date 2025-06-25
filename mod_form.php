@@ -146,6 +146,11 @@ class mod_cmi5launch_mod_form extends moodleform_mod {
         $this->add_action_buttons();
     }
 
+    /**
+     * Add completion rules to the form.
+     *
+     * @return array
+     */
     public function add_completion_rules() {
         $mform =& $this->_form;
 
@@ -206,6 +211,12 @@ class mod_cmi5launch_mod_form extends moodleform_mod {
         return ['completionverbgroup', 'completionexpirygroup'];
     }
 
+    /**
+     * Check if completion rules are enabled.
+     *
+     * @param array $data The submitted form data.
+     * @return bool True if at least one completion rule is enabled, false otherwise.
+     */
     public function completion_rule_enabled($data) {
         if (!empty($data['completionverbenabled']) && !empty($data['cmi5verbid'])) {
             return true;
@@ -216,6 +227,11 @@ class mod_cmi5launch_mod_form extends moodleform_mod {
         return false;
     }
 
+    /**
+     * Get the data from the form.
+     *
+     * @return stdClass The data from the form.
+     */
     public function get_data() {
         $data = parent::get_data();
         if (!$data) {
@@ -234,6 +250,11 @@ class mod_cmi5launch_mod_form extends moodleform_mod {
         return $data;
     }
 
+    /**
+     * Preprocess the data before displaying the form.
+     *
+     * @param array $defaultvalues The default values for the form.
+     */
     public function data_preprocessing(&$defaultvalues) {
         parent::data_preprocessing($defaultvalues);
 
@@ -286,7 +307,12 @@ class mod_cmi5launch_mod_form extends moodleform_mod {
         }
 
     }
-    // Validate the form elements after submitting (server-side).
+    /**
+     * Validate the form elements after submitting (server-side).     *
+     * @param array $data The submitted form data.
+     * @param array $files The submitted files.
+     * @return array An array of errors, if any.
+     */
     public function validation($data, $files) {
         global $CFG, $USER;
         $errors = parent::validation($data, $files);

@@ -25,7 +25,7 @@
 
 // Needed for moodle page.
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
-
+require_login($course, false, $cm);
 // Tell moodle about our page, tell it what the url is.
 $PAGE->set_url('/mod/cmi5launch/setup.php');
 // Tell moodle the context, in this case the site context (it's system wide not a course or course page.)

@@ -35,7 +35,7 @@ class au {
 
     // Uppercase values because that's how they come from player.
     // Moodle wants all lowercase, but we need to be able to receive the data from the player.
-    public $launchmethod, $lmsid, $moveon, $auindex, $activitytype, $masteryscore;
+    public $launchMethod, $lmsId, $moveOn, $auIndex, $activityType, $masteryScore;
     // Constructs AUs. Is fed array and where array key matches property, sets the property.
     public function __construct($statement) {
 

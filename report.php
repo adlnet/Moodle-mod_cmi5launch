@@ -1,4 +1,30 @@
+<script>
+    function key_test(inforfornextpage) {
+
+        // Onclick calls this
+        if (event.keyCode === 13 || event.keyCode === 32) {
+
+            mod_cmi5launch_open_report(inforfornextpage);
+        }
+    }
+
+
+    // Function to run when the experience is launched (on click).
+    function mod_cmi5launch_open_report(inforfornextpage) {
+        // Set the form paramters.
+        document.getElementById('session_report').value = inforfornextpage;
+        // Post it.
+        document.getElementById('launchform').submit();
+    }
+</script>
+
+<form action="<?php echo $backurl ?>" method="get">
+    <input id="id" name="id" type="hidden" value="<?php echo $cmi5launch->course ?>">
+    <input type="submit" value="Back" />
+</form>
 <?php
+
+
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -94,29 +120,6 @@ $cmi5launchsettings = cmi5launch_settings($cmi5launch->id);
 // Activate the secondary nav tab.
 navigation_node::override_active_url(new moodle_url('/mod/cmi5launch/report.php', ['id' => $id]));
 
-?>
-<script>
-    function key_test(inforfornextpage) {
-
-        // Onclick calls this
-        if (event.keyCode === 13 || event.keyCode === 32) {
-
-            mod_cmi5launch_open_report(inforfornextpage);
-        }
-    }
-
-
-    // Function to run when the experience is launched (on click).
-    function mod_cmi5launch_open_report(inforfornextpage) {
-        // Set the form paramters.
-        document.getElementById('session_report').value = inforfornextpage;
-        // Post it.
-        document.getElementById('launchform').submit();
-    }
-</script>
-
-<?php
-
 // Trigger a report viewed event.
 // MB - we don't currently do this, maybe in future.
 /*
@@ -179,8 +182,7 @@ if (has_capability('mod/cmi5launch:viewgrades', $context)) {
     }
 } else {
 
-    // If the user does not have the correct capability then we are looking at a specific user,
-    // who is not a teacher and needs to see only their grades.
+    // If the user does not have the correct capability then we are looking at a specific user who is not a teacher and needs to see only their grades.
     // Retrieve that user from DB.
     $user = $DB->get_record('user', ['id' => $USER->id]);
 
@@ -196,14 +198,6 @@ if (has_capability('mod/cmi5launch:viewgrades', $context)) {
     // Where back button goes.
     $backurl = $CFG->wwwroot . '/grade/report/user/index.php' . '?id=' . $cmi5launch->course;
 }
-
-// Create back button.
-?>
-<form action="<?php echo $backurl ?>" method="get">
-    <input id="id" name="id" type="hidden" value="<?php echo $cmi5launch->course ?>">
-    <input type="submit" value="Back" />
-</form>
-<?php
 
 // Reload cmi5 course instance.
 $record = $DB->get_record('cmi5launch', ['id' => $cmi5launch->id]);
