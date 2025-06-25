@@ -3,8 +3,6 @@
 # Node dependencies
 node_modules/
 
-# Grunt and RequireJS build output
-amd/build/
 
 # npm logs
 npm-debug.log*
