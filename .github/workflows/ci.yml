@@ -98,6 +98,15 @@ jobs:
       - name: Grunt
         if: ${{ !cancelled() }}
         run: moodle-plugin-ci grunt --max-lint-warnings 0
+      - name: Debug Git status after Grunt
+        if: ${{ !cancelled() }}
+        run: |
+        echo " Git status:"
+        git status
+        echo " Git diff stat:"
+        git diff --stat
+        echo " Full Git diff:"
+        git diff
 
       - name: PHPUnit tests
         if: ${{ !cancelled() }}
