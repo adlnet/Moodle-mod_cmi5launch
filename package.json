@@ -9,6 +9,10 @@
       "@babel/preset-env": "^7.22.0",
       "requirejs": "^2.3.6",
       "uglify-js": "^3.17.4"
-    }
+    },
+    "scripts": {
+  "build": "grunt amd"
+}
+
   }
   
