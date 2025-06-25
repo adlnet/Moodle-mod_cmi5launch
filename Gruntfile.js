@@ -21,7 +21,7 @@ module.exports = function(grunt) {
                     baseUrl: "amd/build",
                     name: "settings",  
                     out: "amd/build/settings.min.js",
-                    optimize: "uglify"
+                    optimize: "none"
                 }
             },
             tenant: {
@@ -29,7 +29,7 @@ module.exports = function(grunt) {
                     baseUrl: "amd/build",
                     name: "tenant",
                     out: "amd/build/tenant.min.js",
-                    optimize: "uglify"
+                    optimize: "none"
                 }
             }
         }
