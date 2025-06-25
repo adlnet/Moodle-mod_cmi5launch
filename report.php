@@ -1,27 +1,3 @@
-<script>
-    function key_test(inforfornextpage) {
-
-        // Onclick calls this
-        if (event.keyCode === 13 || event.keyCode === 32) {
-
-            mod_cmi5launch_open_report(inforfornextpage);
-        }
-    }
-
-
-    // Function to run when the experience is launched (on click).
-    function mod_cmi5launch_open_report(inforfornextpage) {
-        // Set the form paramters.
-        document.getElementById('session_report').value = inforfornextpage;
-        // Post it.
-        document.getElementById('launchform').submit();
-    }
-</script>
-
-<form action="<?php echo $backurl ?>" method="get">
-    <input id="id" name="id" type="hidden" value="<?php echo $cmi5launch->course ?>">
-    <input type="submit" value="Back" />
-</form>
 <?php
 
 
@@ -142,7 +118,7 @@ if (empty($noheader)) {
     $strreport = get_string('cmi5launchreport', 'cmi5launch');
     $strattempt = get_string('cmi5launchattemptrow', 'cmi5launch');
 
-    // Setup the page
+    // Setup the page.
     $PAGE->set_title("$course->shortname: " . format_string($course->id));
     $PAGE->set_heading($course->fullname);
     $PAGE->activityheader->set_attrs([
@@ -327,7 +303,30 @@ $reporttable->get_page_start();
 $reporttable->get_page_size();
 $reporttable->finish_output();
 ?>
+<script>
+    function key_test(inforfornextpage) {
 
+        // Onclick calls this
+        if (event.keyCode === 13 || event.keyCode === 32) {
+
+            mod_cmi5launch_open_report(inforfornextpage);
+        }
+    }
+
+
+    // Function to run when the experience is launched (on click).
+    function mod_cmi5launch_open_report(inforfornextpage) {
+        // Set the form paramters.
+        document.getElementById('session_report').value = inforfornextpage;
+        // Post it.
+        document.getElementById('launchform').submit();
+    }
+</script>
+
+<form action="<?php echo $backurl ?>" method="get">
+    <input id="id" name="id" type="hidden" value="<?php echo $cmi5launch->course ?>">
+    <input type="submit" value="Back" />
+</form>
 <form id="launchform" action="session_report.php" method="get">
     <input id="id" name="id" type="hidden" value="<?php echo $id ?>">
     <input id="session_report" name="session_report" type="hidden" value="default">

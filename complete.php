@@ -15,11 +15,13 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Launches the experience with the requested registration
+ * Launches the experience with the requested registration.
+ * 
  * @package mod_cmi5launch
  * @copyright  2013 Andrew Downes
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once('completion_check.php');
 

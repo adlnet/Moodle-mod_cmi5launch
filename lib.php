@@ -148,7 +148,7 @@ function cmi5launch_update_instance(stdClass $cmi5launch, ?mod_cmi5launch_mod_fo
 
 
 
-// The below functions are blank. I assume they can be filled in to implement activity tracking. -MB
+// The below functions are blank. I assume they can be filled in to implement activity tracking. -MB.
 /**
  * Prepares the recent activity data
  *
@@ -652,9 +652,9 @@ function cmi5launch_get_statements($url, $basiclogin, $basicpass, $version, $act
  * Build a cmi5 Agent based on the current user
  *
  * @package  mod_cmi5launch
+ * @param string $instance The Moodle id for the cmi5 module instance.
  * @return cmi5 Agent $agent Agent
  */
-
 function cmi5launch_getactor($instance) {
     global $USER, $CFG;
 
@@ -725,8 +725,6 @@ function cmi5launch_settings($instance) {
 
 /**
  * Return grade for given user or all users.
- *
- * @global stdClass
  * @param object $cmi5launch. Cmi5 mod instance object.
  * @param int $userid optional user id, 0 means all users.
  * @return array array of grades, false if none
@@ -896,11 +894,12 @@ function cmi5launch_grade_item_update($cmi5launch, $grades = null) {
         // Calculate grade based on grade type, and update rawgrade (a param of grade item).
         switch($gradetype){
 
-            // 'GRADE_AUS_CMI5' = '0'.
-            // 'GRADE_HIGHEST_CMI5' = '1'.
-            // 'GRADE_AVERAGE_CMI5', =  '2'.
-            // 'GRADE_SUM_CMI5', = '3'.
-
+            /* For reference: 
+                GRADE_AUS_CMI5 = 0.
+                GRADE_HIGHEST_CMI5 = 1.
+                GRADE_AVERAGE_CMI5 =  2.
+                GRADE_SUM_CMI5 = 3.
+            */
             case 1:
                 foreach ($grades as $key => $grade) {
 

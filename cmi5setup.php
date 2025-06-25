@@ -28,12 +28,12 @@ require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require_login($course, false, $cm);
 // Tell moodle about our page, tell it what the url is.
 $PAGE->set_url('/mod/cmi5launch/setup.php');
-// Tell moodle the context, in this case the site context (it's system wide not a course or course page.)
+// Tell moodle the context, in this case the site context (it's system wide not a course or course page).
 $PAGE->set_context(\context_system::instance());
-// Title tells what is on tab
+// Title tells what is on tab.
 $PAGE->set_title(title: get_string('cmi5launchsetuptitle', 'cmi5launch'));
 
-// When you want to output html use the moodle core output rendereer: often overridden in theme
+// When you want to output html use the moodle core output rendereer: often overridden in theme.
 echo $OUTPUT->header();
 
 // Easier to make template as object typecast to array.
@@ -44,7 +44,7 @@ $templatecontext = (object) [
 // Takes template and template context - basically some variables passed into template and used to render stuff.
 echo $OUTPUT->render_from_template('mod_cmi5launch/setup', $templatecontext);
 
-// When we first come here lets check if there are plugin settings for username, passowrd, and url, there shouldnt be so display the form.
+// When we first come here check if there are plugin settings for username, passowrd, and url.
 // If there are, then we should display the tenant form.
 // Retrieve the three settings from the database.
 $playerurl = get_config('cmi5launch', 'cmi5launchplayerurl');
@@ -54,7 +54,7 @@ $playerpass = get_config('cmi5launch', 'cmi5launchbasepass');
 $playerpass = null;
 
 // If the settings are not set, then display the first form.
-if(!$playerurl || !$playername || !$playerpass){
+if(!$playerurl || !$playername || !$playerpass) {
 
     redirect(url: $CFG->wwwroot . '/mod/cmi5launch/setupform.php', message: get_string('cmi5launchsetupcancel', 'cmi5launch'));
 

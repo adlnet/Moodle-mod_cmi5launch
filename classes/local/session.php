@@ -33,13 +33,13 @@ defined('MOODLE_INTERNAL') || die();
 class session {
     // Properties, these need to be capitilized as they are because that's how they are returned in statements and need to be saved.
     // Id is session id.
-    public $id, $tenantname, $tenantid, $registrationscoursesausid, $lmsid,
+    public $id, $tenantname, $tenantId, $registrationsCoursesAusId, $lmsid,
     $progress = [], $aulaunchurl, $launchurl, $grade,
-    $createdat, $updatedat, $registrationcourseausid,
-    $code, $lastrequesttime, $launchtokenid, $launchmode, $masteryscore,
-    $islaunched, $isinitialized, $initializedat, $iscompleted,
-    $ispassed, $isfailed, $isterminated, $isabandoned, $courseid, $completed, $passed, $inprogress;
-
+    $createdAt, $updatedAt, $registrationCourseAusId,
+    $code, $lastRequestTime, $launchTokenId, $launchMode, $masteryScore,
+    $isLaunched, $isInitialized, $initializedAt, $isCompleted,
+    $isPassed, $isFailed, $isTerminated, $isAbandoned, $courseid, $completed, $passed, $inprogress;
+    
     // Database properties, that need to be lower case.
     public $sessionid, $userid, $registrationscoursesausid, $createdat, $updatedat, $launchtokenid, $lastrequesttime, $launchmode, $masteryscore, $tenantid,
     $score, $response, $islaunched, $isinitialized, $initializedat, $duration, $iscompleted, $ispassed, $isfailed, $isterminated, $isabandoned, $launchmethod, $moodlecourseid;

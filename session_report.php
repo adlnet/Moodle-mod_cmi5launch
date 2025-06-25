@@ -111,14 +111,6 @@ if (empty($noheader)) {
     echo $OUTPUT->header();
 }
 
-// Back button.
-?>
-<form action="report.php" method="get">
-    <input id="id" name="id" type="hidden" value="<?php echo $id ?>">
-    <input type="submit" value="Back" />
-</form>
-<?php
-
 // Retrieve the user.
 $user = $DB->get_record('user', ['id' => $userid]);
 
@@ -149,7 +141,7 @@ $table->define_baseurl($PAGE->url);
 
 // Decode and put AU ids in array.
 $auids = (json_decode($auidprevpage, true));
-// Aurecord to hold record
+// Aurecord to hold record.
 $aurecord = null;
 
 // For each AU id, find the one that matches our auid from previous page, this is the record we want.
@@ -159,11 +151,9 @@ foreach ($auids as $key => $auid) {
     // Retrieve record from table.
     $aurecord = $DB->get_record('cmi5launch_aus', ['id' => $auid, 'lmsid' => $cmi5idprevpage]);
     if (!$aurecord) {
-        // If no record found,
-        // do nothin,
+        // If no record found, do nothing,
         continue;
     } else {
-
 
         if (isset($aurecord->sessions)) {
             // Retrieve session ids for this course.
@@ -193,7 +183,8 @@ foreach ($auids as $key => $auid) {
                 if (!empty($session->createdat)) {
 
                     // Retrieve createdAt and format.
-                    $date = new DateTime($session->createdat, new DateTimeZone('US/Eastern'));
+                    $date = new DateTime($session->createdat, 
+                        new DateTimeZone('US/Eastern'));
                     $date->setTimezone(new DateTimeZone('America/New_York'));
                     $datestart = $date->format('D d M Y H:i:s');
                 } else {
@@ -204,18 +195,21 @@ foreach ($auids as $key => $auid) {
                 if (!empty($session->lastrequesttime)) {
 
                     // Retrieve lastRequestTime and format.
-                    $date = new DateTime($session->lastrequesttime, new DateTimeZone('US/Eastern'));
+                    $date = new DateTime($session->lastrequesttime, 
+                        new DateTimeZone('US/Eastern'));
                     $date->setTimezone(new DateTimeZone('America/New_York'));
                     $datefinish = $date->format('D d M Y H:i:s');
                 } else {
                     // If no lastRequesttime then use updatedat.
                     // Retrieve lastRequestTime and format.
-                    $date = new DateTime($session->updatedat, new DateTimeZone('US/Eastern'));
+                    $date = new DateTime($session->updatedat, 
+                        new DateTimeZone('US/Eastern'));
                     $date->setTimezone(new DateTimeZone('America/New_York'));
                     $datefinish = $date->format('D d M Y H:i:s');
                 }
                 // The users sessions.
-                $usersession = $DB->get_record('cmi5launch_sessions', ['sessionid' => $sessionid, 'userid' => $userid, 'moodlecourseid' => $id]);
+                $usersession = $DB->get_record('cmi5launch_sessions', 
+                    ['sessionid' => $sessionid, 'userid' => $userid, 'moodlecourseid' => $id]);
 
                 // Add row data.
                 $rowdata["Attempt"] = get_string('cmi5launchattemptrow', 'cmi5launch') . $attempt;
@@ -225,7 +219,7 @@ foreach ($auids as $key => $auid) {
                 // AUs moveon specification.
                 $aumoveon = $aurecord->moveon;
 
-                // 0 is no 1 is yes, these are from CMI5 player
+                // 0 is no 1 is yes, these are from CMI5 player.
                 $iscompleted = $session->iscompleted;
                 $ispassed = $session->ispassed;
                 $isfailed = $session->isfailed;
@@ -280,8 +274,9 @@ foreach ($auids as $key => $auid) {
                 $table->add_data_keyed($rowdata);
             }
         }
-    } // end else from aurecord if
-} // end of for each auids
+    } // End else from aurecord if.
+} // End of for each auids.
+
 // Display the grading type, highest, avg, etc.
 $scorecolumns[] = 'Grading type';
 $scoreheaders[] = 'Grading type';
@@ -313,3 +308,11 @@ $scoretable->get_page_size();
 $table->add_separator();
 $scoretable->finish_output();
 $table->finish_output();
+// Back button.
+?>
+<form action="report.php" method="get">
+    <input id="id" name="id" type="hidden" value="<?php echo $id ?>">
+    <input type="submit" value="Back" />
+</form>
+<?php
+

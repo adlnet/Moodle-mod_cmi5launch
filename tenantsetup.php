@@ -84,7 +84,8 @@ if ($mform->is_cancelled()) {
             if ($idresult && $result) {
 
                 // If result is true then redirect back to settings page.
-                redirect(url: $CFG->wwwroot . '/mod/cmi5launch/tokensetup.php', message: get_string('cmi5launchtenantmadesuccess', 'cmi5launch'));
+                redirect(url: $CFG->wwwroot . '/mod/cmi5launch/tokensetup.php', 
+                    message: get_string('cmi5launchtenantmadesuccess', 'cmi5launch'));
 
             } else {
                 echo get_string('cmi5launchtenantfailsave', 'cmi5launch');

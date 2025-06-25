@@ -83,7 +83,7 @@ $string['cmi5launchgradesettings_help'] = 'These are site-wide, default values u
 
 $string['othersettings'] = 'Additional settings';
 
-// Cmi5 settings
+// Cmi5 settings.
 
 // Header.
 $string['cmi5launchsettingsheader'] = 'cmi5 player settings';
@@ -162,7 +162,7 @@ $string['cmi5launchtokensetupheading'] = 'Generate new bearer token for cmi5 pla
 
 
 
-// cmi5_connectors
+// CMI5_connectors.
 $string['cmi5launchcommerror'] = " CMI5 Player is not communicating. Is it running?";
 $string['cmi5launchreturned'] = " CMI5 Player returned ";
 $string['cmi5launchwith'] = " error. With message";
@@ -182,7 +182,7 @@ $string['cmi5launchgeterror'] = "communicating with player, sending or crafting 
 $string['cmi5launchsessioninfoerror'] = "retrieving the session information.";
 $string['cmi5launchsessioninfouncaughterror'] = "Uncaught error retrieving the session information.";
 
-// tenant setup
+// Tenant setup.
 $string['cmi5launchtenanttitle'] = 'Creating  a tenant';
 $string['cmi5launchtenantmadesuccess'] = 'Tenant made and saved successfully';
 $string['cmi5launchtenantfailsave'] = "Failed to save tenant to DB.";
@@ -190,7 +190,7 @@ $string['cmi5launchtenantfailsavemessage'] = "Tenant name failed to save as sett
 $string['cmi5launchtenantfailplayersavemessage'] = "Failed to make tenant. Check connection to player and tenant name (cannot reuse old tenant names).";
 $string['cmi5launchtenantnamefail'] = 'Tenant name not retrieved or blank. Please try again.';
 
-// For forms
+// For forms.
 $string['cmi5launchsetupformplayer'] = 'This is needed to connect to player';
 $string['cmi5launchtenantformplayer'] = '<p>Please enter a tenant name. When submitted it will create a tenant in the cmi5 player and automatically retrieve and save a bearer token for it as well</p>';
 
@@ -221,32 +221,6 @@ $string['mod_cmi5launch_last_attempt_lock'] = 'Lock after final attempt';
 $string['lastattemptlock_help'] = 'If enabled, a student is prevented from launching the cmi5 player after using up all their allocated attempts.';
 $string['mod_cmi5launch_last_attempt_lockdesc'] = 'If enabled, a student is prevented from launching the cmi5 player after using up all their allocated attempts.';
 
-/*
-MB - Not sure if we need ALL of these
-No - If a previous attempt is completed, passed or failed, the student will be provided with the option to enter in review mode or start a new attempt.
-When previous attempt completed, passed or failed - This relies on the SCORM package setting the status of \'completed\', \'passed\' or \'failed\'.
-Always - Each re-entry to the SCORM activity will generate a new attempt and the student will not be returned to the same point they reached in their previous attempt.';
-
-$string['forceattemptalways'] = 'Always';
-$string['forceattemptoncomplete'] = 'When previous attempt completed, passed or failed';
-$string['forcejavascript'] = 'Force users to enable JavaScript';
-$string['forcejavascript_desc'] = 'If enabled (recommended) this prevents access to SCORM objects when JavaScript is not supported/enabled in a users browser. If disabled the user may view the SCORM but API communication will fail and no grade information will be saved.';
-$string['forcejavascriptmessage'] = 'JavaScript is required to view this object, please enable JavaScript in your browser and try again.';
-$string['found'] = 'Manifest found';
-$string['frameheight'] = 'The height of the stage frame or window.';
-$string['framewidth'] = 'The width of the stage frame or window.';
-$string['fromleft'] = 'From left';
-$string['fromtop'] = 'From top';
-$string['fullscreen'] = 'Fill the whole screen';
-
-Not sure if we want to implement these?
-$string['masteryoverride'] = 'Mastery score overrides status';
-$string['masteryoverride_help'] = 'If enabled and a mastery score is provided, when LMSFinish is called and a raw score has been set, status will be recalculated using the raw score and mastery score and any status provided by the SCORM (including "incomplete") will be overridden.';
-$string['masteryoverridedesc'] = 'This preference sets the default for the mastery score override setting';
-*/
-
-
-
 $string['general'] = 'General data';
 $string['mod_cmi5launch_grade_average'] = 'Average grade';
 $string['gradeforattempt'] = 'Grade for attempt';
@@ -271,7 +245,7 @@ $string['grademethoddesc'] = 'The grading method defines how the grade for a sin
 $string['gradereported'] = 'Grade reported';
 $string['gradesettings'] = 'Grade settings';
 
-// Grade errors
+// Grade errors.
 $string['cmi5launchnogradeerror'] = 'No grades to update. No record for user found in this course.';
 $string['cmi5launchgradeerror'] = ' Error in updating or checking user grades. Report this error to system administrator: ';
 $string['cmi5launchgradetypenotfound'] = 'Grade type not found.';
@@ -292,37 +266,37 @@ $string['cmi5launchlrssettingscorrect'] = ' Check LRS settings are correct.';
 $string['cmi5launchlrscommunicationerror'] = 'Unable to communicate with LRS. Caught exception: ';
 $string['cmi5launchlrschecksettings'] = " Check LRS is up, username and password are correct, and LRS endpoint is correct.";
 
-// Related to actor
+// Related to actor.
 $string['cmi5launchactorretrievalerror'] = 'Unable to retrieve actor name from LRS. Caught exception: ';
 $string['cmi5launchactornotretrieved'] = '(Actor name not retrieved)';
 
-// Related to verb
+// Related to verb.
 $string['cmi5launchverbretrievalerror'] = 'Unable to retrieve verb from LRS. Caught exception: ';
 $string['cmi5launchverbnotretrieved'] = '(Verb not retrieved)';
 
-// Related to object
+// Related to object.
 $string['cmi5launchobjectnotpresent'] = '(Object name not retrieved/there is no object in this statement)';
 $string['cmi5launchobjectretrievalerror'] = 'Unable to retrieve object name from LRS. Caught exception: ';
 $string['cmi5launchobjectnotretrieved'] = '(Object name not retrieved)';
 
-// Related to timestamp
+// Related to timestamp.
 $string['cmi5launchtimestampnotpresent'] = '(Timestamp not retrieved or not present in statement)';
 $string['cmi5launchtimestampretrievalerror'] = 'Unable to retrieve timestamp from LRS. Caught exception: ';
 $string['cmi5launchtimestampnotretrieved'] = '(Timestamp not retrieved)';
 
-// Related to score
+// Related to score.
 $string['cmi5launchscorenotpresent'] = '(Score not retrieved or not present in statement)';
 $string['cmi5launchscoreretrievalerror'] = 'Unable to retrieve score from LRS. Caught exception: ';
 $string['cmi5launchscorenotretrieved'] = '(Score not retrieved)';
 
-// Related to session
+// Related to session.
 $string['cmi5launchsessionidretrievalerror'] = 'Unable to retrieve session id from LRS. Caught exception: ';
 $string['cmi5launchsessionupdateerror'] = 'Error in updating session. Report this error to system administrator: ';
 $string['cmi5launchsessioncreationerror'] = 'Error in creating session. Report this error to system administrator: ';
 $string['cmi5launchsessionretrievederror'] = '<p>Error attempting to get session data from DB. Check session id.</p>';
 $string['cmi5launchsessionbuilderror'] = 'Statement to build session is null or not an array/object.';
 
-// Related to statements
+// Related to statements.
 $string['cmi5launchstatementsretrievalerror'] = 'Unable to retrieve statements from LRS. Caught exception: ';
 $string['cmi5launchstatementsnotretrieved'] = '(Statements not retrieved)';
 
@@ -457,7 +431,7 @@ $string['cmi5launchsessionaucompletedfailed'] = 'Completed and Failed';
 $string['cmi5launchsessiongradehigh'] = 'Highest';
 $string['cmi5launchsessiongradeaverage'] = 'Average';
 
-// For view.php
+// For view.php.
 $string['cmi5launchviewcourseerror'] = 'Creating or retrieving user course record. Contact your system administrator with error: ';
 $string['cmi5launchviewexceptionau'] = 'Excepted AU, found ';
 $string['cmi5launchviewauerror'] = 'retrieving and displaying AU satisfied status and grade. Contact your system administrator with error: ';

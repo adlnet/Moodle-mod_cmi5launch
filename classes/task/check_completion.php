@@ -15,6 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Checks the completion state of cmi5launch modules.
  * @package mod_cmi5launch
  * @copyright  2013 Andrew Downes
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -25,11 +26,30 @@ defined('MOODLE_INTERNAL') || die();
 require_once(dirname(dirname(dirname(__FILE__))).'/lib.php');
 require_once($CFG->dirroot.'/lib/completionlib.php');
 
+/**
+ * Scheduled task to check the completion state of cmi5launch modules.
+ *
+ * @package mod_cmi5launch
+ * */
 class check_completion extends \core\task\scheduled_task {
+
+    /**
+     * Returns the name of the task.
+     *
+     * @return string
+     */
     public function get_name() {
         return get_string('checkcompletion', 'mod_cmi5launch');
     }
 
+    /**
+     * Execute the task.
+     *
+     * This function checks the completion state of all cmi5launch modules
+     * and updates the completion state for each user enrolled in the course.
+     *
+     * @return void
+     */
     public function execute() {
         global $DB;
 
