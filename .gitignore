@@ -1,1 +1,19 @@
 .vscode/
+
+# Node dependencies
+node_modules/
+
+# Grunt and RequireJS build output
+amd/build/
+
+# npm logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Optional: VS Code project settings
+.vscode/
+
+# Optional: OS-specific files
+.DS_Store
+Thumbs.db
