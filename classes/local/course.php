@@ -22,28 +22,36 @@
  */
 
  namespace mod_cmi5launch\local;
- defined('MOODLE_INTERNAL') || die();
-
+/*
+ * This class represents a course in the cmi5 context.
+ * It contains properties that are relevant to the course and method to construct a course object.
+ */
 class course {
 
-    // Lowercase values are for saving to DB.
+    /* Properties of the course object.
+     * These properties are set based on the data retrieved from the database.
+     * They represent various attributes of a cmi5 course.
+     */
     public $id, $url, $ausgrades, $type, $lmsid, $grade, $scores, $title, $moveon, $auindex,
     $parents, $objectives, $launchurl, $sessions = [], $sessionid, $returnurl, $description = [], $activitytype, $launchmethod,
     $masteryscore, $progress, $noattempt, $completed, $passed, $inprogress, $satisfied, $moodlecourseid;
 
-    // The id assigned by cmi5 player.
+    /* The id assigned by cmi5 player.
+    */
     public $courseid;
 
-    // The user id who is taking the course.
+    /* The user id who is taking the course. */
     public $userid;
 
-    // The registration id assigned by the CMI5 player.
+    /* The registration id assigned by the CMI5 player.*/
     public $registrationid;
 
-    // Array of AUs in the course.
+    /* Array of AUs in the course.*/
     public $aus = [];
 
-    // Constructs courses. Is fed array and where array key matches property, sets the property.
+    /* Constructs courses. Is fed array and where array if key matches property, sets the property.
+     * @param array $statement The array containing course data.
+    */
     public function __construct($statement) {
 
         foreach ($statement as $key => $value) {

@@ -54,7 +54,7 @@ $playerpass = get_config('cmi5launch', 'cmi5launchbasepass');
 $playerpass = null;
 
 // If the settings are not set, then display the first form.
-if(!$playerurl || !$playername || !$playerpass) {
+if (!$playerurl || !$playername || !$playerpass) {
 
     redirect(url: $CFG->wwwroot . '/mod/cmi5launch/setupform.php', message: get_string('cmi5launchsetupcancel', 'cmi5launch'));
 

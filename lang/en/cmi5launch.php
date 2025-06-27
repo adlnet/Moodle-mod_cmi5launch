@@ -228,12 +228,12 @@ $string['mod_cmi5launch_grade_highest'] = 'Highest grade';
 $string['grademethod'] = 'Grading method';
 $string['grademethod_help'] = 'The grading method defines how the grade for a single attempt of the activity is determined.';
 
-// for lib.php
+// For lib.php.
 $string['cmi5launchaunotfound'] = 'No ids match';
 $string['cmi5launchstatementdoesnotequal'] = 'Type from statement does not equal either block or AU.';
 $string['cmi5lauchincorrectvalue'] = 'Incorrect value passed to function cmi5launch_find_au_satisfied. Correct values are a boolean or array';
 
-// For tokensetup.php
+// For tokensetup.php.
 $string['cmi5launchtokensetuptitle'] = 'Creating a tenant';
 $string['cmi5launchtokensaveerror'] = 'Failed to save token to settings. Check connection with DB and try again.';
 $string['cmi5launchtokensaveerror'] = 'Failed to save token to settings. Check connection with DB and try again.';

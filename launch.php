@@ -72,7 +72,7 @@ $userscourse = $DB->get_record('cmi5launch_usercourse', ['courseid'  => $record-
 // To hold launch url.
 $location = "";
 
-// Most of the functions below have their own error handling. 
+// Most of the functions below have their own error handling.
 // We will encapsulate here in case there are any php errors, such as json_decode not working, etc.
 // Set error and exception handler to catch and override the default PHP error messages, to make messages more user friendly.
 set_error_handler('mod_cmi5launch\local\custom_warning', E_WARNING);

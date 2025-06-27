@@ -24,6 +24,8 @@
 
 namespace mod_cmi5launch\local;
 
+defined(constant_name: 'MOODLE_INTERNAL') || die;
+
 /**
  * An exception handler to use in AU cases when many different exceptions for data errors may be thrown.
  * @param \Throwable $exception - The exception that was thrown.
@@ -58,7 +60,8 @@ function exception_grade(\Throwable $exception) {
  */
 function progresslrsreq_warning($errno, $errstr, $errfile, $errline) {
 
-    throw new nullException(get_string('cmi5launchlrscommunicationerror', 'cmi5launch') . $errstr . get_string('cmi5launchlrschecksettings', 'cmi5launch' ), 0);
+    throw new nullException(get_string('cmi5launchlrscommunicationerror', 'cmi5launch')
+        . $errstr . get_string('cmi5launchlrschecksettings', 'cmi5launch' ), 0);
 
 }
 
@@ -73,7 +76,8 @@ function progresslrsreq_warning($errno, $errstr, $errfile, $errline) {
  * @package mod_cmi5launch
  */
 function custom_warningau($errno, $errstr, $errfile, $errline) {
-    echo (get_string('cmi5launcherrorau', 'cmi5launch')). "<br> $errstr at $errfile on $errline:" .  get_string('cmi5launcherrorausession', 'cmi5launch');
+    echo (get_string('cmi5launcherrorau', 'cmi5launch')). "<br> $errstr at $errfile on $errline:"
+        .  get_string('cmi5launcherrorausession', 'cmi5launch');
 
     exit;
 
@@ -90,7 +94,8 @@ function custom_warningau($errno, $errstr, $errfile, $errline) {
  */
 function custom_warning($errno, $errstr, $errfile, $errline) {
 
-    throw new customException(get_string('cmi5launcherrorexperience', 'cmi5launch'). $errstr .' at '. $errfile .' on ' .$errline, 0);
+    throw new customException(get_string('cmi5launcherrorexperience', 'cmi5launch')
+        . $errstr .' at '. $errfile .' on ' .$errline, 0);
 
 }
 
@@ -106,22 +111,21 @@ function custom_warning($errno, $errstr, $errfile, $errline) {
  */
 function custom_warningview($errno, $errstr, $errfile, $errline) {
 
-    throw new customException(get_string('cmi5launcherrormain', 'cmi5launch') . $errstr .' at '. $errfile .' on ' .$errline, 0);
+    throw new customException(get_string('cmi5launcherrormain', 'cmi5launch') 
+        . $errstr .' at '. $errfile .' on ' .$errline, 0);
 
 }
 /**
  * An exception handler to use in AU cases when many different exceptions for data errors may be thrown.
- * @param mixed $errno - The error number.
- * @param mixed $errstr - The error message.
- * @param mixed $errfile -  The file where the error occurred.
- * @param mixed $errline - The line number where the error occurred.
+ * @param \Throwable $exception - The exception that was thrown.
  * @throws \mod_cmi5launch\local\nullException
  * @return never
  * @package mod_cmi5launch
  */
 function exception_progresslrsreq(\Throwable $exception) {
 
-    throw new nullException(get_string('cmi5launchlrscommunicationerror', 'cmi5launch') . $exception->getMessage() . get_string('cmi5launchlrschecksettings', 'cmi5launch'), 0);
+    throw new nullException(get_string('cmi5launchlrscommunicationerror', 'cmi5launch') 
+        . $exception->getMessage() . get_string('cmi5launchlrschecksettings', 'cmi5launch'), 0);
 }
 /**
  * A warning handler for LRS communications when many different exceptions for data errors may be thrown.
@@ -139,10 +143,7 @@ function progresslrs_warning($errno, $errstr, $errfile, $errline) {
 
 /**
  * An exception handler to use in LRS communications when many different exceptions for data errors may be thrown.
- * @param mixed $errno - The error number.
- * @param mixed $errstr - The error message.
- * @param mixed $errfile -  The file where the error occurred.
- * @param mixed $errline - The line number where the error occurred.
+ * @param \Throwable $exception - The exception that was thrown.
  * @throws \mod_cmi5launch\local\nullException
  * @return never
  * @package mod_cmi5launch
@@ -209,21 +210,24 @@ function grade_warning($errno, $errstr, $errfile, $errline) {
  */
 class nullException extends \Exception {
 
-    // Redefine the exception so message isn't optional
+    /**
+     * Redefine the exception so message isn't optional.
+     * @param string $message - The message to be displayed.
+     * @param int $code - The error code.
+     * @param \Throwable|null $previous -  The previous exception we are overriding,
+     */
     public function __construct($message, $code = 0, Throwable $previous = null) {
-        // some code
 
-        // make sure everything is assigned properly
+        // Make sure everything is assigned properly.
         parent::__construct($message, $code, $previous);
     }
 
-    // custom string representation of object (what is returned with echo)
+    /**
+     * Custom string representation of object (what is returned with echo).
+     * @return string - The string representation of the exception.
+     */
     public function __toString(): string {
         return __CLASS__ . ": [{$this->code}]: {$this->message}\n";
-    }
-
-    public function customfunction() {
-        echo "A custom function for this type of exception\n";
     }
 }
 
@@ -241,6 +245,12 @@ class playerException extends \Exception {
 
     // Redefine the exception so message isn't optional
     // I want an exception that takkkes what is missing and adds it to messsssage?
+        /**
+     * Redefine the exception so message isn't optional.
+     * @param string $message - The message to be displayed.
+     * @param int $code - The error code.
+     * @param \Throwable|null $previous -  The previous exception we are overriding,
+     */
     public function __construct($message, $code = 0, Throwable $previous = null) {
 
         $playermessage = get_string('cmi5launchplayerexception', 'cmi5launch') . $message;
@@ -249,7 +259,10 @@ class playerException extends \Exception {
     }
 
 
-    // Custom string representation of object (what is returned with echo)
+    /**
+     * Custom string representation of object (what is returned with echo).
+     * @return string - The string representation of the exception.
+     */
     public function __toString(): string {
         return __CLASS__ . ": [{$this->code}]: {$this->message}\n";
         // maybe here?

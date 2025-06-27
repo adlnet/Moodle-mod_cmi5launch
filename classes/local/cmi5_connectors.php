@@ -111,7 +111,7 @@ class cmi5_connectors {
 
     /**
      * Function to create a tenant.
-     * @param $newtenantname - the name the new tenant will be, retreived from Tenant Name textbox.
+     * @param string $newtenantname  The name the new tenant will be, retreived from Tenant Name textbox.
      * @return bool|string - Response from cmi5 player.
      * @throws playerException - If the request fails or returns an error.
      */
@@ -165,8 +165,8 @@ class cmi5_connectors {
      * Function to retrieve registration from cmi5 player.
      * This way uses the registration ID and GET request.
      * Registration  is "code" in returned json body.
-     * @param $registration - registration UUID
-     * @param $id - cmi5 launch id
+     * @param string $registration - Registration UUID.
+     * @param int $id - CMI5 launch id.
      * @return bool|string - Response from cmi5 player.
      * @throws playerException - If the request fails or returns an error.
      */
@@ -209,8 +209,8 @@ class cmi5_connectors {
      * This way uses the course id and actor name.
      * As this is a POST request it returns a new code everytime it is called.
      * Registration  is "code" in returned json body.
-     * @param $courseid - course id - The course ID in the CMI5 player.
-     * @param $id - the course id in MOODLE.
+     * @param int $courseid - The course ID in the CMI5 player.
+     * @param int $id - The course id in MOODLE.
      * @return string - The registration code from the CMI5 player.
      * @throws playerException - If the request fails or returns an error.
      */
@@ -277,8 +277,8 @@ class cmi5_connectors {
 
     /**
      * Function to retrieve a token from cmi5 player.
-     * @param $audience - the name the of the audience using the token.
-     * @param #tenantid - the id of the tenant.
+     * @param string $audience - The name the of the audience using the token.
+     * @param int $tenantid - The id of the tenant.
      * @return string - The token from the CMI5 player.
      * @throws playerException - If the request fails or returns an error.
      */
@@ -332,8 +332,8 @@ class cmi5_connectors {
 
     /**
      * Function to retrieve a launch URL for an AU.
-     * @param $id - courses's ID in MOODLE to retrieve corect record.
-     * @param $auindex -AU's index to send in the request for launch url.
+     * @param int $id - Courses's ID in MOODLE to retrieve corect record.
+     * @param int $auindex - AU's index to send in the request for launch url.
      * @return array - The launch URL and other info from the CMI5 player.
      * @throws playerException - If the request fails or returns an error.
      */
@@ -402,12 +402,12 @@ class cmi5_connectors {
 
     /**
      * Function to construct, send an URL, and save result as POST message to player.
-     * @param $cmi5launch_stream_and_send - the function that will be used to send the request.
-     * @param $databody - the data that will be used to construct the body of request as JSON.
-     * @param $url - The URL the request will be sent to.
-     * @param $filetype - The type of file being sent, either zip or json.
-     * @param ...$tokenorpassword is a variable length param. If one is passed, it is $token, if two it is $username and $password.
-     * @return mixed - $result is the response from cmi5 player.
+     * @param callable $cmi5launchstreamandsend - tThe function that will be used to send the request.
+     * @param array $databody - The data that will be used to construct the body of request as JSON.
+     * @param string $url - The URL the request will be sent to.
+     * @param string $filetype - The type of file being sent, either zip or json.
+     * @param string ...$tokenorpassword is a variable length param. If one is passed, it is $token, if two it is $username and $password.
+     * @return mixed $result - Is the response from cmi5 player.
      * @throws playerException - If the request fails or returns an error.
      */
     public function cmi5launch_send_request_to_cmi5_player_post($cmi5launchstreamandsend, $databody, $url, $filetype, ...$tokenorpassword) {
@@ -501,9 +501,9 @@ class cmi5_connectors {
 
     /**
      * Function to construct and send GET request to CMI5 player.
-     * @param $cmi5launch_stream_and_send - the function that will be used to send the request.
-     * @param $token - the token that will be used to authenticate the request.
-     * @param $url - The URL the request will be sent to.
+     * @param callable $cmi5launchstreamandsend - The function that will be used to send the request.
+     * @param string $token - The token that will be used to authenticate the request.
+     * @param string $url - The URL the request will be sent to.
      * @return mixed - $sessionDecoded is the response from cmi5 player.
      * @throws playerException - If the request fails or returns an error.
      */

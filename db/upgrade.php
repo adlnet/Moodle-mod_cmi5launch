@@ -9,7 +9,7 @@
 // Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
+// GNU General Public License for more fdetails.
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
@@ -114,7 +114,7 @@ function xmldb_cmi5launch_upgrade($oldversion) {
             $dbman->drop_table(new xmldb_table($tempname));
 
             // 8. Finish upgrade step
-            upgrade_mod_savepoint(true, 2025052113, 'cmi5launch');
+            upgrade_mod_savepoint(true, 2025052112, 'cmi5launch');
         }
 
     }
@@ -1072,6 +1072,7 @@ function xmldb_cmi5launch_upgrade($oldversion) {
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
+        upgrade_mod_savepoint(true, 2016121200, 'cmi5launch');
     }
 
     if ($oldversion < 2018103000) {

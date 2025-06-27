@@ -1,6 +1,4 @@
 <?php
-
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -158,7 +156,8 @@ if (has_capability('mod/cmi5launch:viewgrades', $context)) {
     }
 } else {
 
-    // If the user does not have the correct capability then we are looking at a specific user who is not a teacher and needs to see only their grades.
+    // If the user does not have the correct capability then we are looking at a specific user.
+    // Who is not a teacher and needs to see only their grades.
     // Retrieve that user from DB.
     $user = $DB->get_record('user', ['id' => $USER->id]);
 
@@ -321,6 +320,10 @@ $reporttable->finish_output();
         // Post it.
         document.getElementById('launchform').submit();
     }
+
+if (empty($noheader)) {
+    echo $OUTPUT->footer();
+}
 </script>
 
 <form action="<?php echo $backurl ?>" method="get">
@@ -331,8 +334,4 @@ $reporttable->finish_output();
     <input id="id" name="id" type="hidden" value="<?php echo $id ?>">
     <input id="session_report" name="session_report" type="hidden" value="default">
 </form>
-<?php
 
-if (empty($noheader)) {
-    echo $OUTPUT->footer();
-}

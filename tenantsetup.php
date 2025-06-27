@@ -37,7 +37,7 @@ require_once($CFG->dirroot . '/mod/cmi5launch/classes/local/tenant_form.php');
 $PAGE->set_url('/mod/cmi5launch/tenantsetup.php');
 // Tell moodle the context, in this case the site context (it's system wide not a course or course page).
 $PAGE->set_context(\context_system::instance());
-// Title tells what is on tab
+// Title tells what is on tab.
 $PAGE->set_title(title: get_string('cmi5launchtenanttitle', 'cmi5launch'));
 
 
@@ -84,7 +84,7 @@ if ($mform->is_cancelled()) {
             if ($idresult && $result) {
 
                 // If result is true then redirect back to settings page.
-                redirect(url: $CFG->wwwroot . '/mod/cmi5launch/tokensetup.php', 
+                redirect(url: $CFG->wwwroot . '/mod/cmi5launch/tokensetup.php',
                     message: get_string('cmi5launchtenantmadesuccess', 'cmi5launch'));
 
             } else {

@@ -95,8 +95,8 @@ function cmi5launch_supports($feature) {
  * will create a new instance and return the id number
  * of the new instance.
  *
- * @param object $cmi5launch An object from the form in mod_form.php
- * @param mod_cmi5launch_mod_form $mform The form object.
+ * @param stdClass $cmi5launch An object from the form in mod_form.php
+ * @param mod_cmi5launch_mod_form|null $mform The form object or null if not provided.
  * @return int The id of the newly inserted cmi5launch record
  */
 function cmi5launch_add_instance(stdClass $cmi5launch, ?mod_cmi5launch_mod_form $mform = null) {
@@ -124,8 +124,8 @@ function cmi5launch_add_instance(stdClass $cmi5launch, ?mod_cmi5launch_mod_form 
  * (defined by the form in mod_form.php) this function
  * will update an existing instance with new data.
  *
- * @param object $cmi5launch An object from the form in mod_form.php.
- * @param mod_cmi5launch_mod_form $mform  The form object.
+ * @param stdClass $cmi5launch An object from the form in mod_form.php.
+ * @param mod_cmi5launch_mod_form|null $mform The form object or null if not provided.
  * @return boolean Success/Fail
  */
 function cmi5launch_update_instance(stdClass $cmi5launch, ?mod_cmi5launch_mod_form $mform = null) {
@@ -314,7 +314,7 @@ function cmi5launch_extend_navigation(navigation_node $navref, stdclass $course,
  * so it is safe to rely on the $PAGE.
  *
  * @param settings_navigation $settingsnav
- * @param navigation_node $cmi5launchnode
+ * @param navigation_node | null $cmi5launchnode
  */
 function cmi5launch_extend_settings_navigation(settings_navigation $settingsnav, ?navigation_node $cmi5launchnode = null) {
 }
@@ -530,7 +530,7 @@ function cmi5launch_validate_package($file) {
  * Check for AUs and their satisifed status in a block. Recursive to handle nested blocks.
  *
  * @package  mod_cmi5launch
- * @param mixed bool|array - $auinfoin - the info containing a block, au, or true/false au satisfied value.
+ * @param bool|array $auinfoin - the info containing a block, au, or true/false au satisfied value.
  * @param string $aulmsid - the lms id of the au we are looking for.
  * @return mixed - returns an array of aus or au satisfied value.
  */
@@ -725,9 +725,9 @@ function cmi5launch_settings($instance) {
 
 /**
  * Return grade for given user or all users.
- * @param object $cmi5launch. Cmi5 mod instance object.
- * @param int $userid optional user id, 0 means all users.
- * @return array array of grades, false if none
+ * @param stdClass $cmi5launch The Cmi5 mod instance object.
+ * @param int $userid Optional user id, 0 means all users.
+ * @return array|false Array of grades, false if none
  */
 function cmi5launch_get_user_grades($cmi5launch, $userid=0) {
 
@@ -894,7 +894,7 @@ function cmi5launch_grade_item_update($cmi5launch, $grades = null) {
         // Calculate grade based on grade type, and update rawgrade (a param of grade item).
         switch($gradetype){
 
-            /* For reference: 
+            /* For reference:
                 GRADE_AUS_CMI5 = 0.
                 GRADE_HIGHEST_CMI5 = 1.
                 GRADE_AVERAGE_CMI5 =  2.
@@ -921,13 +921,13 @@ function cmi5launch_grade_item_update($cmi5launch, $grades = null) {
     return grade_update('mod/cmi5launch', $cmi5launch->course, 'mod', 'cmi5launch', $cmi5launch->id, 0, $grades, $params);
 }
 
-    /**
-     * Wrapper function to allow for testing where file_get_contents cannot be overriden.
-     * Also has stream_context_create as this makes a resource which interfers with testing.
-     * @param array $option - The headers and other info to send to the url.
-     * @param string $url - The url to send the data to.
-     * @return mixed $result - either a string or false.
-     */
+/**
+ * Wrapper function to allow for testing where file_get_contents cannot be overriden.
+ * Also has stream_context_create as this makes a resource which interfers with testing.
+ * @param array $options - The headers and other info to send to the url.
+ * @param string $url - The url to send the data to.
+ * @return string|false $result - either a string or false.
+ */
 function cmi5launch_stream_and_send($options, $url) {
 
     // The options are placed into a stream to be sent.
@@ -941,12 +941,12 @@ function cmi5launch_stream_and_send($options, $url) {
     return $result;
 }
 
-    /**
-     * Deletes an instance of the cmi5launch module.
-     *
-     * @param int $id The ID of the module instance.
-     * @return bool True on success.
-     */
+/**
+ * Deletes an instance of the cmi5launch module.
+ *
+ * @param int $id The ID of the module instance.
+ * @return bool True on success.
+ */
 function cmi5launch_delete_instance($id) {
     global $DB;
 

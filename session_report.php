@@ -151,7 +151,7 @@ foreach ($auids as $key => $auid) {
     // Retrieve record from table.
     $aurecord = $DB->get_record('cmi5launch_aus', ['id' => $auid, 'lmsid' => $cmi5idprevpage]);
     if (!$aurecord) {
-        // If no record found, do nothing,
+        // If no record found, do nothing.
         continue;
     } else {
 
@@ -183,7 +183,7 @@ foreach ($auids as $key => $auid) {
                 if (!empty($session->createdat)) {
 
                     // Retrieve createdAt and format.
-                    $date = new DateTime($session->createdat, 
+                    $date = new DateTime($session->createdat,
                         new DateTimeZone('US/Eastern'));
                     $date->setTimezone(new DateTimeZone('America/New_York'));
                     $datestart = $date->format('D d M Y H:i:s');
@@ -195,14 +195,14 @@ foreach ($auids as $key => $auid) {
                 if (!empty($session->lastrequesttime)) {
 
                     // Retrieve lastRequestTime and format.
-                    $date = new DateTime($session->lastrequesttime, 
+                    $date = new DateTime($session->lastrequesttime,
                         new DateTimeZone('US/Eastern'));
                     $date->setTimezone(new DateTimeZone('America/New_York'));
                     $datefinish = $date->format('D d M Y H:i:s');
                 } else {
                     // If no lastRequesttime then use updatedat.
                     // Retrieve lastRequestTime and format.
-                    $date = new DateTime($session->updatedat, 
+                    $date = new DateTime($session->updatedat,
                         new DateTimeZone('US/Eastern'));
                     $date->setTimezone(new DateTimeZone('America/New_York'));
                     $datefinish = $date->format('D d M Y H:i:s');
@@ -241,15 +241,15 @@ foreach ($auids as $key => $auid) {
                 // Update table.
                 $scorecolumns[] = get_string('cmi5launchattemptrow', 'cmi5launch') . $attempt;
                 $scoreheaders[] = get_string('cmi5launchattemptrow', 'cmi5launch') . $attempt;
-                if ($usersession){
+                if ($usersession) {
                     $scorerow[get_string('cmi5launchattemptrow', 'cmi5launch') . $attempt] = $usersession->score;
                 }
                 switch ($gradetype) {
 
-                    // 'GRADE_AUS_CMI5' = '0').
-                    // 'GRADE_HIGHEST_CMI5' = '1'.
-                    // 'GRADE_AVERAGE_CMI5', =  '2'.
-                    // 'GRADE_SUM_CMI5', = '3'.
+                    // GRADE_AUS_CMI5 = 0.
+                    // GRADE_HIGHEST_CMI5 = 1.
+                    // GRADE_AVERAGE_CMI5 =  2.
+                    // GRADE_SUM_CMI5 = 3.
 
                     case 1:
                         $grade = get_string('cmi5launchsessiongradehigh', 'cmi5launch');
@@ -287,7 +287,7 @@ $scoreheaders[] = 'Overall Score';
 if (!empty($sessionscores)) {
 
     $scorerow["Overall Score"] = $overall;
-}else{
+} else {
     $scorerow["Overall Score"] = '';
 }
 

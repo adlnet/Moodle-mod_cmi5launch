@@ -15,26 +15,42 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * //Class to retrieve progress statements from LRS
- * //Holds methods for tracking and displaying student progress
+ * Class to retrieve progress statements from LRS.
+ * Holds methods for tracking and displaying student progress.
  * @copyright  2023 Megan Bohland
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @package mod_cmi5launch
  */
 namespace mod_cmi5launch\local;
 
-defined('MOODLE_INTERNAL') || die();
-
+/**
+ * Class to retrieve progress statements from LRS.
+ * Holds methods for tracking and displaying student progress.
+ */
 class progress {
 
+    /**
+     * Returns the function that retrieves statements.
+     *
+     * @return callable
+     */
     public function cmi5launch_get_retrieve_statements() {
         return [$this, 'cmi5launch_retrieve_statements'];
     }
 
+    /**
+     * Returns the function that gets completion info.
+     *
+     * @return callable
+     */
     public function cmi5launch_get_request_completion_info() {
         return [$this, 'cmi5launch_request_completion_info'];
     }
-
+    /**
+     * Returns the function that retrieves statements from the LRS.
+     *
+     * @return callable
+     */
     public function cmi5launch_get_request_statements_from_lrs() {
         return [$this, 'cmi5launch_request_statements_from_lrs'];
     }
@@ -47,7 +63,7 @@ class progress {
      */
     public function cmi5launch_request_statements_from_lrs($registrationid, $session) {
 
-        // Set error and exception handler to catch and override the default PHP error messages, to make messages more user friendly.
+        // Set error and exception handler to catch and override the default PHP error messages, to make more user friendly.
         set_error_handler('mod_cmi5launch\local\progresslrs_warning', E_WARNING);
         set_exception_handler('mod_cmi5launch\local\exception_progresslrs');
 
@@ -82,7 +98,6 @@ class progress {
             restore_error_handler();
 
             return $result;
-
         } catch (\Throwable $e) {
 
             // Restore default hadlers.
@@ -97,8 +112,8 @@ class progress {
 
     /**
      * Builds and sends requests to LRS
-     * @param callable $cmi5launch_stream_and_send - function to stream and send data.
-     * @param array $data - data to send in request.
+     * @param callable $cmi5launchstreamandsend  Function to stream and send data.
+     * @param array $data - Data to send in request.
      * @param mixed $id  - The id of the cmi5launch instance.
      * @return mixed - The response from the LRS.
      * @throws nullException - If there is an error retrieving the LRS settings or sending the request.
@@ -123,10 +138,11 @@ class progress {
         catch (\Throwable $e) {
 
             // Throw exception if settings are missing.
-            Throw new nullException(get_string('cmi5launchlrssettingsretrievalerror', 'cmi5launch'). $e->getMessage() . get_string('cmi5launchlrssettingscorrect', 'cmi5launch'));
+            Throw new nullException(get_string('cmi5launchlrssettingsretrievalerror', 'cmi5launch')
+                . $e->getMessage() . get_string('cmi5launchlrssettingscorrect', 'cmi5launch'));
         }
 
-        // Set error and exception handler to catch and override the default PHP error messages, to make messages more user friendly.
+        // Set error and exception handler to catch and override the default PHP error messages, to make more user friendly.
         set_error_handler('mod_cmi5launch\local\progresslrsreq_warning', E_WARNING);
         set_exception_handler('mod_cmi5launch\local\exception_progresslrsreq');
 
@@ -146,8 +162,8 @@ class progress {
 
         try {
             // By calling the function this way, it enables encapsulation of the function and allows for testing.
-                // It is an extra step, but necessary for required PHP Unit testing.
-                $result = call_user_func($stream, $options, $url);
+            // It is an extra step, but necessary for required PHP Unit testing.
+            $result = call_user_func($stream, $options, $url);
 
             // Decode result.
             $resultdecoded = json_decode($result, true);
@@ -248,7 +264,8 @@ class progress {
 
         global $CFG;
         // Encase the whole thing in a try catch block to catch any errors.
-        // If an array key isn't there it will throw a warning. It will not stop execution but catching it will enable us to send better error messages.
+        // If an array key isn't there it will throw a warning.
+        // It will not stop execution but catching it will enable us to send better error messages.
         try {
 
             // First find the object, it should always be second level of statement (so third level array).
@@ -310,13 +327,15 @@ class progress {
      */
     public function cmi5launch_retrieve_timestamp($resultarray, $registrationid) {
 
-         // Encase the whole thing in a try catch block to catch any errors.
-        // If an array key isn't there it will throw a warning. It will not stop execution but catching it will enable us to send better error messages.
+        // Encase the whole thing in a try catch block to catch any errors.
+        // If an array key isn't there it will throw a warning.
+        // It will not stop execution but catching it will enable us to send better error messages.
         try {
             // Verify this statement has a 'timestamp' param.
             if (array_key_exists("timestamp", $resultarray[$registrationid][0])) {
 
-                $date = new \DateTime($resultarray[$registrationid][0]["timestamp"], new \DateTimeZone('US/Eastern'));
+                $date = new \DateTime($resultarray[$registrationid][0]["timestamp"],
+                    new \DateTimeZone('US/Eastern'));
 
                 $date->setTimezone(new \DateTimeZone('America/New_York'));
 
@@ -351,8 +370,9 @@ class progress {
         // Variable to hold score.
         $score = null;
 
-         // Encase the whole thing in a try catch block to catch any errors.
-        // If an array key isn't there it will throw a warning. It will not stop execution but catching it will enable us to send better error messages.
+        // Encase the whole thing in a try catch block to catch any errors.
+        // If an array key isn't there it will throw a warning. 
+        // It will not stop execution but catching it will enable us to send better error messages.
         try {
             // Verify this statement has a 'result' param.
             if (array_key_exists("result", $resultarray[$registrationid][0])) {

@@ -29,7 +29,7 @@
  */
 
 
-defined('MOODLE_INTERNAL') || die;
+defined(constant_name: 'MOODLE_INTERNAL') || die;
 
 require_once($CFG->dirroot . '/mod/cmi5launch/constants.php');
 
@@ -137,14 +137,15 @@ if ($ADMIN->fulltree) {
         $showbutton = true;
     }
 
-    $settings->add(new admin_setting_heading('cmi5launch/cmi5launchsettings', get_string('cmi5launchsettingsheader', 'cmi5launch'), ''));
+    $settings->add(new admin_setting_heading('cmi5launch/cmi5launchsettings', 
+        get_string('cmi5launchsettingsheader', 'cmi5launch'), ''));
 
     if ($showbutton) {
 
         // Show only a button, otherwise regular information showing.
         // This is the first time setup.
         // Use this for the button instead of config text.
-        // Setup form link/button
+        // Setup form link/button.
         $setupurl = new moodle_url('/mod/cmi5launch/setupform.php');
         $setupbutton = html_writer::link(
             $setupurl,

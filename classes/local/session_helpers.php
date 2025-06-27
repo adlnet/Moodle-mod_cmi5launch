@@ -30,25 +30,39 @@ use mod_cmi5launch\local\session;
 
 
 class session_helpers {
-
+    /**
+     * Returns the function to create a session.
+     *
+     * @return callable
+     */
     public function cmi5launch_get_create_session() {
         return [$this, 'cmi5launch_create_session'];
     }
-
+    /**
+     * Returns the function to update a session.
+     *
+     * @return callable
+     */
     public function cmi5launch_get_update_session() {
         return [$this, 'cmi5launch_update_sessions'];
     }
-
+    /**
+     * Returns the function to retrieve a session from the db.
+     *
+     * @return callable
+     */
     public function cmi5launch_get_retrieve_sessions_from_db() {
         return [$this, 'cmi5launch_retrieve_sessions_from_db'];
     }
     /**
      * Gets updated session information from CMI5 player
-     * @param mixed $sessionid - the session id
-     * @param mixed $cmi5id - cmi5 instance id
-     * @return session
+     * @param Progress $progress - The progress class- to use it's functions.
+     * @param Cmi5_connectors $cmi5 - The cmi5 connector class- to use it's functions.
+     * @param int $sessionid - The session id.
+     * @param int $cmi5id - The cmi5 instance id.
+     * @param /User $user - The user object.
+     * @return object - The session updated session pobject.
      */
-    // can we inject classes not methods?
     public function cmi5launch_update_sessions($progress, $cmi5, $sessionid, $cmi5launchid, $user) {
 
         global $CFG, $DB, $cmi5launch, $USER;
@@ -83,7 +97,7 @@ class session_helpers {
                 // If the property exists and it's not id or sessionid, set it to lowercase and
                 // encode value if it is array. (DB needs properties in lowercase, but player returns camelcase).
 
-                    // If it's an array, encode it so it can be saved to DB.
+                // If it's an array, encode it so it can be saved to DB.
                 if (is_array($value)) {
                     $value = json_encode($value);
                 }
@@ -154,9 +168,7 @@ class session_helpers {
             $newrecord->launchurl = $launchurl;
             $newrecord->tenantname = $USER->username;
             $newrecord->launchmethod = $launchmethod;
-            // I think here is where we eed to implement : moodlecourseid
             $newrecord->moodlecourseid = $cmi5launch->id;
-            // And userid!
             $newrecord->userid = $USER->id;
 
             // Save record to table.
@@ -189,9 +201,9 @@ class session_helpers {
 
 
     /**
-     * Retrieves session from DB
-     * @param mixed $sessionid - the session id
-     * @return session
+     * Retrieves session from DB.
+     * @param int $sessionid - the session id.
+     * @return object session - the session object.
      */
     public function cmi5launch_retrieve_sessions_from_db($sessionid) {
 
