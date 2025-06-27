@@ -23,10 +23,6 @@
  */
 
 
-
-
-
-// constants
 define('CMI5LAUNCH_PLAYER_V1', '/api/v1/');
 define( 'CMI5LAUNCH_PLAYER_TENANT_URL', '/api/v1/tenant');
 define('CMI5LAUNCH_PLAYER_COURSE_URL', '/api/v1/course');

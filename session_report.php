@@ -208,7 +208,7 @@ foreach ($auids as $key => $auid) {
                     $datefinish = $date->format('D d M Y H:i:s');
                 }
                 // The users sessions.
-                $usersession = $DB->get_record('cmi5launch_sessions', 
+                $usersession = $DB->get_record('cmi5launch_sessions',
                     ['sessionid' => $sessionid, 'userid' => $userid, 'moodlecourseid' => $id]);
 
                 // Add row data.
@@ -314,5 +314,4 @@ $table->finish_output();
     <input id="id" name="id" type="hidden" value="<?php echo $id ?>">
     <input type="submit" value="Back" />
 </form>
-<?php
 

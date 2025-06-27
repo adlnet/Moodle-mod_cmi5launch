@@ -300,11 +300,11 @@ function cmi5launch_export_contents($cm, $baseurl) {
  * This can be called by an AJAX request so do not rely on $PAGE as it might not be set up properly.
  *
  * @param navigation_node $navref An object representing the navigation tree node of the cmi5launch module instance
- * @param stdClass $course
- * @param stdClass $module
- * @param cm_info $cm
+ * @param stdClass $course The course object.
+ * @param stdClass $module The module object.
+ * @param cm_info $cm The course module information object.
  */
-function cmi5launch_extend_navigation(navigation_node $navref, stdclass $course, stdclass $module, cm_info $cm) {
+function cmi5launch_extend_navigation(navigation_node $navref, stdClass $course, stdClass $module, cm_info $cm) {
 }
 
 /**
@@ -313,8 +313,8 @@ function cmi5launch_extend_navigation(navigation_node $navref, stdclass $course,
  * This function is called when the context for the page is a cmi5launch module. This is not called by AJAX
  * so it is safe to rely on the $PAGE.
  *
- * @param settings_navigation $settingsnav
- * @param navigation_node | null $cmi5launchnode
+ * @param settings_navigation $settingsnav The settings navigation object(tree) to extend.
+ * @param navigation_node|null $cmi5launchnode The cmi5launch node to extend, or null if not set.
  */
 function cmi5launch_extend_settings_navigation(settings_navigation $settingsnav, ?navigation_node $cmi5launchnode = null) {
 }

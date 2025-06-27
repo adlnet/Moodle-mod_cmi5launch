@@ -27,6 +27,11 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/mod/cmi5launch/backup/moodle2/restore_cmi5launch_stepslib.php'); // Because it exists (must).
 
+/**
+ * cmi5launch restore activity task that provides the structure for the restore.
+ *
+ * @package    mod_cmi5launch
+ */
 class restore_cmi5launch_activity_task extends restore_activity_task {
 
     /**

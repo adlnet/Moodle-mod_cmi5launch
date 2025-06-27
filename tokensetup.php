@@ -24,19 +24,19 @@
 
 use mod_cmi5launch\local\cmi5_connectors;
 
-
+require_login();
 
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require_once($CFG->libdir.'/tablelib.php');
 require_once($CFG->libdir.'/formslib.php');
 require_once($CFG->dirroot. '/reportbuilder/classes/local/report/column.php');
-// Include our class file
+// Include our class file.
 require_once($CFG->dirroot.'/mod/cmi5launch/classes/local/token_form.php');
-// Tell moodle about our page, tell it what the url is.\\
+// Tell moodle about our page, tell it what the url is.
 $PAGE->set_url('/mod/cmi5launch/tokensetup.php');
-// Tell moodle the context, in this case the site context (it's system wide not a course or course page.)
+// Tell moodle the context, in this case the site context (it's system wide not a course or course page).
 $PAGE->set_context(\context_system::instance());
-// Title tells what is on tab
+// Title tells what is on tab.
 $PAGE->set_title(title: get_string('cmi5launchtokensetuptitle', 'cmi5launch'));
 define('CMI5LAUNCH_REPORT_DEFAULT_PAGE_SIZE', 20);
 define('CMI5LAUNCH_REPORT_ATTEMPTS_ALL_STUDENTS', 0);
@@ -75,15 +75,14 @@ if ($tenantname != null && $tenantid != null) {
 
             // If fail we freeze and alert user with a window with error message.
             echo $link;
-        }else {
+        } else {
             // Assuming the tokenresult is not false, it was saved correctly and we cango back to setting pae.
             // If result is true then redirect back to settings page.
             $settingurl = new moodle_url($CFG->wwwroot . '/' . 'admin/settings.php', ['section' => 'modsettingcmi5launch']);
 
             redirect($settingurl, get_string('cmi5launchtokencreatedsuccess', 'cmi5launch'), 10);
         }
-    }
-    else {
+    } else {
 
         echo (get_string('cmi5launchtokendbretrievefailed', 'cmi5launch'));
         echo "<br>";
@@ -103,7 +102,7 @@ if ($tenantname != null && $tenantid != null) {
 }
 
 
-// When you want to output html use the moodle core output rendereer: often overridden in theme
+// When you want to output html use the moodle core output rendereer: often overridden in theme.
 echo $OUTPUT->header();
 
 // We want to display a form.

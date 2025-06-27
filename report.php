@@ -301,6 +301,48 @@ foreach ($auschunked[0] as $au) {
 $reporttable->get_page_start();
 $reporttable->get_page_size();
 $reporttable->finish_output();
+
+// Back button form.
+echo html_writer::start_tag('form', [
+    'action' => $backurl,
+    'method' => 'get'
+]);
+echo html_writer::empty_tag('input', [
+    'type' => 'hidden',
+    'name' => 'id',
+    'id' => 'id',
+    'value' => $cmi5launch->course
+]);
+echo html_writer::empty_tag('input', [
+    'type' => 'submit',
+    'value' => get_string('cmi5launchbackbutton', 'mod_cmi5launch')
+]);
+echo html_writer::end_tag('form');
+
+// Launch form to session_report.php.
+echo html_writer::start_tag('form', [
+    'id' => 'launchform',
+    'action' => 'session_report.php',
+    'method' => 'get'
+]);
+echo html_writer::empty_tag('input', [
+    'type' => 'hidden',
+    'name' => 'id',
+    'id' => 'id',
+    'value' => $id
+]);
+echo html_writer::empty_tag('input', [
+    'type' => 'hidden',
+    'name' => 'session_report',
+    'id' => 'session_report',
+    'value' => 'default'
+]);
+echo html_writer::end_tag('form');
+
+
+if (empty($noheader)) {
+    echo $OUTPUT->footer();
+}
 ?>
 <script>
     function key_test(inforfornextpage) {
@@ -321,17 +363,5 @@ $reporttable->finish_output();
         document.getElementById('launchform').submit();
     }
 
-if (empty($noheader)) {
-    echo $OUTPUT->footer();
-}
+
 </script>
-
-<form action="<?php echo $backurl ?>" method="get">
-    <input id="id" name="id" type="hidden" value="<?php echo $cmi5launch->course ?>">
-    <input type="submit" value="Back" />
-</form>
-<form id="launchform" action="session_report.php" method="get">
-    <input id="id" name="id" type="hidden" value="<?php echo $id ?>">
-    <input id="session_report" name="session_report" type="hidden" value="default">
-</form>
-
