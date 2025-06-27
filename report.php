@@ -305,17 +305,17 @@ $reporttable->finish_output();
 // Back button form.
 echo html_writer::start_tag('form', [
     'action' => $backurl,
-    'method' => 'get'
+    'method' => 'get',
 ]);
 echo html_writer::empty_tag('input', [
     'type' => 'hidden',
     'name' => 'id',
     'id' => 'id',
-    'value' => $cmi5launch->course
+    'value' => $cmi5launch->course,
 ]);
 echo html_writer::empty_tag('input', [
     'type' => 'submit',
-    'value' => get_string('cmi5launchbackbutton', 'mod_cmi5launch')
+    'value' => get_string('cmi5launchbackbutton', 'mod_cmi5launch'),
 ]);
 echo html_writer::end_tag('form');
 
@@ -323,19 +323,19 @@ echo html_writer::end_tag('form');
 echo html_writer::start_tag('form', [
     'id' => 'launchform',
     'action' => 'session_report.php',
-    'method' => 'get'
+    'method' => 'get',
 ]);
 echo html_writer::empty_tag('input', [
     'type' => 'hidden',
     'name' => 'id',
     'id' => 'id',
-    'value' => $id
+    'value' => $id,
 ]);
 echo html_writer::empty_tag('input', [
     'type' => 'hidden',
     'name' => 'session_report',
     'id' => 'session_report',
-    'value' => 'default'
+    'value' => 'default',
 ]);
 echo html_writer::end_tag('form');
 

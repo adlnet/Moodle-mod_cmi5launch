@@ -22,24 +22,40 @@
  * @package mod_cmi5launch
  */
 namespace mod_cmi5launch\local;
-
+defined('MOODLE_INTERNAL') || die();
 // Include the errorover (error override) funcs.
-require_once ($CFG->dirroot . '/mod/cmi5launch/classes/local/errorover.php');
+require_once($CFG->dirroot . '/mod/cmi5launch/classes/local/errorover.php');
 
+/**
+ * Class au
+ *
+ * This class is used to create an AU object from a statement.
+ * It is used to handle the data for an AU in the cmi5launch module.
+ *
+ * @package mod_cmi5launch\local
+ */
 class au {
 
-    // Lowercase values are for saving to DB.
+    /**
+     * Lowercase values are for saving to DB.
+     *  
+     */ 
     public $id, $attempt, $url, $type, $lmsid, $grade, $scores, $title, $moveon, $auindex, $parents, $objectives,
     $description, $activitytype, $launchmethod, $masteryscore, $satisfied, $launchurl, $sessions, $progress, $noattempt,
     $completed, $passed, $inprogress, $userid, $moodlecourseid;
 
-    // Uppercase values because that's how they come from player.
-    // Moodle wants all lowercase, but we need to be able to receive the data from the player.
-    public $launchMethod, $lmsId, $moveOn, $auIndex, $activityType, $masteryScore;
-    // Constructs AUs. Is fed array and where array key matches property, sets the property.
+    /* Uppercase values because that's how they come from player.
+     * Moodle wants all lowercase, but we need to be able to receive the data from the player.
+     */
+     public $launchMethod, $lmsId, $moveOn, $auIndex, $activityType, $masteryScore;
+    
+    /**
+     * Constructs AUs. Is fed array and where array key matches property, sets the property.
+     * @param mixed $statement - Data to make AU.
+     * @throws \mod_cmi5launch\local\nullException
+     */
     public function __construct($statement) {
 
-        // What can go wrong here? It could be that a statement is null
         // or that the statement is not an array or not an object.
         if (is_null($statement) || (!is_array($statement) && !is_object($statement) )) {
 

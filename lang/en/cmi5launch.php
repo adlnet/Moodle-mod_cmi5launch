@@ -193,7 +193,7 @@ $string['cmi5launchtenantnamefail'] = 'Tenant name not retrieved or blank. Pleas
 // For forms.
 $string['cmi5launchsetupformplayer'] = 'This is needed to connect to player';
 $string['cmi5launchtenantformplayer'] = '<p>Please enter a tenant name. When submitted it will create a tenant in the cmi5 player and automatically retrieve and save a bearer token for it as well</p>';
-
+$string['cmi5launchbackbutton'] = 'Back';
 // Grading info - MB.
 // Headers.
 $string['defaultgradesettings'] = 'Default values for cmi5 launch link activity grades';

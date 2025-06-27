@@ -24,17 +24,13 @@
 
 namespace mod_cmi5launch\local;
 
-use mod_cmi5launch\local\au;
-use mod_cmi5launch\local\errorover;
-use mod_cmi5launch\local\session_helpers;
+defined('MOODLE_INTERNAL') || die();
 
+use mod_cmi5launch\local\au;
 
 global $CFG;
 // Include the errorover (error override) funcs.
-require_once ($CFG->dirroot . '/mod/cmi5launch/classes/local/errorover.php');
-// require 'errorover.php';
-
-defined('MOODLE_INTERNAL') || die();
+require_once($CFG->dirroot . '/mod/cmi5launch/classes/local/errorover.php');
 
 class au_helpers {
 

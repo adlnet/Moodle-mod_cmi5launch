@@ -23,7 +23,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die;
 
 /**
  * Structure step to restore one cmi5launch activity
@@ -33,22 +32,22 @@ class restore_cmi5launch_activity_structure_step extends restore_activity_struct
 
     /**
      * Store original session IDs to remap after execution.
-     * @var array 
+     * @var array
      */
     private $arrayofoldsessionids = [];
     /**
      * Store original AU IDs to remap after execution.
-     * @var array 
+     * @var array
      */
     private $arrayofoldauids = [];
     /**
      * Store new session IDs to remap after execution
-     * @var array 
+     * @var array
      */
     private $arrayofnewsessionids = [];
     /**
      * Store new AU IDs to remap after execution.
-     * @var array 
+     * @var array
      */
     private $arrayofnewauids = []; // Store new AU IDs to remap after execution.
 
@@ -108,8 +107,7 @@ class restore_cmi5launch_activity_structure_step extends restore_activity_struct
      */
     protected function process_session($data) {
         global $DB;
-        error_log("Restoring sessions" . PHP_EOL, 3, '/var/www/moodledata/cmi5_debug.log');
-
+        debugging("Restoring session data", DEBUG_DEVELOPER);
         $data = (object) $data;
         $oldid = $data->id;
 
@@ -134,7 +132,7 @@ class restore_cmi5launch_activity_structure_step extends restore_activity_struct
         $this->arrayofnewsessionids[] = $newitemid;
         debugging("New session ID {$newitemid} added to array for remapping later", DEBUG_DEVELOPER);
 
-        // Save mapping so we can remap session IDs in aus.scores and aus.sessions
+        // Save mapping so we can remap session IDs in aus.scores and aus.sessions.
         $this->set_mapping('cmi5launch_sessions', $oldid, $newitemid);
         debugging("Restored session: old ID {$oldid} is now mapped to new DB ID {$newitemid}", DEBUG_DEVELOPER);
 
@@ -148,8 +146,7 @@ class restore_cmi5launch_activity_structure_step extends restore_activity_struct
      */
     protected function process_au($data) {
         global $DB;
-        error_log("Restoring aus" . PHP_EOL, 3, '/var/www/moodledata/cmi5_debug.log');
-
+        debugging("Restoring AU data", DEBUG_DEVELOPER);
         $data = (object) $data;
         $oldid = $data->id;
 
@@ -208,7 +205,7 @@ class restore_cmi5launch_activity_structure_step extends restore_activity_struct
         }
 
         // Store mapping for use in usercourse 'aus' JSON.
-        $this->set_mapping('cmi5launch_aus', $oldid, $newitemid);// Save remap info
+        $this->set_mapping('cmi5launch_aus', $oldid, $newitemid);// Save remap info.
 
         $this->au_dbid_map[$oldid] = $newitemid;
     }
@@ -318,7 +315,7 @@ class restore_cmi5launch_activity_structure_step extends restore_activity_struct
                 // Remap each session ID.
                 $newsessionid = $this->get_mappingid('cmi5launch_sessions', $oldsessionid);
                 if ($newsessionid !== false) {
-                    $newsessionids[] = $newsessionid; // Store new session ID
+                    $newsessionids[] = $newsessionid; // Store new session ID.
                     debugging("Saved new session ID {$newsessionid} for AU {$auid}", DEBUG_DEVELOPER);
                 } else {
                     debugging("Failed to remap session ID {$oldsessionid} for AU {$auid}", DEBUG_DEVELOPER);

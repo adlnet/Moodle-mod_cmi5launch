@@ -59,7 +59,7 @@ class session_helpers {
      * @param Progress $progress - The progress class- to use it's functions.
      * @param Cmi5_connectors $cmi5 - The cmi5 connector class- to use it's functions.
      * @param int $sessionid - The session id.
-     * @param int $cmi5id - The cmi5 instance id.
+     * @param int $cmi5launchid - The cmi5 instance id.
      * @param /User $user - The user object.
      * @return object - The session updated session pobject.
      */

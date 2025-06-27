@@ -90,7 +90,7 @@ class grade_helpers {
     public function cmi5launch_fetch_attempts_array() {
         return [$this, 'cmi5launch_get_attempts_array'];
     }
-    
+
     /**
      * Returns the function that retrieves the grade method.
      *
@@ -199,10 +199,6 @@ class grade_helpers {
             $scores = json_decode($scores, true);
         }
 
-        // if it is an object print so i know what it is
-        if (is_object($scores)) {
-            var_dump($scores);
-        }
         if (!$scores == null && is_array($scores)) {
 
             // Find the highest grade.
@@ -235,21 +231,24 @@ class grade_helpers {
         set_exception_handler('mod_cmi5launch\local\exception_grade');
 
         // Check if record already exists.
-        $exists = $DB->record_exists('cmi5launch_usercourse', ['courseid' => $cmi5launch->courseid, 'userid' => $user->id]);
+        $exists = $DB->record_exists('cmi5launch_usercourse',
+            ['courseid' => $cmi5launch->courseid, 'userid' => $user->id]);
 
         try {
             // If it exists, we want to update it.
             if (!$exists == false) {
 
                 // Retrieve the record.
-                $userscourse = $DB->get_record('cmi5launch_usercourse', ['courseid' => $cmi5launch->courseid, 'userid' => $user->id]);
+                $userscourse = $DB->get_record('cmi5launch_usercourse',
+                    ['courseid' => $cmi5launch->courseid, 'userid' => $user->id]);
 
                 $auids = json_decode($userscourse->aus);
 
                 // Bring in functions and classes.
                 $sessionhelper = new session_helpers;
 
-                $returnedinfo = $this->cmi5launch_update_au_for_user_grades($sessionhelper, $auids, $user);
+                $returnedinfo = $this->cmi5launch_update_au_for_user_grades($sessionhelper,
+                    $auids, $user);
                 // Array to hold AU scores.
                 $auscores = $returnedinfo[0];
                 $overallgrade = $returnedinfo[1];
@@ -338,7 +337,8 @@ class grade_helpers {
                         foreach ($sessions as $sessionid) {
 
                             // Using current session id, retrieve session from DB.
-                            $session = $DB->get_record('cmi5launch_sessions', ['sessionid' => $sessionid, 'userid' => $user->id, "moodlecourseid" => $cmi5launch->id]);
+                            $session = $DB->get_record('cmi5launch_sessions', ['sessionid' => $sessionid,
+                                'userid' => $user->id, "moodlecourseid" => $cmi5launch->id]);
 
                             // Retrieve new info (if any) from CMI5 player and LRS on session.
                             $session = $updatesession($progress, $cmi5, $sessionid, $cmi5launch->id, $user);

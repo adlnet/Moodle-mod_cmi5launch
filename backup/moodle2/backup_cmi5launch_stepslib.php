@@ -48,17 +48,17 @@ class backup_cmi5launch_activity_structure_step extends backup_activity_structur
         $austable = new backup_nested_element('aus_records');
 
         $au = new backup_nested_element('au', ['id'], [ 'userid', 'attempt', 'launchmethod', 'lmsid', 'moodlecourseid', 'url',
-            'type', 'title', 'moveon', 'auindex', 'parents', 'objectives', 'description', 'activitytype', 'masteryscore', 'completed',
-            'passed', 'inprogress', 'noattempt', 'satisfied', 'sessions', 'scores', 'grade']);
+            'type', 'title', 'moveon', 'auindex', 'parents', 'objectives', 'description', 'activitytype', 'masteryscore',
+            'completed', 'passed', 'inprogress', 'noattempt', 'satisfied', 'sessions', 'scores', 'grade']);
         $austable->add_child($au);
 
         // Sessions, which are the individual sessions for each AU.
         $sessionstable = new backup_nested_element('session_records');
 
-        $session = new backup_nested_element('session', ['id'], ['sessionid', 'userid', 'moodlecourseid', 'registrationscoursesausid',
-            'tenantname', 'createdat', 'updatedat', 'code', 'launchtokenid', 'lastrequesttime', 'launchmode', 'masteryscore', 'score', 
-            'islaunched', 'isinitialized', 'initializedat', 'duration', 'iscompleted', 'ispassed', 'isfailed', 'isterminated', 'isabandoned',
-            'progress', 'launchmethod', 'launchurl']);
+        $session = new backup_nested_element('session', ['id'], ['sessionid', 'userid', 'moodlecourseid',
+            'registrationscoursesausid', 'tenantname', 'createdat', 'updatedat', 'code', 'launchtokenid', 'lastrequesttime',
+            'launchmode', 'masteryscore', 'score', 'islaunched', 'isinitialized', 'initializedat', 'duration', 'iscompleted',
+            'ispassed', 'isfailed', 'isterminated', 'isabandoned', 'progress', 'launchmethod', 'launchurl']);
         $sessionstable->add_child($session);
 
         // Data sources.

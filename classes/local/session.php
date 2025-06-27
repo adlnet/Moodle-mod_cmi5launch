@@ -24,15 +24,20 @@
 
 
 namespace mod_cmi5launch\local;
-// Include the errorover (error override) funcs.
-require_once ($CFG->dirroot . '/mod/cmi5launch/classes/local/errorover.php');
-
 
 defined('MOODLE_INTERNAL') || die();
 
+// Include the errorover (error override) funcs.
+require_once($CFG->dirroot . '/mod/cmi5launch/classes/local/errorover.php');
+
+/**
+ * A class to hold sessions properties and methods.
+ */
 class session {
-    // Properties, these need to be capitilized as they are because that's how they are returned in statements and need to be saved.
-    // Id is session id.
+    /**
+     * Properties, these need to be capitilized as they are because that's how they are returned in statements and need to be saved.
+     * Id is session id.
+     */
     public $id, $tenantname, $tenantId, $registrationsCoursesAusId, $lmsid,
     $progress = [], $aulaunchurl, $launchurl, $grade,
     $createdAt, $updatedAt, $registrationCourseAusId,
@@ -40,16 +45,19 @@ class session {
     $isLaunched, $isInitialized, $initializedAt, $isCompleted,
     $isPassed, $isFailed, $isTerminated, $isAbandoned, $courseid, $completed, $passed, $inprogress;
     
-    // Database properties, that need to be lower case.
-    public $sessionid, $userid, $registrationscoursesausid, $createdat, $updatedat, $launchtokenid, $lastrequesttime, $launchmode, $masteryscore, $tenantid,
-    $score, $response, $islaunched, $isinitialized, $initializedat, $duration, $iscompleted, $ispassed, $isfailed, $isterminated, $isabandoned, $launchmethod, $moodlecourseid;
+    /**
+     * Database properties, that need to be lower case.
+     */
+    public $sessionid, $userid, $registrationscoursesausid, $createdat, $updatedat, $launchtokenid,
+        $lastrequesttime, $launchmode, $masteryscore, $tenantid, $score, $response, $islaunched, $isinitialized,
+        $initializedat, $duration, $iscompleted, $ispassed, $isfailed, $isterminated, $isabandoned, $launchmethod, $moodlecourseid;
 
 
-    // Constructs sessions. Is fed array and where array key matches property, sets the property.
+    /**
+     * Constructs sessions. Is fed array and where array key matches property, sets the property.
+     */
     public function __construct($statement) {
 
-        // What can go wrong here? It could be that a statement is null
-        // or that the statement is not an array or not an object.
         if (is_null($statement) || (!is_array($statement) && !is_object($statement) )) {
 
             throw new nullException(get_string('cmi5launchsessionbuilderror', 'cmi5launch'), 0);

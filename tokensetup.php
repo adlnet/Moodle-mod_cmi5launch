@@ -22,9 +22,12 @@
  * @package mod_cmi5launch
  */
 
+ 
 use mod_cmi5launch\local\cmi5_connectors;
 
-require_login();
+defined('MOODLE_INTERNAL') || die();
+
+isloggedin();
 
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require_once($CFG->libdir.'/tablelib.php');
@@ -56,13 +59,13 @@ $gettoken = $cmi5helper->cmi5launch_get_retrieve_token();
  $tenantname = get_config('cmi5launch', 'cmi5launchtenantname');
  $tenantid = get_config('cmi5launch', 'cmi5launchtenantid');
 
-// If niether are false.
+// If neither are false.
 if ($tenantname != null && $tenantid != null) {
 
     // Make the new token and grab results.
     $token = $gettoken($tenantname, $tenantid);
 
-    // If the token is not false it should be what we need
+    // If the token is not false it should be what we need.
     if ($token != false) {
 
         // Save it to the settings.

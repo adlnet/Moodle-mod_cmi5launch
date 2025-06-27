@@ -59,8 +59,8 @@ class setup_cmi5 extends moodleform {
         $mform->addElement('text', 'cmi5name', get_string('cmi5launchbasicname', 'cmi5launch'));
         // Set type of element.
         $mform->setType('cmi5name', PARAM_NOTAGS);
-        // Default value.
-        $mform->setDefault('cmi5name', get_string('cmi5launchbasicname_default', 'cmi5launch')); // The second arg here is the default value and appears in the text box.
+        // Default value. The second arg here is the default value and appears in the text box.
+        $mform->setDefault('cmi5name', get_string('cmi5launchbasicname_default', 'cmi5launch'));
         // Add a rule to make this field required.
         $mform->addRule('cmi5name',  $message, 'required');
         // Add a help button with a help message.
@@ -71,8 +71,8 @@ class setup_cmi5 extends moodleform {
         $mform->addElement('text', 'cmi5password', get_string('cmi5launchbasepass', 'cmi5launch'));
         // Set type of element.
         $mform->setType('cmi5password', PARAM_NOTAGS);
-        // Default value.
-        $mform->setDefault('cmi5password', get_string('cmi5launchbasepass_default', 'cmi5launch')); // The second arg here is the default value and appears in the text box.
+        // Default value. The second arg here is the default value and appears in the text box.
+        $mform->setDefault('cmi5password', get_string('cmi5launchbasepass_default', 'cmi5launch'));
         // Add a rule to make this field required.
         $mform->addRule('cmi5password',  $message, 'required');
         // Below is the help button, it sucks you have to push it to see the help text, but it is there

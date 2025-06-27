@@ -89,7 +89,7 @@ if (!$au->sessions == null) {
 
     try {
 
-        // Set error and exception handler to catch and override the default PHP error messages, to make messages more user friendly.
+        // Set error and exception handler to catch and override the default PHP error messages, to make them more user friendly.
         set_error_handler('mod_cmi5launch\local\custom_warningAU', E_WARNING);
         set_exception_handler('mod_cmi5launch\local\custom_warningAU');
 
@@ -126,7 +126,6 @@ if (!$au->sessions == null) {
                 $date = new DateTime($session->createdat,
                     new DateTimeZone('US/Eastern'));
                 $date->setTimezone(new DateTimeZone('America/New_York'));
-                // date_timezone_set($date, new DateTimeZone('America/New_York'));
                 $sessioninfo[] = $date->format('D d M Y H:i:s');
             }
 
@@ -180,60 +179,60 @@ echo "<p tabindex=\"0\" onkeyup=\"key_test('{$auid}')\" id='cmi5launch_newattemp
         </button>
     </p>";
 
-// Completion div
+// Completion div.
 echo '<div id="cmi5launch_completioncheck"></div>';
 
-// Back button
+// Back button.
 echo html_writer::start_tag('form', [
     'action' => 'view.php',
-    'method' => 'get'
+    'method' => 'get',
 ]);
 echo html_writer::empty_tag('input', [
     'type' => 'hidden',
     'name' => 'id',
     'id' => 'id',
-    'value' => $id
+    'value' => $id,
 ]);
 echo html_writer::empty_tag('input', [
     'type' => 'submit',
-    'value' => get_string('cmi5launchbackbutton', 'mod_cmi5launch') // Optional localization.
+    'value' => get_string('cmi5launchbackbutton', 'mod_cmi5launch'), // Optional localization.
 ]);
 echo html_writer::end_tag('form');
-// Launch form
+
+// Launch form.
 echo html_writer::start_tag('form', [
     'id' => 'launchform',
     'action' => 'launch.php',
-    'method' => 'get'
+    'method' => 'get',
 ]);
 echo html_writer::empty_tag('input', [
     'type' => 'hidden',
     'name' => 'launchform_registration',
     'id' => 'launchform_registration',
-    'value' => 'default'
+    'value' => 'default',
 ]);
 echo html_writer::empty_tag('input', [
     'type' => 'hidden',
     'name' => 'id',
     'id' => 'id',
-    'value' => $id
+    'value' => $id,
 ]);
 echo html_writer::empty_tag('input', [
     'type' => 'hidden',
     'name' => 'n',
     'id' => 'n',
-    'value' => $n
+    'value' => $n,
 ]);
 echo html_writer::empty_tag('input', [
     'type' => 'hidden',
     'name' => 'auid',
     'id' => 'auid',
-    'value' => $auid
+    'value' => $auid,
 ]);
 echo html_writer::end_tag('form');
 
 
 echo $OUTPUT->footer();
-
 
 ?>
 
@@ -255,17 +254,6 @@ echo $OUTPUT->footer();
         document.getElementById('launchform').submit();
     }
 
-    // TODO: there may be a better way to check completion. Out of scope for current project.
-    document.addEventListener('DOMContentLoaded', function() {
-        setInterval(function() {
-            fetch('completion_check.php?id=<?php echo $id ?>&n=<?php echo $n ?>')
-                .then(response => response.text())
-                .then(data => {
-                    document.getElementById('cmi5launch_completioncheck').innerHTML = data;
-                })
-                .catch(error => console.error('Error:', error));
-        }, 30000); // TODO: make this interval a configuration setting.
-    });
 
 </script>
 

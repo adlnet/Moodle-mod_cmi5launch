@@ -27,7 +27,7 @@
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 // Include our class file.
 require_once($CFG->dirroot.'/mod/cmi5launch/classes/local/setup_form.php');
-//Login check.
+// Login check.
 require_login();
 
 // Tell moodle about our page, tell it what the url is.

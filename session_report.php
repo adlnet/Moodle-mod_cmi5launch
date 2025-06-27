@@ -309,9 +309,23 @@ $table->add_separator();
 $scoretable->finish_output();
 $table->finish_output();
 // Back button.
-?>
-<form action="report.php" method="get">
-    <input id="id" name="id" type="hidden" value="<?php echo $id ?>">
-    <input type="submit" value="Back" />
-</form>
+echo html_writer::start_tag('form', [
+    'action' => 'report.php',
+    'method' => 'get'
+]);
 
+echo html_writer::empty_tag('input', [
+    'type' => 'hidden',
+    'id' => 'id',
+    'name' => 'id',
+    'value' => $id
+]);
+
+echo html_writer::empty_tag('input', [
+    'type' => 'submit',
+    'value' => get_string('cmi5launchbackbutton', 'mod_cmi5launch') // Optional: make 'Back' translatable
+]);
+
+echo html_writer::end_tag('form');
+
+?>
