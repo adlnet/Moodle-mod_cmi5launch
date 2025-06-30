@@ -42,6 +42,35 @@ function xmldb_cmi5launch_upgrade($oldversion) {
     global $DB;
     $dbman = $DB->get_manager();
 
+    // Upgrade to allow float/decimals.
+    if ($oldversion < 2025063014) {
+
+        // 1. Change usercourse.grade to number(10,2)
+        $table = new xmldb_table('cmi5launch_usercourse');
+        $field = new xmldb_field('grade', XMLDB_TYPE_NUMBER, '10, 2', null, false, null, 0);
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->change_field_type($table, $field);
+        }
+
+        // 2. Change sessions.score to number(10,2)
+        $table = new xmldb_table('cmi5launch_sessions');
+        $field = new xmldb_field('score', XMLDB_TYPE_NUMBER, '10, 2', null, false, null, 0);
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->change_field_type($table, $field);
+        }
+
+        // 3. Change aus.grade to number(10,2)
+        $table = new xmldb_table('cmi5launch_aus');
+        $field = new xmldb_field('grade', XMLDB_TYPE_NUMBER, '10, 2', null, false, null, 0);
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->change_field_type($table, $field);
+        }
+
+        // Mark upgrade complete.
+        upgrade_mod_savepoint(true, 2025063014, 'cmi5launch');
+    }
+
+    
     // The player table is no longer used, remove.
     if ($oldversion < 2025061612) {
 

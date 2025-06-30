@@ -22,12 +22,11 @@
  * @package mod_cmi5launch
  */
 
- 
+
 use mod_cmi5launch\local\cmi5_connectors;
 
 defined('MOODLE_INTERNAL') || die();
 
-isloggedin();
 
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require_once($CFG->libdir.'/tablelib.php');
@@ -48,6 +47,8 @@ define('CMI5LAUNCH_REPORT_ATTEMPTS_STUDENTS_WITH_NO', 2);
 $PAGE->requires->jquery();
 
 global $cmi5launch, $CFG;
+
+require_login();
 
 // External classes and functions.
 $cmi5helper = new cmi5_connectors;

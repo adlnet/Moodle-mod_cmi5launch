@@ -160,7 +160,7 @@ class restore_cmi5launch_activity_structure_step extends restore_activity_struct
         // Add oldid to oldauid array for remapping later.
         $this->arrayofoldauids[] = $oldid;
         debugging("Processing AU with old ID {$oldid}", DEBUG_DEVELOPER);
-        
+
         // Check for existing in case of duplicates.
         $existing = $DB->get_record('cmi5launch_aus', [
             'userid' => $data->userid,

@@ -147,7 +147,7 @@ class grade_helpers {
      * Takes in an array of scores and returns the average grade.
      * @param mixed $scores - Either an array of numbers, string of numbers to be converted to an array,
      *                      - or a singular int.
-     * @return int The average grade.
+     * @return float The average grade.
      */
     public function cmi5launch_average_grade($scores) {
 
@@ -165,34 +165,27 @@ class grade_helpers {
             // Find the average of the scores.
             $averagegrade = (array_sum($scores) / count($scores));
 
-        } else if (!$scores == null && !is_array($scores)) {
-
-            // If it's an int, it's a single value so average is itself.
-            $averagegrade = $scores;
-
+        } else if (is_numeric($scores)) {
+            $averagegrade = (float)$scores;
         } else {
-            $averagegrade = 0;
-
+            $averagegrade = 0.0;
         }
 
-        // Now apply intval.
-        $averagegrade = intval($averagegrade);
-
-        return $averagegrade;
+        return round((float)$averagegrade, 2);
     }
 
     /**
      * Takes in an array of scores and returns the highest grade.
      * @param mixed $scores - Either an array of numbers, string of numbers to be converted to an array,
      *                      - or a singular int.
-     * @return int The highest grade.
+     * @return float The highest grade.
      */
     public function cmi5launch_highest_grade($scores) {
 
         global $cmi5launch, $USER, $DB;
 
         // Highest equals 0 to start.
-        $highestgrade = 0;
+        $highestgrade = 0.0;
 
         // First check if scores is a string, if a string we need it to be array.
         if (is_string($scores)) {
@@ -204,16 +197,12 @@ class grade_helpers {
             // Find the highest grade.
             $highestgrade = max($scores);
 
-        } else if ($scores > $highestgrade && !is_array($scores) && is_numeric($scores)) {
-
-            // If it's an int, it's a single value so highest is itself.
-            $highestgrade = $scores;
+        } else if (is_numeric($scores)) {
+            $highestgrade = (float) $scores;
         }
+    
+        return round((float)$highestgrade, 2);
 
-        // Now apply intval.
-        $highestgrade = intval($highestgrade);
-
-        return $highestgrade;
     }
 
 

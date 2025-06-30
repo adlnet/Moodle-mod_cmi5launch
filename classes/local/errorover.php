@@ -109,12 +109,12 @@ function custom_warning($errno, $errstr, $errfile, $errline) {
  * @return never
  * @package mod_cmi5launch
  */
-function custom_warningview($errno, $errstr, $errfile, $errline) {
+function custom_exceptionview($errno, $errstr, $errfile, $errline) {
 
-    throw new customException(get_string('cmi5launcherrormain', 'cmi5launch') 
-        . $errstr .' at '. $errfile .' on ' .$errline, 0);
-
+    throw new nullException(get_string('cmi5launcherror', 'cmi5launch')  . $errstr, 0);
+        ;
 }
+
 /**
  * An exception handler to use in AU cases when many different exceptions for data errors may be thrown.
  * @param \Throwable $exception - The exception that was thrown.

@@ -178,7 +178,7 @@ foreach ($auids as $key => $auid) {
 
                 $session = $updatesession($progress, $cmi5, $sessionid, $cmi5launch->id, $user);
                 // Add score to array for AU.
-                $sessionscores[] = $session->score;
+                $sessionscores[] = (float)$session->score;
 
                 if (!empty($session->createdat)) {
 
@@ -242,7 +242,7 @@ foreach ($auids as $key => $auid) {
                 $scorecolumns[] = get_string('cmi5launchattemptrow', 'cmi5launch') . $attempt;
                 $scoreheaders[] = get_string('cmi5launchattemptrow', 'cmi5launch') . $attempt;
                 if ($usersession) {
-                    $scorerow[get_string('cmi5launchattemptrow', 'cmi5launch') . $attempt] = $usersession->score;
+                    $scorerow[get_string('cmi5launchattemptrow', 'cmi5launch') . $attempt] = is_numeric($usersession->score) ? number_format((float)$usersession->score, 2) : '';
                 }
                 switch ($gradetype) {
 
@@ -268,7 +268,8 @@ foreach ($auids as $key => $auid) {
                 $rowdata["Status"] = $austatus;
 
                 if ($usersession) {
-                    $rowdata["Score"] = $usersession->score;
+                    $rowdata["Score"] = is_numeric($usersession->score) ? number_format((float)$usersession->score, 2) : '';
+
                 }
 
                 $table->add_data_keyed($rowdata);
@@ -286,7 +287,7 @@ $scoreheaders[] = 'Overall Score';
 // Session score may be null or empty.
 if (!empty($sessionscores)) {
 
-    $scorerow["Overall Score"] = $overall;
+    $scorerow["Overall Score"] = isset($overall) && is_numeric($overall) ? number_format((float)$overall, 2) : '';
 } else {
     $scorerow["Overall Score"] = '';
 }
@@ -297,7 +298,7 @@ $scoretable->define_headers($scoreheaders);
 $scoretable->define_baseurl($PAGE->url);
 $scoretable->setup();
 $scoretable->add_data_keyed($scorerow);
-$scoretable->add_data_keyed("SCORE");
+//$scoretable->add_data_keyed("SCORE");
 
 $table->get_page_start();
 $table->get_page_size();
@@ -311,21 +312,19 @@ $table->finish_output();
 // Back button.
 echo html_writer::start_tag('form', [
     'action' => 'report.php',
-    'method' => 'get'
+    'method' => 'get',
 ]);
 
 echo html_writer::empty_tag('input', [
     'type' => 'hidden',
     'id' => 'id',
     'name' => 'id',
-    'value' => $id
+    'value' => $id,
 ]);
 
 echo html_writer::empty_tag('input', [
     'type' => 'submit',
-    'value' => get_string('cmi5launchbackbutton', 'mod_cmi5launch') // Optional: make 'Back' translatable
+    'value' => get_string('cmi5launchbackbutton', 'mod_cmi5launch'),
 ]);
 
 echo html_writer::end_tag('form');
-
-?>

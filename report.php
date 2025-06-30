@@ -277,7 +277,7 @@ foreach ($auschunked[0] as $au) {
         $infofornextpage[] = $user->id;
 
         // Convert their grade to string to be passed into html button.
-        $userscoreasstring = strval($userscore);
+        $userscoreasstring = is_numeric($userscore) ? number_format((float)$userscore, 2) : $userscore;
 
         // Encode to send to next page, because it has to go as a string and pass through the Javascript function.
         $sendtopage = base64_encode(json_encode($infofornextpage, JSON_HEX_QUOT));
