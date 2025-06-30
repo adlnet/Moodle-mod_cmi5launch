@@ -21,7 +21,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @package mod_cmi5launch
  */
-
 namespace mod_cmi5launch\local;
 
 defined('MOODLE_INTERNAL') || die();
@@ -34,19 +33,38 @@ require_once($CFG->dirroot . '/mod/cmi5launch/classes/local/errorover.php');
 
 class au_helpers {
 
+    /**
+     * Returns this class's function that retrieve AUs.
+     * @return callable
+     */
     public function get_cmi5launch_retrieve_aus() {
         return [$this, 'cmi5launch_retrieve_aus'];
     }
+    /**
+     * Returns this class's function that creates AUs.
+     * @return callable
+     */
     public function get_cmi5launch_create_aus() {
         return [$this, 'cmi5launch_create_aus'];
     }
+    /**
+     * Returns this class's function that saves AUs.
+     * @return callable
+     */
     public function get_cmi5launch_save_aus() {
         return [$this, 'cmi5launch_save_aus'];
     }
+    /**
+     * Returns this class's function that retrieves AUs from the DB.
+     * @return callable
+     */
     public function get_cmi5launch_retrieve_aus_from_db() {
         return [$this, 'cmi5launch_retrieve_aus_from_db'];
     }
-
+    /**
+     * Returns this class's function that updates AUs from the grades.
+     * @return callable
+     */
     public function get_cmi5launch_update_au_for_user_grades() {
         return [$this, 'cmi5launch_update_au_for_user_grades'];
     }

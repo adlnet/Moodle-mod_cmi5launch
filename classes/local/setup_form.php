@@ -75,7 +75,7 @@ class setup_cmi5 extends moodleform {
         $mform->setDefault('cmi5password', get_string('cmi5launchbasepass_default', 'cmi5launch'));
         // Add a rule to make this field required.
         $mform->addRule('cmi5password',  $message, 'required');
-        // Below is the help button, it sucks you have to push it to see the help text, but it is there
+        // Below is the help button.
         $mform->addHelpButton('cmi5password', 'cmi5launchbasepass', 'cmi5launch');
 
          $this->add_action_buttons();

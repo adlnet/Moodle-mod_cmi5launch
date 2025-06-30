@@ -25,7 +25,7 @@
 
 namespace mod_cmi5launch\local;
 
-defined('MOODLE_INTERNAL') || die();
+defined(constant_name: 'MOODLE_INTERNAL') || die();
 
 // Include the errorover (error override) funcs.
 require_once($CFG->dirroot . '/mod/cmi5launch/classes/local/errorover.php');
@@ -55,6 +55,7 @@ class session {
 
     /**
      * Constructs sessions. Is fed array and where array key matches property, sets the property.
+     * @param mixed $statement - Data to make session.
      */
     public function __construct($statement) {
 

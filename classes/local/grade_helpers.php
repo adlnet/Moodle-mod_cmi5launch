@@ -215,7 +215,7 @@ class grade_helpers {
 
         global $cmi5launch, $USER, $DB;
 
-        // Set error and exception handler to catch and override the default PHP error messages, to make messages more user friendly.
+        // Set error and exception handler to catch and override the default PHP error messages, make messages more user friendly.
         set_error_handler('mod_cmi5launch\local\grade_warning', E_WARNING);
         set_exception_handler('mod_cmi5launch\local\exception_grade');
 
@@ -290,7 +290,7 @@ class grade_helpers {
         $progress = new progress;
         $cmi5 = new cmi5_connectors;
 
-        // Set error and exception handler to catch and override the default PHP error messages, to make messages more user friendly.
+        // Set error and exception handler to catch and override the default PHP error messages, make messages more user friendly.
         set_error_handler('mod_cmi5launch\local\grade_warning', E_WARNING);
         set_exception_handler('mod_cmi5launch\local\exception_grade');
 

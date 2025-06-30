@@ -242,7 +242,8 @@ foreach ($auids as $key => $auid) {
                 $scorecolumns[] = get_string('cmi5launchattemptrow', 'cmi5launch') . $attempt;
                 $scoreheaders[] = get_string('cmi5launchattemptrow', 'cmi5launch') . $attempt;
                 if ($usersession) {
-                    $scorerow[get_string('cmi5launchattemptrow', 'cmi5launch') . $attempt] = is_numeric($usersession->score) ? number_format((float)$usersession->score, 2) : '';
+                    $scorerow[get_string('cmi5launchattemptrow', 'cmi5launch')
+                    . $attempt] = is_numeric($usersession->score) ? number_format((float)$usersession->score, 2) : '';
                 }
                 switch ($gradetype) {
 
@@ -298,7 +299,6 @@ $scoretable->define_headers($scoreheaders);
 $scoretable->define_baseurl($PAGE->url);
 $scoretable->setup();
 $scoretable->add_data_keyed($scorerow);
-// $scoretable->add_data_keyed("SCORE");
 
 $table->get_page_start();
 $table->get_page_size();

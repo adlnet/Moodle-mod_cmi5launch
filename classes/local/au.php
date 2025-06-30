@@ -38,8 +38,8 @@ class au {
 
     /**
      * Lowercase values are for saving to DB.
-     *  
-     */ 
+     * 
+     */
     public $id, $attempt, $url, $type, $lmsid, $grade, $scores, $title, $moveon, $auindex, $parents, $objectives,
     $description, $activitytype, $launchmethod, $masteryscore, $satisfied, $launchurl, $sessions, $progress, $noattempt,
     $completed, $passed, $inprogress, $userid, $moodlecourseid;
@@ -56,7 +56,7 @@ class au {
      */
     public function __construct($statement) {
 
-        // or that the statement is not an array or not an object.
+        // Or that the statement is not an array or not an object.
         if (is_null($statement) || (!is_array($statement) && !is_object($statement) )) {
 
             throw new nullException(get_string('cmi5launchaubuilderror', 'cmi5launch'), 0);

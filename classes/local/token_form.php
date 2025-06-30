@@ -22,12 +22,22 @@
  * @package mod_cmi5launch
  */
 
-// moodleform is defined in formslib.php
+// Moodleform is defined in formslib.php.
 require_once("$CFG->libdir/formslib.php");
+defined(constant_name: 'MOODLE_INTERNAL') || die();
 
-
+/**
+ * A form for the purpose of setting up a cmi5 tenant token.
+ *
+ * This form is used to create a token for the cmi5 player.
+ * It includes a text field for the token and a button to generate it.
+ *
+ * @package mod_cmi5launch
+ */
 class setup_token extends moodleform {
-    // Add elements to form.
+    /**
+     * Add elements to form.
+     */
     public function definition() {
         $message = get_string('cmi5launchsetupformplayer', 'cmi5launch');
         // A reference to the form is stored in $this->form.
@@ -38,8 +48,8 @@ class setup_token extends moodleform {
         $mform->addElement('text', 'cmi5token', get_string('cmi5launchtenanttoken', 'cmi5launch'));
         // Set type of element.
         $mform->setType('cmi5token', PARAM_NOTAGS);
-        // Default value.
-        $mform->setDefault('cmi5token', get_string('cmi5launchtenanttoken_default', 'cmi5launch')); // The second arg here is the default value and appears in the text box.
+        // Default value.  // The second arg here is the default value and appears in the text box.
+        $mform->setDefault('cmi5token', get_string('cmi5launchtenanttoken_default', 'cmi5launch'));
         // These three go together for making one eleme
         // $mform->addElement('button', 'generatetoken', 'Generate Token');
         // Add a rule to make this field required.
@@ -48,8 +58,10 @@ class setup_token extends moodleform {
         $this->add_action_buttons();
     }
 
-    // Custom validation should be added here.
-    function validation($data, $files) {
+    /* 
+     * Custom validation should be added here.
+     */
+    public function validation($data, $files) {
         return [];
     }
 }
