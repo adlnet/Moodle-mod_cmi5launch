@@ -298,7 +298,7 @@ $scoretable->define_headers($scoreheaders);
 $scoretable->define_baseurl($PAGE->url);
 $scoretable->setup();
 $scoretable->add_data_keyed($scorerow);
-//$scoretable->add_data_keyed("SCORE");
+// $scoretable->add_data_keyed("SCORE");
 
 $table->get_page_start();
 $table->get_page_size();

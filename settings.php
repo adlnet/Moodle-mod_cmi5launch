@@ -137,7 +137,7 @@ if ($ADMIN->fulltree) {
         $showbutton = true;
     }
 
-    $settings->add(new admin_setting_heading('cmi5launch/cmi5launchsettings', 
+    $settings->add(new admin_setting_heading('cmi5launch/cmi5launchsettings',
         get_string('cmi5launchsettingsheader', 'cmi5launch'), ''));
 
     if ($showbutton) {

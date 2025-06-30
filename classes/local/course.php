@@ -28,7 +28,7 @@
  */
 class course {
 
-    /** 
+    /**
      * Properties of the course object.
      * These properties are set based on the data retrieved from the database.
      * They represent various attributes of a cmi5 course.

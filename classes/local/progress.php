@@ -371,7 +371,7 @@ class progress {
         $score = null;
 
         // Encase the whole thing in a try catch block to catch any errors.
-        // If an array key isn't there it will throw a warning. 
+        // If an array key isn't there it will throw a warning.
         // It will not stop execution but catching it will enable us to send better error messages.
         try {
             // Verify this statement has a 'result' param.

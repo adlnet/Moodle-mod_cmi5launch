@@ -383,7 +383,7 @@ try {
         // Assign au name, progress, and index.
         $auinfo[] = $au->title;
         $auinfo[] = ($austatus);
-/*
+        /*
         $grade = 0;
 
         // Retrieve grade.
@@ -405,25 +405,25 @@ try {
             // There is no grade, leave blank.
             $auinfo[] = (" ");
         }
-*/
-$grade = floatval($au->grade);
+        */
+        $grade = floatval($au->grade);
 
-// Determine whether to display grade:
-if ($au->sessions !== null) {
-    // AU has been attempted.
+        // Determine whether to display grade:
+        if ($au->sessions !== null) {
+            // AU has been attempted.
 
-    if ($au->grade !== null && is_numeric($au->grade)) {
-        // If numeric grade exists, even if 0, display it.
-        $auinfo[] = $grade;
-    } else {
-        // Grade missing despite attempt, leave blank.
-        $auinfo[] = " ";
-    }
+            if ($au->grade !== null && is_numeric($au->grade)) {
+                // If numeric grade exists, even if 0, display it.
+                $auinfo[] = $grade;
+            } else {
+                // Grade missing despite attempt, leave blank.
+                $auinfo[] = " ";
+            }
 
-} else {
-    // AU has NOT been attempted — no grade should display.
-    $auinfo[] = " ";
-}
+        } else {
+            // AU has NOT been attempted — no grade should display.
+            $auinfo[] = " ";
+        }
         $auindex = $au->auindex;
 
         // AU id for next page (to be loaded).

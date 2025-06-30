@@ -124,7 +124,7 @@ function custom_exceptionview($errno, $errstr, $errfile, $errline) {
  */
 function exception_progresslrsreq(\Throwable $exception) {
 
-    throw new nullException(get_string('cmi5launchlrscommunicationerror', 'cmi5launch') 
+    throw new nullException(get_string('cmi5launchlrscommunicationerror', 'cmi5launch')
         . $exception->getMessage() . get_string('cmi5launchlrschecksettings', 'cmi5launch'), 0);
 }
 /**
@@ -246,11 +246,11 @@ class playerException extends \Exception {
     // Redefine the exception so message isn't optional
     // I want an exception that takkkes what is missing and adds it to messsssage?
         /**
-     * Redefine the exception so message isn't optional.
-     * @param string $message - The message to be displayed.
-     * @param int $code - The error code.
-     * @param \Throwable|null $previous -  The previous exception we are overriding,
-     */
+         * Redefine the exception so message isn't optional.
+         * @param string $message - The message to be displayed.
+         * @param int $code - The error code.
+         * @param \Throwable|null $previous -  The previous exception we are overriding,
+         */
     public function __construct($message, $code = 0, Throwable $previous = null) {
 
         $playermessage = get_string('cmi5launchplayerexception', 'cmi5launch') . $message;

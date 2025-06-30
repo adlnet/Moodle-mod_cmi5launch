@@ -200,7 +200,7 @@ class grade_helpers {
         } else if (is_numeric($scores)) {
             $highestgrade = (float) $scores;
         }
-    
+
         return round((float)$highestgrade, 2);
 
     }

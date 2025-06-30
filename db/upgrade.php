@@ -70,7 +70,6 @@ function xmldb_cmi5launch_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2025063014, 'cmi5launch');
     }
 
-    
     // The player table is no longer used, remove.
     if ($oldversion < 2025061612) {
 
