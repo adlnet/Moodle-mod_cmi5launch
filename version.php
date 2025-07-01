@@ -28,11 +28,11 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2025063014;      // The current module version (Date: YYYYMMDDXX).
+$plugin->version   = 2025070116;      // The current module version (Date: YYYYMMDDXX).
 
 $plugin->requires  = 2023100900;      // Requires at least Moodle 4.3 version.
 $plugin->cron      = 0;               // Period for cron to check this module (secs).
 $plugin->component = 'mod_cmi5launch'; // To check on upgrade, that module sits in correct place.
 $plugin->maturity = MATURITY_STABLE;
-$plugin->release = '1.0.1 (Build: 2025063014)';
+$plugin->release = '1.1.0 (Build: 2025070116)';
 $plugin->php       = '8.0.0'; // Requires PHP 8.0+.
