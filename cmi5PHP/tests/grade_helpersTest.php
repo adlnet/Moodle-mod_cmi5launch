@@ -45,13 +45,13 @@ class grade_helpersTest extends TestCase {
         global $DB, $cmi5launch, $cmi5launchid, $USER, $testcourseid, $testcourseausids, $testcoursesessionids, $cmi5launchsettings;
 
         // Restore overridden global variable.
-        unset($globals['USER']);
-        unset($globals['cmi5launchsettings']);
-        unset($globals['cmi5launch']);
-        unset($globals['cmi5launchid']);
-        unset($globals['testcourseid']);
-        unset($globals['testcourseausids']);
-        unset($globals['testcoursesessionids']);
+        unset($USER);
+        unset($cmi5launchsettings);
+        unset($cmi5launch);
+        unset($cmi5launchid);
+        unset($testcourseid);
+        unset($testcourseausids);
+        unset($testcoursesessionids);
 
     }
 
@@ -71,7 +71,7 @@ class grade_helpersTest extends TestCase {
         // GRADE_AVERAGE_CMI5 =  2.
         // GRADE_SUM_CMI5 = 3.
         $cmi5launchsettings = [
-            "cmi5launchlrsendpoint" => "Test LRS point",
+            "cmi5launchlrsendpofloat" => "Test LRS pofloat",
             "cmi5launchlrslogin" => "Test LRS login",
             "cmi5launchlrspass" => "Test LRS password",
             "cmi5launchtenanttoken" => "Testtoken",
@@ -134,28 +134,28 @@ class grade_helpersTest extends TestCase {
 
         // Check the result for string.
         $this->assertEquals($average, $resultstring);
-        // Now the return should be an int as it is converted in function.
-        $this->assertIsInt($resultstring);
+        // Now the return should be an float as it is converted in function.
+        $this->assertIsFloat($resultstring);
 
         // Check the result for array.
         $this->assertEquals($average, $resultarray);
-        // Now the return should be an int as it is converted in function.
-        $this->assertIsInt($resultarray);
+        // Now the return should be an float as it is converted in function.
+        $this->assertIsfloat($resultarray);
 
     }
 
     /*
     * Test of the cmi5launch_average_grade method.
     * This takes scores and averages them.
-    * // We need to test with a singular int as string or array
+    * // We need to test with a singular float as string or array
     * @return void
     */
     public function testcmi5launch_average_grade_singular() {
         // Scores as an array.
         $scoresarray = [0 => 3];
 
-        // Score as a plain int.
-        $scoreint = 3;
+        // Score as a plain float.
+        $scorefloat = 3;
 
         // Scores as a (json_encoded) string.
         $scoresstring = json_encode($scoresarray);
@@ -171,22 +171,22 @@ class grade_helpersTest extends TestCase {
         // Call the method under test.
         $resultstring = $averagegrade($scoresstring);
         $resultarray = $averagegrade($scoresarray);
-        $resultint = $averagegrade($scoreint);
+        $resultfloat = $averagegrade($scorefloat);
 
         // Check the result for string.
         $this->assertEquals($average, $resultstring);
-        // Now the return should be an int as it is converted in function.
-        $this->assertIsInt($resultstring);
+        // Now the return should be an float as it is converted in function.
+        $this->assertIsFloat($resultstring);
 
         // Check the result for array.
         $this->assertEquals($average, $resultarray);
-        // Now the return should be an int as it is converted in function.
-        $this->assertIsInt($resultarray);
+        // Now the return should be an float as it is converted in function.
+        $this->assertIsfloat($resultarray);
 
         // Check the result for array.
-        $this->assertEquals($average, $resultint);
-        // Now the return should be an int as it is converted in function.
-        $this->assertIsInt($resultint);
+        $this->assertEquals($average, $resultfloat);
+        // Now the return should be an float as it is converted in function.
+        $this->assertIsfloat($resultfloat);
 
     }
 
@@ -204,8 +204,8 @@ class grade_helpersTest extends TestCase {
         // Scores as a (json_encoded) string.
         $scoresstring = json_encode($scoresarray);
 
-        // Score as a plain int.
-        $scoreint = 0;
+        // Score as a plain float.
+        $scorefloat = 0;
 
         // So the average of either should be.
         $average = 0;
@@ -218,22 +218,22 @@ class grade_helpersTest extends TestCase {
         // Call the method under test.
         $resultstring = $averagegrade($scoresstring);
         $resultarray = $averagegrade($scoresarray);
-        $resultint = $averagegrade($scoreint);
+        $resultfloat = $averagegrade($scorefloat);
 
         // Check the result for string.
         $this->assertEquals($average, $resultstring);
-        // Now the return should be an int as it is converted in function.
-        $this->assertIsInt($resultstring);
+        // Now the return should be an float as it is converted in function.
+        $this->assertIsfloat($resultstring);
 
         // Check the result for array.
         $this->assertEquals($average, $resultarray);
-        // Now the return should be an int as it is converted in function.
-        $this->assertIsInt($resultarray);
+        // Now the return should be an float as it is converted in function.
+        $this->assertIsFloat($resultarray);
 
         // Check the result for array.
-        $this->assertEquals($average, $resultint);
-        // Now the return should be an int as it is converted in function.
-        $this->assertIsInt($resultint);
+        $this->assertEquals($average, $resultfloat);
+        // Now the return should be an float as it is converted in function.
+        $this->assertIsfloat($resultfloat);
 
     }
 
@@ -264,20 +264,20 @@ class grade_helpersTest extends TestCase {
 
         // Check the result for string.
         $this->assertEquals($highest, $resultstring);
-        // Now the return should be an int as it is converted in function.
-        $this->assertIsInt($resultstring);
+        // Now the return should be an float as it is converted in function.
+        $this->assertIsfloat($resultstring);
 
         // Check the result for array.
         $this->assertEquals($highest, $resultarray);
-        // Now the return should be an int as it is converted in function.
-        $this->assertIsInt($resultarray);
+        // Now the return should be an float as it is converted in function.
+        $this->assertIsfloat($resultarray);
 
     }
 
     /*
     * Test of the cmi5launch_highest_grade method.
     * This takes scores and returns the highest one of them.
-    * // We need to test with scores being a string and int.
+    * // We need to test with scores being a string and float.
     * @return void
     */
     public function testcmi5launch_highest_grade_single() {
@@ -287,7 +287,7 @@ class grade_helpersTest extends TestCase {
         // Scores as a (json_encoded) string.
         $scoresstring = json_encode($scoresarray);
 
-        $scoreint = 5;
+        $scorefloat = 5;
 
         // So the highest of either should be.
         $highest = 5;
@@ -300,29 +300,29 @@ class grade_helpersTest extends TestCase {
         // Call the method under test.
         $resultstring = $highestgrade($scoresstring);
         $resultarray = $highestgrade($scoresarray);
-        $resultint = $highestgrade($scoreint);
+        $resultfloat = $highestgrade($scorefloat);
 
         // Check the result for string.
         $this->assertEquals($highest, $resultstring);
-        // Now the return should be an int as it is converted in function.
-        $this->assertIsInt($resultstring);
+        // Now the return should be an float as it is converted in function.
+        $this->assertIsfloat($resultstring);
 
         // Check the result for array.
         $this->assertEquals($highest, $resultarray);
-        // Now the return should be an int as it is converted in function.
-        $this->assertIsInt($resultarray);
+        // Now the return should be an float as it is converted in function.
+        $this->assertIsfloat($resultarray);
 
-        // Check the result for Int.
-        $this->assertEquals($highest, $resultint);
-        // Now the return should be an int as it is converted in function.
-        $this->assertIsInt($resultint);
+        // Check the result for float.
+        $this->assertEquals($highest, $resultfloat);
+        // Now the return should be an float as it is converted in function.
+        $this->assertIsfloat($resultfloat);
 
     }
 
     /*
     * Test of the cmi5launch_highest_grade method.
     * This takes scores and returns the highest one of them.
-    * // We need to test with scores being a 0 and string and int.
+    * // We need to test with scores being a 0 and string and float.
     * @return void
     */
     public function testcmi5launch_highest_grade_zero() {
@@ -332,7 +332,7 @@ class grade_helpersTest extends TestCase {
         // Scores as a (json_encoded) string.
         $scoresstring = json_encode($scoresarray);
 
-        $scoreint = 0;
+        $scorefloat = 0;
 
         // So the highest of either should be.
         $highest = 0;
@@ -345,22 +345,22 @@ class grade_helpersTest extends TestCase {
         // Call the method under test.
         $resultstring = $highestgrade($scoresstring);
         $resultarray = $highestgrade($scoresarray);
-        $resultint = $highestgrade($scoreint);
+        $resultfloat = $highestgrade($scorefloat);
 
         // Check the result for string.
         $this->assertEquals($highest, $resultstring);
-        // Now the return should be an int as it is converted in function.
-        $this->assertIsInt($resultstring);
+        // Now the return should be an float as it is converted in function.
+        $this->assertIsFloat($resultstring);
 
         // Check the result for array.
         $this->assertEquals($highest, $resultarray);
-        // Now the return should be an int as it is converted in function.
-        $this->assertIsInt($resultarray);
+        // Now the return should be an float as it is converted in function.
+        $this->assertIsFloat($resultarray);
 
-        // Check the result for Int.
-        $this->assertEquals($highest, $resultint);
-        // Now the return should be an int as it is converted in function.
-        $this->assertIsInt($resultint);
+        // Check the result for Float.
+        $this->assertEquals($highest, $resultfloat);
+        // Now the return should be an float as it is converted in function.
+        $this->assertIsFloat($resultfloat);
 
     }
      /*

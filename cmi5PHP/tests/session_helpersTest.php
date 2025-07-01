@@ -91,8 +91,8 @@ class session_helpersTest extends TestCase {
     protected function tearDown(): void {
         global $sessionids;
         // Restore overridden global variable.
-        unset($globals['USER']);
-        unset($globals['cmi5launchsettings']);
+        unset($USER);
+        unset($cmi5launchsettings);
 
         deletetestcmi5launch_sessions($sessionids);
     }

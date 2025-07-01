@@ -63,14 +63,14 @@ class cmi5_connectorsTest extends TestCase {
         global $DB, $cmi5launch, $cmi5launchid, $USER, $testcourseid, $testcourseausids, $testcoursesessionids, $cmi5launchsettings;
 
         // Restore overridden global variable.
-        unset($globals['USER']);
-        unset($globals['cmi5launchsettings']);
-        unset($globals['cmi5launch']);
-        unset($globals['cmi5launchid']);
-        unset($globals['testcourseid']);
-        unset($globals['testcourseausids']);
-        unset($globals['testcoursesessionids']);
-
+        unset($USER);
+        unset($cmi5launchsettings);
+        unset($cmi5launch);
+        unset($cmi5launchid);
+        unset($testcourseid);
+        unset($testcourseausids);
+        unset($testcoursesessionids);
+        
         // Delete the test record.
         // deletetestcmi5launch($cmi5launchid);
 
@@ -93,8 +93,8 @@ class cmi5_connectorsTest extends TestCase {
     protected function tearDown(): void {
         global $DB, $cmi5launch, $cmi5launchid, $USER, $testcourseid, $testcourseausids, $testcoursesessionids, $cmi5launchsettings;
         // Restore overridden global variable.
-        unset($globals['USER']);
-        unset($globals['cmi5launchsettings']);
+        unset($USER);
+        unset($cmi5launchsettings);
 
         deletetestcmi5launch_usercourse($testcourseid);
     }

@@ -38,7 +38,7 @@ class ausHelpersTest extends TestCase {
     protected function setUp(): void {
 
         // Based on created AU in program.
-        $this->mockStatement2 = [
+        $this->mockstatement2 = [
             "id" => "https://exampleau",
             "attempt" => null,
             "url" => "example.html?pages=1&complete=launch",
@@ -73,7 +73,7 @@ class ausHelpersTest extends TestCase {
 
         // Based on created AU in program, but with some values changed.
         // For instance title is an empty array
-        $this->mockStatementExcept = [
+        $this->mockstatementexcept = [
             "id" => "https://exampleau",
             "attempt" => null,
             "url" => "example.html?pages=1&complete=launch",
@@ -102,7 +102,7 @@ class ausHelpersTest extends TestCase {
             'masteryScore' => null,
         ];
         // Based on created AU in program, but with some values changed. Here title is a string.
-        $this->mockStatementExcept2 = [
+        $this->mockstatementexcept2 = [
             "id" => "https://exampleau",
             "attempt" => null,
             "url" => "example.html?pages=1&complete=launch",
@@ -369,7 +369,7 @@ class ausHelpersTest extends TestCase {
         $helper = new au_helpers();
 
         // Pass in a statement with something wrong. This one has a null title.
-        $testaus[0][] = $this->mockStatementExcept;
+        $testaus[0][] = $this->mockstatementexcept;
 
         // Because this exception is thrown by the error handler, not the SUT, test the output to ensure right exception was thrown.
         $expected = "Cannot save to DB. Stopped at record with ID number " . 1 . "."
@@ -394,9 +394,9 @@ class ausHelpersTest extends TestCase {
         $helper = new au_helpers();
 
         // This first statement is correct. We want to test that it gets the SECOND statement number,
-        $testaus[0][] = $this->mockStatement2;
+        $testaus[0][] = $this->mockstatement2;
         // This one has 'title' as string instead of array.
-        $testaus[1][] = $this->mockStatementExcept2;
+        $testaus[1][] = $this->mockstatementexcept2;
 
         // The expected is built by the two messages knowing 'title' is a string.
         $expected = "Cannot save to DB. Stopped at record with ID number " . 2 . "."
@@ -451,7 +451,7 @@ class ausHelpersTest extends TestCase {
 
         // Lets create 4 aus statement
         for ($i = 0; $i < 3; $i++) {
-            $testaus[$i][] = $this->mockStatement2;
+            $testaus[$i][] = $this->mockstatement2;
         }
 
         // So now with this fake 'statement', lets ensure it pulls the correct value which is "correct Retrieval"
@@ -486,7 +486,7 @@ class ausHelpersTest extends TestCase {
         // Save new aus to db to pull.
         // Lets create 4 aus statement
         for ($i = 0; $i < 3; $i++) {
-            $testaus[$i][] = $this->mockStatement2;
+            $testaus[$i][] = $this->mockstatement2;
         }
 
         // So now with this fake 'statement', lets ensure it pulls the correct value which is "correct Retrieval"

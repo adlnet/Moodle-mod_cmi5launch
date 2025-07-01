@@ -91,8 +91,8 @@ class progressTest extends TestCase {
     protected function tearDown(): void {
         global $sessionids, $testcourseid, $cmi5launchsettings;
         // Restore overridden global variable.
-        unset($globals['USER']);
-        unset($globals['cmi5launchsettings']);
+        unset($USER);
+        unset($cmi5launchsettings);
         deletetestcmi5launch_usercourse($testcourseid);
         deletetestcmi5launch_sessions($sessionids);
     }
@@ -171,7 +171,7 @@ class progressTest extends TestCase {
         $sessionid = $sessionids[0];
 
         // Retrieve a session from the DB as an object.
-        $session = $DB->get_record('cmi5launch_sessions', ['sessionid' => $sessionid], '*', MUST_EXIST);
+        $session = $DB->get_record('cmi5launch_sessions', ['sessionid' => $sessionid, 'moodlecourseid' => $cmi5launch->id], '*', MUST_EXIST);
 
         // Mock data as it will be passed to stub.
         $data = [
