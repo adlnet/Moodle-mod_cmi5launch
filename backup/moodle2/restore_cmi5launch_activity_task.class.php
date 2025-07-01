@@ -19,7 +19,7 @@
  *
  * @package    mod_cmi5launch
  * @copyright  2025 Megan Bohland
- * @copyright  Based on work by 2016 onward Remote-Learner.net Inc 
+ * @copyright  Based on work by 2016 onward Remote-Learner.net Inc
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -27,6 +27,11 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/mod/cmi5launch/backup/moodle2/restore_cmi5launch_stepslib.php'); // Because it exists (must).
 
+/**
+ * cmi5launch restore activity task that provides the structure for the restore.
+ *
+ * @package    mod_cmi5launch
+ */
 class restore_cmi5launch_activity_task extends restore_activity_task {
 
     /**
@@ -55,9 +60,9 @@ class restore_cmi5launch_activity_task extends restore_activity_task {
      * @return array
      */
     public static function define_decode_contents() {
-        $contents = array();
+        $contents = [];
 
-        $contents[] = new restore_decode_content('cmi5launch', array('intro'), 'cmi5launch');
+        $contents[] = new restore_decode_content('cmi5launch', ['intro'], 'cmi5launch');
 
         return $contents;
     }
@@ -69,7 +74,7 @@ class restore_cmi5launch_activity_task extends restore_activity_task {
      * @return array
      */
     public static function define_decode_rules() {
-        $rules = array();
+        $rules = [];
 
         // List of cmi5launchs in course.
         $rules[] = new restore_decode_rule('CMI5LAUNCHINDEX', '/mod/cmi5launch/index.php?id=$1', 'course');
@@ -88,14 +93,12 @@ class restore_cmi5launch_activity_task extends restore_activity_task {
 
     /**
      * Define the restore log rules that will be applied
-     * by the {@link restore_logs_processor} when restoring
-     * cmi5launch logs. It must return one array
-     * of {@link restore_log_rule} objects.
-     *
+     * by the restore_logs_processor when restoring cmi5launch logs.
+     * It must return one array of objects.
      * @return array
      */
     public static function define_restore_log_rules() {
-        $rules = array();
+        $rules = [];
 
         $rules[] = new restore_log_rule('cmi5launch', 'add', 'view.php?id={course_module}', '{cmi5launch}');
         $rules[] = new restore_log_rule('cmi5launch', 'update', 'view.php?id={course_module}', '{cmi5launch}');
@@ -106,18 +109,17 @@ class restore_cmi5launch_activity_task extends restore_activity_task {
 
     /**
      * Define the restore log rules that will be applied
-     * by the {@link restore_logs_processor} when restoring
-     * course logs. It must return one array
-     * of {@link restore_log_rule} objects.
+     * by the restore_logs_processor when restoring course logs.
+     * It must return one array of objects.
      *
-     * Note this rules are applied when restoring course logs
+     * Note these rules are applied when restoring course logs
      * by the restore final task, but are defined here at
-     * activity level. All them are rules not linked to any module instance (cmid = 0).
+     * activity level. All are rules not linked to any module instance (cmid = 0).
      *
      * @return array
      */
     public static function define_restore_log_rules_for_course() {
-        $rules = array();
+        $rules = [];
 
         $rules[] = new restore_log_rule('cmi5launch', 'view all', 'index.php?id={course}', null);
 

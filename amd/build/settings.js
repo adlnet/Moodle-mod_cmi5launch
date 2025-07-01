@@ -1,6 +1,6 @@
+"use strict";
 
-
-define('settings',[], function () {
+define([], function () {
   return {
     init: function init() {
       var tokenForm = document.getElementById('settingformtoken');
@@ -20,4 +20,3 @@ define('settings',[], function () {
     }
   };
 });
-

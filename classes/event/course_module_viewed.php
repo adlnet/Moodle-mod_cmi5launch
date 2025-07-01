@@ -16,13 +16,12 @@
 
 /**
  * The mod_cmi5launch course module viewed event.
- *
+ * @copyright  2013 Andrew Downes
  * @package    mod_cmi5launch
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace mod_cmi5launch\event;
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * The mod_cmi5launch course module viewed event class.
@@ -48,8 +47,8 @@ class course_module_viewed extends \core\event\course_module_viewed {
      * @return array of parameters to be passed to legacy add_to_log() function.
      */
     protected function get_legacy_logdata() {
-        return array($this->courseid, 'cmi5launch', 'pre-view', 'view.php?id=' . $this->contextinstanceid, $this->objectid,
-                $this->contextinstanceid);
+        return [$this->courseid, 'cmi5launch', 'pre-view', 'view.php?id=' . $this->contextinstanceid, $this->objectid,
+                $this->contextinstanceid];
     }
 }
 

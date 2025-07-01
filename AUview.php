@@ -19,6 +19,7 @@
  * @copyright  2023 Megan Bohland
  * @copyright  Based on work by 2013 Andrew Downes
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package mod_cmi5launch
  */
 
 use mod_cmi5launch\local\session_helpers;
@@ -31,7 +32,6 @@ require('header.php');
 
 // Include the errorover (error override) funcs.
 require_once($CFG->dirroot . '/mod/cmi5launch/classes/local/errorover.php');
-
 
 require_login($course, false, $cm);
 
@@ -56,7 +56,7 @@ $event->trigger();
 */
 
 // Print the page header.
-$PAGE->set_url('/mod/cmi5launch/view.php', array('id' => $cm->id));
+$PAGE->set_url('/mod/cmi5launch/view.php', ['id' => $cm->id]);
 $PAGE->set_title(format_string($cmi5launch->name));
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($context);
@@ -64,50 +64,6 @@ $PAGE->set_context($context);
 
 // Output starts here.
 echo $OUTPUT->header();
-
-// Create the back button.
-?>
-<form action="view.php" method="get">
-    <input id="id" name="id" type="hidden" value="<?php echo $id ?>">
-    <input type="submit" value="Back" />
-</form>
-<?php
-
-// TODO: Put all the php inserted data as parameters on the functions and put the functions in a separate JS file.
-
-?>
-
-<script>
-    function key_test(registration) {
-
-        if (event.keyCode === 13 || event.keyCode === 32) {
-            mod_cmi5launch_launchexperience(registration);
-        }
-    }
-
-
-    // Function to run when the experience is launched.
-    function mod_cmi5launch_launchexperience(registration) {
-        // Set the form paramters.
-        document.getElementById('launchform_registration').value = registration;
-        // Post it.
-        document.getElementById('launchform').submit();
-    }
-
-    // TODO: there may be a better way to check completion. Out of scope for current project.
-    document.addEventListener('DOMContentLoaded', function() {
-        setInterval(function() {
-            fetch('completion_check.php?id=<?php echo $id ?>&n=<?php echo $n ?>')
-                .then(response => response.text())
-                .then(data => {
-                    document.getElementById('cmi5launch_completioncheck').innerHTML = data;
-                })
-                .catch(error => console.error('Error:', error));
-        }, 30000); // TODO: make this interval a configuration setting.
-    });
-</script>
-
-<?php
 
 // Retrieve the registration and AU ID from view.php.
 $auid = required_param('AU_view', PARAM_TEXT);
@@ -119,10 +75,10 @@ cmi5launch_update_grades($cmi5launch, $USER->id);
 $au = $retrieveaus($auid);
 
 // Array to hold session scores for the AU.
-$sessionscores = array();
+$sessionscores = [];
 
 // Reload cmi5 instance.
-$record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
+$record = $DB->get_record('cmi5launch', ['id' => $cmi5launch->id]);
 
 // Reload user course instance.
 $userscourse = $DB->get_record('cmi5launch_usercourse', ['courseid'  => $record->courseid, 'userid'  => $USER->id]);
@@ -132,23 +88,23 @@ if (!$au->sessions == null) {
 
     try {
 
-        // Set error and exception handler to catch and override the default PHP error messages, to make messages more user friendly.
+        // Set error and exception handler to catch and override the default PHP error messages, to make them more user friendly.
         set_error_handler('mod_cmi5launch\local\custom_warningAU', E_WARNING);
         set_exception_handler('mod_cmi5launch\local\custom_warningAU');
 
         // Array to hold info for table population.
-        $tabledata = array();
+        $tabledata = [];
 
         // Build table.
         $table = new html_table();
         $table->id = 'cmi5launch_auSessionTable';
         $table->caption = get_string('modulenameplural', 'cmi5launch');
-        $table->head = array(
+        $table->head = [
             get_string('cmi5launchviewfirstlaunched', 'cmi5launch'),
             get_string('cmi5launchviewlastlaunched', 'cmi5launch'),
             get_string('cmi5launchviewprogress', 'cmi5launch'),
             get_string('cmi5launchviewgradeheader', 'cmi5launch'),
-        );
+        ];
 
 
         // Retrieve session ids.
@@ -158,24 +114,25 @@ if (!$au->sessions == null) {
         foreach ($sessionids as $key => $sessionid) {
 
             // Get the session from DB with session id.
-            $session = $DB->get_record('cmi5launch_sessions', array('sessionid' => $sessionid));
+            $session = $DB->get_record('cmi5launch_sessions', ['sessionid' => $sessionid]);
 
             // Array to hold data for table.
-            $sessioninfo = array();
+            $sessioninfo = [];
 
             if ($session->createdat != null) {
 
                 // Retrieve createdAt and format.
-                $date = new DateTime($session->createdat, new DateTimeZone('US/Eastern'));
+                $date = new DateTime($session->createdat,
+                    new DateTimeZone('US/Eastern'));
                 $date->setTimezone(new DateTimeZone('America/New_York'));
-                // date_timezone_set($date, new DateTimeZone('America/New_York'));
                 $sessioninfo[] = $date->format('D d M Y H:i:s');
             }
 
             if ($session->lastrequesttime != null) {
 
                 // Retrieve lastRequestTime and format.
-                $date = new DateTime($session->lastrequesttime, new DateTimeZone('US/Eastern'));
+                $date = new DateTime($session->lastrequesttime,
+                    new DateTimeZone('US/Eastern'));
                 $date->setTimezone(new DateTimeZone('America/New_York'));
                 $sessioninfo[] = $date->format('D d M Y H:i:s');
             }
@@ -197,7 +154,8 @@ if (!$au->sessions == null) {
         restore_error_handler();
 
         // Throw an exception.
-        throw new customException(get_string('cmi5launchloadsessionerror', 'cmi5launch') . $e->getMessage() );
+        throw new customException(get_string('cmi5launchloadsessionerror', 'cmi5launch')
+            . $e->getMessage() );
     }
 
     // Write table.
@@ -214,25 +172,88 @@ if (!$au->sessions == null) {
 
 // Pass the auid and new session info to next page (launch.php).
 // New attempt button.
-echo "<p tabindex=\"0\"onkeyup=\"key_test('"
-    . $auid . "')\"id='cmi5launch_newattempt'><button onclick=\"mod_cmi5launch_launchexperience('"
-    . $auid
-    . "')\" style=\"cursor: pointer;\">"
-    . get_string('cmi5launch_attempt', 'cmi5launch')
-    . "</button></p>";
+echo "<p tabindex=\"0\" onkeyup=\"key_test('{$auid}')\" id='cmi5launch_newattempt'>
+        <button onclick=\"mod_cmi5launch_launchexperience('{$auid}')\" style=\"cursor: pointer;\">
+            " . get_string('cmi5launch_attempt', 'cmi5launch') . "
+        </button>
+    </p>";
 
-// Add a form to be posted based on the attempt selected.
-?>
+// Completion div.
+echo '<div id="cmi5launch_completioncheck"></div>';
 
-    <form id="launchform" action="launch.php" method="get">
-        <input id="launchform_registration" name="launchform_registration" type="hidden" value="default">
-        <input id="id" name="id" type="hidden" value="<?php echo $id ?>">
-        <input id="n" name="n" type="hidden" value="<?php echo $n ?>">
-        <input id="auid" name="auid" type="hidden" value="<?php echo $auid ?>"> <!-- Pass AU ID -->
+// Back button.
+echo html_writer::start_tag('form', [
+    'action' => 'view.php',
+    'method' => 'get',
+]);
+echo html_writer::empty_tag('input', [
+    'type' => 'hidden',
+    'name' => 'id',
+    'id' => 'id',
+    'value' => $id,
+]);
+echo html_writer::empty_tag('input', [
+    'type' => 'submit',
+    'value' => get_string('cmi5launchbackbutton', 'mod_cmi5launch'), // Optional localization.
+]);
+echo html_writer::end_tag('form');
 
-    </form>
+// Launch form.
+echo html_writer::start_tag('form', [
+    'id' => 'launchform',
+    'action' => 'launch.php',
+    'method' => 'get',
+]);
+echo html_writer::empty_tag('input', [
+    'type' => 'hidden',
+    'name' => 'launchform_registration',
+    'id' => 'launchform_registration',
+    'value' => 'default',
+]);
+echo html_writer::empty_tag('input', [
+    'type' => 'hidden',
+    'name' => 'id',
+    'id' => 'id',
+    'value' => $id,
+]);
+echo html_writer::empty_tag('input', [
+    'type' => 'hidden',
+    'name' => 'n',
+    'id' => 'n',
+    'value' => $n,
+]);
+echo html_writer::empty_tag('input', [
+    'type' => 'hidden',
+    'name' => 'auid',
+    'id' => 'auid',
+    'value' => $auid,
+]);
+echo html_writer::end_tag('form');
 
-
-<?php
 
 echo $OUTPUT->footer();
+
+?>
+
+<script>
+// TODO: Put all the php inserted data as parameters on the functions and put the functions in a separate JS file.
+
+    function key_test(registration) {
+
+        if (event.keyCode === 13 || event.keyCode === 32) {
+            mod_cmi5launch_launchexperience(registration);
+        }
+    }
+
+    // Function to run when the experience is launched.
+    function mod_cmi5launch_launchexperience(registration) {
+        // Set the form paramters.
+        document.getElementById('launchform_registration').value = registration;
+        // Post it.
+        document.getElementById('launchform').submit();
+    }
+
+
+</script>
+
+

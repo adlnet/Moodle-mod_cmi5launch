@@ -19,13 +19,10 @@
  *
  * @copyright  2025 Megan Bohland
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package mod_cmi5launch
  */
 
 
-
-
-
-// constants 
 define('CMI5LAUNCH_PLAYER_V1', '/api/v1/');
 define( 'CMI5LAUNCH_PLAYER_TENANT_URL', '/api/v1/tenant');
 define('CMI5LAUNCH_PLAYER_COURSE_URL', '/api/v1/course');
@@ -60,4 +57,4 @@ define('CMI5_UPDATE_EVERYTIME', '3');
 
 
 
-?>
+

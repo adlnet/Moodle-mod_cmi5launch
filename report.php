@@ -19,6 +19,7 @@
  *
  * @copyright  2023 Megan Bohland
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package mod_cmi5launch
  */
 
 
@@ -40,7 +41,7 @@ define('CMI5LAUNCH_REPORT_ATTEMPTS_STUDENTS_WITH_NO', 2);
 global $cmi5launch, $cmi5launchsettings, $USER, $DB;
 // Reload course information.
 $cm = get_coursemodule_from_id('cmi5launch', $id, 0, false, MUST_EXIST);
-$course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
+$course = $DB->get_record('course', ['id' => $cm->course], '*', MUST_EXIST);
 
 // Activity Module ID.
 $id = required_param('id', PARAM_INT);
@@ -93,29 +94,6 @@ $cmi5launchsettings = cmi5launch_settings($cmi5launch->id);
 // Activate the secondary nav tab.
 navigation_node::override_active_url(new moodle_url('/mod/cmi5launch/report.php', ['id' => $id]));
 
-?>
-<script>
-    function key_test(inforfornextpage) {
-
-        // Onclick calls this
-        if (event.keyCode === 13 || event.keyCode === 32) {
-
-            mod_cmi5launch_open_report(inforfornextpage);
-        }
-    }
-
-
-    // Function to run when the experience is launched (on click).
-    function mod_cmi5launch_open_report(inforfornextpage) {
-        // Set the form paramters.
-        document.getElementById('session_report').value = inforfornextpage;
-        // Post it.
-        document.getElementById('launchform').submit();
-    }
-</script>
-
-<?php
-
 // Trigger a report viewed event.
 // MB - we don't currently do this, maybe in future.
 /*
@@ -138,14 +116,14 @@ if (empty($noheader)) {
     $strreport = get_string('cmi5launchreport', 'cmi5launch');
     $strattempt = get_string('cmi5launchattemptrow', 'cmi5launch');
 
-    // Setup the page
+    // Setup the page.
     $PAGE->set_title("$course->shortname: " . format_string($course->id));
     $PAGE->set_heading($course->fullname);
     $PAGE->activityheader->set_attrs([
         'hidecompletion' => true,
         'description' => '',
     ]);
-    $PAGE->navbar->add($strreport, new moodle_url('/mod/cmi5launch/report.php', array('id' => $cm->id)));
+    $PAGE->navbar->add($strreport, new moodle_url('/mod/cmi5launch/report.php', ['id' => $cm->id]));
 
     echo $OUTPUT->header();
 }
@@ -178,10 +156,10 @@ if (has_capability('mod/cmi5launch:viewgrades', $context)) {
     }
 } else {
 
-    // If the user does not have the correct capability then we are looking at a specific user,
-    // who is not a teacher and needs to see only their grades.
+    // If the user does not have the correct capability then we are looking at a specific user.
+    // Who is not a teacher and needs to see only their grades.
     // Retrieve that user from DB.
-    $user = $DB->get_record('user', array('id' => $USER->id));
+    $user = $DB->get_record('user', ['id' => $USER->id]);
 
     // Make sure their grades are up to date.
     $updategrades($user);
@@ -196,16 +174,8 @@ if (has_capability('mod/cmi5launch:viewgrades', $context)) {
     $backurl = $CFG->wwwroot . '/grade/report/user/index.php' . '?id=' . $cmi5launch->course;
 }
 
-// Create back button.
-?>
-<form action="<?php echo $backurl ?>" method="get">
-    <input id="id" name="id" type="hidden" value="<?php echo $cmi5launch->course ?>">
-    <input type="submit" value="Back" />
-</form>
-<?php
-
 // Reload cmi5 course instance.
-$record = $DB->get_record('cmi5launch', array('id' => $cmi5launch->id));
+$record = $DB->get_record('cmi5launch', ['id' => $cmi5launch->id]);
 
 // Retrieve AU ids for this course.
 $aus = json_decode($record->aus, true);
@@ -225,13 +195,13 @@ $reporttable->setup();
 foreach ($auschunked[0] as $au) {
 
     // Array to hold data for rows.
-    $rowdata = array();
+    $rowdata = [];
 
     // For each AU, iterate through each user.
     foreach ($users as $user) {
 
         // Array to hold info for next page, that will be placed into buttons for user to click.
-        $infofornextpage = array();
+        $infofornextpage = [];
 
         // Retrieve the current au id, this is always unique and will help with retrieving the
         // student grades. It is the uniquie id cmi5 spec id.
@@ -273,7 +243,7 @@ foreach ($auschunked[0] as $au) {
                 if (array_key_exists($aulmsid, $usergrades)) {
 
                     // If it is, we want it's info which should be title => grade(s).
-                    $auinfo = array();
+                    $auinfo = [];
                     $auinfo = $usergrades[$aulmsid];
                     $augrades = $auinfo[$currenttitle];
 
@@ -294,7 +264,7 @@ foreach ($auschunked[0] as $au) {
                     }
 
                     // Remove [] from userscore if they are there.
-                    $toremove = array("[", "]");
+                    $toremove = ["[", "]"];
                     if ($userscore != null && str_contains($userscore, "[")) {
                         $userscore = str_replace($toremove, "", $userscore);
                     }
@@ -307,7 +277,7 @@ foreach ($auschunked[0] as $au) {
         $infofornextpage[] = $user->id;
 
         // Convert their grade to string to be passed into html button.
-        $userscoreasstring = strval($userscore);
+        $userscoreasstring = is_numeric($userscore) ? number_format((float)$userscore, 2) : $userscore;
 
         // Encode to send to next page, because it has to go as a string and pass through the Javascript function.
         $sendtopage = base64_encode(json_encode($infofornextpage, JSON_HEX_QUOT));
@@ -331,14 +301,67 @@ foreach ($auschunked[0] as $au) {
 $reporttable->get_page_start();
 $reporttable->get_page_size();
 $reporttable->finish_output();
-?>
 
-<form id="launchform" action="session_report.php" method="get">
-    <input id="id" name="id" type="hidden" value="<?php echo $id ?>">
-    <input id="session_report" name="session_report" type="hidden" value="default">
-</form>
-<?php
+// Back button form.
+echo html_writer::start_tag('form', [
+    'action' => $backurl,
+    'method' => 'get',
+]);
+echo html_writer::empty_tag('input', [
+    'type' => 'hidden',
+    'name' => 'id',
+    'id' => 'id',
+    'value' => $cmi5launch->course,
+]);
+echo html_writer::empty_tag('input', [
+    'type' => 'submit',
+    'value' => get_string('cmi5launchbackbutton', 'mod_cmi5launch'),
+]);
+echo html_writer::end_tag('form');
+
+// Launch form to session_report.php.
+echo html_writer::start_tag('form', [
+    'id' => 'launchform',
+    'action' => 'session_report.php',
+    'method' => 'get',
+]);
+echo html_writer::empty_tag('input', [
+    'type' => 'hidden',
+    'name' => 'id',
+    'id' => 'id',
+    'value' => $id,
+]);
+echo html_writer::empty_tag('input', [
+    'type' => 'hidden',
+    'name' => 'session_report',
+    'id' => 'session_report',
+    'value' => 'default',
+]);
+echo html_writer::end_tag('form');
+
 
 if (empty($noheader)) {
     echo $OUTPUT->footer();
 }
+?>
+<script>
+    function key_test(inforfornextpage) {
+
+        // Onclick calls this
+        if (event.keyCode === 13 || event.keyCode === 32) {
+
+            mod_cmi5launch_open_report(inforfornextpage);
+        }
+    }
+
+
+    // Function to run when the experience is launched (on click).
+    function mod_cmi5launch_open_report(inforfornextpage) {
+        // Set the form paramters.
+        document.getElementById('session_report').value = inforfornextpage;
+        // Post it.
+        document.getElementById('launchform').submit();
+    }
+
+
+</script>

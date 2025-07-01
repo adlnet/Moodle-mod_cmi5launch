@@ -1,15 +1,19 @@
-export const init = () => {
-    const tokenForm = document.getElementById('settingformtoken');
-    const setupForm = document.getElementById('setupform');
+define([], function() {
+    return {
+        init: function() {
+            const tokenForm = document.getElementById('settingformtoken');
+            const setupForm = document.getElementById('setupform');
 
-    const tokenBtn = document.getElementById('totokenbtn');
-    const setupBtn = document.getElementById('tosetupbtn');
+            const tokenBtn = document.getElementById('totokenbtn');
+            const setupBtn = document.getElementById('tosetupbtn');
 
-    if (tokenBtn && tokenForm) {
-        tokenBtn.addEventListener('click', () => tokenForm.submit());
-    }
+            if (tokenBtn && tokenForm) {
+                tokenBtn.addEventListener('click', () => tokenForm.submit());
+            }
 
-    if (setupBtn && setupForm) {
-        setupBtn.addEventListener('click', () => setupForm.submit());
-    }
-};
+            if (setupBtn && setupForm) {
+                setupBtn.addEventListener('click', () => setupForm.submit());
+            }
+        }
+    };
+});

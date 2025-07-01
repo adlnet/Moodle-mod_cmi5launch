@@ -28,8 +28,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
- 
-defined('MOODLE_INTERNAL') || die;
+
+defined(constant_name: 'MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/mod/cmi5launch/constants.php');
 
@@ -40,24 +40,20 @@ use mod_cmi5launch\local\grade_helpers;
 // Bring in grade helpers.
 $gradehelpers = new grade_helpers;
 
-$get_grade_array = $gradehelpers->cmi5launch_get_grade_method_array();
-$cmi5launch_get_attempts_array = $gradehelpers->cmi5launch_fetch_attempts_array();
-$cmi5launch_get_grade_type_array = $gradehelpers->cmi5launch_fetch_what_grade_array();
+$getgradearray = $gradehelpers->cmi5launch_get_grade_method_array();
+$cmi5launchgetattemptsarray = $gradehelpers->cmi5launch_fetch_attempts_array();
+$cmi5launchgetgradetypearray = $gradehelpers->cmi5launch_fetch_what_grade_array();
 
-
-
-// maybe add if ($hassiteconfig?) Can regulare users access this? TODO -MB
 if ($ADMIN->fulltree) {
     $PAGE->requires->js_call_amd('mod_cmi5launch/settings', 'init');
 
     require_once($CFG->dirroot . '/mod/cmi5launch/settingslib.php');
 
-    // MB
     // From scorm grading stuff.
-    $yesno = array(
+    $yesno = [
         0 => get_string('no'),
-        1 => get_string('yes')
-    );
+        1 => get_string('yes'),
+    ];
 
     // Default display settings.
     $settings->add(new admin_setting_heading(
@@ -66,7 +62,7 @@ if ($ADMIN->fulltree) {
         get_string('cmi5launchlrsfieldset_help', 'cmi5launch')
     ));
 
-    // LRS settings
+    // LRS settings.
     $settings->add(new admin_setting_heading('cmi5launch/cmi5lrssettings', get_string('cmi5lrssettingsheader', 'cmi5launch'), ''));
 
     $settings->add(new admin_setting_configtext_mod_cmi5launch(
@@ -77,11 +73,11 @@ if ($ADMIN->fulltree) {
         PARAM_URL
     ));
 
-    $options = array(
+    $options = [
         1 => get_string('cmi5launchlrsauthentication_option_0', 'cmi5launch'),
         2 => get_string('cmi5launchlrsauthentication_option_1', 'cmi5launch'),
         0 => get_string('cmi5launchlrsauthentication_option_2', 'cmi5launch'),
-    );
+    ];
     // Note the numbers above are deliberately mis-ordered for reasons of backwards compatibility with older settings.
 
     $setting = new admin_setting_configselect(
@@ -141,15 +137,15 @@ if ($ADMIN->fulltree) {
         $showbutton = true;
     }
 
-    $settings->add(new admin_setting_heading('cmi5launch/cmi5launchsettings', get_string('cmi5launchsettingsheader', 'cmi5launch'), ''));
+    $settings->add(new admin_setting_heading('cmi5launch/cmi5launchsettings',
+        get_string('cmi5launchsettingsheader', 'cmi5launch'), ''));
 
     if ($showbutton) {
 
         // Show only a button, otherwise regular information showing.
         // This is the first time setup.
-        // Use this for the button instead of config text
-        
-        // Setup form link/button
+        // Use this for the button instead of config text.
+        // Setup form link/button.
         $setupurl = new moodle_url('/mod/cmi5launch/setupform.php');
         $setupbutton = html_writer::link(
             $setupurl,
@@ -190,9 +186,7 @@ if ($ADMIN->fulltree) {
         );
         $settings->add($setting);
 
-        // Display tenant info
-        // To corrrect hardcoded strings and follow moodles coding standards to have full sentences, we may need three get_string here.
-        // We could have them all in one long string (ie getstring . var . getstring . var) but I think this is better.- mb
+        // Display tenant info.
         $tenantnamestring = get_string('cmi5launchtenantnameis', 'cmi5launch') . $tenantname;
         $tenantidstring = get_string('cmi5launchtenantidis', 'cmi5launch') . $tenantid;
         $tenantwarning = get_string('cmi5launchtenant_warning', 'cmi5launch');
@@ -205,13 +199,13 @@ if ($ADMIN->fulltree) {
             'cmi5launch/cmi5launchtenanttoken',
             get_string('cmi5launchtenanttoken', 'cmi5launch'),
             get_string('cmi5launchtenanttoken_help', 'cmi5launch') ,
-                
+
             get_string('cmi5launchtenanttoken_default', 'cmi5launch')
         );
 
         $settings->add($setting);
 
-            // Token setup form link/button.
+        // Token setup form link/button.
         $tokenurl = new moodle_url('/mod/cmi5launch/tokensetup.php');
         $tokenbutton = html_writer::link(
             $tokenurl,
@@ -227,9 +221,6 @@ if ($ADMIN->fulltree) {
 
     }
 
-
-    // MB.
-    // Grade stuff I'm bringing over.
     // Default grade settings.
     $settings->add(new admin_setting_heading('cmi5launch/gradesettings', get_string('defaultgradesettings', 'cmi5launch'), ''));
     $settings->add(new admin_setting_configselect(
@@ -237,7 +228,7 @@ if ($ADMIN->fulltree) {
         get_string('grademethod', 'cmi5launch'),
         get_string('grademethoddesc', 'cmi5launch'),
         MOD_CMI5LAUNCH_GRADE_HIGHEST,
-        $get_grade_array()
+        $getgradearray()
     ));
 
     for ($i = 0; $i <= 100; $i++) {
@@ -261,7 +252,7 @@ if ($ADMIN->fulltree) {
             get_string('maximumattempts', 'cmi5launch'),
             '',
             '0',
-            $cmi5launch_get_attempts_array()
+            $cmi5launchgetattemptsarray()
         ),
         get_string('whatmaxdesc', 'cmi5launch'),
     );
@@ -271,7 +262,7 @@ if ($ADMIN->fulltree) {
         get_string('whatgrade', 'cmi5launch'),
         get_string('whatgradedesc', 'cmi5launch'),
         MOD_CMI5LAUNCH_HIGHEST_ATTEMPT,
-        $cmi5launch_get_grade_type_array()
+        $cmi5launchgetgradetypearray()
     ));
 
     // Not sure if we want to implement mastery override at this time -MB.
@@ -289,4 +280,4 @@ if ($ADMIN->fulltree) {
     ));
 }
 
-?>
+

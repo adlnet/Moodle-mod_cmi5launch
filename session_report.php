@@ -19,6 +19,7 @@
  *
  * @copyright  2023 Megan Bohland
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package mod_cmi5launch
  */
 
 use mod_cmi5launch\local\au_helpers;
@@ -77,7 +78,7 @@ $userid = $fromreportpage[3];
 
 // Retrieve the course module.
 $cm = get_coursemodule_from_id('cmi5launch', $id, 0, false, MUST_EXIST);
-$course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
+$course = $DB->get_record('course', ['id' => $cm->course], '*', MUST_EXIST);
 $contextmodule = context_module::instance($cm->id);
 
 // Set page url.
@@ -105,21 +106,13 @@ if (empty($noheader)) {
         'hidecompletion' => true,
         'description' => '',
     ]);
-    $PAGE->navbar->add($strreport, new moodle_url('/mod/cmi5launch/report.php', array('id' => $cm->id)));
+    $PAGE->navbar->add($strreport, new moodle_url('/mod/cmi5launch/report.php', ['id' => $cm->id]));
 
     echo $OUTPUT->header();
 }
 
-// Back button.
-?>
-<form action="report.php" method="get">
-    <input id="id" name="id" type="hidden" value="<?php echo $id ?>">
-    <input type="submit" value="Back" />
-</form>
-<?php
-
 // Retrieve the user.
-$user = $DB->get_record('user', array('id' => $userid));
+$user = $DB->get_record('user', ['id' => $userid]);
 
 // Create tables to display on page.
 // This is the main table with session info.
@@ -138,8 +131,8 @@ $headers[] = get_string('cmi5launchsatisfiedstatusheader', 'cmi5launch');
 $columns[] = 'Score';
 $headers[] = get_string('cmi5launchscoreheader', 'cmi5launch');
 
-$scorecolumns = array();
-$scoreheaders = array();
+$scorecolumns = [];
+$scoreheaders = [];
 
 // Add the columns and headers to the table.
 $table->define_columns($columns);
@@ -148,21 +141,19 @@ $table->define_baseurl($PAGE->url);
 
 // Decode and put AU ids in array.
 $auids = (json_decode($auidprevpage, true));
-// Aurecord to hold record
+// Aurecord to hold record.
 $aurecord = null;
 
 // For each AU id, find the one that matches our auid from previous page, this is the record we want.
 foreach ($auids as $key => $auid) {
 
-    //This maybe better. it looks for the record rather than loop through ALL records.
+    // This maybe better. it looks for the record rather than loop through ALL records.
     // Retrieve record from table.
     $aurecord = $DB->get_record('cmi5launch_aus', ['id' => $auid, 'lmsid' => $cmi5idprevpage]);
     if (!$aurecord) {
-        // If no record found,
-       //do nothin,
+        // If no record found, do nothing.
         continue;
     } else {
-
 
         if (isset($aurecord->sessions)) {
             // Retrieve session ids for this course.
@@ -172,11 +163,11 @@ foreach ($auids as $key => $auid) {
             $attempt = 1;
 
             // Arrays to hold row info.
-            $rowdata = array();
-            $scorerow = array();
+            $rowdata = [];
+            $scorerow = [];
 
             // An array to hold grades for max or mean scoring.
-            $sessionscores = array();
+            $sessionscores = [];
             // Set table up, this needs to be done before rows added.
             $table->setup();
             $austatus = "";
@@ -187,12 +178,13 @@ foreach ($auids as $key => $auid) {
 
                 $session = $updatesession($progress, $cmi5, $sessionid, $cmi5launch->id, $user);
                 // Add score to array for AU.
-                $sessionscores[] = $session->score;
+                $sessionscores[] = (float)$session->score;
 
                 if (!empty($session->createdat)) {
 
                     // Retrieve createdAt and format.
-                    $date = new DateTime($session->createdat, new DateTimeZone('US/Eastern'));
+                    $date = new DateTime($session->createdat,
+                        new DateTimeZone('US/Eastern'));
                     $date->setTimezone(new DateTimeZone('America/New_York'));
                     $datestart = $date->format('D d M Y H:i:s');
                 } else {
@@ -203,18 +195,21 @@ foreach ($auids as $key => $auid) {
                 if (!empty($session->lastrequesttime)) {
 
                     // Retrieve lastRequestTime and format.
-                    $date = new DateTime($session->lastrequesttime, new DateTimeZone('US/Eastern'));
+                    $date = new DateTime($session->lastrequesttime,
+                        new DateTimeZone('US/Eastern'));
                     $date->setTimezone(new DateTimeZone('America/New_York'));
                     $datefinish = $date->format('D d M Y H:i:s');
                 } else {
                     // If no lastRequesttime then use updatedat.
                     // Retrieve lastRequestTime and format.
-                    $date = new DateTime($session->updatedat, new DateTimeZone('US/Eastern'));
+                    $date = new DateTime($session->updatedat,
+                        new DateTimeZone('US/Eastern'));
                     $date->setTimezone(new DateTimeZone('America/New_York'));
                     $datefinish = $date->format('D d M Y H:i:s');
                 }
                 // The users sessions.
-                $usersession = $DB->get_record('cmi5launch_sessions', array('sessionid' => $sessionid, 'userid' => $userid, 'moodlecourseid' => $id));
+                $usersession = $DB->get_record('cmi5launch_sessions',
+                    ['sessionid' => $sessionid, 'userid' => $userid, 'moodlecourseid' => $id]);
 
                 // Add row data.
                 $rowdata["Attempt"] = get_string('cmi5launchattemptrow', 'cmi5launch') . $attempt;
@@ -224,7 +219,7 @@ foreach ($auids as $key => $auid) {
                 // AUs moveon specification.
                 $aumoveon = $aurecord->moveon;
 
-                // 0 is no 1 is yes, these are from CMI5 player
+                // 0 is no 1 is yes, these are from CMI5 player.
                 $iscompleted = $session->iscompleted;
                 $ispassed = $session->ispassed;
                 $isfailed = $session->isfailed;
@@ -246,15 +241,16 @@ foreach ($auids as $key => $auid) {
                 // Update table.
                 $scorecolumns[] = get_string('cmi5launchattemptrow', 'cmi5launch') . $attempt;
                 $scoreheaders[] = get_string('cmi5launchattemptrow', 'cmi5launch') . $attempt;
-                if ($usersession){
-                $scorerow[get_string('cmi5launchattemptrow', 'cmi5launch') . $attempt] = $usersession->score;
+                if ($usersession) {
+                    $scorerow[get_string('cmi5launchattemptrow', 'cmi5launch')
+                    . $attempt] = is_numeric($usersession->score) ? number_format((float)$usersession->score, 2) : '';
                 }
                 switch ($gradetype) {
 
-                    // 'GRADE_AUS_CMI5' = '0').
-                    // 'GRADE_HIGHEST_CMI5' = '1'.
-                    // 'GRADE_AVERAGE_CMI5', =  '2'.
-                    // 'GRADE_SUM_CMI5', = '3'.
+                    // GRADE_AUS_CMI5 = 0.
+                    // GRADE_HIGHEST_CMI5 = 1.
+                    // GRADE_AVERAGE_CMI5 =  2.
+                    // GRADE_SUM_CMI5 = 3.
 
                     case 1:
                         $grade = get_string('cmi5launchsessiongradehigh', 'cmi5launch');
@@ -273,14 +269,16 @@ foreach ($auids as $key => $auid) {
                 $rowdata["Status"] = $austatus;
 
                 if ($usersession) {
-                    $rowdata["Score"] = $usersession->score;
+                    $rowdata["Score"] = is_numeric($usersession->score) ? number_format((float)$usersession->score, 2) : '';
+
                 }
 
                 $table->add_data_keyed($rowdata);
             }
         }
-    } // end else from aurecord if 
-} // end of for each auids
+    } // End else from aurecord if.
+} // End of for each auids.
+
 // Display the grading type, highest, avg, etc.
 $scorecolumns[] = 'Grading type';
 $scoreheaders[] = 'Grading type';
@@ -290,8 +288,8 @@ $scoreheaders[] = 'Overall Score';
 // Session score may be null or empty.
 if (!empty($sessionscores)) {
 
-    $scorerow["Overall Score"] = $overall;
-}else{
+    $scorerow["Overall Score"] = isset($overall) && is_numeric($overall) ? number_format((float)$overall, 2) : '';
+} else {
     $scorerow["Overall Score"] = '';
 }
 
@@ -301,7 +299,6 @@ $scoretable->define_headers($scoreheaders);
 $scoretable->define_baseurl($PAGE->url);
 $scoretable->setup();
 $scoretable->add_data_keyed($scorerow);
-$scoretable->add_data_keyed("SCORE");
 
 $table->get_page_start();
 $table->get_page_size();
@@ -312,3 +309,22 @@ $scoretable->get_page_size();
 $table->add_separator();
 $scoretable->finish_output();
 $table->finish_output();
+// Back button.
+echo html_writer::start_tag('form', [
+    'action' => 'report.php',
+    'method' => 'get',
+]);
+
+echo html_writer::empty_tag('input', [
+    'type' => 'hidden',
+    'id' => 'id',
+    'name' => 'id',
+    'value' => $id,
+]);
+
+echo html_writer::empty_tag('input', [
+    'type' => 'submit',
+    'value' => get_string('cmi5launchbackbutton', 'mod_cmi5launch'),
+]);
+
+echo html_writer::end_tag('form');

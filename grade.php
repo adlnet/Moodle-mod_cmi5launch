@@ -16,7 +16,7 @@
 
 /**
  * Redirect the user based on their capabilities to reporting page.
- * @package   mod_cmi5
+ * @package   mod_cmi5launch
  * @category  grade
  * @copyright 2023 Megan Bohland
  * @copyright Based on work by 2010 onwards Dan Marsden
@@ -55,13 +55,13 @@ $gradeid = optional_param('gradeid', 0, PARAM_INT);
 
 
 
-$PAGE->set_url('/mod/cmi5launch/grade.php', array(
+$PAGE->set_url('/mod/cmi5launch/grade.php', [
     'id' => $id,
     'itemid' => $itemid,
     'itemnumber' => $itemnumber,
     'gradeid' => $gradeid,
     'userid' => $userid,
-));
+]);
 
 global $cmi5launch, $USER;
 
@@ -70,9 +70,9 @@ if (! $cm = get_coursemodule_from_id('cmi5launch', $cm->id)) {
     throw new \moodle_exception('invalidcoursemodule');
 }
 
-if (! $course = $DB->get_record('cmi5launch', array('course' => $cm->course, 'name' => $cm->name))) {
+if (! $course = $DB->get_record('cmi5launch', ['course' => $cm->course, 'name' => $cm->name])) {
 
-    $returned = $DB->get_record('cmi5launch', array('course' => $cm->course, 'name' => $cm->name));
+    $returned = $DB->get_record('cmi5launch', ['course' => $cm->course, 'name' => $cm->name]);
 
     throw new \moodle_exception('coursemisconf');
 }
@@ -96,19 +96,19 @@ if (has_capability('mod/cmi5launch:viewgrades', $context)) {
     // If the logged in user has an id pass that along, as they may have grades to view as well.
     if ($userid != 0 || $userid != null) {
 
-        redirect(new moodle_url('/mod/cmi5launch/report.php', array(
+        redirect(new moodle_url('/mod/cmi5launch/report.php', [
             'id' => $cm->id,
             'userid' => $userid,
             'itemnumber' => $itemnumber,
             'itemid' => $itemid,
             'gradeid' => $gradeid,
-        )));
-        
+        ]));
+
 
     } else {
-        redirect(new moodle_url('/mod/cmi5launch/report.php', array(
+        redirect(new moodle_url('/mod/cmi5launch/report.php', [
             'id' => $cm->id,
-            'itemid' => $itemid)));
+            'itemid' => $itemid]));
     }
 
 } else {
@@ -117,7 +117,7 @@ if (has_capability('mod/cmi5launch:viewgrades', $context)) {
     // Retrieve/update the users grades for this course.
     cmi5launch_update_grades($cmi5launch, $USER->id);
 
-    redirect(new moodle_url('/mod/cmi5launch/report.php', array(
+    redirect(new moodle_url('/mod/cmi5launch/report.php', [
         'id' => $cm->id,
-        'userid' => $userid)));
+        'userid' => $userid]));
 }

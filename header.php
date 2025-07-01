@@ -30,11 +30,11 @@ $n  = optional_param('n', 0, PARAM_INT);
 
 if ($id) {
     $cm         = get_coursemodule_from_id('cmi5launch', $id, 0, false, MUST_EXIST);
-    $course     = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
-    $cmi5launch  = $DB->get_record('cmi5launch', array('id' => $cm->instance), '*', MUST_EXIST);
+    $course     = $DB->get_record('course', ['id' => $cm->course], '*', MUST_EXIST);
+    $cmi5launch  = $DB->get_record('cmi5launch', ['id' => $cm->instance], '*', MUST_EXIST);
 } else if ($n) {
-    $cmi5launch  = $DB->get_record('cmi5launch', array('id' => $n), '*', MUST_EXIST);
-    $course     = $DB->get_record('course', array('id' => $cmi5launch->course), '*', MUST_EXIST);
+    $cmi5launch  = $DB->get_record('cmi5launch', ['id' => $n], '*', MUST_EXIST);
+    $course     = $DB->get_record('course', ['id' => $cmi5launch->course], '*', MUST_EXIST);
     $cm         = get_coursemodule_from_instance('cmi5launch', $cmi5launch->id, $course->id, false, MUST_EXIST);
 } else {
     error(get_string('idmissing', 'report_cmi5'));

@@ -15,12 +15,14 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * launches the experience with the requested registration
+ * Launches the experience with the requested registration
  *
- * @package mod_cmi5launch
+ * @package    mod_cmi5launch
  * @copyright  2013 Andrew Downes
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once('header.php');
 
@@ -41,10 +43,10 @@ if ($completion->is_enabled($cm) && $cmi5launch->cmi5verbid) {
 
     if ($oldstate->completionstate !== $newstate->completionstate) {
         // Trigger Activity completed event.
-        $event = \mod_cmi5launch\event\activity_completed::create(array(
+        $event = \mod_cmi5launch\event\activity_completed::create([
             'objectid' => $cmi5launch->id,
             'context' => $context,
-        ));
+        ]);
         $event->add_record_snapshot('course_modules', $cm);
         $event->add_record_snapshot('cmi5launch', $cmi5launch);
         $event->trigger();

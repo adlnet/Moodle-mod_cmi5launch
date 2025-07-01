@@ -23,11 +23,11 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$tasks = array(
-    array(
+$tasks = [
+    [
         'classname' => 'mod_cmi5launch\task\check_completion',
         'blocking' => 0,
         'minute' => '01',
         'hour' => '23',
-    ),
-);
+    ],
+];

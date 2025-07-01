@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-
 /**
  * Defines the version of cmi5launch
  *
@@ -23,19 +22,17 @@
  *
  * @package mod_cmi5launch
  * @copyright  2024 Megan Bohland
- * @copyright  Based o
- * n work by 2013 Andrew Downes
+ * @copyright  Based on work by 2013 Andrew Downes
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2025062412;      // The current module version (Date: YYYYMMDDXX).
+$plugin->version   = 2025070116;      // The current module version (Date: YYYYMMDDXX).
 
 $plugin->requires  = 2023100900;      // Requires at least Moodle 4.3 version.
 $plugin->cron      = 0;               // Period for cron to check this module (secs).
 $plugin->component = 'mod_cmi5launch'; // To check on upgrade, that module sits in correct place.
 $plugin->maturity = MATURITY_STABLE;
-$plugin->release = '1.0.1 (Build: 2025062412)';
-$plugin->php       = '8.0.0'; // Requires PHP 8.0+
-          
+$plugin->release = '1.1.0 (Build: 2025070116)';
+$plugin->php       = '8.0.0'; // Requires PHP 8.0+.

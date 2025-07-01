@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * BAckup tasks for cmi5 plugin.
+ * Backup tasks for cmi5 plugin.
  *
  * @package    mod_cmi5launch
  * @copyright 2023 Megan Bohland
@@ -25,8 +25,13 @@
 
 defined('MOODLE_INTERNAL') || die;
 
-require_once($CFG->dirroot.'/mod/cmi5launch/backup/moodle2/backup_cmi5launch_stepslib.php');    // Because it exists (must).
+require_once($CFG->dirroot.'/mod/cmi5launch/backup/moodle2/backup_cmi5launch_stepslib.php');
 
+/**
+ * cmi5launch backup activity task that provides the structure for the backup.
+ *
+ * @package    mod_cmi5launch
+ * */
 class backup_cmi5launch_activity_task extends backup_activity_task {
 
     /**

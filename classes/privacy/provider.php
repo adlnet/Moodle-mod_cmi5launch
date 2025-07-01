@@ -19,6 +19,7 @@
  *
  * @copyright  2024 Megan Bohland
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package mod_cmi5launch
  */
 
  namespace mod_cmi5launch\privacy;
@@ -30,104 +31,113 @@
  use core_privacy\local\request\helper;
  use core_privacy\local\request\userlist;
  use core_privacy\local\request\writer;
+
+/**
+ * Class to implement Privacy APIs for the cmi5launch module.
+ */
 class provider implements
+        
         // This plugin does store personal user data.
         \core_privacy\local\metadata\provider,
         \core_privacy\local\request\core_userlist_provider,
-        \core_privacy\local\request\plugin\provider
-        {
-
-        public static function get_metadata(collection $collection): collection {
-
-            // Database tables.
-            $collection->add_database_table(
-                'cmi5launch_usercourse',
-                [
-                    'id' => 'privacy:metadata:cmi5launch_usercourse:id',
-                    'userid' => 'privacy:metadata:cmi5launch_usercourse:userid',
-                    'registrationid' => 'privacy:metadata:cmi5launch_usercourse:registrationid',
-                    'ausgrades' => 'privacy:metadata:cmi5launch_usercourse:ausgrades',
-                    'grade' => 'privacy:metadata:cmi5launch_usercourse:grade',
-                ],
-
-                'privacy:metadata:cmi5launch_usercourse',
-            );
-            $collection->add_database_table(
-                'cmi5launch_sessions',
-                [
-                    'id' => 'privacy:metadata:cmi5launch_sessions:id',
-                    'sessionid' => 'privacy:metadata:cmi5launch_sessions:sessionid',
-                    'userid' => 'privacy:metadata:cmi5launch_sessions:userid',
-                    'registrationscoursesausid' => 'privacy:metadata:cmi5launch_sessions:registrationscoursesausid',
-                    'createdat' => 'privacy:metadata:cmi5launch_sessions:createdat',
-                    'updatedat' => 'privacy:metadata:cmi5launch_sessions:updatedat',
-                    'code' => 'privacy:metadata:cmi5launch_sessions:code',
-                    'launchtokenid' => 'privacy:metadata:cmi5launch_sessions:launchtokenid',
-                    'lastrequesttime' => 'privacy:metadata:cmi5launch_sessions:lastrequesttime',
-                    'score' => 'privacy:metadata:cmi5launch_sessions:score',
-                    'islaunched' => 'privacy:metadata:cmi5launch_sessions:islaunched',
-                    'isinitialized' => 'privacy:metadata:cmi5launch_sessions:isinitialized',
-                    'initializedat' => 'privacy:metadata:cmi5launch_sessions:initializedat',
-                    'duration' => 'privacy:metadata:cmi5launch_sessions:duration',
-                    'iscompleted' => 'privacy:metadata:cmi5launch_sessions:iscompleted',
-                    'ispassed' => 'privacy:metadata:cmi5launch_sessions:ispassed',
-                    'isfailed' => 'privacy:metadata:cmi5launch_sessions:isfailed',
-                    'isterminated' => 'privacy:metadata:cmi5launch_sessions:isterminated',
-                    'isabandoned' => 'privacy:metadata:cmi5launch_sessions:isabandoned',
-                    'progress' => 'privacy:metadata:cmi5launch_sessions:progress',
-                    'launchurl' => 'privacy:metadata:cmi5launch_sessions:launchurl',
-
-                ],
-
-                'privacy:metadata:cmi5launch_sessions',
-            );
-
-            $collection->add_database_table(
-                'cmi5launch_aus',
-                [
-                    'id' => 'privacy:metadata:cmi5launch_aus:id',
-                    'userid' => 'privacy:metadata:cmi5launch_aus:userid',
-                    'attempt' => 'privacy:metadata:cmi5launch_aus:attempt',
-                    'lmsid' => 'privacy:metadata:cmi5launch_aus:lmsid',
-                    'completed' => 'privacy:metadata:cmi5launch_aus:completed',
-                    'passed' => 'privacy:metadata:cmi5launch_aus:passed',
-                    'inprogress' => 'privacy:metadata:cmi5launch_aus:inprogress',
-                    'noattempt' => 'privacy:metadata:cmi5launch_aus:noattempt',
-                    'satisfied' => 'privacy:metadata:cmi5launch_aus:satisfied',
-                    'sessions' => 'privacy:metadata:cmi5launch_aus:sessions',
-                    'scores' => 'privacy:metadata:cmi5launch_aus:scores',
-                    'grade' => 'privacy:metadata:cmi5launch_aus:grade',
-                ],
-
-                'privacy:metadata:cmi5launch_aus',
-            );
-
-            // External systems.
-            $collection->add_external_location_link('lrs', [
-                'registrationid' => 'privacy:metadata:lrs:registrationid',
-                'createdat' => 'privacy:metadata:lrs:createdat',
-            ], 'privacy:metadata:lrs');
-
-            $collection->add_external_location_link('cmi5_player', [
-                'registrationid' => 'privacy:metadata:cmi5_player:registrationid',
-                'actor' => 'privacy:metadata:cmi5_player:actor',
-                'courseid' => 'privacy:metadata:cmi5_player:courseid',
-                'returnurl' => 'privacy:metadata:cmi5_player:returnurl',
-                'sessionid' => 'privacy:metadata:cmi5_player:sessionid',
-            ], 'privacy:metadata:cmi5_player');
+        \core_privacy\local\request\plugin\provider {
 
 
-            return $collection;
+    /**
+     * Retreives relevant userdata.
+     * @param \core_privacy\local\metadata\collection $collection - The cmi5 module collection.
+     * @return collection - The data collection for the cmi5launch module.
+     */
+    public static function get_metadata(collection $collection): collection {
+
+        // Database tables.
+        $collection->add_database_table(
+            'cmi5launch_usercourse',
+            [
+                'id' => 'privacy:metadata:cmi5launch_usercourse:id',
+                'userid' => 'privacy:metadata:cmi5launch_usercourse:userid',
+                'registrationid' => 'privacy:metadata:cmi5launch_usercourse:registrationid',
+                'ausgrades' => 'privacy:metadata:cmi5launch_usercourse:ausgrades',
+                'grade' => 'privacy:metadata:cmi5launch_usercourse:grade',
+            ],
+
+            'privacy:metadata:cmi5launch_usercourse',
+        );
+        $collection->add_database_table(
+            'cmi5launch_sessions',
+            [
+                'id' => 'privacy:metadata:cmi5launch_sessions:id',
+                'sessionid' => 'privacy:metadata:cmi5launch_sessions:sessionid',
+                'userid' => 'privacy:metadata:cmi5launch_sessions:userid',
+                'registrationscoursesausid' => 'privacy:metadata:cmi5launch_sessions:registrationscoursesausid',
+                'createdat' => 'privacy:metadata:cmi5launch_sessions:createdat',
+                'updatedat' => 'privacy:metadata:cmi5launch_sessions:updatedat',
+                'code' => 'privacy:metadata:cmi5launch_sessions:code',
+                'launchtokenid' => 'privacy:metadata:cmi5launch_sessions:launchtokenid',
+                'lastrequesttime' => 'privacy:metadata:cmi5launch_sessions:lastrequesttime',
+                'score' => 'privacy:metadata:cmi5launch_sessions:score',
+                'islaunched' => 'privacy:metadata:cmi5launch_sessions:islaunched',
+                'isinitialized' => 'privacy:metadata:cmi5launch_sessions:isinitialized',
+                'initializedat' => 'privacy:metadata:cmi5launch_sessions:initializedat',
+                'duration' => 'privacy:metadata:cmi5launch_sessions:duration',
+                'iscompleted' => 'privacy:metadata:cmi5launch_sessions:iscompleted',
+                'ispassed' => 'privacy:metadata:cmi5launch_sessions:ispassed',
+                'isfailed' => 'privacy:metadata:cmi5launch_sessions:isfailed',
+                'isterminated' => 'privacy:metadata:cmi5launch_sessions:isterminated',
+                'isabandoned' => 'privacy:metadata:cmi5launch_sessions:isabandoned',
+                'progress' => 'privacy:metadata:cmi5launch_sessions:progress',
+                'launchurl' => 'privacy:metadata:cmi5launch_sessions:launchurl',
+
+            ],
+
+            'privacy:metadata:cmi5launch_sessions',
+        );
+
+        $collection->add_database_table(
+            'cmi5launch_aus',
+            [
+                'id' => 'privacy:metadata:cmi5launch_aus:id',
+                'userid' => 'privacy:metadata:cmi5launch_aus:userid',
+                'attempt' => 'privacy:metadata:cmi5launch_aus:attempt',
+                'lmsid' => 'privacy:metadata:cmi5launch_aus:lmsid',
+                'completed' => 'privacy:metadata:cmi5launch_aus:completed',
+                'passed' => 'privacy:metadata:cmi5launch_aus:passed',
+                'inprogress' => 'privacy:metadata:cmi5launch_aus:inprogress',
+                'noattempt' => 'privacy:metadata:cmi5launch_aus:noattempt',
+                'satisfied' => 'privacy:metadata:cmi5launch_aus:satisfied',
+                'sessions' => 'privacy:metadata:cmi5launch_aus:sessions',
+                'scores' => 'privacy:metadata:cmi5launch_aus:scores',
+                'grade' => 'privacy:metadata:cmi5launch_aus:grade',
+            ],
+
+            'privacy:metadata:cmi5launch_aus',
+        );
+
+        // External systems.
+        $collection->add_external_location_link('lrs', [
+            'registrationid' => 'privacy:metadata:lrs:registrationid',
+            'createdat' => 'privacy:metadata:lrs:createdat',
+        ], 'privacy:metadata:lrs');
+
+        $collection->add_external_location_link('cmi5_player', [
+            'registrationid' => 'privacy:metadata:cmi5_player:registrationid',
+            'actor' => 'privacy:metadata:cmi5_player:actor',
+            'courseid' => 'privacy:metadata:cmi5_player:courseid',
+            'returnurl' => 'privacy:metadata:cmi5_player:returnurl',
+            'sessionid' => 'privacy:metadata:cmi5_player:sessionid',
+        ], 'privacy:metadata:cmi5_player');
+
+        return $collection;
     }
 
 
      /**
-     * Export all user data for the specified user, in the specified contexts.
-     *
-     * @param approved_contextlist $contextlist The approved contexts to export information for.
-     */
+      * Export all user data for the specified user, in the specified contexts.
+      *
+      * @param approved_contextlist $contextlist The approved contexts to export information for.
+      */
     public static function export_user_data(approved_contextlist $contextlist) {
-        
+
         global $DB;
 
         if (empty($contextlist)) {
@@ -142,36 +152,36 @@ class provider implements
         // Get the list of contexts that contain user information for the specified user.
         // (The context->instanceid = cm->id and the cm.instance equals moodlecourseid).
         foreach ($contextlist as $context) {
-           
+
             $data = helper::get_context_data($context, $user);
 
-            // Retrieve the coursemodule
+            // Retrieve the coursemodule.
             $cm = get_coursemodule_from_id('cmi5launch', $context->instanceid);
-            
+
             // The course modules instance correlates to the moodle course id in our tables.
-            // Combined with the user id, we can get the specific records we need. 
-            $mid =  $cm->instance;
-            $params = array ('userid' => $userid,   'moodlecourseid'=> $mid);
-            
-            // Start getting data on usercourse table
+            // Combined with the user id, we can get the specific records we need.
+            $mid = $cm->instance;
+            $params = ['userid' => $userid,   'moodlecourseid' => $mid];
+
+            // Start getting data on usercourse table.
             $recordset = $DB->get_recordset('cmi5launch_usercourse', $params);
 
             // To hold the course data.
             $coursedata = [];
-            
+
             // Cycle through recordset in case there are multiple.
             foreach ($recordset as $record) {
 
                 // Make user friendly names for data.
-                $userfriendly = array( 'ID of instance' => $record->id,
+                $userfriendly = [ 'ID of instance' => $record->id,
                     'User ID' => $record->userid,
-                    'Course ID' => $record->courseid, 
-                    'Moodle Course ID' => $record->moodlecourseid, 
+                    'Course ID' => $record->courseid,
+                    'Moodle Course ID' => $record->moodlecourseid,
                     'Registration ID' => $record->registrationid,
                     'Return URL' => $record->returnurl,
                     'AUs of instance' => $record->aus,
-                    'Grades of AUs' => $record->ausgrades, 
-                    'Overall grade of instance' => $record->grade);
+                    'Grades of AUs' => $record->ausgrades,
+                    'Overall grade of instance' => $record->grade];
 
                 // Then add as ONE item in array, that way if there is more than one it unpacks nicely.
                 $coursedata = ['User information' => $userfriendly];
@@ -179,7 +189,7 @@ class provider implements
 
             // Combine the course data with the usercourse data.
             $contextdata = (object)array_merge((array)$data, $coursedata);
-            
+
             // Write data out.
             writer::with_context($context)->export_data(
                     ['Course info pertaining to user'],
@@ -191,12 +201,12 @@ class provider implements
 
             // To hold the AU data.
             $ausdata = [];
-            
+
             // Cycle through recordset in case there are multiple.
             foreach ($recordset as $record) {
-    
-               // Make user friendly names for data display.
-               $userfriendly = array( 'ID of AU instance' => $record->id,
+
+                // Make user friendly names for data display.
+                $userfriendly = [ 'ID of AU instance' => $record->id,
                     'User ID' => $record->userid,
                     'The attempt number of the AU' => $record->attempt,
                     'LMS ID of the AU' => $record->lmsid,
@@ -218,36 +228,36 @@ class provider implements
                     'This AUs individual session\'s IDs' => $record->sessions,
                     'The scores of the AU, as array' => $record->scores,
                     'The overall grade of the AU' => $record->grade,
-                );
-            
-               // Then add as ONE item in array, that way if there is more than one it unpacks nicely.
-               $ausdata = ['AU info' => $userfriendly];
+                ];
+
+                // Then add as ONE item in array, that way if there is more than one it unpacks nicely.
+                $ausdata = ['AU info' => $userfriendly];
             }
-            
+
             // Combine the course data with the au data.
             $contextdata = (object)array_merge((array)$data, $ausdata);
-            
+
             // Write data out.
             writer::with_context($context)->export_data(
                 ['AU info pertaining to user'],
                 (object) $contextdata
             );
-            
+
             // Now get the sessions data.
             $recordset = $DB->get_recordset('cmi5launch_sessions', $params);
 
-        // To hold session information.
-        $sessiondata = [];
-        
-        // Cycle through recordset in case there are multiple.
-        foreach ($recordset as $record) {
+            // To hold session information.
+            $sessiondata = [];
 
-            // Make user friendly names for display.
-            $userfriendly = array( 'ID of session instance' => $record->id,
+            // Cycle through recordset in case there are multiple.
+            foreach ($recordset as $record) {
+
+                // Make user friendly names for display.
+                $userfriendly = [ 'ID of session instance' => $record->id,
                 'Session ID' => $record->sessionid,
                 'User ID' => $record->userid,
-                'Moodle Course ID' => $record->moodlecourseid, 
-                'Registration Courses AUs ID' => $record->registrationscoursesausid, 
+                'Moodle Course ID' => $record->moodlecourseid,
+                'Registration Courses AUs ID' => $record->registrationscoursesausid,
                 'Time a session was started' => $record->creeatedat,
                 'Time a session was updated' => $record->updatedat,
                 'Code' => $record->code,
@@ -264,21 +274,22 @@ class provider implements
                 'If it was failed' => $record->isfailed,
                 'If it was terminated' => $record->isterminated,
                 'If it was abandoned' => $record->isabandoned,
-                'Progress of session in recordments from LRS' => ("<pre>" . implode("\n ", json_decode($record->progress) ) . "</pre>"),
-                'Launch URL' => $record->launchurl);
+                'Progress of session in recordments from LRS' => ("<pre>" . implode("\n ",
+                    json_decode($record->progress) ) . "</pre>"),
+                'Launch URL' => $record->launchurl];
 
-            // Then add as ONE item in array, that way if there is more than one it unpacks nicely.
-            $sessiondata = ['Session info' => $userfriendly];
-        }
+                // Then add as ONE item in array, that way if there is more than one it unpacks nicely.
+                $sessiondata = ['Session info' => $userfriendly];
+            }
 
-        // Combine the course data with the session data.
-        $contextdata = (object)array_merge((array)$data, $sessiondata);
-        
-        // Write data out.
-        writer::with_context($context)->export_data(
+            // Combine the course data with the session data.
+            $contextdata = (object)array_merge((array)$data, $sessiondata);
+
+            // Write data out.
+            writer::with_context($context)->export_data(
             ['Session info pertaining to user'],
             (object) $contextdata
-        );
+            );
 
         }
 
@@ -291,8 +302,7 @@ class provider implements
      * @param int $userid The user to search.
      * @return contextlist $contextlist The contextlist containing the list of contexts used in this plugin.
      */
-    public static function get_contexts_for_userid(int $userid) : contextlist {
-
+    public static function get_contexts_for_userid(int $userid): contextlist {
 
         global $DB;
 
@@ -317,7 +327,7 @@ class provider implements
 
         return $contextlist;
     }
-    
+
     /**
      * Get the list of users who have data within a context.
      *
@@ -340,7 +350,7 @@ class provider implements
             ON ctx.instanceid = cm.id
             AND ctx.contextlevel = :modlevel
             WHERE ctx.id = :contextid";
-    
+
         $params = ['modlevel' => CONTEXT_MODULE, 'contextid' => $context->id];
 
         $userlist->add_from_sql('userid', sprintf($sql, 'cmi5launch_usercourse'), $params);
@@ -355,29 +365,29 @@ class provider implements
      * @param context $context A user context.
      */
     public static function delete_data_for_all_users_in_context(\context $context) {
-        
+
         global $DB;
 
         // This should not happen, but just in case.
         if ($context->contextlevel != CONTEXT_MODULE) {
             return;
         }
-    
+
         $cm = get_coursemodule_from_id('cmi5launch', $context->instanceid);
         if (!$cm) {
             return;
         }
-    
-        // This table needs a diferent key, but to be deleted still
+
+        // This table needs a diferent key, but to be deleted still.
         $DB->delete_records('cmi5launch', ['id' => $cm->instance]);
-        
+
         // Tables to delete from with same key.
         $tables = ['cmi5launch_usercourse', 'cmi5launch_sessions', 'cmi5launch_aus'];
-        
+
         foreach ($tables as $table) {
 
             $DB->delete_records($table, ['moodlecourseid' => $cm->instance]);
-        
+
         }
     }
 
@@ -394,11 +404,10 @@ class provider implements
             return;
         }
         $userid = $contextlist->get_user()->id;
-      
-        
+
         foreach ($contextlist->get_contexts() as $context) {
 
-            //Retrieve the instance id from the context.
+            // Retrieve the instance id from the context.
             $instanceid = $DB->get_field('course_modules', 'instance', ['id' => $context->instanceid], MUST_EXIST);
 
             // Tables to delete from with same key if context matches.
@@ -406,7 +415,7 @@ class provider implements
 
             foreach ($tables as $table) {
 
-                $sql = array("moodlecourseid" => $instanceid, "userid" => $userid);
+                $sql = ["moodlecourseid" => $instanceid, "userid" => $userid];
 
                 $deleted = $DB->delete_records($table, $sql);
 
@@ -430,11 +439,11 @@ class provider implements
         list($userinsql, $userinparams) = $DB->get_in_or_equal($userlist->get_userids(), SQL_PARAMS_NAMED);
         $params = array_merge(['moodlecourseid' => $cm->instance], $userinparams);
         $sql = "moodlecourseid = :moodlecourseid AND userid {$userinsql}";
-    
+
         $DB->delete_records_select('cmi5launch_usercourse', $sql, $params);
         $DB->delete_records_select('cmi5launch_sessions', $sql, $params);
         $DB->delete_records_select('cmi5launch_aus', $sql, $params);
     }
 
-   
-    }
+
+}

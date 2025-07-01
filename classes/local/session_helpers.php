@@ -19,40 +19,56 @@
  *
  * @copyright  2023 Megan Bohland
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package mod_cmi5launch
  */
 
 namespace mod_cmi5launch\local;
-defined('MOODLE_INTERNAL') || die();
 
 use mod_cmi5launch\local\cmi5_connectors;
 use mod_cmi5launch\local\session;
 
-
+/**
+ * Class of helper functions for sessions.
+ */
 class session_helpers {
-
+    /**
+     * Returns the function to create a session.
+     *
+     * @return callable
+     */
     public function cmi5launch_get_create_session() {
         return [$this, 'cmi5launch_create_session'];
     }
-
+    /**
+     * Returns the function to update a session.
+     *
+     * @return callable
+     */
     public function cmi5launch_get_update_session() {
         return [$this, 'cmi5launch_update_sessions'];
     }
-
+    /**
+     * Returns the function to retrieve a session from the db.
+     *
+     * @return callable
+     */
     public function cmi5launch_get_retrieve_sessions_from_db() {
         return [$this, 'cmi5launch_retrieve_sessions_from_db'];
     }
     /**
      * Gets updated session information from CMI5 player
-     * @param mixed $sessionid - the session id
-     * @param mixed $cmi5id - cmi5 instance id
-     * @return session
+     * @param Progress $progress - The progress class- to use it's functions.
+     * @param Cmi5_connectors $cmi5 - The cmi5 connector class- to use it's functions.
+     * @param int $sessionid - The session id.
+     * @param int $cmi5launchid - The cmi5 instance id.
+     * @param /User $user - The user object.
+     * @return object - The session updated session pobject.
      */
-    // can we inject classes not methods? 
     public function cmi5launch_update_sessions($progress, $cmi5, $sessionid, $cmi5launchid, $user) {
-        
+
         global $CFG, $DB, $cmi5launch, $USER;
 
-        // Set error and exception handler to catch and override the default PHP error messages, to make messages more user friendly.
+        // Set error and exception handler to catch and override the default PHP error messages, make messages more user friendly.
         set_error_handler('mod_cmi5launch\local\progresslrs_warning', E_WARNING);
         set_exception_handler('mod_cmi5launch\local\exception_progresslrs');
 
@@ -61,14 +77,13 @@ class session_helpers {
         $getsessioninfo = $connector->cmi5launch_get_session_info();
         $getprogress = $progress->cmi5launch_get_retrieve_statements();
 
-        
         try {
             // Get the session from DB with session id.
-            $session = $DB->get_record('cmi5launch_sessions', array('sessionid' => $sessionid, 'userid' => $user->id));
+            $session = $DB->get_record('cmi5launch_sessions', ['sessionid' => $sessionid, 'userid' => $user->id]);
 
             // Reload cmi5 instance.
-            $record = $DB->get_record('cmi5launch', array('id' => $cmi5launchid));
-    
+            $record = $DB->get_record('cmi5launch', ['id' => $cmi5launchid]);
+
             // Reload user course instance.
             $userscourse = $DB->get_record('cmi5launch_usercourse', ['courseid' => $record->courseid, 'userid' => $user->id]);
             // Get updates from the LRS as well.
@@ -82,16 +97,16 @@ class session_helpers {
                 // We don't want to overwrite ids.
                 // If the property exists and it's not id or sessionid, set it to lowercase and
                 // encode value if it is array. (DB needs properties in lowercase, but player returns camelcase).
-             
-                    // If it's an array, encode it so it can be saved to DB.
-                    if (is_array($value)) {
-                        $value = json_encode($value);
-                    }
 
-                    if (is_string($key)) {
-                        $key = mb_convert_case($key, MB_CASE_LOWER, "UTF-8");
-                    }
-                   
+                // If it's an array, encode it so it can be saved to DB.
+                if (is_array($value)) {
+                    $value = json_encode($value);
+                }
+
+                if (is_string($key)) {
+                    $key = mb_convert_case($key, MB_CASE_LOWER, "UTF-8");
+                }
+
                 if (property_exists($session, $key) && $key != 'id' && $key != 'sessionid') {
 
                     // If it's an array, encode it so it can be saved to DB.
@@ -102,7 +117,7 @@ class session_helpers {
                     if (is_string($key)) {
                         $key = mb_convert_case($key, MB_CASE_LOWER, "UTF-8");
                     }
-                    
+
                     $session->$key = $value;
                 }
             }
@@ -111,19 +126,19 @@ class session_helpers {
             $DB->update_record('cmi5launch_sessions', $session);
 
         } catch (\Throwable $e) {
-            
+
             // Restore default handlers.
             restore_exception_handler();
             restore_error_handler();
 
             // If there is an error, return the error.
-            throw new nullException(get_string('cmi5launchsessionupdateerror', 'cmi5launch'). $e->getMessage()); 
-       
+            throw new nullException(get_string('cmi5launchsessionupdateerror', 'cmi5launch'). $e->getMessage());
+
         }
         // Restore default handlers.
         restore_exception_handler();
         restore_error_handler();
-        
+
         return $session;
     }
 
@@ -138,7 +153,7 @@ class session_helpers {
 
         global $DB, $CFG, $cmi5launch, $USER;
 
-        // Set error and exception handler to catch and override the default PHP error messages, to make messages more user friendly.
+        // Set error and exception handler to catch and override the default PHP error messages, make messages more user friendly.
         set_error_handler('mod_cmi5launch\local\progresslrs_warning', E_WARNING);
         set_exception_handler('mod_cmi5launch\local\exception_progresslrs');
 
@@ -154,9 +169,7 @@ class session_helpers {
             $newrecord->launchurl = $launchurl;
             $newrecord->tenantname = $USER->username;
             $newrecord->launchmethod = $launchmethod;
-            // I think here is where we eed to implement : moodlecourseid
             $newrecord->moodlecourseid = $cmi5launch->id;
-            // And userid!
             $newrecord->userid = $USER->id;
 
             // Save record to table.
@@ -165,7 +178,7 @@ class session_helpers {
             // Instantiate progress and cmi5_connectors class to pass.
             $progress = new progress;
             $cmi5 = new cmi5_connectors;
-            
+
             // Retrieve new info (if any) from CMI5 player and LRS on session.
             $session = $this->cmi5launch_update_sessions($progress, $cmi5, $sessionid, $cmi5launch->id, $USER);
 
@@ -173,7 +186,7 @@ class session_helpers {
             restore_exception_handler();
             restore_error_handler();
 
-            // Return value 
+            // Return value.
             return $newid;
         } catch (\Throwable $e) {
 
@@ -182,23 +195,22 @@ class session_helpers {
             restore_error_handler();
 
             // If there is an error, return the error.
-            throw new nullException(get_string('cmi5launchsessioncreationerror', 'cmi5launch') . $e->getMessage()); 
+            throw new nullException(get_string('cmi5launchsessioncreationerror', 'cmi5launch') . $e->getMessage());
 
         }
     }
 
 
     /**
-     * Retrieves session from DB
-     * @param mixed $sessionid - the session id
-     * @return session
+     * Retrieves session from DB.
+     * @param int $sessionid - the session id.
+     * @return object session - the session object.
      */
     public function cmi5launch_retrieve_sessions_from_db($sessionid) {
 
         global $DB, $CFG;
 
         $check = $DB->record_exists('cmi5launch_sessions', ['sessionid' => $sessionid], '*', IGNORE_MISSING);
-
 
         // If check is negative, the record does not exist. Throw error.
         if (!$check) {
@@ -210,7 +222,7 @@ class session_helpers {
 
         } else {
 
-            $sessionitem = $DB->get_record('cmi5launch_sessions',  array('sessionid' => $sessionid));
+            $sessionitem = $DB->get_record('cmi5launch_sessions',  ['sessionid' => $sessionid]);
 
             $session = new session($sessionitem);
 

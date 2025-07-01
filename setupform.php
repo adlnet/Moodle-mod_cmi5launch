@@ -15,10 +15,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Page to create cmi5 connection, and tenant and token. 
+ * Page to create cmi5 connection, and tenant and token.
  *
  * @copyright  2023 Megan Bohland
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package mod_cmi5launch
  */
 
 
@@ -26,11 +27,14 @@
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 // Include our class file.
 require_once($CFG->dirroot.'/mod/cmi5launch/classes/local/setup_form.php');
+// Login check.
+require_login();
+
 // Tell moodle about our page, tell it what the url is.
 $PAGE->set_url('/mod/cmi5launch/setupform.php');
 // Tell moodle the context, in this case the site context (it's system wide not a course or course page).
 $PAGE->set_context(\context_system::instance());
-// Title tells what is on tab
+// Title tells what is on tab.
 $PAGE->set_title(title: get_string('cmi5launchsettingtitle', 'cmi5launch'));
 
 // We want to initialze form in PHP before you echo to page. Wou dont want to render while doing calcs.
@@ -57,14 +61,16 @@ if ($mform->is_cancelled()) {
     $resultname = set_config('cmi5launchbasicname', $cmi5name, $plugin = 'cmi5launch');
     $resultpass = set_config('cmi5launchbasepass', $cmi5password, $plugin = 'cmi5launch');
 
-    
-    // As long as they are not null/false we can move on to the next form
-    if ($resulturl && $resultname && $resultpass){
-        //Move to next form
-        redirect(url: $CFG->wwwroot . '/mod/cmi5launch/tenantsetup.php', message: get_string('cmi5launchsettingsaved', 'cmi5launch'));
-    }else{
+
+    // As long as they are not null/false we can move on to the next form.
+    if ($resulturl && $resultname && $resultpass) {
+        // Move to next form.
+        redirect(url: $CFG->wwwroot . '/mod/cmi5launch/tenantsetup.php',
+            message: get_string('cmi5launchsettingsaved', 'cmi5launch'));
+    } else {
         // If for some reason they are null or false, then we will redirect back to the form.
-        redirect(url: $CFG->wwwroot . '/mod/cmi5launch/setupform.php', message: get_string('cmi5launchsettingsavedfail', 'cmi5launch'));
+        redirect(url: $CFG->wwwroot . '/mod/cmi5launch/setupform.php',
+            message: get_string('cmi5launchsettingsavedfail', 'cmi5launch'));
 
     }
 
@@ -77,4 +83,4 @@ $mform->display();
 
 echo $OUTPUT->footer();
 
-?>
+

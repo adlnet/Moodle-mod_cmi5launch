@@ -21,9 +21,6 @@
  * @copyright  2013 Andrew Downes
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-defined('MOODLE_INTERNAL') || die();
-
 class admin_setting_configtext_mod_cmi5launch extends admin_setting_configtext {
     /**
      * Saves the setting(s) provided in $data
