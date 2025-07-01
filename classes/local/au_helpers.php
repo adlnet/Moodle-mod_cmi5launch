@@ -31,6 +31,14 @@ global $CFG;
 // Include the errorover (error override) funcs.
 require_once($CFG->dirroot . '/mod/cmi5launch/classes/local/errorover.php');
 
+/**
+ * Class au_helpers
+ *
+ * This class contains helper functions for handling AUs in the cmi5launch module.
+ * It provides methods to retrieve, create, save, and update AUs.
+ *
+ * @package mod_cmi5launch\local
+ */
 class au_helpers {
 
     /**
@@ -146,7 +154,9 @@ class au_helpers {
 
         // Variables for error over and exception handling.
         // Array of all items in new record, this will be useful for troubleshooting.
-        $newrecorditems = ['id', 'attempt', 'auid', 'launchmethod', 'lmsid', 'url', 'type', 'title', 'moveon', 'auindex', 'parents', 'objectives', 'description', 'activitytype', 'masteryscore', 'completed', 'passed', 'inprogress', 'noattempt', 'satisfied', 'moodlecourseid'];
+        $newrecorditems = ['id', 'attempt', 'auid', 'launchmethod', 'lmsid', 'url', 'type', 'title', 'moveon', 
+            'auindex', 'parents', 'objectives', 'description', 'activitytype', 'masteryscore', 'completed', 'passed', 'inprogress',
+            'noattempt', 'satisfied', 'moodlecourseid'];
         $currentrecord = 1;
         $newid = "";
         $newrecord = "";
@@ -184,7 +194,7 @@ class au_helpers {
                     $newrecord->url = $auobject->url;
                     $newrecord->type = $auobject->type;
 
-                    // Apparently this convoluted method is necessary due to nature of php unit tests MB
+                    // Apparently this convoluted method is necessary due to nature of php unit tests -MB.
                     $title = json_decode(json_encode($auobject->title), true);
                     $newrecord->title = $title[0]['text'];
                     $newrecord->moveon = $auobject->moveOn;
@@ -211,21 +221,20 @@ class au_helpers {
                     // This is for troubleshooting, so we know where the error is.
                     $currentrecord++;
 
-                    // The set exception handler catches exceptions that SLIP by,
-                    // So maybe DONT make it throwable and  catch type errror
+                    // The set exception handler catches exceptions that SLIP by.
                 } catch (\Throwable $e) {
 
                     echo (get_string('cmi5launchaucannotsavedb', 'cmi5launch') . ($currentrecord) . ".");
 
-                    // This is the tricky part, we need to find out which field is missing. But because the error is thrown ON the field, we need to do some
-                    // manuevering to find out which field is missing.
+                    // This is the tricky part, we need to find out which field is missing.
+                    // But because the error is thrown ON the field, we need to do some manuevering to find out which field is missing.
                     // Typecast to array to grab the list item.
                     $items = (array) $newrecord;
 
                     // Get the last ley of array
                     $lastkey = array_key_last($items);
 
-                    // Heres thhe tricky part, the lastkey here is somewhere in the array we earlier made and the NEXT one would be the one that threw the error.
+                    // Here's the tricky part, the lastkey here is somewhere in the array we earlier made and the NEXT one would be the one that threw the error.
                     // So now we can grab the key after the last one.
                     $key = array_search($lastkey, $newrecorditems) + 1;
 

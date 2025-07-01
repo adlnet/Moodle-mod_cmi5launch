@@ -23,6 +23,7 @@
  */
 namespace mod_cmi5launch\local;
 defined('MOODLE_INTERNAL') || die();
+
 // Include the errorover (error override) funcs.
 require_once($CFG->dirroot . '/mod/cmi5launch/classes/local/errorover.php');
 
@@ -37,17 +38,168 @@ require_once($CFG->dirroot . '/mod/cmi5launch/classes/local/errorover.php');
 class au {
 
     /**
-     * Lowercase values are for saving to DB.
-     * 
+     * @var int|null AU ID from the Moodle database.
      */
-    public $id, $attempt, $url, $type, $lmsid, $grade, $scores, $title, $moveon, $auindex, $parents, $objectives,
-    $description, $activitytype, $launchmethod, $masteryscore, $satisfied, $launchurl, $sessions, $progress, $noattempt,
-    $completed, $passed, $inprogress, $userid, $moodlecourseid;
+    public $id;
 
-    /* Uppercase values because that's how they come from player.
-     * Moodle wants all lowercase, but we need to be able to receive the data from the player.
+    /**
+     * @var int|null Attempt number.
      */
-     public $launchMethod, $lmsId, $moveOn, $auIndex, $activityType, $masteryScore;
+    public $attempt;
+
+    /**
+     * @var string|null URL for the AU.
+     */
+    public $url;
+
+    /**
+     * @var string|null Type of AU.
+     */
+    public $type;
+
+    /**
+     * @var string|null LMS ID of the AU from cmi5 player.
+     */
+    public $lmsid;
+
+    /**
+     * @var float|null Grade achieved.
+     */
+    public $grade;
+
+    /**
+     * @var mixed|null Score data.
+     */
+    public $scores;
+
+    /**
+     * @var string|null Title of the AU.
+     */
+    public $title;
+
+    /**
+     * @var string|null MoveOn criteria.
+     */
+    public $moveon;
+
+    /**
+     * @var int|null Index of the AU within the cmi5 object.
+     */
+    public $auindex;
+
+    /**
+     * @var mixed|null Parent AU relationships.
+     */
+    public $parents;
+
+    /**
+     * @var mixed|null Objectives associated with the AU.
+     */
+    public $objectives;
+
+    /**
+     * @var string|null Description of the AU.
+     */
+    public $description;
+
+    /**
+     * @var string|null Type of activity.
+     */
+    public $activitytype;
+
+    /**
+     * @var string|null Launch method for the AU.
+     */
+    public $launchmethod;
+
+    /**
+     * @var float|null Mastery score threshold.
+     */
+    public $masteryscore;
+
+    /**
+     * @var bool|null Whether the AU was satisfied.
+     */
+    public $satisfied;
+
+    /**
+     * @var string|null URL used to launch the AU (from the cmi5 player).
+     */
+    public $launchurl;
+
+    /**
+     * @var array|null Array to hold linked session ids..
+     */
+    public $sessions;
+
+    /**
+     * @var mixed|null Progress data for the AU.
+     */
+    public $progress;
+
+    /**
+     * @var bool|null Indicates if there is no attempt.
+     */
+    public $noattempt;
+
+    /**
+     * @var bool|null Whether the AU was completed.
+     */
+    public $completed;
+
+    /**
+     * @var bool|null Whether the AU was passed.
+     */
+    public $passed;
+
+    /**
+     * @var bool|null Whether the AU is in progress.
+     */
+    public $inprogress;
+
+    /**
+     * @var int|null ID of the user.
+     */
+    public $userid;
+
+    /**
+     * @var int|null Moodle course ID (matches the id of cmi5 object/course this AU is part of).
+     */
+    public $moodlecourseid;
+
+    // The following HAVE to be PascalCase as they are for compatibility with the cmi5 player statements.
+    // Even though this is against Moodle coding standards.
+
+    /**
+     * @var string|null Launch method from player input (PascalCase).
+     */
+    public $launchMethod;
+
+    /**
+     * @var string|null LMS ID from player input (PascalCase).
+     */
+    public $lmsId;
+
+    /**
+     * @var string|null MoveOn from player input (PascalCase).
+     */
+    public $moveOn;
+
+    /**
+     * @var int|null AU index from player input (PascalCase).
+     */
+    public $auIndex;
+
+    /**
+     * @var string|null Activity type from player input (PascalCase).
+     */
+    public $activityType;
+
+    /**
+     * @var float|null Mastery score from player input (PascalCase).
+     */
+    public $masteryScore;
+
     
     /**
      * Constructs AUs. Is fed array and where array key matches property, sets the property.

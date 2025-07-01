@@ -29,7 +29,7 @@
  */
 
 
-defined(constant_name: 'MOODLE_INTERNAL') || die;
+defined(constant_name: 'MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/mod/cmi5launch/constants.php');
 

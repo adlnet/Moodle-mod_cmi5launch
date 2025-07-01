@@ -22,9 +22,10 @@
  * @package mod_cmi5launch
  */
 
+defined(constant_name: 'MOODLE_INTERNAL') || die();
+
 // Moodleform is defined in formslib.php.
 require_once("$CFG->libdir/formslib.php");
-defined(constant_name: 'MOODLE_INTERNAL') || die();
 
 /**
  * A form for the purpose of setting up a cmi5 tenant token.
@@ -44,22 +45,23 @@ class setup_token extends moodleform {
         // A common convention is to store it in a variable, such as `$mform`.
         $mform = $this->_form; // Don't forget the underscore!
 
-        // Add elements to your form. Second arg is the name of element
+        // Add elements to your form. Second arg is the name of element.
         $mform->addElement('text', 'cmi5token', get_string('cmi5launchtenanttoken', 'cmi5launch'));
         // Set type of element.
         $mform->setType('cmi5token', PARAM_NOTAGS);
         // Default value.  // The second arg here is the default value and appears in the text box.
         $mform->setDefault('cmi5token', get_string('cmi5launchtenanttoken_default', 'cmi5launch'));
-        // These three go together for making one eleme
-        // $mform->addElement('button', 'generatetoken', 'Generate Token');
         // Add a rule to make this field required.
         $mform->addRule('cmi5token', $message, 'required');
 
         $this->add_action_buttons();
     }
 
-    /* 
+    /*
      * Custom validation should be added here.
+     * @param array $data The data submitted by the form.
+     * @param array $files The files submitted by the form.
+     * @return array An array of errors, empty if no errors.
      */
     public function validation($data, $files) {
         return [];

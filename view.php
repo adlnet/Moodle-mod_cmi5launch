@@ -31,7 +31,6 @@ use mod_cmi5launch\local\au_helpers;
 use mod_cmi5launch\local\session_helpers;
 
 require_once("../../config.php");
-// require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require('header.php');
 
 // Include the errorover (error override) funcs.
@@ -79,72 +78,6 @@ echo $OUTPUT->header();
 
 // Reload cmi5 course instance.
 $record = $DB->get_record('cmi5launch', ['id' => $cmi5launch->id]);
-
-// TODO: Put all the php inserted data as parameters on the functions and put the functions in a separate JS file.
-?>
-
-<script>
-    function key_test(registration) {
-
-        //Onclick calls this
-        if (event.keyCode === 13 || event.keyCode === 32) {
-
-            mod_cmi5launch_launchexperience(registration);
-        }
-    }
-
-        // Function to run when the experience is launched (on click).
-        function mod_cmi5launch_launchexperience(registrationInfo) {
-
-            // Set the form paramters.
-            document.getElementById('AU_view').value = registrationInfo;
-
-            // Post it.
-            document.getElementById('launchform').submit();
-
-            //Add some new content.
-            if (!document.getElementById('cmi5launch_status')) {
-                const message = "<?php echo get_string('cmi5launch_progress', 'cmi5launch'); ?>";
-                const cardBody = document.querySelector('#region-main .card-body');
-                const div = document.createElement('div');
-                div.id = 'cmi5launch_status';
-                div.innerHTML = `
-                    <span id="cmi5launch_completioncheck"></span>
-                    <p id="cmi5launch_attemptprogress">${message}</p>
-                    <p id="cmi5launch_exit">
-                        <a href="complete.php?id=<?php echo $id ?>&n=<?php echo $n ?>" title="Return to course">
-                            Return to course
-                        </a>
-                    </p>
-                `;
-                cardBody.appendChild(div);
-            }
-
-            fetch('completion_check.php?id=<?php echo $id ?>&n=<?php echo $n ?>')
-                .then(response => response.text())
-                .then(html => {
-                    const container = document.getElementById('cmi5launch_completioncheck');
-                    if (container) container.innerHTML = html;
-                });
-
-                    }
-
-        // TODO: there may be a better way to check completion. Out of scope for current project.
-        //MB - Someone elses todo, may be worth looking into
-        document.addEventListener('DOMContentLoaded', () => {
-            setInterval(() => {
-                fetch('completion_check.php?id=<?php echo $id ?>&n=<?php echo $n ?>')
-                    .then(response => response.text())
-                    .then(html => {
-                        const container = document.getElementById('cmi5launch_completioncheck');
-                        if (container) container.innerHTML = html;
-                    });
-            }, 30000);
-        });
-
-    </script>
-
-<?php
 
 // Check for updates.
 cmi5launch_update_grades($cmi5launch, $USER->id);
@@ -270,20 +203,17 @@ try {
         // To hold if the au is satisfied.
         $ausatisfied = "";
 
-        // Cycle through AUs (or blocks) in registration info from player, we are looking for the one
-        // that matches our AU lmsID.
+        // Cycle through AUs (or blocks) in registration info from player, looking for the one that matches our AU lmsID.
         foreach ($ausfromcmi5 as $key => $value) {
 
             // Check for the AUs satisfied status. Compare with lmsId to find status for that instance.
             $ausatisfied = cmi5launch_find_au_satisfied($value, $aulmsid);
-            // If au satisfied is ever true then we found it, once satisified it
-            // doesn't matter if others have failed or were also satisified.
+            // If au satisfied is ever true then we found it, once satisified it doesn't matter if others have failed or were also satisified.
             if ($ausatisfied == "true") {
                 break;
 
-                // This elseif was built as a failsafe. Very rarely there may be an instance where the player issues
-                // a duplicate lms id or registration number. For example, this can happen if the server crashes while a course
-                // is being made or updated.
+                // This elseif was built as a failsafe. Very rarely there may be an instance where the player issues a duplicate lms id or registration number.
+                // For example, this can happen if the server crashes while a course is being made or updated.
                 // However, under normal circumstances, the AU LMSID should always match at least one of the AUs returned by player.
             } else if ($ausatisfied = "No ids match") {
 
@@ -396,8 +326,7 @@ try {
 
             // Display the 0.
             $auinfo[] = ($grade);
-            // TODO - This needs to be more interactive, course creators need to be able top control
-            // whether a satisified AU is considered a 0 or not, but for now, if satisfied, don't show 0.
+
             if ($austatus == "Satisfied") {
                 $auinfo[2] = " ";
             }
@@ -408,11 +337,13 @@ try {
         */
         $grade = floatval($au->grade);
 
+        // TODO - This needs to be more interactive, course creators need to be able top control
+        // whether a satisified AU is considered a 0 or not, but for now, if satisfied, don't show 0.
         // Determine whether to display grade:
         if ($au->sessions !== null) {
             // AU has been attempted.
 
-            if ($au->grade !== null && is_numeric($au->grade)) {
+            if ($au->grade !== null && is_numeric($au->grade) && $austatus !== "Satisfied") {
                 // If numeric grade exists, even if 0, display it.
                 $auinfo[] = $grade;
             } else {
@@ -427,7 +358,6 @@ try {
         $auindex = $au->auindex;
 
         // AU id for next page (to be loaded).
-        // $infofornextpage = $auid;
 
         // Assign au link to auviews.
         $auinfo[] = "<button tabindex=\"0\" id='cmi5relaunch_attempt'
@@ -468,14 +398,76 @@ restore_error_handler();
 
 echo html_writer::table($table);
 
-// Add a form to be posted based on the attempt selected.
+echo $OUTPUT->footer();
+
+// TODO: Put all the php inserted data as parameters on the functions and put the functions in a separate JS file.
 ?>
+
 <form id="launchform" action="AUview.php" method="get">
     <input id="AU_view" name="AU_view" type="hidden" value="default">
     <input id="AU_view_id" name="AU_view_id" type="hidden" value="default">
     <input id="id" name="id" type="hidden" value="<?php echo $id ?>">
     <input id="n" name="n" type="hidden" value="<?php echo $n ?>">
 </form>
-<?php
 
-echo $OUTPUT->footer();
+<script>
+    function key_test(registration) {
+
+        //Onclick calls this
+        if (event.keyCode === 13 || event.keyCode === 32) {
+
+            mod_cmi5launch_launchexperience(registration);
+        }
+    }
+
+        // Function to run when the experience is launched (on click).
+        function mod_cmi5launch_launchexperience(registrationInfo) {
+
+            // Set the form paramters.
+            document.getElementById('AU_view').value = registrationInfo;
+
+            // Post it.
+            document.getElementById('launchform').submit();
+
+            //Add some new content.
+            if (!document.getElementById('cmi5launch_status')) {
+                const message = "<?php echo get_string('cmi5launch_progress', 'cmi5launch'); ?>";
+                const cardBody = document.querySelector('#region-main .card-body');
+                const div = document.createElement('div');
+                div.id = 'cmi5launch_status';
+                div.innerHTML = `
+                    <span id="cmi5launch_completioncheck"></span>
+                    <p id="cmi5launch_attemptprogress">${message}</p>
+                    <p id="cmi5launch_exit">
+                        <a href="complete.php?id=<?php echo $id ?>&n=<?php echo $n ?>" title="Return to course">
+                            Return to course
+                        </a>
+                    </p>
+                `;
+                cardBody.appendChild(div);
+            }
+
+            fetch('completion_check.php?id=<?php echo $id ?>&n=<?php echo $n ?>')
+                .then(response => response.text())
+                .then(html => {
+                    const container = document.getElementById('cmi5launch_completioncheck');
+                    if (container) container.innerHTML = html;
+                });
+
+                    }
+
+        // TODO: there may be a better way to check completion. Out of scope for current project.
+        //MB - Someone elses todo, may be worth looking into
+        document.addEventListener('DOMContentLoaded', () => {
+            setInterval(() => {
+                fetch('completion_check.php?id=<?php echo $id ?>&n=<?php echo $n ?>')
+                    .then(response => response.text())
+                    .then(html => {
+                        const container = document.getElementById('cmi5launch_completioncheck');
+                        if (container) container.innerHTML = html;
+                    });
+            }, 30000);
+        });
+
+    </script>
+

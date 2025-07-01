@@ -22,9 +22,10 @@
  * @package mod_cmi5launch
  */
 
+ defined(constant_name: 'MOODLE_INTERNAL') || die();
+
 // Moodleform is defined in formslib.php.
 require_once("$CFG->libdir/formslib.php");
-defined(constant_name: 'MOODLE_INTERNAL') || die();
 
 /**
  * A form for the purpose of setting up a cmi5 tenant.

@@ -24,7 +24,7 @@
 
 namespace mod_cmi5launch\local;
 
-defined(constant_name: 'MOODLE_INTERNAL') || die;
+defined(constant_name: 'MOODLE_INTERNAL') || die();
 
 /**
  * An exception handler to use in AU cases when many different exceptions for data errors may be thrown.
@@ -254,7 +254,7 @@ class playerException extends \Exception {
     public function __construct($message, $code = 0, Throwable $previous = null) {
 
         $playermessage = get_string('cmi5launchplayerexception', 'cmi5launch') . $message;
-        // make sure everything is assigned properly
+        // Make sure everything is assigned properly.
         parent::__construct($playermessage, $code, $previous);
     }
 
@@ -265,13 +265,8 @@ class playerException extends \Exception {
      */
     public function __toString(): string {
         return __CLASS__ . ": [{$this->code}]: {$this->message}\n";
-        // maybe here?
     }
 
-    public function customfunction() {
-        echo "  This error to string            :";
-        // $this->getTraceAsString();
-    }
 }
 
 /**
@@ -289,25 +284,18 @@ class customException extends \Exception {
 
 
     public function __construct($message, $code = 0, Throwable $previous = null) {
-        // some code
 
-        // Ah maybe here is where I can differentiate them
         $playermessage = get_string('cmi5launchcustomexceptionmessage', 'cmi5launch') . $message;
-        // make sure everything is assigned properly
+        // Make sure everything is assigned properly.
         parent::__construct($playermessage, $code, $previous);
 
         echo"$playermessage";
     }
 
 
-    // custom string representation of object (what is returned with echo)
+    // Custom string representation of object (what is returned with echo).
     public function __toString(): string {
         return __CLASS__ . ": [{$this->code}]: {$this->message}\n";
-        // maybe here?
     }
 
-    public function customfunction() {
-        // echo "  This error to string            :";
-        // $this->getTraceAsString();
-    }
 }

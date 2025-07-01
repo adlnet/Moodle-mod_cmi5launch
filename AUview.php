@@ -33,7 +33,6 @@ require('header.php');
 // Include the errorover (error override) funcs.
 require_once($CFG->dirroot . '/mod/cmi5launch/classes/local/errorover.php');
 
-
 require_login($course, false, $cm);
 
 global $cmi5launch, $USER;

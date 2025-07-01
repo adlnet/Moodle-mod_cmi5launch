@@ -16,13 +16,12 @@
 
 /**
  * The mod_cmi5launch activity completed event.
- *
+ * @copyright  2013 Andrew Downes
  * @package    mod_cmi5launch
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace mod_cmi5launch\event;
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * The mod_cmi5launch activity completed event class.

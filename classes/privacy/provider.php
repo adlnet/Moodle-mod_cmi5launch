@@ -31,13 +31,23 @@
  use core_privacy\local\request\helper;
  use core_privacy\local\request\userlist;
  use core_privacy\local\request\writer;
+
+/**
+ * Class to implement Privacy APIs for the cmi5launch module.
+ */
 class provider implements
+        
         // This plugin does store personal user data.
         \core_privacy\local\metadata\provider,
         \core_privacy\local\request\core_userlist_provider,
         \core_privacy\local\request\plugin\provider {
 
 
+    /**
+     * Retreives relevant userdata.
+     * @param \core_privacy\local\metadata\collection $collection - The cmi5 module collection.
+     * @return collection - The data collection for the cmi5launch module.
+     */
     public static function get_metadata(collection $collection): collection {
 
         // Database tables.
@@ -145,7 +155,7 @@ class provider implements
 
             $data = helper::get_context_data($context, $user);
 
-            // Retrieve the coursemodule
+            // Retrieve the coursemodule.
             $cm = get_coursemodule_from_id('cmi5launch', $context->instanceid);
 
             // The course modules instance correlates to the moodle course id in our tables.
@@ -153,7 +163,7 @@ class provider implements
             $mid = $cm->instance;
             $params = ['userid' => $userid,   'moodlecourseid' => $mid];
 
-            // Start getting data on usercourse table
+            // Start getting data on usercourse table.
             $recordset = $DB->get_recordset('cmi5launch_usercourse', $params);
 
             // To hold the course data.
@@ -264,7 +274,8 @@ class provider implements
                 'If it was failed' => $record->isfailed,
                 'If it was terminated' => $record->isterminated,
                 'If it was abandoned' => $record->isabandoned,
-                'Progress of session in recordments from LRS' => ("<pre>" . implode("\n ", json_decode($record->progress) ) . "</pre>"),
+                'Progress of session in recordments from LRS' => ("<pre>" . implode("\n ",
+                    json_decode($record->progress) ) . "</pre>"),
                 'Launch URL' => $record->launchurl];
 
                 // Then add as ONE item in array, that way if there is more than one it unpacks nicely.
@@ -367,7 +378,7 @@ class provider implements
             return;
         }
 
-        // This table needs a diferent key, but to be deleted still
+        // This table needs a diferent key, but to be deleted still.
         $DB->delete_records('cmi5launch', ['id' => $cm->instance]);
 
         // Tables to delete from with same key.

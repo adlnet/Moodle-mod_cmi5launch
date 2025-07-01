@@ -16,13 +16,14 @@
 
 /**
  * @see uninstall_plugin()
- *
  * @package mod_cmi5launch
  * @copyright  2013 Andrew Downes mrdownes@hotmail.com
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 require_once(dirname(dirname(dirname(dirname(__FILE__)))).'/config.php');
 
+require_login($course, false, $cm);
 /**
  * Custom uninstallation procedure
  * @package mod_cmi5launch

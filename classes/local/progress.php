@@ -134,8 +134,7 @@ class progress {
             // LRS username and password.
             $user = $settings['cmi5launchlrslogin'];
             $pass = $settings['cmi5launchlrspass'];
-        }
-        catch (\Throwable $e) {
+        } catch (\Throwable $e) {
 
             // Throw exception if settings are missing.
             Throw new nullException(get_string('cmi5launchlrssettingsretrievalerror', 'cmi5launch')
@@ -180,7 +179,8 @@ class progress {
             restore_exception_handler();
             restore_error_handler();
 
-            throw new nullException(get_string('cmi5launchlrscommunicationerror', 'cmi5launch') . $e->getMessage() . get_string('cmi5launchlrschecksettings', 'cmi5launch'), 0);
+            throw new nullException(get_string('cmi5launchlrscommunicationerror', 'cmi5launch') 
+                . $e->getMessage() . get_string('cmi5launchlrschecksettings', 'cmi5launch'), 0);
         }
     }
 
@@ -192,7 +192,8 @@ class progress {
      */
     public function cmi5launch_retrieve_actor($resultarray, $registrationid) {
 
-        // If it fails to parse array it should throw an error, this shouldn't stop execution, but catch so we can send a better message to user.
+        // If it fails to parse array it should throw an error, this shouldn't stop execution.
+        // Catch so we can send a better message to user.
         try {
             // Actor should be in statement.
             $actor = $resultarray[$registrationid][0]["actor"]["account"]["name"];
@@ -218,7 +219,8 @@ class progress {
     public function cmi5launch_retrieve_verb($resultarray, $registrationid) {
 
         // Encase the whole thing in a try catch block to catch any errors.
-        // If an array key isn't there it will throw a warning. It will not stop execution but catching it will enable us to send better error messages.
+        // If an array key isn't there it will throw a warning. It will not stop execution.
+        // But catching it will enable us to send better error messages.
 
         try {
             // Some verbs do not have an easy to display 'language' option, we need to check if 'display' is present.
@@ -384,7 +386,6 @@ class progress {
                 if (array_key_exists("score", $resultinfo)) {
 
                     $score = $resultarray[$registrationid][0]["result"]["score"];
-                    ;
                     // Raw score preferred to scaled.
                     if (array_key_exists("raw", $score)) {
 
@@ -398,8 +399,7 @@ class progress {
 
                         return $returnscore;
                     }
-                }
-                else {
+                } else {
 
                     return get_string('cmi5launchscorenotpresent', 'cmi5launch');
                 }
@@ -456,7 +456,8 @@ class progress {
                     }
                 } catch (\Throwable $e) {
                     // If there is an error, echo the error.
-                    echo(get_string('cmi5launchsessionidretrievalerror', 'cmi5launch') . $e->getMessage() . ". There may not be an extension key in statement.");
+                    echo(get_string('cmi5launchsessionidretrievalerror', 'cmi5launch')
+                        . $e->getMessage() . ". There may not be an extension key in statement.");
                 }
 
                 // Now if code equals currentsessionid, this is a statement pertaining to this session.

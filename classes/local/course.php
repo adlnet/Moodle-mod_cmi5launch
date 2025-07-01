@@ -22,43 +22,173 @@
  */
 
  namespace mod_cmi5launch\local;
+
 /**
  * This class represents a course in the cmi5 context.
- * It contains properties that are relevant to the course and method to construct a course object.
+ * It contains properties that are relevant to the course and a method to construct a course object.
+ *
+ * @package mod_cmi5launch\local
  */
 class course {
 
     /**
-     * Properties of the course object.
-     * These properties are set based on the data retrieved from the database.
-     * They represent various attributes of a cmi5 course.
+     * @var int|null Internal Moodle database ID for the course.
      */
-    public $id, $url, $ausgrades, $type, $lmsid, $grade, $scores, $title, $moveon, $auindex,
-    $parents, $objectives, $launchurl, $sessions = [], $sessionid, $returnurl, $description = [], $activitytype, $launchmethod,
-    $masteryscore, $progress, $noattempt, $completed, $passed, $inprogress, $satisfied, $moodlecourseid;
+    public $id;
 
     /**
-     * The id assigned by cmi5 player.
+     * @var string|null Launch URL for the course.
+     */
+    public $url;
+
+    /**
+     * @var array|null Grades associated with AUs in the course.
+     */
+    public $ausgrades;
+
+    /**
+     * @var string|null Type of the course.
+     */
+    public $type;
+
+    /**
+     * @var string|null LMS ID assigned to the course (bby the cmi5 player).
+     */
+    public $lmsid;
+
+    /**
+     * @var float|null Final grade for the course.
+     */
+    public $grade;
+
+    /**
+     * @var mixed|null Score details for the course.
+     */
+    public $scores;
+
+    /**
+     * @var string|null Title of the course.
+     */
+    public $title;
+
+    /**
+     * @var string|null MoveOn condition at the course level.
+     */
+    public $moveon;
+
+    /**
+     * @var int|null AU index used for tracking.
+     */
+    public $auindex;
+
+    /**
+     * @var mixed|null Parent AU relationships.
+     */
+    public $parents;
+
+    /**
+     * @var mixed|null Objectives tied to the course.
+     */
+    public $objectives;
+
+    /**
+     * @var string|null URL used to launch the course assigned by player.
+     */
+    public $launchurl;
+
+    /**
+     * @var array Session data for the course, ids to track in DB.
+     */
+    public $sessions = [];
+
+    /**
+     * @var string|null Unique session ID.
+     */
+    public $sessionid;
+
+    /**
+     * @var string|null URL to return to after course completion.
+     */
+    public $returnurl;
+
+    /**
+     * @var array Description(s) of the course.
+     */
+    public $description = [];
+
+    /**
+     * @var string|null Activity type used in the course.
+     */
+    public $activitytype;
+
+    /**
+     * @var string|null Launch method used.
+     */
+    public $launchmethod;
+
+    /**
+     * @var float|null Mastery score required for course success.
+     */
+    public $masteryscore;
+
+    /**
+     * @var mixed|null Progress data.
+     */
+    public $progress;
+
+    /**
+     * @var bool|null Whether there was no attempt made.
+     */
+    public $noattempt;
+
+    /**
+     * @var bool|null Whether the course was completed.
+     */
+    public $completed;
+
+    /**
+     * @var bool|null Whether the course was passed.
+     */
+    public $passed;
+
+    /**
+     * @var bool|null Whether the course is currently in progress.
+     */
+    public $inprogress;
+
+    /**
+     * @var bool|null Whether the course was satisfied.
+     */
+    public $satisfied;
+
+    /**
+     * @var int|null Moodle course ID.
+     */
+    public $moodlecourseid;
+
+    /**
+     * @var string|null Course ID assigned by the cmi5 player.
      */
     public $courseid;
 
     /**
-     * The user id who is taking the course.
+     * @var int|null ID of the user taking the course.
      */
     public $userid;
 
     /**
-     * The registration id assigned by the CMI5 player.
+     * @var string|null Registration ID from the cmi5 player.
      */
     public $registrationid;
 
     /**
-     * Array of AUs in the course.
+     * @var array AU objects belonging to this course, IDs mapping to the AUs in DB.
      */
     public $aus = [];
 
     /**
-     * Constructs courses. Is fed array and where array if key matches property, sets the property.
+     * Constructs a course object. Accepts an array of key-value pairs to populate properties.
+     *
      * @param array $statement The array containing course data.
      */
     public function __construct($statement) {
@@ -66,12 +196,11 @@ class course {
         foreach ($statement as $key => $value) {
 
             // If the key exists as a property, set it.
-            if (property_exists($this, $key) ) {
-
-                $this->$key = ($value);
+            if (property_exists($this, $key)) {
+                $this->$key = $value;
 
                 // We want the ID to be null here, so we can assign it later.
-                if ($key == 'id') {
+                if ($key === 'id') {
                     $this->$key = null;
                 }
             }

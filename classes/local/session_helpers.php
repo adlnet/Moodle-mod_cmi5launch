@@ -23,12 +23,13 @@
  */
 
 namespace mod_cmi5launch\local;
-defined('MOODLE_INTERNAL') || die();
 
 use mod_cmi5launch\local\cmi5_connectors;
 use mod_cmi5launch\local\session;
 
-
+/**
+ * Class of helper functions for sessions.
+ */
 class session_helpers {
     /**
      * Returns the function to create a session.
@@ -67,7 +68,7 @@ class session_helpers {
 
         global $CFG, $DB, $cmi5launch, $USER;
 
-        // Set error and exception handler to catch and override the default PHP error messages, to make messages more user friendly.
+        // Set error and exception handler to catch and override the default PHP error messages, make messages more user friendly.
         set_error_handler('mod_cmi5launch\local\progresslrs_warning', E_WARNING);
         set_exception_handler('mod_cmi5launch\local\exception_progresslrs');
 
@@ -152,7 +153,7 @@ class session_helpers {
 
         global $DB, $CFG, $cmi5launch, $USER;
 
-        // Set error and exception handler to catch and override the default PHP error messages, to make messages more user friendly.
+        // Set error and exception handler to catch and override the default PHP error messages, make messages more user friendly.
         set_error_handler('mod_cmi5launch\local\progresslrs_warning', E_WARNING);
         set_exception_handler('mod_cmi5launch\local\exception_progresslrs');
 
@@ -185,7 +186,7 @@ class session_helpers {
             restore_exception_handler();
             restore_error_handler();
 
-            // Return value
+            // Return value.
             return $newid;
         } catch (\Throwable $e) {
 
