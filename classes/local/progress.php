@@ -336,12 +336,9 @@ class progress {
             // Verify this statement has a 'timestamp' param.
             if (array_key_exists("timestamp", $resultarray[$registrationid][0])) {
 
-                $date = new \DateTime($resultarray[$registrationid][0]["timestamp"],
-                    new \DateTimeZone('US/Eastern'));
+                $timestamp = strtotime($resultarray[$registrationid][0]["timestamp"]);
+                $date = userdate($timestamp);
 
-                $date->setTimezone(new \DateTimeZone('America/New_York'));
-
-                $date = $date->format('d-m-Y' . " " . 'h:i a');
 
                 return $date;
 
