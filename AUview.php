@@ -122,19 +122,15 @@ if (!$au->sessions == null) {
             if ($session->createdat != null) {
 
                 // Retrieve createdAt and format.
-                $date = new DateTime($session->createdat,
-                    new DateTimeZone('US/Eastern'));
-                $date->setTimezone(new DateTimeZone('America/New_York'));
-                $sessioninfo[] = $date->format('D d M Y H:i:s');
+                $sessioninfo[] = userdate(strtotime($session->createdat), '%a %d %b %Y %H:%M:%S');
+
             }
 
             if ($session->lastrequesttime != null) {
 
                 // Retrieve lastRequestTime and format.
-                $date = new DateTime($session->lastrequesttime,
-                    new DateTimeZone('US/Eastern'));
-                $date->setTimezone(new DateTimeZone('America/New_York'));
-                $sessioninfo[] = $date->format('D d M Y H:i:s');
+                $sessioninfo[] = userdate(strtotime($session->lastrequesttime), '%a %d %b %Y %H:%M:%S');
+
             }
             // Add progress to table.
             $sessioninfo[] = ("<pre>" . implode("\n ", json_decode($session->progress)) . "</pre>");

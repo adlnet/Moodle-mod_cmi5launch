@@ -181,32 +181,19 @@ foreach ($auids as $key => $auid) {
                 $sessionscores[] = (float)$session->score;
 
                 if (!empty($session->createdat)) {
-
-                    // Retrieve createdAt and format.
-                    $date = new DateTime($session->createdat,
-                        new DateTimeZone('US/Eastern'));
-                    $date->setTimezone(new DateTimeZone('America/New_York'));
-                    $datestart = $date->format('D d M Y H:i:s');
+                    $datestart = userdate(strtotime($session->createdat));
                 } else {
-                    // If no createdAt, set to empty.
                     $datestart = "";
                 }
-
+                
                 if (!empty($session->lastrequesttime)) {
-
-                    // Retrieve lastRequestTime and format.
-                    $date = new DateTime($session->lastrequesttime,
-                        new DateTimeZone('US/Eastern'));
-                    $date->setTimezone(new DateTimeZone('America/New_York'));
-                    $datefinish = $date->format('D d M Y H:i:s');
+                    $datefinish = userdate(strtotime($session->lastrequesttime));
+                } else if (!empty($session->updatedat)) {
+                    $datefinish = userdate(strtotime($session->updatedat));
                 } else {
-                    // If no lastRequesttime then use updatedat.
-                    // Retrieve lastRequestTime and format.
-                    $date = new DateTime($session->updatedat,
-                        new DateTimeZone('US/Eastern'));
-                    $date->setTimezone(new DateTimeZone('America/New_York'));
-                    $datefinish = $date->format('D d M Y H:i:s');
+                    $datefinish = '';
                 }
+                
                 // The users sessions.
                 $usersession = $DB->get_record('cmi5launch_sessions',
                     ['sessionid' => $sessionid, 'userid' => $userid, 'moodlecourseid' => $id]);
