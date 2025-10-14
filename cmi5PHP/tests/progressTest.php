@@ -702,12 +702,12 @@ class progressTest extends TestCase {
         $faketime = "2024-00-00T00:00:00.000Z";
 
         // Turn expected into a date so it matches what's leaving the function.
-        $expected = new \DateTime($faketime, new \DateTimeZone('US/Eastern'));
+        $expected = userdate(strtotime($faketime), '%a %d %b %Y %H:%M:%S');
 
-        $expected->setTimezone(new \DateTimeZone('America/New_York'));
 
-        $expected = $expected->format('d-m-Y' . " " . 'h:i a');
+        // We need tochange the timezone so it matches the non hardcoded file.
 
+    
         // Progress class and SUT.
         $progress = new \mod_cmi5launch\local\progress();
         // Because we have a new function to make these values in a test environment, the

@@ -25,8 +25,6 @@
 
 require_once(dirname(dirname(dirname(dirname(__FILE__)))).'/config.php');
 
-require_login($course, false, $cm);
-
 /**
  * Post installation procedure
  *

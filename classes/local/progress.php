@@ -337,7 +337,7 @@ class progress {
             if (array_key_exists("timestamp", $resultarray[$registrationid][0])) {
 
                 $timestamp = strtotime($resultarray[$registrationid][0]["timestamp"]);
-                $date = userdate($timestamp);
+                $date = userdate($timestamp, '%a %d %b %Y %H:%M:%S');
 
 
                 return $date;
