@@ -120,15 +120,15 @@ $table = new \flexible_table('mod-cmi5launch-report');
 // This table holds the overall score, showing the grading type.
 $scoretable = new \flexible_table('mod-cmi5launch-report');
 
-$columns[] = 'Attempt';
+$columns[] = get_string('cmi5launchattemptheader', 'cmi5launch');
 $headers[] = get_string('cmi5launchattemptheader', 'cmi5launch');
-$columns[] = 'Started';
+$columns[] = get_string('cmi5launchstartedheader', 'cmi5launch');
 $headers[] = get_string('cmi5launchstartedheader', 'cmi5launch');
-$columns[] = 'Finished';
+$columns[] = get_string('cmi5launchfinishedheader', 'cmi5launch');
 $headers[] = get_string('cmi5launchfinishedheader', 'cmi5launch');
-$columns[] = 'Status';
-$headers[] = get_string('cmi5launchsatisfiedstatusheader', 'cmi5launch');
-$columns[] = 'Score';
+$columns[] = get_string('cmi5launchstatusheader', 'cmi5launch');
+$headers[] = get_string('cmi5launchstatusheader', 'cmi5launch');
+$columns[] = get_string('cmi5launchscoreheader', 'cmi5launch');
 $headers[] = get_string('cmi5launchscoreheader', 'cmi5launch');
 
 $scorecolumns = [];

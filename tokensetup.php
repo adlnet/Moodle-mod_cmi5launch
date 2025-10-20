@@ -25,7 +25,7 @@
 
 use mod_cmi5launch\local\cmi5_connectors;
 
-defined('MOODLE_INTERNAL') || die();
+//defined('MOODLE_INTERNAL') || die();
 
 
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
