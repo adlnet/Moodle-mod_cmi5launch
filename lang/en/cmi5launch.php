@@ -414,15 +414,16 @@ $string['cmi5launchattemptheader'] = 'Attempt';
 $string['cmi5launchstartedheader'] = 'Started';
 $string['cmi5launchfinishedheader'] = 'Finished';
 $string['cmi5launchscoreheader'] = 'Score';
+$string['cmi5launchstatusheader'] = 'Status';
 $string['cmi5launchsatisfiedstatusheader'] = 'AU Satisfied Status';
 
 $string['cmi5launchautitleheader'] = 'AU Title';
 $string['cmi5launchattemptrow'] = 'Attempt ';
 $string['cmi5launchautitleheader'] = 'AU Title';
 $string['cmi5launchattemptrow'] = 'Attempt ';
-$string['started'] = 'Started';
-$string['last'] = 'Finished';
-$string['score'] = 'Score';
+$string['cmi5launchstarted'] = 'Started';
+$string['cmi5launchfinished'] = 'Finished';
+$string['cmi5launchscore'] = 'Score';
 
 // Session reports.
 $string['cmi5launchsessionaucompleted'] = 'Completed';
