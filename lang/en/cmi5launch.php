@@ -35,6 +35,7 @@ defined('MOODLE_INTERNAL') || die();
 $string['modulename'] = 'cmi5 launch link';
 $string['modulenameplural'] = 'cmi5 launch links';
 $string['modulename_help'] = 'A plug in for Moodle that allows the launch of cmi5 (xAPI) content which is then tracked to a separate LRS.';
+$string['nocmi5launchs'] = 'There are no cmi5 launch links in this course.';
 
 // Start Default LRS Admin Settings.
 // Header.
