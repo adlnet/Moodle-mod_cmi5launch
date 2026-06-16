@@ -369,7 +369,7 @@ class cmi5_connectors {
                 throw new playerException(get_string('cmi5launchtokenerror', 'cmi5launch'));
             }
         } catch (\Throwable $e){
-            throw new playerException(get_string('cmi5launchtokenuncaughtterror', 'cmi5launch'). $e);
+            throw new playerException(get_string('cmi5launchtokenuncaughterror', 'cmi5launch'). $e);
         }
     }
 
